@@ -140,8 +140,7 @@ printBounds(int taxisID, int calendar)
   /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600),
    * incperiod%3600);*/
   int len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], abs(incperiod) != 1 ? "s" : "");
-  for (int i = 0; i < 11 - len; ++i)
-    fprintf(stdout, " ");
+  for (int i = 0; i < 11 - len; ++i) fprintf(stdout, " ");
 }
 
 static int
@@ -346,8 +345,7 @@ Tinfo(void *process)
               /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600,
                * fmod(jdelta,3600), incperiod%3600);*/
               len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], abs(incperiod) != 1 ? "s" : "");
-              for (i = 0; i < 11 - len; ++i)
-                fprintf(stdout, " ");
+              for (i = 0; i < 11 - len; ++i) fprintf(stdout, " ");
             }
           else
             {
@@ -410,9 +408,8 @@ Tinfo(void *process)
               else if (its < 0)
                 {
                   if (cdoVerbose)
-                    fprintf(stdout,
-                            "  %c--- Wrong date/time information, negative "
-                            "increment!",
+                    fprintf(stdout, "  %c--- Wrong date/time information, negative "
+                                    "increment!",
                             arrow);
                 }
             }

@@ -74,9 +74,8 @@ print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID,
                     showHeader = false;
                   }
 
-                fprintf(stdout,
-                        "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g "
-                        "%9.7g %12.5g\n",
+                fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g "
+                                "%9.7g %12.5g\n",
                         year, month, day, hour, minute, second, code, level, xval, yval, sglval);
               }
           }
@@ -177,8 +176,7 @@ Fldstat(void *process)
 
   int ngrids = vlistNgrids(vlistID1);
 
-  for (int index = 0; index < ngrids; index++)
-    vlistChangeGridIndex(vlistID2, index, gridID2);
+  for (int index = 0; index < ngrids; index++) vlistChangeGridIndex(vlistID2, index, gridID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -196,8 +194,7 @@ Fldstat(void *process)
       if (!useweights)
         {
           cdoPrint("Using constant grid cell area weights!");
-          for (size_t i = 0; i < gridsizemax; ++i)
-            field.weight[i] = 1;
+          for (size_t i = 0; i < gridsizemax; ++i) field.weight[i] = 1;
         }
     }
 

@@ -168,13 +168,11 @@ args2int_lista(int argc, char **argv, lista_t *lista)
 
       if (inc >= 0)
         {
-          for (ival = first; ival <= last; ival += inc)
-            lista_set_int(lista, nint++, ival);
+          for (ival = first; ival <= last; ival += inc) lista_set_int(lista, nint++, ival);
         }
       else
         {
-          for (ival = first; ival >= last; ival += inc)
-            lista_set_int(lista, nint++, ival);
+          for (ival = first; ival >= last; ival += inc) lista_set_int(lista, nint++, ival);
         }
     }
 
@@ -216,13 +214,11 @@ args2flt_lista(int argc, char **argv, lista_t *lista)
 
           if (inc >= 0)
             {
-              for (ival = first; ival <= last; ival += inc)
-                lista_set_flt(lista, nint++, (double) ival);
+              for (ival = first; ival <= last; ival += inc) lista_set_flt(lista, nint++, (double) ival);
             }
           else
             {
-              for (ival = first; ival >= last; ival += inc)
-                lista_set_flt(lista, nint++, (double) ival);
+              for (ival = first; ival >= last; ival += inc) lista_set_flt(lista, nint++, (double) ival);
             }
         }
     }

@@ -45,8 +45,7 @@ sampleData(double *array1, int gridID1, double *array2, int gridID2, int resampl
              __func__, nlon1, nlat1, nlon2, nlat2, gridID1, gridID2, resampleFactor);
 
   for (size_t ilat1 = 0; ilat1 < nlat1; ilat1 += resampleFactor)
-    for (size_t ilon1 = 0; ilon1 < nlon1; ilon1 += resampleFactor)
-      *array2++ = array1[ilat1 * nlon1 + ilon1];
+    for (size_t ilon1 = 0; ilon1 < nlon1; ilon1 += resampleFactor) *array2++ = array1[ilat1 * nlon1 + ilon1];
 }
 
 static void
@@ -129,8 +128,7 @@ Samplegrid(void *process)
 
   int nvars = vlistNvars(vlistID1);
   bool *vars = (bool *) Malloc(nvars * sizeof(bool));
-  for (varID = 0; varID < nvars; varID++)
-    vars[varID] = false;
+  for (varID = 0; varID < nvars; varID++) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
 

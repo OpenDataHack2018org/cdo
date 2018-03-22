@@ -32,7 +32,7 @@ static unsigned long
 gregdate_to_julday(int year,  /* Gregorian year */
                    int month, /* Gregorian month (1-12) */
                    int day    /* Gregorian day (1-31) */
-)
+                   )
 {
 #if INT_MAX <= 0X7FFF
   long igreg = 15 + 31 * (10 + (12 * 1582));
@@ -279,8 +279,7 @@ selcompc(field_type *field, double c, int (*compare)(double, double))
 
   if (DBL_IS_EQUAL(c, missval))
     {
-      for (i = 0; i < len; i++)
-        array[i] = missval;
+      for (i = 0; i < len; i++) array[i] = missval;
     }
   else if (nmiss > 0)
     {

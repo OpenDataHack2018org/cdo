@@ -185,16 +185,14 @@ ProcessType::checkStreamCnt(void)
   // printf(" streamCnt %d %d\n", m_streamCnt, streamCnt);
 
   if (m_streamCnt > streamCnt)
-    CdoError::Abort(Cdo::progname,
-                    "Too many streams specified!"
-                    " Operator ",
+    CdoError::Abort(Cdo::progname, "Too many streams specified!"
+                                   " Operator ",
                     m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt,
                     " output streams.");
 
   if (m_streamCnt < streamCnt && !obase)
-    CdoError::Abort(Cdo::progname,
-                    "Too few streams specified!"
-                    " Operator ",
+    CdoError::Abort(Cdo::progname, "Too few streams specified!"
+                                   " Operator ",
                     m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt,
                     " output streams.");
 
@@ -347,7 +345,7 @@ ProcessType::addFileOutStream(std::string file)
 {
   if (file[0] == '-')
     {
-        CdoError::Abort(Cdo::progname, "Missing output file. Found an operator instead of filename: ", file);
+      CdoError::Abort(Cdo::progname, "Missing output file. Found an operator instead of filename: ", file);
     }
   outputStreams.push_back(create_pstream(file));
   m_streamCnt++;
@@ -451,17 +449,15 @@ ProcessType::query_user_exit(const char *argument)
     {
       if (nbr_itr++ > USR_RPL_MAX_NBR)
         {
-          (void) fprintf(stdout,
-                         "\n%s: ERROR %d failed attempts to obtain valid "
-                         "interactive input.\n",
+          (void) fprintf(stdout, "\n%s: ERROR %d failed attempts to obtain valid "
+                                 "interactive input.\n",
                          prompt, nbr_itr - 1);
           exit(EXIT_FAILURE);
         }
 
       if (nbr_itr > 1) (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
-      (void) fprintf(stdout,
-                     "%s: %s exists ---`e'xit, or `o'verwrite (delete existing "
-                     "file) (e/o)? ",
+      (void) fprintf(stdout, "%s: %s exists ---`e'xit, or `o'verwrite (delete existing "
+                             "file) (e/o)? ",
                      prompt, argument);
       (void) fflush(stdout);
       if (fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL) continue;

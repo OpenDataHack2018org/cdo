@@ -137,13 +137,13 @@ sort_par(long num_links, double *restrict add1, int parent, int par_depth)
       who_am_i = nsplit * parent + i;
 
 #ifdef _OPENMP
-      /*      if ( 0 )
-        {
-          int my_depth = (int) (log(parent)/log(2))+1;
-          cdoPrint("I am %i (parent %i), my_depth is: %i thread_num %i (%i)",
-          who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
-        }
-      */
+/*      if ( 0 )
+  {
+    int my_depth = (int) (log(parent)/log(2))+1;
+    cdoPrint("I am %i (parent %i), my_depth is: %i thread_num %i (%i)",
+    who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
+  }
+*/
 #endif
 
       sort_iter_single(nl[i], add1s[i], who_am_i);
@@ -167,11 +167,10 @@ sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   tmp = (double *) Malloc(num_links * sizeof(double));
 
 #ifdef _OPENMP
-#pragma omp parallel for if (depth < par_depth /* && num_links > 4096*/) private(i) num_threads(2) \
-    schedule(static, 1024)
+#pragma omp parallel for if (depth < par_depth /* && num_links > 4096*/) private(i) num_threads(2) schedule(static, \
+                                                                                                            1024)
 #endif
-  for (i = 0; i < num_links; i++)
-    tmp[i] = add1[idx[i]];
+  for (i = 0; i < num_links; i++) tmp[i] = add1[idx[i]];
 
   memcpy(add1, tmp, num_links * sizeof(double));
 

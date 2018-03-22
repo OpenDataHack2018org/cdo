@@ -114,8 +114,7 @@ selEndOfPeriod(field_type *periods, field_type history, field_type current, int 
 #ifdef _OPENMP
 #pragma omp parallel for default(shared)
 #endif
-          for (i = 0; i < len; i++)
-            parray[i] = DBL_IS_EQUAL(carray[i], 0.0) ? pmissval : carray[i];
+          for (i = 0; i < len; i++) parray[i] = DBL_IS_EQUAL(carray[i], 0.0) ? pmissval : carray[i];
         }
     }
 

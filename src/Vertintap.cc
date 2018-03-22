@@ -130,8 +130,7 @@ Vertintap(void *process)
           double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev) / sizeof(*stdlev);
           plev = (double *) Malloc(nplev * sizeof(double));
-          for (int i = 0; i < nplev; ++i)
-            plev[i] = stdlev[i];
+          for (int i = 0; i < nplev; ++i) plev[i] = stdlev[i];
         }
       else
         {
@@ -139,8 +138,7 @@ Vertintap(void *process)
                               20000,  15000, 10000, 7000,  5000,  3000,  2000,  1000 };
           nplev = sizeof(stdlev) / sizeof(*stdlev);
           plev = (double *) Malloc(nplev * sizeof(double));
-          for (int i = 0; i < nplev; ++i)
-            plev[i] = stdlev[i];
+          for (int i = 0; i < nplev; ++i) plev[i] = stdlev[i];
         }
     }
   else
@@ -278,15 +276,13 @@ Vertintap(void *process)
       height2pressure(&phlev[0], plev, nplev);
 
       if (cdoVerbose)
-        for (int i = 0; i < nplev; ++i)
-          cdoPrint("level = %d   height = %g   pressure = %g", i + 1, plev[i], phlev[i]);
+        for (int i = 0; i < nplev; ++i) cdoPrint("level = %d   height = %g   pressure = %g", i + 1, plev[i], phlev[i]);
 
       arrayCopy(nplev, &phlev[0], plev);
     }
 
   if (useLogType)
-    for (int k = 0; k < nplev; k++)
-      plev[k] = log(plev[k]);
+    for (int k = 0; k < nplev; k++) plev[k] = log(plev[k]);
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -346,8 +342,7 @@ Vertintap(void *process)
         {
           vars[varID] = false;
           nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-          for (levelID = 0; levelID < nlevel; levelID++)
-            varnmiss[varID][levelID] = 0;
+          for (levelID = 0; levelID < nlevel; levelID++) varnmiss[varID][levelID] = 0;
         }
 
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -384,11 +379,9 @@ Vertintap(void *process)
             }
           else if (dpressID != -1)
             {
-              for (size_t i = 0; i < gridsize; i++)
-                ps_prog[i] = 0;
+              for (size_t i = 0; i < gridsize; i++) ps_prog[i] = 0;
               for (int k = 0; k < nhlevf; ++k)
-                for (size_t i = 0; i < gridsize; i++)
-                  ps_prog[i] += vardata1[dpressID][k * gridsize + i];
+                for (size_t i = 0; i < gridsize; i++) ps_prog[i] += vardata1[dpressID][k * gridsize + i];
             }
           else
             {
@@ -404,8 +397,7 @@ Vertintap(void *process)
 
           arrayCopy(gridsize * nhlevf, vardata1[apressID], &full_press[0]);
 
-          for (size_t i = 0; i < gridsize; i++)
-            half_press[i] = 0;
+          for (size_t i = 0; i < gridsize; i++) half_press[i] = 0;
           for (int k = 1; k < nhlevf; k++)
             for (size_t i = 0; i < gridsize; i++)
               half_press[k * gridsize + i] = 0.5 * (full_press[(k - 1) * gridsize + i] + full_press[k * gridsize + i]);
@@ -414,12 +406,9 @@ Vertintap(void *process)
 
           if (useLogType)
             {
-              for (size_t i = 0; i < gridsize; i++)
-                ps_prog[i] = log(ps_prog[i]);
-              for (size_t ki = 0; ki < nhlevh * gridsize; ki++)
-                half_press[ki] = log(half_press[ki]);
-              for (size_t ki = 0; ki < nhlevf * gridsize; ki++)
-                full_press[ki] = log(full_press[ki]);
+              for (size_t i = 0; i < gridsize; i++) ps_prog[i] = log(ps_prog[i]);
+              for (size_t ki = 0; ki < nhlevh * gridsize; ki++) half_press[ki] = log(half_press[ki]);
+              for (size_t ki = 0; ki < nhlevf * gridsize; ki++) full_press[ki] = log(full_press[ki]);
             }
 
           genind(&vert_index[0], plev, &full_press[0], gridsize, nplev, nhlevf);

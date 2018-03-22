@@ -202,31 +202,27 @@ zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, size_t *iatt, const 
           if (zaxis->size == 0) cdoAbort("size undefined (zaxis description file: %s)!", dname);
           if (zaxis->size != nvalues) cdoAbort("size=%zu and number of levels=%zu differ!", zaxis->size, nvalues);
           zaxis->vals = (double *) Malloc(zaxis->size * sizeof(double));
-          for (size_t i = 0; i < zaxis->size; ++i)
-            zaxis->vals[i] = parameter2double(kv->values[i]);
+          for (size_t i = 0; i < zaxis->size; ++i) zaxis->vals[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "lbounds"))
         {
           if (zaxis->size == 0) cdoAbort("size undefined (zaxis description file: %s)!", dname);
           if (zaxis->size != nvalues) cdoAbort("size=%zu and number of lbounds=%zu differ!", zaxis->size, nvalues);
           zaxis->lbounds = (double *) Malloc(zaxis->size * sizeof(double));
-          for (size_t i = 0; i < zaxis->size; ++i)
-            zaxis->lbounds[i] = parameter2double(kv->values[i]);
+          for (size_t i = 0; i < zaxis->size; ++i) zaxis->lbounds[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "ubounds"))
         {
           if (zaxis->size == 0) cdoAbort("size undefined (zaxis description file: %s)!", dname);
           if (zaxis->size != nvalues) cdoAbort("size=%zu and number of ubounds=%zu differ!", zaxis->size, nvalues);
           zaxis->ubounds = (double *) Malloc(zaxis->size * sizeof(double));
-          for (size_t i = 0; i < zaxis->size; ++i)
-            zaxis->ubounds[i] = parameter2double(kv->values[i]);
+          for (size_t i = 0; i < zaxis->size; ++i) zaxis->ubounds[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "vct"))
         {
           if (zaxis->vctsize == 0) cdoAbort("vctsize undefined (zaxis description file: %s)!", dname);
           zaxis->vct = (double *) Malloc(zaxis->vctsize * sizeof(double));
-          for (size_t i = 0; i < zaxis->vctsize; ++i)
-            zaxis->vct[i] = parameter2double(kv->values[i]);
+          for (size_t i = 0; i < zaxis->vctsize; ++i) zaxis->vct[i] = parameter2double(kv->values[i]);
         }
       else
         {
@@ -269,16 +265,14 @@ zaxis_read_attributes(size_t iatt, size_t nkv, kvmap_t *kvmap, int zaxisID)
       if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32)
         {
           int *ivals = (int *) Malloc(nvalues * sizeof(int));
-          for (size_t i = 0; i < nvalues; ++i)
-            ivals[i] = literal_to_int(kv->values[i]);
+          for (size_t i = 0; i < nvalues; ++i) ivals[i] = literal_to_int(kv->values[i]);
           cdiDefAttInt(zaxisID, CDI_GLOBAL, key, dtype, nvalues, ivals);
           Free(ivals);
         }
       else if (dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64)
         {
           double *dvals = (double *) Malloc(nvalues * sizeof(double));
-          for (size_t i = 0; i < nvalues; ++i)
-            dvals[i] = literal_to_double(kv->values[i]);
+          for (size_t i = 0; i < nvalues; ++i) dvals[i] = literal_to_double(kv->values[i]);
           cdiDefAttFlt(zaxisID, CDI_GLOBAL, key, dtype, nvalues, dvals);
           Free(dvals);
         }
@@ -301,8 +295,7 @@ zaxisFromFile(FILE *gfp, const char *dname)
   size_t nkv = list_size(kvlist);
   if (nkv == 0) return -1;
   kvmap_t *kvmap = (kvmap_t *) Malloc(nkv * sizeof(kvmap_t));
-  for (size_t i = 0; i < nkv; ++i)
-    kvmap[i].isValid = false;
+  for (size_t i = 0; i < nkv; ++i) kvmap[i].isValid = false;
 
   size_t ik = 0;
   for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)

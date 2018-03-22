@@ -122,19 +122,14 @@ getLayerThickness(bool useweights, bool genbounds, int index, int zaxisID, int n
         }
     }
 
-  for (i = 0; i < nlev; ++i)
-    thickness[i] = fabs(ubounds[i] - lbounds[i]);
+  for (i = 0; i < nlev; ++i) thickness[i] = fabs(ubounds[i] - lbounds[i]);
 
   double lsum = 0;
   double wsum = 0;
-  for (i = 0; i < nlev; ++i)
-    lsum += thickness[i];
-  for (i = 0; i < nlev; ++i)
-    weights[i] = thickness[i];
-  for (i = 0; i < nlev; ++i)
-    weights[i] /= (lsum / nlev);
-  for (i = 0; i < nlev; ++i)
-    wsum += weights[i];
+  for (i = 0; i < nlev; ++i) lsum += thickness[i];
+  for (i = 0; i < nlev; ++i) weights[i] = thickness[i];
+  for (i = 0; i < nlev; ++i) weights[i] /= (lsum / nlev);
+  for (i = 0; i < nlev; ++i) wsum += weights[i];
 
   if (cdoVerbose)
     {
@@ -232,8 +227,7 @@ Vertstat(void *process)
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);
-  for (varID = 0; varID < nvars; varID++)
-    vlistDefFlag(vlistID1, varID, 0, TRUE);
+  for (varID = 0; varID < nvars; varID++) vlistDefFlag(vlistID1, varID, 0, TRUE);
 
   int vlistID2 = vlistCreate();
   cdoVlistCopyFlag(vlistID2, vlistID1);
@@ -370,8 +364,7 @@ Vertstat(void *process)
               if (lrange)
                 {
                   vars2[varID].nmiss = nmiss;
-                  for (size_t i = 0; i < gridsize; i++)
-                    vars2[varID].ptr[i] = vars1[varID].ptr[i];
+                  for (size_t i = 0; i < gridsize; i++) vars2[varID].ptr[i] = vars1[varID].ptr[i];
                 }
 
               if (operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0)) farcmul(&vars1[varID], layer_thickness);
@@ -416,8 +409,7 @@ Vertstat(void *process)
                   if (samp1[varID].ptr == NULL)
                     {
                       samp1[varID].ptr = (double *) Malloc(gridsize * sizeof(double));
-                      for (size_t i = 0; i < gridsize; i++)
-                        samp1[varID].ptr[i] = vars1[varID].nsamp;
+                      for (size_t i = 0; i < gridsize; i++) samp1[varID].ptr[i] = vars1[varID].nsamp;
                     }
 
                   for (size_t i = 0; i < gridsize; i++)

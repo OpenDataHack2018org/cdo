@@ -110,11 +110,9 @@ Selgridcell(void *process)
       indarr = (int *) lista_dataptr(ilista);
 
       if (cdoVerbose)
-        for (int i = 0; i < nind; i++)
-          cdoPrint("int %d = %d", i + 1, indarr[i]);
+        for (int i = 0; i < nind; i++) cdoPrint("int %d = %d", i + 1, indarr[i]);
 
-      for (int i = 0; i < nind; i++)
-        indarr[i] -= 1;
+      for (int i = 0; i < nind; i++) indarr[i] -= 1;
     }
 
   int indmin = indarr[0];
@@ -138,8 +136,7 @@ Selgridcell(void *process)
 
   int nvars = vlistNvars(vlistID1);
   bool *vars = (bool *) Malloc(nvars * sizeof(bool));
-  for (varID = 0; varID < nvars; varID++)
-    vars[varID] = false;
+  for (varID = 0; varID < nvars; varID++) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
   sindex_t *sindex = (sindex_t *) Malloc(ngrids * sizeof(sindex_t));
@@ -151,10 +148,8 @@ Selgridcell(void *process)
       size_t gridsize = vlistGridsizeMax(vlistID1);
       ncells = gridsize - nind;
       cellidx = (long *) Malloc(gridsize * sizeof(long));
-      for (size_t i = 0; i < gridsize; ++i)
-        cellidx[i] = 1;
-      for (long i = 0; i < nind; ++i)
-        cellidx[indarr[i]] = 0;
+      for (size_t i = 0; i < gridsize; ++i) cellidx[i] = 1;
+      for (long i = 0; i < nind; ++i) cellidx[indarr[i]] = 0;
       long j = 0;
       for (size_t i = 0; i < gridsize; ++i)
         if (cellidx[i] == 1) cellidx[j++] = i;
@@ -163,8 +158,7 @@ Selgridcell(void *process)
   else
     {
       cellidx = (long *) Malloc(nind * sizeof(long));
-      for (int i = 0; i < nind; ++i)
-        cellidx[i] = indarr[i];
+      for (int i = 0; i < nind; ++i) cellidx[i] = indarr[i];
     }
 
   if (ncells == 0) cdoAbort("Mask is empty!");

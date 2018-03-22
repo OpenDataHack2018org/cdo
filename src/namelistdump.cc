@@ -70,9 +70,8 @@ main(int argc, char *argv[])
       switch (status)
         {
         case NAMELIST_ERROR_INVAL:
-          fprintf(stderr,
-                  "Namelist error: Invalid character in %s (line=%d "
-                  "character='%c')!\n",
+          fprintf(stderr, "Namelist error: Invalid character in %s (line=%d "
+                          "character='%c')!\n",
                   filename, p->lineno, buffer[p->pos]);
           break;
         case NAMELIST_ERROR_PART:

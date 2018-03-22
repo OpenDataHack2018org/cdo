@@ -46,8 +46,7 @@ Selrec(void *process)
 
   if (cdoVerbose)
     {
-      for (int i = 0; i < nsel; i++)
-        cdoPrint("intarr entry: %d %d", i, intarr[i]);
+      for (int i = 0; i < nsel; i++) cdoPrint("intarr entry: %d %d", i, intarr[i]);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));

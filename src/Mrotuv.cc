@@ -285,15 +285,13 @@ Mrotuv(void *process)
     }
 
   vlistClearFlag(vlistID1);
-  for (int lid = 0; lid < nlevs; lid++)
-    vlistDefFlag(vlistID1, uid, lid, TRUE);
+  for (int lid = 0; lid < nlevs; lid++) vlistDefFlag(vlistID1, uid, lid, TRUE);
   int vlistID2 = vlistCreate();
   cdoVlistCopyFlag(vlistID2, vlistID1);
   vlistChangeVarGrid(vlistID2, 0, gridIDu);
 
   vlistClearFlag(vlistID1);
-  for (int lid = 0; lid < nlevs; lid++)
-    vlistDefFlag(vlistID1, vid, lid, TRUE);
+  for (int lid = 0; lid < nlevs; lid++) vlistDefFlag(vlistID1, vid, lid, TRUE);
   int vlistID3 = vlistCreate();
   cdoVlistCopyFlag(vlistID3, vlistID1);
   vlistChangeVarGrid(vlistID3, 0, gridIDv);

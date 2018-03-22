@@ -60,21 +60,15 @@ vert_gen_weights3d(bool expol, int nlev1, size_t gridsize, double *xlev1, int nl
 
   for (size_t i = 0; i < gridsize; i++)
     {
-      for (int k = 0; k < nlev1; ++k)
-        lev1[k] = xlev1[k * gridsize + i];
-      for (int k = 0; k < nlev2; ++k)
-        lev2[k] = xlev2[k * gridsize + i];
+      for (int k = 0; k < nlev1; ++k) lev1[k] = xlev1[k * gridsize + i];
+      for (int k = 0; k < nlev2; ++k) lev2[k] = xlev2[k * gridsize + i];
 
       vert_gen_weights(expol, nlev1, &lev1[0], nlev2, &lev2[0], &lev_idx1[0], &lev_idx2[0], &lev_wgt1[0], &lev_wgt2[0]);
 
-      for (int k = 0; k < nlev2; ++k)
-        xlev_idx1[k * gridsize + i] = lev_idx1[k] * gridsize + i;
-      for (int k = 0; k < nlev2; ++k)
-        xlev_idx2[k * gridsize + i] = lev_idx2[k] * gridsize + i;
-      for (int k = 0; k < nlev2; ++k)
-        xlev_wgt1[k * gridsize + i] = lev_wgt1[k];
-      for (int k = 0; k < nlev2; ++k)
-        xlev_wgt2[k * gridsize + i] = lev_wgt2[k];
+      for (int k = 0; k < nlev2; ++k) xlev_idx1[k * gridsize + i] = lev_idx1[k] * gridsize + i;
+      for (int k = 0; k < nlev2; ++k) xlev_idx2[k * gridsize + i] = lev_idx2[k] * gridsize + i;
+      for (int k = 0; k < nlev2; ++k) xlev_wgt1[k * gridsize + i] = lev_wgt1[k];
+      for (int k = 0; k < nlev2; ++k) xlev_wgt2[k * gridsize + i] = lev_wgt2[k];
     }
 }
 
@@ -267,8 +261,7 @@ Intlevel3d(void *process)
   zaxisID3 = zaxisCreate(zaxisInqType(zaxisID1), nlevo);
   lev2 = (double *) Malloc(nlevo * sizeof(double));
   /* fill values with its indices */
-  for (int i = 0; i < nlevo; i++)
-    lev2[i] = (double) i + 1;
+  for (int i = 0; i < nlevo; i++) lev2[i] = (double) i + 1;
   zaxisDefLevels(zaxisID3, lev2);
   zaxisDefName(zaxisID3, "lev");
   /*  copy VCT from input vlistID1 to output vlistID3 if there is one */
@@ -303,8 +296,7 @@ Intlevel3d(void *process)
   std::vector<double *> vardata2(nvars); /* output */
 
   /* by default no variable should be interpolated */
-  for (i = 0; i < nvars; i++)
-    varinterp[varID] = false;
+  for (i = 0; i < nvars; i++) varinterp[varID] = false;
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -358,8 +350,7 @@ Intlevel3d(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      for (varID = 0; varID < nvars; ++varID)
-        vars[varID] = false;
+      for (varID = 0; varID < nvars; ++varID) vars[varID] = false;
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);

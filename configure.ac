@@ -106,12 +106,14 @@ case "$CC" in
   *)      C_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
 esac
 
+if test -n "$F77" ; then
 case "$F77" in
   pgf*)      F77_VERSION=`$F77 -V | head -2 | tail -n 1`;;
   gfortran*) F77_VERSION=`$F77 --version | head -n 1`;;
   ifort*)    F77_VERSION=`$F77 --version | head -n 1`;;
   *)         F77_VERSION=`$F77 -V 2>&1   | head -n 1 | grep -v error`;;
 esac
+fi
 
 if test -z "$CXX_VERSION" ; then CXX_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(CXX_VERSION, ["$CXX_VERSION"], [CXX Compiler version])
@@ -119,24 +121,12 @@ AC_DEFINE_UNQUOTED(CXX_VERSION, ["$CXX_VERSION"], [CXX Compiler version])
 if test -z "$C_VERSION" ; then C_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(C_VERSION, ["$C_VERSION"], [C Compiler version])
 
+if test -n "$F77" ; then
 if test -z "$F77_VERSION" ; then F77_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(F77_VERSION, ["$F77_VERSION"], [F77 Compiler version])
+fi
 
-# Checks for username, hostname and system type
-USERNAME=$LOGNAME
-if test -z "$USERNAME" ; then USERNAME=$USER; fi;
-if test -z "$USERNAME" ; then USERNAME="unknown"; fi;
-AC_DEFINE_UNQUOTED([USER_NAME],["$USERNAME"], [User name])
-AC_SUBST([USER_NAME],["$USERNAME"])
-
-AS_IF([test -z "$HOST"],
-      [HOST=unknown
-       AS_IF([test -x /bin/hostname],[HOST=$(hostname)],
-             [AS_IF([test -x /bin/uname],
-                    [HOST=$(uname -n)])])])
-AC_DEFINE_UNQUOTED([HOST_NAME],["$HOST"],[Host name])
-AC_SUBST([HOST_NAME],["$HOST"])
-
+# Check for system type
 AC_DEFINE_UNQUOTED([SYSTEM_TYPE],["$ac_cv_build"], [System type])
 AC_SUBST([SYSTEM_TYPE],["$ac_cv_build"])
 #  ----------------------------------------------------------------------
@@ -302,7 +292,7 @@ AC_CONFIG_FILES([test/Merstat.test test/Zonstat.test test/Mergetime.test],[chmod
 AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Setmiss.test test/Smooth.test test/MapReduce.test test/Ninfo.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([Makefile src/lib/ncl/Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile test/bandit_tests/Makefile cdo.spec cdo.settings])
+AC_CONFIG_FILES([Makefile src/lib/ncl/Makefile src/lib/yac/Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile test/bandit_tests/Makefile cdo.spec cdo.settings])
 AC_OUTPUT
 
 #  ----------------------------------------------------------------------

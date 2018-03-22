@@ -90,8 +90,7 @@ Pressure(void *process)
     }
 
   double *level = (double *) Malloc(nhlevh * sizeof(double));
-  for (int l = 0; l < nhlevh; l++)
-    level[l] = l + 1;
+  for (int l = 0; l < nhlevh; l++) level[l] = l + 1;
   zaxisDefLevels(zaxisIDp, level);
   Free(level);
 
@@ -252,8 +251,7 @@ Pressure(void *process)
       if (zaxisIDh != -1)
         {
           if (lnpsID != -1)
-            for (size_t i = 0; i < gridsize; i++)
-              ps_prog[i] = exp(pdata[i]);
+            for (size_t i = 0; i < gridsize; i++) ps_prog[i] = exp(pdata[i]);
           else if (psID != -1)
             arrayCopy(gridsize, pdata, ps_prog);
 

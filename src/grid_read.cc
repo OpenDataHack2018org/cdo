@@ -232,8 +232,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
                      nvalues, size, dname);
 
           grid->xvals = (double *) Malloc(size * sizeof(double));
-          for (size_t i = 0; i < size; ++i)
-            grid->xvals[i] = parameter2double(kv->values[i]);
+          for (size_t i = 0; i < size; ++i) grid->xvals[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "yvals"))
         {
@@ -245,8 +244,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
                      nvalues, size, dname);
 
           grid->yvals = (double *) Malloc(size * sizeof(double));
-          for (size_t i = 0; i < size; ++i)
-            grid->yvals[i] = parameter2double(kv->values[i]);
+          for (size_t i = 0; i < size; ++i) grid->yvals[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "xbounds"))
         {
@@ -259,8 +257,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
                      nvalues, grid->nvertex * size, dname);
 
           grid->xbounds = (double *) Malloc(grid->nvertex * size * sizeof(double));
-          for (size_t i = 0; i < grid->nvertex * size; ++i)
-            grid->xbounds[i] = parameter2double(kv->values[i]);
+          for (size_t i = 0; i < grid->nvertex * size; ++i) grid->xbounds[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "ybounds"))
         {
@@ -273,8 +270,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
                      nvalues, grid->nvertex * size, dname);
 
           grid->ybounds = (double *) Malloc(grid->nvertex * size * sizeof(double));
-          for (size_t i = 0; i < grid->nvertex * size; ++i)
-            grid->ybounds[i] = parameter2double(kv->values[i]);
+          for (size_t i = 0; i < grid->nvertex * size; ++i) grid->ybounds[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "gridlatlon"))
         {
@@ -368,16 +364,14 @@ grid_read_mapping(size_t igmap, size_t nkv, kvmap_t *kvmap, int gridID)
       if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32)
         {
           int *ivals = (int *) Malloc(nvalues * sizeof(int));
-          for (size_t i = 0; i < nvalues; ++i)
-            ivals[i] = literal_to_int(kv->values[i]);
+          for (size_t i = 0; i < nvalues; ++i) ivals[i] = literal_to_int(kv->values[i]);
           cdiDefAttInt(gridID, CDI_GLOBAL, key, dtype, nvalues, ivals);
           Free(ivals);
         }
       else if (dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64)
         {
           double *dvals = (double *) Malloc(nvalues * sizeof(double));
-          for (size_t i = 0; i < nvalues; ++i)
-            dvals[i] = literal_to_double(kv->values[i]);
+          for (size_t i = 0; i < nvalues; ++i) dvals[i] = literal_to_double(kv->values[i]);
           cdiDefAttFlt(gridID, CDI_GLOBAL, key, dtype, nvalues, dvals);
           Free(dvals);
         }
@@ -400,8 +394,7 @@ grid_read(FILE *gfp, const char *dname)
   size_t nkv = list_size(kvlist);
   if (nkv == 0) return -1;
   kvmap_t *kvmap = (kvmap_t *) Malloc(nkv * sizeof(kvmap_t));
-  for (size_t i = 0; i < nkv; ++i)
-    kvmap[i].isValid = false;
+  for (size_t i = 0; i < nkv; ++i) kvmap[i].isValid = false;
 
   size_t ik = 0;
   for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)

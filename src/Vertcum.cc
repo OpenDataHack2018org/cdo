@@ -107,8 +107,7 @@ Vertcum(void *process)
 
                       zaxisIDhl = zaxisCreate(ZAXIS_HYBRID_HALF, nlevshl);
                       double *levels = (double *) Malloc(nlevshl * sizeof(double));
-                      for (levelID = 0; levelID < nlevshl; ++levelID)
-                        levels[levelID] = levelID + 1;
+                      for (levelID = 0; levelID < nlevshl; ++levelID) levels[levelID] = levelID + 1;
                       zaxisDefLevels(zaxisIDhl, levels);
                       Free(levels);
                       zaxisDefVct(zaxisIDhl, nvct, vct);
@@ -167,13 +166,11 @@ Vertcum(void *process)
 
           if (operatorID == VERTCUMHL && nlevs2 == nlevshl)
             {
-              for (size_t i = 0; i < gridsize; ++i)
-                vardata2[varID][0][i] = 0;
+              for (size_t i = 0; i < gridsize; ++i) vardata2[varID][0][i] = 0;
             }
           else
             {
-              for (size_t i = 0; i < gridsize; ++i)
-                vardata2[varID][0][i] = vardata1[varID][0][i];
+              for (size_t i = 0; i < gridsize; ++i) vardata2[varID][0][i] = vardata1[varID][0][i];
             }
 
           for (levelID = 1; levelID < nlevs2; ++levelID)
@@ -224,10 +221,8 @@ Vertcum(void *process)
     {
       int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       int nlevs2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-      for (levelID = 0; levelID < nlevs; ++levelID)
-        Free(vardata1[varID][levelID]);
-      for (levelID = 0; levelID < nlevs2; ++levelID)
-        Free(vardata2[varID][levelID]);
+      for (levelID = 0; levelID < nlevs; ++levelID) Free(vardata1[varID][levelID]);
+      for (levelID = 0; levelID < nlevs2; ++levelID) Free(vardata2[varID][levelID]);
       Free(vardata1[varID]);
       Free(vardata2[varID]);
       Free(varnmiss[varID]);

@@ -88,11 +88,9 @@ farcpy(field_type *field1, field_type field2)
   if (len != nwpv * gridsize2) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (field2.memtype == MEMTYPE_FLOAT)
-    for (size_t i = 0; i < len; i++)
-      array1[i] = array2f[i];
+    for (size_t i = 0; i < len; i++) array1[i] = array2f[i];
   else
-    for (size_t i = 0; i < len; i++)
-      array1[i] = array2[i];
+    for (size_t i = 0; i < len; i++) array1[i] = array2[i];
 }
 
 void
@@ -116,8 +114,7 @@ faradd(field_type *field1, field_type field2)
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = ADDMN(array1[i], array2[i]);
+      for (size_t i = 0; i < len; i++) array1[i] = ADDMN(array1[i], array2[i]);
 
       field1->nmiss = arrayNumMV(len, array1, missval1);
     }
@@ -125,8 +122,7 @@ faradd(field_type *field1, field_type field2)
     {
       if (field2.memtype == MEMTYPE_FLOAT)
         {
-          for (size_t i = 0; i < len; i++)
-            array1[i] += array2f[i];
+          for (size_t i = 0; i < len; i++) array1[i] += array2f[i];
         }
       else
         {
@@ -167,8 +163,7 @@ farsum(field_type *field1, field_type field2)
     {
       if (field2.memtype == MEMTYPE_FLOAT)
         {
-          for (size_t i = 0; i < len; i++)
-            array1[i] += array2f[i];
+          for (size_t i = 0; i < len; i++) array1[i] += array2f[i];
         }
       else
         {
@@ -213,8 +208,7 @@ farsumw(field_type *field1, field_type field2, double w)
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(array1, array2, w, len)
 #endif
-      for (size_t i = 0; i < len; i++)
-        array1[i] += w * array2[i];
+      for (size_t i = 0; i < len; i++) array1[i] += w * array2[i];
     }
 }
 
@@ -262,8 +256,7 @@ farsumtr(field_type *occur, field_type field, const double refval)
 #ifdef _OPENMP
 #pragma omp parallel for default(shared)
 #endif
-      for (size_t i = 0; i < len; i++)
-        oarray[i] = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : oarray[i] + 1.0;
+      for (size_t i = 0; i < len; i++) oarray[i] = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : oarray[i] + 1.0;
     }
 }
 
@@ -303,13 +296,11 @@ farsumq(field_type *field1, field_type field2)
     {
       if (field2.memtype == MEMTYPE_FLOAT)
         {
-          for (size_t i = 0; i < len; i++)
-            array1[i] += ((double) array2f[i]) * array2f[i];
+          for (size_t i = 0; i < len; i++) array1[i] += ((double) array2f[i]) * array2f[i];
         }
       else
         {
-          for (size_t i = 0; i < len; i++)
-            array1[i] += array2[i] * array2[i];
+          for (size_t i = 0; i < len; i++) array1[i] += array2[i] * array2[i];
         }
     }
 }
@@ -347,8 +338,7 @@ farsumqw(field_type *field1, field_type field2, double w)
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] += w * array2[i] * array2[i];
+      for (size_t i = 0; i < len; i++) array1[i] += w * array2[i] * array2[i];
     }
 }
 
@@ -372,15 +362,13 @@ farsub(field_type *field1, field_type field2)
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = SUBMN(array1[i], array2[i]);
+      for (size_t i = 0; i < len; i++) array1[i] = SUBMN(array1[i], array2[i]);
 
       field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] -= array2[i];
+      for (size_t i = 0; i < len; i++) array1[i] -= array2[i];
     }
 }
 
@@ -404,15 +392,13 @@ farmul(field_type *field1, field_type field2)
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = MULMN(array1[i], array2[i]);
+      for (size_t i = 0; i < len; i++) array1[i] = MULMN(array1[i], array2[i]);
 
       field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] *= array2[i];
+      for (size_t i = 0; i < len; i++) array1[i] *= array2[i];
     }
 }
 
@@ -432,8 +418,7 @@ fardiv(field_type *field1, field_type field2)
   size_t len = nwpv * gridInqSize(grid1);
   if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  for (size_t i = 0; i < len; i++)
-    array1[i] = DIVMN(array1[i], array2[i]);
+  for (size_t i = 0; i < len; i++) array1[i] = DIVMN(array1[i], array2[i]);
 
   field1->nmiss = arrayNumMV(len, array1, missval1);
 }
@@ -479,8 +464,7 @@ farsetmiss(field_type *field1, field_type field2)
 
   if (nmiss1)
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = DBL_IS_EQUAL(array1[i], missval1) ? array2[i] : array1[i];
+      for (size_t i = 0; i < len; i++) array1[i] = DBL_IS_EQUAL(array1[i], missval1) ? array2[i] : array1[i];
 
       field1->nmiss = arrayNumMV(len, array1, missval1);
     }
@@ -517,8 +501,7 @@ farmin(field_type *field1, field_type field2)
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = MIN(array1[i], array2[i]);
+      for (size_t i = 0; i < len; i++) array1[i] = MIN(array1[i], array2[i]);
     }
 }
 
@@ -553,8 +536,7 @@ farmax(field_type *field1, field_type field2)
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = MAX(array1[i], array2[i]);
+      for (size_t i = 0; i < len; i++) array1[i] = MAX(array1[i], array2[i]);
     }
 }
 
@@ -652,8 +634,7 @@ farcvar(field_type *field1, field_type field2, int nsets, int divisor)
 
   if (nsetx == 0)
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = missval1;
+      for (size_t i = 0; i < len; i++) array1[i] = missval1;
     }
   else if ((nmiss1 || nmiss2) /*&& (DBL_IS_NAN(missval1) || DBL_IS_NAN(missval2))*/)
     {
@@ -736,8 +717,7 @@ farmoq(field_type *field1, field_type field2)
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = array2[i] * array2[i];
+      for (size_t i = 0; i < len; i++) array1[i] = array2[i] * array2[i];
     }
 }
 
@@ -770,8 +750,7 @@ farmoqw(field_type *field1, field_type field2, double w)
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = w * array2[i] * array2[i];
+      for (size_t i = 0; i < len; i++) array1[i] = w * array2[i] * array2[i];
     }
 }
 
@@ -821,7 +800,6 @@ farcount(field_type *field1, field_type field2)
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] += 1.0;
+      for (size_t i = 0; i < len; i++) array1[i] += 1.0;
     }
 }

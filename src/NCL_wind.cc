@@ -46,7 +46,7 @@ uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size
       double *tmp_div = div + k * gridsize_uv;
       // Init output array.
       arrayFill(gridsize_uv, tmp_div, 0.0);
-      // Call the Fortran routine.
+// Call the Fortran routine.
 #ifdef HAVE_CF_INTERFACE
       DDVFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missval, boundOpt, tmp_div, ierror);
 #else
@@ -76,7 +76,7 @@ uv2vr_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size
       double *tmp_vort = vort + k * gridsize_uv;
       // Init output array.
       arrayFill(gridsize_uv, tmp_vort, 0.0);
-      // Call the Fortran routine.
+// Call the Fortran routine.
 #ifdef HAVE_CF_INTERFACE
       DVRFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missval, boundOpt, tmp_vort, ierror);
 #else

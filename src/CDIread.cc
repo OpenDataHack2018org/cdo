@@ -26,7 +26,7 @@ filetypestr(int filetype)
 {
   switch (filetype)
     {
-      // clang-format off
+    // clang-format off
     case CDI_FILETYPE_GRB:  return ("GRIB");
     case CDI_FILETYPE_GRB2: return ("GRIB2");
     case CDI_FILETYPE_NC:   return ("NetCDF");

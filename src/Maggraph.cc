@@ -137,8 +137,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits, long n
     {
       fprintf(stderr, "Num params %d\n", nparam);
 
-      for (i = 0; i < nparam; i++)
-        fprintf(stderr, "Param %s\n", params[i]);
+      for (i = 0; i < nparam; i++) fprintf(stderr, "Param %s\n", params[i]);
     }
 
   for (i = 0; i < nparam; ++i)
@@ -1009,8 +1008,7 @@ Maggraph(void *process)
     {
       fprintf(stderr, "Num params %d\n", nparam);
 
-      for (int i = 0; i < nparam; i++)
-        fprintf(stderr, "Param %s\n", pnames[i]);
+      for (int i = 0; i < nparam; i++) fprintf(stderr, "Param %s\n", pnames[i]);
     }
   maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
 

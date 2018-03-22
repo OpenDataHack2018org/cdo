@@ -267,15 +267,11 @@ gengrid(int gridID1, int lhalo, int rhalo)
         }
       else
         {
-          for (i = nlon1 - lhalo; i < nlon1; i++)
-            *pxvals2++ = xvals1[i] - cpi2;
-          for (i = nmin; i < nmax; i++)
-            *pxvals2++ = xvals1[i];
-          for (i = 0; i < rhalo; i++)
-            *pxvals2++ = xvals1[i] + cpi2;
+          for (i = nlon1 - lhalo; i < nlon1; i++) *pxvals2++ = xvals1[i] - cpi2;
+          for (i = nmin; i < nmax; i++) *pxvals2++ = xvals1[i];
+          for (i = 0; i < rhalo; i++) *pxvals2++ = xvals1[i] + cpi2;
 
-          for (i = 0; i < nlat1; i++)
-            yvals2[i] = yvals1[i];
+          for (i = 0; i < nlat1; i++) yvals2[i] = yvals1[i];
         }
       /*
       for ( i = 0; i < nlat2; i++ ) printf("lat : %d %g\n", i+1, yvals2[i]);
@@ -340,15 +336,11 @@ gengrid(int gridID1, int lhalo, int rhalo)
       else
         {
           gridDefNvertex(gridID2, 2);
-          for (i = 2 * (nlon1 - lhalo); i < 2 * nlon1; i++)
-            *pxbounds2++ = xbounds1[i] - cpi2;
-          for (i = 2 * nmin; i < 2 * nmax; i++)
-            *pxbounds2++ = xbounds1[i];
-          for (i = 0; i < 2 * rhalo; i++)
-            *pxbounds2++ = xbounds1[i] + cpi2;
+          for (i = 2 * (nlon1 - lhalo); i < 2 * nlon1; i++) *pxbounds2++ = xbounds1[i] - cpi2;
+          for (i = 2 * nmin; i < 2 * nmax; i++) *pxbounds2++ = xbounds1[i];
+          for (i = 0; i < 2 * rhalo; i++) *pxbounds2++ = xbounds1[i] + cpi2;
 
-          for (i = 0; i < 2 * nlat2; i++)
-            ybounds2[i] = ybounds1[i];
+          for (i = 0; i < 2 * nlat2; i++) ybounds2[i] = ybounds1[i];
         }
 
       gridDefXbounds(gridID2, xbounds2);
@@ -415,14 +407,11 @@ halo(double *array1, int gridID1, double *array2, int lhalo, int rhalo)
 
   for (int ilat = 0; ilat < nlat; ilat++)
     {
-      for (int ilon = nlon1 - lhalo; ilon < nlon1; ilon++)
-        *array2++ = array1[ilat * nlon1 + ilon];
+      for (int ilon = nlon1 - lhalo; ilon < nlon1; ilon++) *array2++ = array1[ilat * nlon1 + ilon];
 
-      for (int ilon = nmin; ilon < nmax; ilon++)
-        *array2++ = array1[ilat * nlon1 + ilon];
+      for (int ilon = nmin; ilon < nmax; ilon++) *array2++ = array1[ilat * nlon1 + ilon];
 
-      for (int ilon = 0; ilon < rhalo; ilon++)
-        *array2++ = array1[ilat * nlon1 + ilon];
+      for (int ilon = 0; ilon < rhalo; ilon++) *array2++ = array1[ilat * nlon1 + ilon];
     }
 }
 
@@ -433,8 +422,7 @@ tpnhalo(double *array1, int gridID1, double *array2)
   size_t nlat = gridInqYsize(gridID1);
 
   for (size_t ilat = 0; ilat < nlat; ilat++)
-    for (size_t ilon = 0; ilon < nlon; ilon++)
-      array2[(ilat + 2) * nlon + ilon] = array1[ilat * nlon + ilon];
+    for (size_t ilon = 0; ilon < nlon; ilon++) array2[(ilat + 2) * nlon + ilon] = array1[ilat * nlon + ilon];
 
   for (size_t ilon = 0; ilon < nlon; ilon++)
     {

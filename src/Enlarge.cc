@@ -100,8 +100,7 @@ Enlarge(void *process)
                 }
 
               for (size_t iy = 0; iy < ysize2; iy++)
-                for (size_t ix = 0; ix < xsize2; ix++)
-                  array2[ix + iy * xsize2] = array1[iy];
+                for (size_t ix = 0; ix < xsize2; ix++) array2[ix + iy * xsize2] = array1[iy];
 
               if (nmiss) nmiss *= xsize2;
             }
@@ -114,16 +113,14 @@ Enlarge(void *process)
                 }
 
               for (size_t iy = 0; iy < ysize2; iy++)
-                for (size_t ix = 0; ix < xsize2; ix++)
-                  array2[ix + iy * xsize2] = array1[ix];
+                for (size_t ix = 0; ix < xsize2; ix++) array2[ix + iy * xsize2] = array1[ix];
 
               if (nmiss) nmiss *= ysize2;
             }
           else
             {
               arrayCopy(gridsize1, array1, array2);
-              for (size_t i = gridsize1; i < gridsize2; i++)
-                array2[i] = array1[gridsize1 - 1];
+              for (size_t i = gridsize1; i < gridsize2; i++) array2[i] = array1[gridsize1 - 1];
 
               if (nmiss && DBL_IS_EQUAL(array1[gridsize1 - 1], missval)) nmiss += (gridsize2 - gridsize1);
             }

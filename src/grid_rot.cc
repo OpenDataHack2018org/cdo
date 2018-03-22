@@ -51,14 +51,12 @@ lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam, double
   if (polgam > 0)
     {
       double zgam = DEG2RAD * polgam;
-      zarg1 = sin(zlampol)
-                  * (-zsinpol * cos(zphirot) * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
-                     + zcospol * sin(zphirot))
+      zarg1 = sin(zlampol) * (-zsinpol * cos(zphirot) * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
+                              + zcospol * sin(zphirot))
               - cos(zlampol) * cos(zphirot) * (sin(zlamrot) * cos(zgam) + cos(zlamrot) * sin(zgam));
 
-      zarg2 = cos(zlampol)
-                  * (-zsinpol * cos(zphirot) * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
-                     + zcospol * sin(zphirot))
+      zarg2 = cos(zlampol) * (-zsinpol * cos(zphirot) * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
+                              + zcospol * sin(zphirot))
               + sin(zlampol) * cos(zphirot) * (sin(zlamrot) * cos(zgam) + cos(zlamrot) * sin(zgam));
     }
   else

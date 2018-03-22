@@ -74,8 +74,7 @@ exprs_from_file(const char *exprf)
   char *exprs = (char *) Malloc(fsize + 1);
 
   int ichar, ipos = 0;
-  while ((ichar = fgetc(fp)) != EOF)
-    exprs[ipos++] = ichar;
+  while ((ichar = fgetc(fp)) != EOF) exprs[ipos++] = ichar;
 
   exprs[ipos] = 0;
   if (ipos == 0) cdoAbort("%s is empty!", exprf);
@@ -377,8 +376,7 @@ Expr(void *process)
   parseParamInit(&parse_arg, vlistID1, pointID, surfaceID, params);
 
   /* Set all input variables to 'needed' if replacing is switched off */
-  for (int varID = 0; varID < nvars1; varID++)
-    parse_arg.needed[varID] = !replacesVariables;
+  for (int varID = 0; varID < nvars1; varID++) parse_arg.needed[varID] = !replacesVariables;
 
   int vartsID = params_add_ts(&parse_arg);
   parse_arg.tsID = vartsID;
@@ -414,8 +412,7 @@ Expr(void *process)
             {
               varIDmap[pidx++] = varID;
               int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-              for (int levID = 0; levID < nlevs; levID++)
-                vlistDefFlag(vlistID1, varID, levID, TRUE);
+              for (int levID = 0; levID < nlevs; levID++) vlistDefFlag(vlistID1, varID, levID, TRUE);
             }
         }
       cdoVlistCopyFlag(vlistID2, vlistID1);

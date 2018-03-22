@@ -76,8 +76,7 @@ Eofcoeff3d(void *process)
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   field_type ***eof = (field_type ***) Malloc(nvars * sizeof(field_type **));
-  for (varID = 0; varID < nvars; varID++)
-    eof[varID] = (field_type **) Malloc(nlevs * sizeof(field_type *));
+  for (varID = 0; varID < nvars; varID++) eof[varID] = (field_type **) Malloc(nlevs * sizeof(field_type *));
 
   int eofID = 0;
   while (1)
@@ -132,16 +131,13 @@ Eofcoeff3d(void *process)
   int vlistID3 = vlistDuplicate(vlistID2);
 
   int ngrids = vlistNgrids(vlistID3);
-  for (i = 0; i < ngrids; i++)
-    vlistChangeGridIndex(vlistID3, i, gridID3);
+  for (i = 0; i < ngrids; i++) vlistChangeGridIndex(vlistID3, i, gridID3);
 
   int nzaxis = vlistNzaxis(vlistID3);
-  for (i = 0; i < nzaxis; i++)
-    vlistChangeZaxisIndex(vlistID3, i, zaxisID3);
+  for (i = 0; i < nzaxis; i++) vlistChangeZaxisIndex(vlistID3, i, zaxisID3);
 
   vlistDefTaxis(vlistID3, taxisID3);
-  for (varID = 0; varID < nvars; varID++)
-    vlistDefVarTimetype(vlistID3, varID, TIME_VARYING);
+  for (varID = 0; varID < nvars; varID++) vlistDefVarTimetype(vlistID3, varID, TIME_VARYING);
 
   // open streams for eofcoeff output
   int *streamIDs = (int *) Malloc(neof * sizeof(int));
@@ -239,8 +235,7 @@ Eofcoeff3d(void *process)
       tsID++;
     }
 
-  for (eofID = 0; eofID < neof; eofID++)
-    pstreamClose(streamIDs[eofID]);
+  for (eofID = 0; eofID < neof; eofID++) pstreamClose(streamIDs[eofID]);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

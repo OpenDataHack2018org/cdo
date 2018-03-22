@@ -49,8 +49,7 @@ farcmul(field_type *field, double rconst)
 
   if (nmiss > 0)
     {
-      for (i = 0; i < len; i++)
-        array[i] = MULMN(array[i], rconst);
+      for (i = 0; i < len; i++) array[i] = MULMN(array[i], rconst);
     }
   else
     {
@@ -59,8 +58,7 @@ farcmul(field_type *field, double rconst)
 #pragma omp parallel for default(shared) private(i)
 #endif
       */
-      for (i = 0; i < len; i++)
-        array[i] *= rconst;
+      for (i = 0; i < len; i++) array[i] *= rconst;
     }
 }
 
@@ -78,15 +76,13 @@ farcdiv(field_type *field, double rconst)
 
   if (nmiss > 0 || IS_EQUAL(rconst, 0))
     {
-      for (i = 0; i < len; i++)
-        array[i] = DIVMN(array[i], rconst);
+      for (i = 0; i < len; i++) array[i] = DIVMN(array[i], rconst);
 
       if (IS_EQUAL(rconst, 0)) field->nmiss = len;
     }
   else
     {
-      for (i = 0; i < len; i++)
-        array[i] /= rconst;
+      for (i = 0; i < len; i++) array[i] /= rconst;
     }
 }
 
@@ -104,13 +100,11 @@ farcadd(field_type *field, double rconst)
 
   if (nmiss > 0)
     {
-      for (i = 0; i < len; i++)
-        array[i] = ADDMN(array[i], rconst);
+      for (i = 0; i < len; i++) array[i] = ADDMN(array[i], rconst);
     }
   else
     {
-      for (i = 0; i < len; i++)
-        array[i] += rconst;
+      for (i = 0; i < len; i++) array[i] += rconst;
     }
 }
 
@@ -130,8 +124,7 @@ farinv(field_type *field)
 
   size_t len = gridInqSize(grid);
 
-  for (size_t i = 0; i < len; i++)
-    array[i] = DIVMN(1.0, array[i]);
+  for (size_t i = 0; i < len; i++) array[i] = DIVMN(1.0, array[i]);
 
   field->nmiss = arrayNumMV(len, array, missval1);
 }

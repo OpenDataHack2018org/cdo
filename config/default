@@ -145,7 +145,6 @@ case "${HOSTNAME}" in
 
         if  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure --prefix=/usr/local \
-                    --enable-maintainer-mode \
                     $CDOLIBS \
 	            CC=gcc CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
 	            CXX=g++ CXXFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \

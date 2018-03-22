@@ -186,8 +186,7 @@ Intntime(void *process)
                 }
               else
                 {
-                  for (size_t i = 0; i < gridsize; i++)
-                    array[i] = single1[i] * fac1 + single2[i] * fac2;
+                  for (size_t i = 0; i < gridsize; i++) array[i] = single1[i] * fac1 + single2[i] * fac2;
                 }
 
               pstreamDefRecord(streamID2, varID, levelID);

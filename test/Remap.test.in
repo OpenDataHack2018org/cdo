@@ -39,21 +39,24 @@ for GRIDTYPE in regular curvilinear unstructured; do
       DEBUG_OUT="--seperateDebugFromLog Remap_${GRIDTYPE}_${GRID}_${RMOD}.debug"
 
       CDOTEST="remap${RMOD} $GRID $GRIDTYPE"
-      CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT remap${RMOD},$GRID $SETGRID $IFILE ${OFILE}"
 
       if [ "@ENABLE_THREADS@" = no -a "$GRIDTYPE" != "regular" ]; then
         test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP POSIX threads not enabled"
       else
         echo "Running test: $NTEST"
-        echo "$CDOCOMMAND"
 
-        $CDOCOMMAND
-        test $? -eq 0 || let RSTAT+=1
+        for NTHREADS in 1 2 4; do
+          CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT -P $NTHREADS remap${RMOD},$GRID $SETGRID $IFILE ${OFILE}"
+          echo "$CDOCOMMAND"
 
-        $CDO $DEBUG_OUT diff,$ABSLIM $OFILE $RFILE > $CDOOUT 2> $CDOERR
-        test $? -eq 0 || let RSTAT+=1
-        test -s $CDOOUT && let RSTAT+=1
-        cat $CDOOUT $CDOERR
+          $CDOCOMMAND
+          test $? -eq 0 || let RSTAT+=1
+
+          $CDO $DEBUG_OUT diff,$ABSLIM $OFILE $RFILE > $CDOOUT 2> $CDOERR
+          test $? -eq 0 || let RSTAT+=1
+          test -s $CDOOUT && let RSTAT+=1
+          cat $CDOOUT $CDOERR
+        done
 
         test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
         if [ $RMOD = dis ]; then

@@ -95,8 +95,7 @@ MapReduce(void *process)
   if (CdoDebug::cdoDebug) cdoPrint("MapReduce: maskSize = %d", maskSize);
 
   int *maskIndexList = (int *) Malloc(maskSize * sizeof(int));
-  for (int m = 0; m < maskSize; m++)
-    maskIndexList[m] = -1;
+  for (int m = 0; m < maskSize; m++) maskIndexList[m] = -1;
 
   size_t k = 0;
   for (size_t i = 0; i < inputGridSize; i++)
@@ -156,8 +155,7 @@ MapReduce(void *process)
 
   /* use the new selection grid for all output variables */
   int ngrids = vlistNgrids(vlistID2);
-  for (int index = 0; index < ngrids; index++)
-    vlistChangeGridIndex(vlistID2, index, outputGridID);
+  for (int index = 0; index < ngrids; index++) vlistChangeGridIndex(vlistID2, index, outputGridID);
 
   /* loop over input fields and mask the data values {{{ */
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -182,8 +180,7 @@ MapReduce(void *process)
 
               pstreamReadRecord(streamID1, arrayIn, &nmiss);
 
-              for (int i = 0; i < maskSize; i++)
-                arrayOut[i] = arrayIn[maskIndexList[i]];
+              for (int i = 0; i < maskSize; i++) arrayOut[i] = arrayIn[maskIndexList[i]];
 
               pstreamDefRecord(streamID2, varID2, levelID2);
               pstreamWriteRecord(streamID2, arrayOut, 0);

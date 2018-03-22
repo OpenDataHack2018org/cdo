@@ -207,11 +207,11 @@ grid_copy_mapping(int gridID1, int gridID2)
 void
 grid_to_radian(const char *units, size_t nvals, double *restrict values, const char *description)
 {
-  if (cmpstr(units, "degree") == 0)
+  if (cmpstr(units, "deg") == 0)
     {
       scale_vec(DEG2RAD, nvals, values);
     }
-  else if (cmpstr(units, "radian") == 0)
+  else if (cmpstr(units, "rad") == 0)
     {
       /* No conversion necessary */
     }
@@ -224,12 +224,11 @@ grid_to_radian(const char *units, size_t nvals, double *restrict values, const c
 void
 grid_to_degree(const char *units, size_t nvals, double *restrict values, const char *description)
 {
-  if (cmpstr(units, "radian") == 0)
+  if (cmpstr(units, "rad") == 0)
     {
-      for (size_t n = 0; n < nvals; ++n)
-        values[n] *= RAD2DEG;
+      for (size_t n = 0; n < nvals; ++n) values[n] *= RAD2DEG;
     }
-  else if (cmpstr(units, "degree") == 0)
+  else if (cmpstr(units, "deg") == 0)
     {
       /* No conversion necessary */
     }
@@ -311,8 +310,7 @@ grid_gen_corners(size_t n, const double *restrict vals, double *restrict corners
     }
   else
     {
-      for (size_t i = 0; i < n - 1; ++i)
-        corners[i + 1] = 0.5 * (vals[i] + vals[i + 1]);
+      for (size_t i = 0; i < n - 1; ++i) corners[i + 1] = 0.5 * (vals[i] + vals[i + 1]);
 
       corners[0] = 2 * vals[0] - corners[1];
       corners[n] = 2 * vals[n - 1] - corners[n - 1];
@@ -669,8 +667,7 @@ qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast, double *arr
   // printf("nx %d  %ld %ld lon1 %g lon2 %g\n", nx, ilon_firstx, ilon_last,
   // (ilon_firstx*360.)/np4, (ilon_last*360.)/np4);
 
-  for (j = 0; j < ny; ++j)
-    nwork += rowlon[j];
+  for (j = 0; j < ny; ++j) nwork += rowlon[j];
 
   double **pwork = (double **) Malloc(ny * sizeof(double *));
   double *work = (double *) Malloc(ny * np4 * sizeof(double));
@@ -686,8 +683,7 @@ qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast, double *arr
   for (j = 0; j < ny; ++j)
     {
       rlon = rowlon[j];
-      for (i = 0; i < rlon; ++i)
-        pwork[j][i] = missval;
+      for (i = 0; i < rlon; ++i) pwork[j][i] = missval;
     }
 
   double *parray = array;
@@ -825,8 +821,7 @@ gridToRegular(int gridID1)
     {
       nx = 2 * ny;
       xvals = (double *) Malloc(nx * sizeof(double));
-      for (size_t i = 0; i < nx; ++i)
-        xvals[i] = i * 360. / nx;
+      for (size_t i = 0; i < nx; ++i) xvals[i] = i * 360. / nx;
     }
 
   size_t gridsize = nx * ny;
@@ -1034,13 +1029,9 @@ gridToCurvilinear(int gridID1, int lbounds)
                 = (len == 1 && memcmp(yunits, "m", 1) == 0) || (len == 2 && memcmp(yunits, "km", 2) == 0);
 
             if (!lvalid_xunits)
-              cdoWarning("Possibly wrong result! Invalid x-coordinate units: "
-                         "\"%s\" (expected \"m\" or \"km\")",
-                         xunits);
+              cdoWarning("Possibly wrong result! Invalid x-coordinate units: \"%s\" (expected \"m\" or \"km\")", xunits);
             if (!lvalid_yunits)
-              cdoWarning("Possibly wrong result! Invalid y-coordinate units: "
-                         "\"%s\" (expected \"m\" or \"km\")",
-                         yunits);
+              cdoWarning("Possibly wrong result! Invalid y-coordinate units: \"%s\" (expected \"m\" or \"km\")", yunits);
           }
 
         if (memcmp(xunits, "km", 2) == 0) xscale = 1000;
@@ -1061,14 +1052,12 @@ gridToCurvilinear(int gridID1, int lbounds)
         if (gridInqXvals(gridID1, NULL))
           gridInqXvals(gridID1, xvals);
         else
-          for (size_t i = 0; i < nx; ++i)
-            xvals[i] = 0;
+          for (size_t i = 0; i < nx; ++i) xvals[i] = 0;
 
         if (gridInqYvals(gridID1, NULL))
           gridInqYvals(gridID1, yvals);
         else
-          for (size_t i = 0; i < ny; ++i)
-            yvals[i] = 0;
+          for (size_t i = 0; i < ny; ++i) yvals[i] = 0;
 
         if (lproj_rll)
           {
@@ -1548,10 +1537,8 @@ gridCurvilinearToRegular(int gridID1)
   double *xvals = (double *) Malloc(nx * sizeof(double));
   double *yvals = (double *) Malloc(ny * sizeof(double));
 
-  for (size_t i = 0; i < nx; i++)
-    xvals[i] = xvals2D[i];
-  for (size_t j = 0; j < ny; j++)
-    yvals[j] = yvals2D[j * nx];
+  for (size_t i = 0; i < nx; i++) xvals[i] = xvals2D[i];
+  for (size_t j = 0; j < ny; j++) yvals[j] = yvals2D[j * nx];
 
   for (size_t j = 1; j < ny; j++)
     for (size_t i = 0; i < nx; i++)
@@ -1714,8 +1701,7 @@ gridWeightsOld(int gridID, double *weights)
 
           /* Normalise weights.  */
           if (IS_NOT_EQUAL(sumw, 0))
-            for (int i = 0; i < datapoint; i++)
-              weights[i] /= sumw;
+            for (int i = 0; i < datapoint; i++) weights[i] /= sumw;
 
           if (lons - 1) Free(lons - 1);
           if (lats - 1) Free(lats - 1);
@@ -1724,8 +1710,7 @@ gridWeightsOld(int gridID, double *weights)
         {
           status = TRUE;
 
-          for (size_t i = 0; i < len; i++)
-            weights[i] = 1. / len;
+          for (size_t i = 0; i < len; i++) weights[i] = 1. / len;
         }
     }
 
@@ -1769,8 +1754,7 @@ gridWeights(int gridID, double *grid_wgts)
     }
   else
     {
-      for (size_t i = 0; i < gridsize; ++i)
-        grid_wgts[i] = 1. / gridsize;
+      for (size_t i = 0; i < gridsize; ++i) grid_wgts[i] = 1. / gridsize;
     }
   /*
   for ( i = 0; i < gridsize; ++i )

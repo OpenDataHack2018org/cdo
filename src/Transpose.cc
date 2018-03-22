@@ -38,14 +38,11 @@ transxy(int gridID, double *array1, double *array2)
       double **a2D1 = (double **) Malloc(ny * sizeof(double *));
       double **a2D2 = (double **) Malloc(nx * sizeof(double *));
 
-      for (int j = 0; j < ny; ++j)
-        a2D1[j] = array1 + j * nx;
-      for (size_t i = 0; i < nx; ++i)
-        a2D2[i] = array2 + i * ny;
+      for (int j = 0; j < ny; ++j) a2D1[j] = array1 + j * nx;
+      for (size_t i = 0; i < nx; ++i) a2D2[i] = array2 + i * ny;
 
       for (int j = 0; j < ny; ++j)
-        for (size_t i = 0; i < nx; ++i)
-          a2D2[i][j] = a2D1[j][i];
+        for (size_t i = 0; i < nx; ++i) a2D2[i][j] = a2D1[j][i];
 
       Free(a2D1);
       Free(a2D2);
@@ -53,8 +50,7 @@ transxy(int gridID, double *array1, double *array2)
   else
     {
       gridsize = gridInqSize(gridID);
-      for (size_t i = 0; i < gridsize; ++i)
-        array2[i] = array1[i];
+      for (size_t i = 0; i < gridsize; ++i) array2[i] = array1[i];
     }
 }
 

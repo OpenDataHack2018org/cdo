@@ -49,7 +49,6 @@
 #include "afterburner.h"
 #include "constants.h"
 #include "compare.h"
-#include "vct_l191.h"
 #include "cdoOptions.h"
 
 #if defined(_OPENMP)
@@ -1582,24 +1581,12 @@ after_precntl(struct Control *globs, struct Variable *vars)
                         }
                       else
                         {
-                          if (numlevel == 191)
-                            {
-                              fprintf(stderr, " Using internal VCT for L191\n");
-                              globs->nvct = (191 + 1) * 2;
-                              globs->vct = (double *) Malloc(globs->nvct * sizeof(double));
-                              arrayCopy(globs->nvct, VCT_L191, globs->vct);
-                              zaxisDefVct(zaxisID, globs->nvct, globs->vct);
-                            }
-                          else
-                            {
-                              Error("VCT not defined in inputfile!");
-                            }
+                          Error("VCT not defined in inputfile!");
                         }
                     }
 
                   if (numlevel != (globs->nvct / 2 - 1))
-                    Error("Number of hybrid levels %d does not match VCT "
-                          "levels %d",
+                    Error("Number of hybrid levels %d does not match VCT levels %d",
                           numlevel, globs->nvct / 2 - 1);
 
                   if (globs->Debug)
@@ -1889,8 +1876,8 @@ after_version(void)
 #endif
   fprintf(stderr, "\n");
 #endif
-#if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
-  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
+#ifdef SYSTEM_TYPE
+  fprintf(stderr, "System: %s\n", SYSTEM_TYPE);
 #endif
   cdiPrintVersion();
   fprintf(stderr, "\n");
@@ -2014,9 +2001,8 @@ after_procstat(char *procpath, int truncation)
       if ((hostname = getenv("HOST")) == NULL) hostname = unknown;
 
       setvbuf(sf, (char *) NULL, _IONBF, 0);
-      fprintf(sf,
-              "%.7s %4.4ld.%2.2ld.%2.2ld %2.2ld:%2.2ld %s "
-              "%-9.9s %7.1f %7.1f T%3.3d %s\n",
+      fprintf(sf, "%.7s %4.4ld.%2.2ld.%2.2ld %2.2ld:%2.2ld %s "
+                  "%-9.9s %7.1f %7.1f T%3.3d %s\n",
               name, yy, mm, dd, hh, mi, VERSION, proc, MaxMBytes, CPUTime, truncation, hostname);
 
       fclose(sf);

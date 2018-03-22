@@ -225,14 +225,14 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
 
   bool *grid1_mask = (bool *) Malloc(gridsize1 * sizeof(bool));
   for (size_t jj = 0; jj < nym; ++jj)
-    for (size_t ii = 0; ii < nlon1; ++ii)
-      grid1_mask[jj * nlon1 + ii] = !DBL_IS_EQUAL(fieldm[jj * nlon1 + ii], missval);
+    for (size_t ii = 0; ii < nlon1; ++ii) grid1_mask[jj * nlon1 + ii] = !DBL_IS_EQUAL(fieldm[jj * nlon1 + ii], missval);
 
   progressInit();
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(Threading::ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(Threading::ompNumThreads, field, fieldm, x, y, xm, \
+                                                                    ym, nxm, nym, gridsize2, missval, nlon1,           \
+                                                                    lon_is_circular, grid1_mask)
 #endif
   for (size_t i = 0; i < gridsize2; ++i)
     {
@@ -274,8 +274,7 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
           // dst_add, plon, plat, wgts[0], wgts[1], wgts[2], wgts[3], iw, jw);
 
           field[i] = 0;
-          for (int n = 0; n < 4; ++n)
-            field[i] += fieldm[src_add[n]] * wgts[n];
+          for (int n = 0; n < 4; ++n) field[i] += fieldm[src_add[n]] * wgts[n];
         }
     }
 
@@ -329,8 +328,7 @@ intgridbil(field_type *field1, field_type *field2)
   if (grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2)) lgeorefgrid = false;
 
   double **array1_2D = (double **) Malloc(nlat1 * sizeof(double *));
-  for (size_t ilat = 0; ilat < nlat1; ilat++)
-    array1_2D[ilat] = array1 + ilat * nlon1;
+  for (size_t ilat = 0; ilat < nlat1; ilat++) array1_2D[ilat] = array1 + ilat * nlon1;
 
   if (lgeorefgrid)
     {
@@ -644,8 +642,7 @@ interpolate(field_type *field1, field_type *field2)
   xin_array = (double *) Malloc(nxlon * nxlat * sizeof(double));
   xin = (double **) Malloc(nxlat * sizeof(double *));
 
-  for (ilat = 0; ilat < nxlat; ilat++)
-    xin[ilat] = xin_array + ilat * nxlon;
+  for (ilat = 0; ilat < nxlat; ilat++) xin[ilat] = xin_array + ilat * nxlon;
 
   xlon = (double *) Malloc(nxlon * sizeof(double));
   for (ilon = 0; ilon < nlon; ilon++)
@@ -664,8 +661,7 @@ interpolate(field_type *field1, field_type *field2)
   xlat[2 * nlat] = (lat[nlat - 1] + lat[nlat]) / 2;
 
   in0 = (double **) Malloc(nlat * sizeof(double *));
-  for (ilat = 0; ilat < nlat; ilat++)
-    in0[ilat] = arrayIn + ilat * nlon;
+  for (ilat = 0; ilat < nlat; ilat++) in0[ilat] = arrayIn + ilat * nlon;
 
   ilon11 = (long *) Malloc(out_nlon * sizeof(long));
   ilon12 = (long *) Malloc(out_nlon * sizeof(long));
@@ -751,14 +747,12 @@ interpolate(field_type *field1, field_type *field2)
     }
 
   xout = (double **) Malloc(out_nlat * sizeof(double *));
-  for (olat = 0; olat < out_nlat; olat++)
-    xout[olat] = arrayOut + olat * out_nlon;
+  for (olat = 0; olat < out_nlat; olat++) xout[olat] = arrayOut + olat * out_nlon;
 
   wrap_around = nlon > 1 && (lon[nlon - 1] >= lon[-1] + 360 - 0.001 || lon[nlon] >= lon[0] + 360 - 0.001);
 
   for (ilat = 0; ilat < nlat; ilat++)
-    for (ilon = 0; ilon < nlon; ilon++)
-      xin[2 * ilat + 1][2 * ilon + 1] = in0[ilat][ilon];
+    for (ilon = 0; ilon < nlon; ilon++) xin[2 * ilat + 1][2 * ilon + 1] = in0[ilat][ilon];
 
   for (ilat = 0; ilat < nxlat; ilat += 2)
     for (ilon = 1; ilon < nxlon; ilon += 2)

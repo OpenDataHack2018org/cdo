@@ -206,8 +206,7 @@ Spectral(void *process)
           ncut = args2int_lista(operatorArgc(), operatorArgv(), ilista);
           wnums = (int *) lista_dataptr(ilista);
           waves = (int *) Malloc(maxntr * sizeof(int));
-          for (i = 0; i < maxntr; i++)
-            waves[i] = 1;
+          for (i = 0; i < maxntr; i++) waves[i] = 1;
           for (i = 0; i < ncut; i++)
             {
               j = wnums[i] - 1;

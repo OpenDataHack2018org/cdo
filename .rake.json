@@ -100,6 +100,12 @@
       "makeCall": "make -j 12",
       "sync": true
     },
+    "localPgi": {
+      "hostname": "luthien",
+      "configureCall": "./configure CC=pgcc CXX=pgc++ FC=pgfortran CPPFLAGS=-I/home/ram/local/pgi/linux86-64/17.10/include",
+      "makeCall": "make -j 12",
+      "sync": true
+    },
     "localGCC_static": {
       "doc": "local builder with default GCC - VPATH build - As-Static-As-Possible",
       "hostname": "luthien",

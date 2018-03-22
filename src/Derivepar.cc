@@ -81,8 +81,7 @@ Derivepar(void *process)
   double *vct = vlist_hybrid_vct(vlistID1, &zaxisIDh, &nvct, &nhlevf);
 
   if (cdoVerbose)
-    for (i = 0; i < nvct / 2; ++i)
-      cdoPrint("vct: %5d %25.17f %25.17f", i, vct[i], vct[nvct / 2 + i]);
+    for (i = 0; i < nvct / 2; ++i) cdoPrint("vct: %5d %25.17f %25.17f", i, vct[i], vct[nvct / 2 + i]);
 
   if (zaxisIDh == -1) cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
 
@@ -334,8 +333,7 @@ Derivepar(void *process)
               else if (varID == presID)
                 {
                   if (lnpsID != -1)
-                    for (size_t i = 0; i < gridsize; ++i)
-                      ps[i] = exp(array[i]);
+                    for (size_t i = 0; i < gridsize; ++i) ps[i] = exp(array[i]);
                   else if (psID != -1)
                     arrayCopy(gridsize, array, ps);
                 }

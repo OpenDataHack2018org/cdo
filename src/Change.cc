@@ -40,22 +40,18 @@ int stringToParam(const char *paramstr);
 void *
 Change(void *process)
 {
-  int nrecs, nvars;
+  int nrecs;
   int varID = 0, levelID;
   int chints[MAXARG];
   char *chnames[MAXARG];
   char varname[CDI_MAX_NAME];
   char *chname = NULL;
   int chcode = 0;
-  int param;
-  int code, tabnum, i;
+  int i;
   size_t nmiss;
-  int nfound;
-  int nzaxis, zaxisID1, zaxisID2, k, nlevs, index;
+  int zaxisID1, zaxisID2, k, index;
   double chlevels[MAXARG];
   int chltypes[MAXARG];
-  double *levels = NULL;
-  double *newlevels = NULL;
 
   cdoInitialize(process);
 
@@ -80,20 +76,17 @@ Change(void *process)
   if (operatorID == CHCODE || operatorID == CHTABNUM)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
-      for (i = 0; i < nch; i++)
-        chints[i] = parameter2int(operatorArgv()[i]);
+      for (i = 0; i < nch; i++) chints[i] = parameter2int(operatorArgv()[i]);
     }
   else if (operatorID == CHPARAM || operatorID == CHNAME || operatorID == CHUNIT)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
-      for (i = 0; i < nch; i++)
-        chnames[i] = operatorArgv()[i];
+      for (i = 0; i < nch; i++) chnames[i] = operatorArgv()[i];
     }
   else if (operatorID == CHLEVEL)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
-      for (i = 0; i < nch; i++)
-        chlevels[i] = parameter2double(operatorArgv()[i]);
+      for (i = 0; i < nch; i++) chlevels[i] = parameter2double(operatorArgv()[i]);
     }
   else if (operatorID == CHLEVELC)
     {
@@ -114,8 +107,7 @@ Change(void *process)
   else if (operatorID == CHLTYPE)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
-      for (i = 0; i < nch; i++)
-        chltypes[i] = parameter2int(operatorArgv()[i]);
+      for (i = 0; i < nch; i++) chltypes[i] = parameter2int(operatorArgv()[i]);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -129,10 +121,10 @@ Change(void *process)
 
   if (operatorID == CHCODE)
     {
-      nvars = vlistNvars(vlistID2);
+      int nvars = vlistNvars(vlistID2);
       for (varID = 0; varID < nvars; varID++)
         {
-          code = vlistInqVarCode(vlistID2, varID);
+          int code = vlistInqVarCode(vlistID2, varID);
           for (i = 0; i < nch; i += 2)
             if (code == chints[i]) vlistDefVarCode(vlistID2, varID, chints[i + 1]);
         }
@@ -140,10 +132,10 @@ Change(void *process)
   else if (operatorID == CHTABNUM)
     {
       int tableID;
-      nvars = vlistNvars(vlistID2);
+      int nvars = vlistNvars(vlistID2);
       for (varID = 0; varID < nvars; varID++)
         {
-          tabnum = tableInqNum(vlistInqVarTable(vlistID2, varID));
+          int tabnum = tableInqNum(vlistInqVarTable(vlistID2, varID));
           for (i = 0; i < nch; i += 2)
             if (tabnum == chints[i])
               {
@@ -154,10 +146,10 @@ Change(void *process)
     }
   else if (operatorID == CHPARAM)
     {
-      nvars = vlistNvars(vlistID2);
+      int nvars = vlistNvars(vlistID2);
       for (varID = 0; varID < nvars; varID++)
         {
-          param = vlistInqVarParam(vlistID2, varID);
+          int param = vlistInqVarParam(vlistID2, varID);
           if (cdoVerbose)
             {
               int pnum, pcat, pdis;
@@ -170,7 +162,7 @@ Change(void *process)
     }
   else if (operatorID == CHNAME)
     {
-      nvars = vlistNvars(vlistID2);
+      int nvars = vlistNvars(vlistID2);
       for (varID = 0; varID < nvars; varID++)
         {
           vlistInqVarName(vlistID2, varID, varname);
@@ -180,7 +172,7 @@ Change(void *process)
     }
   else if (operatorID == CHUNIT)
     {
-      nvars = vlistNvars(vlistID2);
+      int nvars = vlistNvars(vlistID2);
       for (varID = 0; varID < nvars; varID++)
         {
 
@@ -191,49 +183,45 @@ Change(void *process)
     }
   else if (operatorID == CHLEVEL)
     {
-      nzaxis = vlistNzaxis(vlistID2);
+      int nzaxis = vlistNzaxis(vlistID2);
       for (index = 0; index < nzaxis; index++)
         {
           zaxisID1 = vlistZaxis(vlistID2, index);
           if (zaxisInqLevels(zaxisID1, NULL))
             {
-              nlevs = zaxisInqSize(zaxisID1);
-              levels = (double *) Malloc(nlevs * sizeof(double));
-              newlevels = (double *) Malloc(nlevs * sizeof(double));
-              zaxisInqLevels(zaxisID1, levels);
+              int nlevs = zaxisInqSize(zaxisID1);
+              std::vector<double> levels(nlevs);
+              std::vector<double> newlevels(nlevs);
+              zaxisInqLevels(zaxisID1, &levels[0]);
 
-              for (k = 0; k < nlevs; k++)
-                newlevels[k] = levels[k];
+              for (k = 0; k < nlevs; k++) newlevels[k] = levels[k];
 
-              nfound = 0;
+              int nfound = 0;
               for (i = 0; i < nch; i += 2)
                 for (k = 0; k < nlevs; k++)
                   if (fabs(levels[k] - chlevels[i]) < 0.0001) nfound++;
 
               if (nfound)
                 {
-                  zaxisID2 = zaxisDuplicate(zaxisID1);
+                  int zaxisID2 = zaxisDuplicate(zaxisID1);
                   for (i = 0; i < nch; i += 2)
                     for (k = 0; k < nlevs; k++)
                       if (fabs(levels[k] - chlevels[i]) < 0.001) newlevels[k] = chlevels[i + 1];
 
-                  zaxisDefLevels(zaxisID2, newlevels);
+                  zaxisDefLevels(zaxisID2, &newlevels[0]);
                   vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
                 }
-
-              Free(levels);
-              Free(newlevels);
             }
         }
     }
   else if (operatorID == CHLEVELC || operatorID == CHLEVELV)
     {
-      nvars = vlistNvars(vlistID2);
+      int nvars = vlistNvars(vlistID2);
       if (operatorID == CHLEVELC)
         {
           for (varID = 0; varID < nvars; varID++)
             {
-              code = vlistInqVarCode(vlistID2, varID);
+              int code = vlistInqVarCode(vlistID2, varID);
               if (code == chcode) break;
             }
           if (varID == nvars) cdoAbort("Code %d not found!", chcode);
@@ -248,36 +236,33 @@ Change(void *process)
           if (varID == nvars) cdoAbort("Variable name %s not found!", chname);
         }
 
-      zaxisID1 = vlistInqVarZaxis(vlistID2, varID);
+      int zaxisID1 = vlistInqVarZaxis(vlistID2, varID);
       if (zaxisInqLevels(zaxisID1, NULL))
         {
-          nlevs = zaxisInqSize(zaxisID1);
-          levels = (double *) Malloc(nlevs * sizeof(double));
-          zaxisInqLevels(zaxisID1, levels);
-          nfound = 0;
+          int nlevs = zaxisInqSize(zaxisID1);
+          std::vector<double> levels(nlevs);
+          zaxisInqLevels(zaxisID1, &levels[0]);
+          int nfound = 0;
           for (k = 0; k < nlevs; k++)
             if (fabs(levels[k] - chlevels[0]) < 0.0001) nfound++;
 
           if (nfound)
             {
-              zaxisID2 = zaxisDuplicate(zaxisID1);
+              int zaxisID2 = zaxisDuplicate(zaxisID1);
               for (k = 0; k < nlevs; k++)
                 if (fabs(levels[k] - chlevels[0]) < 0.001) levels[k] = chlevels[1];
 
-              zaxisDefLevels(zaxisID2, levels);
+              zaxisDefLevels(zaxisID2, &levels[0]);
               vlistChangeVarZaxis(vlistID2, varID, zaxisID2);
             }
           else
             cdoAbort("Level %g not found!", chlevels[0]);
-
-          Free(levels);
         }
     }
   else if (operatorID == CHLTYPE)
     {
       int ltype, ltype1, ltype2;
-
-      nzaxis = vlistNzaxis(vlistID2);
+      int nzaxis = vlistNzaxis(vlistID2);
       for (index = 0; index < nzaxis; index++)
         {
           zaxisID1 = vlistZaxis(vlistID2, index);
@@ -300,17 +285,20 @@ Change(void *process)
         }
     }
 
-  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-  pstreamDefVlist(streamID2, vlistID2);
+  size_t gridsizemax = vlistGridsizeMax(vlistID2);
+  std::vector<double> array(gridsizemax);
 
-  size_t gridsize = vlistGridsizeMax(vlistID2);
-  double *array = (double *) Malloc(gridsize * sizeof(double));
+  int streamID2 = CDI_UNDEFID;
 
   int tsID1 = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
+      if (streamID2 == CDI_UNDEFID)
+        {
+          streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+          pstreamDefVlist(streamID2, vlistID2);
+        }
       pstreamDefTimestep(streamID2, tsID1);
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -318,16 +306,14 @@ Change(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           pstreamDefRecord(streamID2, varID, levelID);
 
-          pstreamReadRecord(streamID1, array, &nmiss);
-          pstreamWriteRecord(streamID2, array, nmiss);
+          pstreamReadRecord(streamID1, &array[0], &nmiss);
+          pstreamWriteRecord(streamID2, &array[0], nmiss);
         }
       tsID1++;
     }
 
   pstreamClose(streamID1);
   pstreamClose(streamID2);
-
-  if (array) Free(array);
 
   cdoFinish();
 

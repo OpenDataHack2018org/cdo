@@ -31,7 +31,6 @@ libcdo_la_SOURCES =            \
                after_namelist.cc \
                afterburnerlib.cc \
                afterburner.h   \
-               vct_l191.h      \
                calendar.h      \
                constants.h     \
                constants.cc     \
@@ -96,6 +95,8 @@ libcdo_la_SOURCES =            \
                griddes.h       \
                griddes_h5.cc    \
                griddes_nc.cc    \
+               grid_search.cc   \
+               grid_search.h   \
                hetaeta.cc       \
                hetaeta.h       \
                institution.cc   \
@@ -103,8 +104,7 @@ libcdo_la_SOURCES =            \
                interpol.h      \
                job.cc           \
                juldate.cc       \
-               grid_search.cc   \
-               grid_search.h   \
+               knn_weights.h   \
                listarray.cc     \
                listarray.h     \
                list.cc          \
@@ -156,9 +156,12 @@ libcdo_la_SOURCES =            \
                remap.h         \
                remaplib.cc      \
                remapsort.cc     \
+               remap_vars.cc \
+               remap_vars.h  \
                remap_scrip_io.cc \
                remap_search_reg2d.cc \
                remap_search_latbins.cc \
+               remap_search.cc \
                remap_store_link.cc \
                remap_store_link.h \
                remap_store_link_cnsrv.cc \
@@ -166,8 +169,8 @@ libcdo_la_SOURCES =            \
                remap_conserv.cc \
                remap_conserv_scrip.cc \
                remap_distwgt.cc \
-               remap_bicubic_scrip.cc \
-               remap_bilinear_scrip.cc \
+               remap_bicubic.cc \
+               remap_bilinear.cc \
                stdnametable.cc  \
                stdnametable.h  \
                specspace.cc     \
@@ -206,22 +209,6 @@ libcdo_la_SOURCES +=           \
                kdtreelib/pmergesort.cc        \
                kdtreelib/pqueue.cc            \
                kdtreelib/pqueue.h
-libcdo_la_SOURCES +=           \
-               clipping/clipping.c           \
-               clipping/clipping.h           \
-               clipping/area.c               \
-               clipping/area.h               \
-               clipping/ensure_array_size.c  \
-               clipping/ensure_array_size.h  \
-               clipping/geometry.h           \
-               clipping/grid.h               \
-               clipping/points.h             \
-               clipping/dep_list.h           \
-               clipping/grid_cell.c          \
-               clipping/grid_cell.h          \
-               clipping/intersection.c       \
-               clipping/utils.c              \
-               clipping/utils.h 
 #
 bin_PROGRAMS = cdo
 #
@@ -407,7 +394,6 @@ cdo_SOURCES += Adisit.cc        \
                Writegrid.cc     \
                Writerandom.cc   \
                XTimstat.cc      \
-               YAR.cc           \
                Yearmonstat.cc   \
                Ydayarith.cc     \
                Ydaypctl.cc      \
@@ -442,6 +428,7 @@ cdo_SOURCES += Magplot.cc       \
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+cdo_LDADD   += $(top_builddir)/src/lib/yac/libyac.la
 if USE_F77
 cdo_LDADD   += $(top_builddir)/src/lib/ncl/libncl.la
 endif

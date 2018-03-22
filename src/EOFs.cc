@@ -47,8 +47,7 @@ static void
 scale_eigvec_grid(double *restrict out, int tsID, size_t npack, const size_t *restrict pack,
                   const double *restrict weight, double **covar, double sum_w)
 {
-  for (size_t i = 0; i < npack; ++i)
-    out[pack[i]] = covar[tsID][i] / sqrt(weight[pack[i]] / sum_w);
+  for (size_t i = 0; i < npack; ++i) out[pack[i]] = covar[tsID][i] / sqrt(weight[pack[i]] / sum_w);
 }
 
 static void
@@ -61,8 +60,7 @@ scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack, const s
   for (size_t i = 0; i < npack; ++i)
     {
       double sum = 0;
-      for (int j = 0; j < nts; ++j)
-        sum += data[j][i] * covar[tsID][j];
+      for (int j = 0; j < nts; ++j) sum += data[j][i] * covar[tsID][j];
 
       out[pack[i]] = sum;
     }
@@ -92,16 +90,14 @@ scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack, const s
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(npack, pack, sum, out)
 #endif
-      for (size_t i = 0; i < npack; ++i)
-        out[pack[i]] /= sum;
+      for (size_t i = 0; i < npack; ++i) out[pack[i]] /= sum;
     }
   else
     {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(npack, pack, out, missval)
 #endif
-      for (size_t i = 0; i < npack; ++i)
-        out[pack[i]] = missval;
+      for (size_t i = 0; i < npack; ++i) out[pack[i]] = missval;
     }
 }
 
@@ -244,8 +240,7 @@ EOFs(void *process)
       if (nts == -1)
         {
           nts = 0;
-          while (cdoStreamInqTimestep(streamID1, nts))
-            nts++;
+          while (cdoStreamInqTimestep(streamID1, nts)) nts++;
 
           if (cdoVerbose) cdoPrint("Counted %i timeSteps", nts);
 
@@ -313,8 +308,7 @@ EOFs(void *process)
              grid_space == 1 ? "grid_space" : "time_space");
 
   double *weight = (double *) Malloc(gridsize * sizeof(double));
-  for (size_t i = 0; i < gridsize; ++i)
-    weight[i] = 1.;
+  for (size_t i = 0; i < gridsize; ++i) weight[i] = 1.;
 
   if (weight_mode == WEIGHT_ON)
     {
@@ -388,8 +382,7 @@ EOFs(void *process)
               if (weight_mode == WEIGHT_ON)
                 {
                   sum_w = 0;
-                  for (size_t i = 0; i < npack; i++)
-                    sum_w += weight[pack[i]];
+                  for (size_t i = 0; i < npack; i++) sum_w += weight[pack[i]];
                 }
             }
 
@@ -411,11 +404,9 @@ EOFs(void *process)
                   n = npack;
                   double *covar_array = (double *) Malloc(npack * npack * sizeof(double));
                   covar = (double **) Malloc(npack * sizeof(double *));
+                  for (size_t i = 0; i < npack; ++i) covar[i] = covar_array + npack * i;
                   for (size_t i = 0; i < npack; ++i)
-                    covar[i] = covar_array + npack * i;
-                  for (size_t i = 0; i < npack; ++i)
-                    for (size_t j = 0; j < npack; ++j)
-                      covar[i][j] = 0;
+                    for (size_t j = 0; j < npack; ++j) covar[i][j] = 0;
 
                   eofdata[varID][levelID].covar_array = covar_array;
                   eofdata[varID][levelID].covar = covar;
@@ -436,8 +427,7 @@ EOFs(void *process)
               double *data = (double *) Malloc(npack * sizeof(double));
               eofdata[varID][levelID].data[tsID] = data;
 
-              for (size_t ipack = 0; ipack < npack; ipack++)
-                data[ipack] = in[pack[ipack]];
+              for (size_t ipack = 0; ipack < npack; ipack++) data[ipack] = in[pack[ipack]];
             }
 
           eofdata[varID][levelID].init = true;
@@ -467,8 +457,7 @@ EOFs(void *process)
   double xvals = 0, yvals = 0;
   gridDefXvals(gridID2, &xvals);
   gridDefYvals(gridID2, &yvals);
-  for (int i = 0; i < ngrids; i++)
-    vlistChangeGridIndex(vlistID2, i, gridID2);
+  for (int i = 0; i < ngrids; i++) vlistChangeGridIndex(vlistID2, i, gridID2);
 
   /*  eigenvectors */
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
@@ -572,8 +561,7 @@ EOFs(void *process)
 
                       covar_array = (double *) Malloc(nts * nts * sizeof(double));
                       covar = (double **) Malloc(nts * sizeof(double *));
-                      for (int i = 0; i < nts; ++i)
-                        covar[i] = covar_array + nts * i;
+                      for (int i = 0; i < nts; ++i) covar[i] = covar_array + nts * i;
 
                       eig_val = (double *) Malloc(nts * sizeof(double));
                       eofdata[varID][levelID].eig_val = eig_val;
@@ -586,14 +574,12 @@ EOFs(void *process)
                       for (int j1 = 0; j1 < nts; j1++)
                         {
                           double *df1p = data[j1];
-                          for (int j2 = 0; j2 < j1; j2++)
-                            covar[j1][j2] = covar[j2][j1];
+                          for (int j2 = 0; j2 < j1; j2++) covar[j1][j2] = covar[j2][j1];
                           for (int j2 = j1; j2 < nts; j2++)
                             {
                               double *df2p = data[j2];
                               double sum = 0;
-                              for (size_t i = 0; i < npack; i++)
-                                sum += weight[pack[i]] * df1p[i] * df2p[i];
+                              for (size_t i = 0; i < npack; i++) sum += weight[pack[i]] * df1p[i] * df2p[i];
                               covar[j1][j2] = sum / sum_w / nts;
                             }
                         }
@@ -617,8 +603,7 @@ EOFs(void *process)
                   /* NOW: covar contains the eigenvectors, eig_val the
                    * eigenvalues */
 
-                  for (size_t i = 0; i < gridsize; ++i)
-                    out[i] = missval;
+                  for (size_t i = 0; i < gridsize; ++i) out[i] = missval;
 
                   // for ( int i = 0; i < n; i++ ) eig_val[i] *= sum_w;
                 }  // first_call

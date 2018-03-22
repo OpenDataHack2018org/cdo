@@ -257,16 +257,16 @@ struct yy_buffer_state
 
 #define YY_BUFFER_NEW 0
 #define YY_BUFFER_NORMAL 1
-  /* When an EOF's been seen but there's still some text to process
-   * then we mark the buffer as YY_EOF_PENDING, to indicate that we
-   * shouldn't try reading from the input source any more.  We might
-   * still have a bunch of tokens to match, though, because of
-   * possible backing-up.
-   *
-   * When we actually see the EOF, we change the status to "new"
-   * (via yyrestart()), so that the user can continue scanning by
-   * just pointing yyin at a new input file.
-   */
+/* When an EOF's been seen but there's still some text to process
+ * then we mark the buffer as YY_EOF_PENDING, to indicate that we
+ * shouldn't try reading from the input source any more.  We might
+ * still have a bunch of tokens to match, though, because of
+ * possible backing-up.
+ *
+ * When we actually see the EOF, we change the status to "new"
+ * (via yyrestart()), so that the user can continue scanning by
+ * just pointing yyin at a new input file.
+ */
 #define YY_BUFFER_EOF_PENDING 2
 };
 #endif /* !YY_STRUCT_YY_BUFFER_STATE */
@@ -644,30 +644,29 @@ static int input(yyscan_t yyscanner);
  * is returned in "result".
  */
 #ifndef YY_INPUT
-#define YY_INPUT(buf, result, max_size)                                                       \
-  if (YY_CURRENT_BUFFER_LVALUE->yy_is_interactive)                                            \
-    {                                                                                         \
-      int c = '*';                                                                            \
-      int n;                                                                                  \
-      for (n = 0; n < max_size && (c = getc(yyin)) != EOF && c != '\n'; ++n)                  \
-        buf[n] = (char) c;                                                                    \
-      if (c == '\n') buf[n++] = (char) c;                                                     \
-      if (c == EOF && ferror(yyin)) YY_FATAL_ERROR("input in flex scanner failed");           \
-      result = n;                                                                             \
-    }                                                                                         \
-  else                                                                                        \
-    {                                                                                         \
-      errno = 0;                                                                              \
-      while ((result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin)) \
-        {                                                                                     \
-          if (errno != EINTR)                                                                 \
-            {                                                                                 \
-              YY_FATAL_ERROR("input in flex scanner failed");                                 \
-              break;                                                                          \
-            }                                                                                 \
-          errno = 0;                                                                          \
-          clearerr(yyin);                                                                     \
-        }                                                                                     \
+#define YY_INPUT(buf, result, max_size)                                                         \
+  if (YY_CURRENT_BUFFER_LVALUE->yy_is_interactive)                                              \
+    {                                                                                           \
+      int c = '*';                                                                              \
+      int n;                                                                                    \
+      for (n = 0; n < max_size && (c = getc(yyin)) != EOF && c != '\n'; ++n) buf[n] = (char) c; \
+      if (c == '\n') buf[n++] = (char) c;                                                       \
+      if (c == EOF && ferror(yyin)) YY_FATAL_ERROR("input in flex scanner failed");             \
+      result = n;                                                                               \
+    }                                                                                           \
+  else                                                                                          \
+    {                                                                                           \
+      errno = 0;                                                                                \
+      while ((result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin))   \
+        {                                                                                       \
+          if (errno != EINTR)                                                                   \
+            {                                                                                   \
+              YY_FATAL_ERROR("input in flex scanner failed");                                   \
+              break;                                                                            \
+            }                                                                                   \
+          errno = 0;                                                                            \
+          clearerr(yyin);                                                                       \
+        }                                                                                       \
     }
 
 #endif
@@ -1149,8 +1148,7 @@ yy_get_next_buffer(yyscan_t yyscanner)
   /* First move last chars to start of buffer. */
   number_to_move = (int) (yyg->yy_c_buf_p - yyg->yytext_ptr - 1);
 
-  for (i = 0; i < number_to_move; ++i)
-    *(dest++) = *(source++);
+  for (i = 0; i < number_to_move; ++i) *(dest++) = *(source++);
 
   if (YY_CURRENT_BUFFER_LVALUE->yy_buffer_status == YY_BUFFER_EOF_PENDING)
     /* don't do the read, it's not guaranteed to return an EOF,
@@ -1318,7 +1316,7 @@ input(yyscan_t yyscanner)
               /* Reset buffer status. */
               yyrestart(yyin, yyscanner);
 
-              /*FALLTHROUGH*/
+            /*FALLTHROUGH*/
 
             case EOB_ACT_END_OF_FILE:
               {
@@ -1681,8 +1679,7 @@ yy_scan_bytes(const char *yybytes, int _yybytes_len, yyscan_t yyscanner)
   buf = (char *) yyalloc(n, yyscanner);
   if (!buf) YY_FATAL_ERROR("out of dynamic memory in yy_scan_bytes()");
 
-  for (i = 0; i < _yybytes_len; ++i)
-    buf[i] = yybytes[i];
+  for (i = 0; i < _yybytes_len; ++i) buf[i] = yybytes[i];
 
   buf[_yybytes_len] = buf[_yybytes_len + 1] = YY_END_OF_BUFFER_CHAR;
 
@@ -2051,8 +2048,7 @@ yy_flex_strncpy(char *s1, const char *s2, int n, yyscan_t yyscanner)
   (void) yyg;
 
   int i;
-  for (i = 0; i < n; ++i)
-    s1[i] = s2[i];
+  for (i = 0; i < n; ++i) s1[i] = s2[i];
 }
 #endif
 

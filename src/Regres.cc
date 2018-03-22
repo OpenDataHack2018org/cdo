@@ -70,8 +70,7 @@ Regres(void *process)
   field1.ptr = (double *) Malloc(gridsize * sizeof(double));
   field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  for (int w = 0; w < nwork; w++)
-    work[w] = field_calloc(vlistID1, FIELD_PTR);
+  for (int w = 0; w < nwork; w++) work[w] = field_calloc(vlistID1, FIELD_PTR);
 
   int vdate = 0, vtime = 0;
   int tsID = 0;
@@ -153,8 +152,7 @@ Regres(void *process)
       pstreamWriteRecord(streamID3, field2.ptr, nmiss);
     }
 
-  for (int w = 0; w < nwork; w++)
-    field_free(work[w], vlistID1);
+  for (int w = 0; w < nwork; w++) field_free(work[w], vlistID1);
 
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);

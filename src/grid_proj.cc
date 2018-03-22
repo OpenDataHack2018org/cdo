@@ -98,14 +98,12 @@ proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, dou
   //  params[nbpar++] = gen_param("no_defs");
 
   if (cdoVerbose)
-    for (int i = 0; i < nbpar; ++i)
-      cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
+    for (int i = 0; i < nbpar; ++i) cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
 
   projPJ proj = pj_init(nbpar, &params[0]);
   if (!proj) status = -1;
 
-  for (int i = 0; i < nbpar; ++i)
-    Free(params[i]);
+  for (int i = 0; i < nbpar; ++i) Free(params[i]);
 
   /* proj->over = 1; */ /* allow longitude > 180 */
 
@@ -180,14 +178,12 @@ proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1, dou
   if (IS_NOT_EQUAL(y_0, grid_missval)) params[nbpar++] = gen_param("y_0=%g", y_0);
 
   if (cdoVerbose)
-    for (int i = 0; i < nbpar; ++i)
-      cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
+    for (int i = 0; i < nbpar; ++i) cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
 
   projPJ proj = pj_init(nbpar, &params[0]);
   if (!proj) status = -1;
 
-  for (int i = 0; i < nbpar; ++i)
-    Free(params[i]);
+  for (int i = 0; i < nbpar; ++i) Free(params[i]);
 
   /* proj->over = 1; */ /* allow longitude > 180 */
 
@@ -316,14 +312,12 @@ cdo_sinu_to_lonlat(size_t nvals, double *xvals, double *yvals)
   params[nbpar++] = gen_param("ellps=WGS84");
 
   if (cdoVerbose)
-    for (int i = 0; i < nbpar; ++i)
-      cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
+    for (int i = 0; i < nbpar; ++i) cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
 
   projPJ proj = pj_init(nbpar, params);
   if (!proj) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
-  for (int i = 0; i < nbpar; ++i)
-    Free(params[i]);
+  for (int i = 0; i < nbpar; ++i) Free(params[i]);
 
   /* proj->over = 1; */ /* allow longitude > 180 */
 
@@ -354,8 +348,7 @@ cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int attl
     {
       std::vector<int> attint(attlen);
       cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, &attint[0]);
-      for (int i = 0; i < attlen; ++i)
-        attflt[i] = (double) attint[i];
+      for (int i = 0; i < attlen; ++i) attflt[i] = (double) attint[i];
     }
   else if (atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64)
     {
@@ -435,14 +428,12 @@ cdo_laea_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
   if (IS_NOT_EQUAL(y_0, 0)) params[nbpar++] = gen_param("y_0=%g", y_0);
 
   if (cdoVerbose)
-    for (int i = 0; i < nbpar; ++i)
-      cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
+    for (int i = 0; i < nbpar; ++i) cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
 
   projPJ proj = pj_init(nbpar, &params[0]);
   if (!proj) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
-  for (int i = 0; i < nbpar; ++i)
-    Free(params[i]);
+  for (int i = 0; i < nbpar; ++i) Free(params[i]);
 
   /* proj->over = 1; */ /* allow longitude > 180 */
 
@@ -473,12 +464,10 @@ cdo_proj_to_lonlat(char *proj4param, size_t nvals, double *xvals, double *yvals)
   int nbpar;
   for (nbpar = 0; nbpar < 99; ++nbpar)
     {
-      while (*proj4param == ' ' || *proj4param == '+')
-        proj4param++;
+      while (*proj4param == ' ' || *proj4param == '+') proj4param++;
       if (*proj4param == 0) break;
       char *cstart = proj4param;
-      while (*proj4param != ' ' && *proj4param != 0)
-        proj4param++;
+      while (*proj4param != ' ' && *proj4param != 0) proj4param++;
       char *cend = proj4param;
       size_t len = cend - cstart;
       if (len <= 0) break;
@@ -489,14 +478,12 @@ cdo_proj_to_lonlat(char *proj4param, size_t nvals, double *xvals, double *yvals)
     }
 
   if (cdoVerbose)
-    for (int i = 0; i < nbpar; ++i)
-      cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
+    for (int i = 0; i < nbpar; ++i) cdoPrint("Proj.param[%d] = %s", i + 1, params[i]);
 
   projPJ proj = pj_init(nbpar, &params[0]);
   if (!proj) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
-  for (int i = 0; i < nbpar; ++i)
-    Free(params[i]);
+  for (int i = 0; i < nbpar; ++i) Free(params[i]);
 
   projUV p;
   for (size_t i = 0; i < nvals; i++)

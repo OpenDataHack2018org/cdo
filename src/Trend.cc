@@ -58,8 +58,7 @@ Trend(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<recinfo_type> recinfo(maxrecs);
 
-  for (varID = 0; varID < nvars; varID++)
-    vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
+  for (varID = 0; varID < nvars; varID++) vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
@@ -75,8 +74,7 @@ Trend(void *process)
   field1.ptr = (double *) Malloc(gridsize * sizeof(double));
   field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  for (int w = 0; w < nwork; w++)
-    work[w] = field_calloc(vlistID1, FIELD_PTR);
+  for (int w = 0; w < nwork; w++) work[w] = field_calloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -158,8 +156,7 @@ Trend(void *process)
       pstreamWriteRecord(streamID3, field2.ptr, nmiss);
     }
 
-  for (int w = 0; w < nwork; w++)
-    field_free(work[w], vlistID1);
+  for (int w = 0; w < nwork; w++) field_free(work[w], vlistID1);
 
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);

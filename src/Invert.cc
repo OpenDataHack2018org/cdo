@@ -60,13 +60,11 @@ invertLonDes(int vlistID)
           if (gridtype == GRID_CURVILINEAR)
             {
               for (size_t ilat = 0; ilat < nlat; ilat++)
-                for (size_t ilon = 0; ilon < nlon; ilon++)
-                  xv2[ilat * nlon + nlon - ilon - 1] = xv1[ilat * nlon + ilon];
+                for (size_t ilon = 0; ilon < nlon; ilon++) xv2[ilat * nlon + nlon - ilon - 1] = xv1[ilat * nlon + ilon];
             }
           else
             {
-              for (size_t ilon = 0; ilon < nlon; ilon++)
-                xv2[nlon - ilon - 1] = xv1[ilon];
+              for (size_t ilon = 0; ilon < nlon; ilon++) xv2[nlon - ilon - 1] = xv1[ilon];
             }
 
           gridDefXvals(gridID2, xv2);
@@ -132,16 +130,14 @@ invertLatCoord(int gridID)
           gridInqXvals(gridID, yv1);
 
           for (size_t ilat = 0; ilat < nlat; ilat++)
-            for (size_t ilon = 0; ilon < nlon; ilon++)
-              yv2[(nlat - ilat - 1) * nlon + ilon] = yv1[ilat * nlon + ilon];
+            for (size_t ilon = 0; ilon < nlon; ilon++) yv2[(nlat - ilat - 1) * nlon + ilon] = yv1[ilat * nlon + ilon];
 
           gridDefXvals(gridID, yv2);
 
           gridInqYvals(gridID, yv1);
 
           for (size_t ilat = 0; ilat < nlat; ilat++)
-            for (size_t ilon = 0; ilon < nlon; ilon++)
-              yv2[(nlat - ilat - 1) * nlon + ilon] = yv1[ilat * nlon + ilon];
+            for (size_t ilon = 0; ilon < nlon; ilon++) yv2[(nlat - ilat - 1) * nlon + ilon] = yv1[ilat * nlon + ilon];
 
           gridDefYvals(gridID, yv2);
         }
@@ -149,8 +145,7 @@ invertLatCoord(int gridID)
         {
           gridInqYvals(gridID, yv1);
 
-          for (size_t ilat = 0; ilat < nlat; ilat++)
-            yv2[nlat - ilat - 1] = yv1[ilat];
+          for (size_t ilat = 0; ilat < nlat; ilat++) yv2[nlat - ilat - 1] = yv1[ilat];
 
           gridDefYvals(gridID, yv2);
         }
@@ -236,8 +231,7 @@ invertLonData(double *array1, double *array2, int gridID1)
         }
 
       for (size_t ilat = 0; ilat < nlat; ilat++)
-        for (size_t ilon = 0; ilon < nlon; ilon++)
-          field2[ilat][nlon - ilon - 1] = field1[ilat][ilon];
+        for (size_t ilon = 0; ilon < nlon; ilon++) field2[ilat][nlon - ilon - 1] = field1[ilat][ilon];
 
       if (field1) Free(field1);
       if (field2) Free(field2);
@@ -265,8 +259,7 @@ invertLatData(double *array1, double *array2, int gridID1)
           field2[ilat] = array2 + ilat * nlon;
         }
 
-      for (size_t ilat = 0; ilat < nlat; ilat++)
-        arrayCopy(nlon, field1[ilat], field2[nlat - ilat - 1]);
+      for (size_t ilat = 0; ilat < nlat; ilat++) arrayCopy(nlon, field1[ilat], field2[nlat - ilat - 1]);
 
       if (field1) Free(field1);
       if (field2) Free(field2);

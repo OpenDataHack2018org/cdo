@@ -102,8 +102,7 @@ Timsort(void *process)
   int nts = tsID;
 
   double **sarray = (double **) Malloc(Threading::ompNumThreads * sizeof(double *));
-  for (int i = 0; i < Threading::ompNumThreads; i++)
-    sarray[i] = (double *) Malloc(nts * sizeof(double));
+  for (int i = 0; i < Threading::ompNumThreads; i++) sarray[i] = (double *) Malloc(nts * sizeof(double));
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -121,13 +120,11 @@ Timsort(void *process)
             {
               int ompthID = cdo_omp_get_thread_num();
 
-              for (int tsID = 0; tsID < nts; tsID++)
-                sarray[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
+              for (int tsID = 0; tsID < nts; tsID++) sarray[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
               qsort(sarray[ompthID], nts, sizeof(double), cmpdarray);
 
-              for (int tsID = 0; tsID < nts; tsID++)
-                vars[tsID][varID][levelID].ptr[i] = sarray[ompthID][tsID];
+              for (int tsID = 0; tsID < nts; tsID++) vars[tsID][varID][levelID].ptr[i] = sarray[ompthID][tsID];
             }
         }
     }

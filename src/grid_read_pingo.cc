@@ -36,8 +36,7 @@ skip_nondigit_lines(FILE *gfp)
       if (c == EOF || isdigit(c) || c == '.' || c == '+' || c == '-' || c == 'N')
         break;  // N: for NaN
       else
-        while (c != '\n' && c != EOF)
-          c = fgetc(gfp);
+        while (c != '\n' && c != EOF) c = fgetc(gfp);
     }
 
   ungetc(c, gfp);
@@ -107,8 +106,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
           if (grid.xsize > 1)
             if (IS_EQUAL(grid.xvals[0], grid.xvals[1])) grid.xvals[1] += 360;
 
-          for (i = 0; i < (int) grid.xsize; i++)
-            grid.xvals[i] = grid.xvals[0] + i * (grid.xvals[1] - grid.xvals[0]);
+          for (i = 0; i < (int) grid.xsize; i++) grid.xvals[i] = grid.xvals[0] + i * (grid.xvals[1] - grid.xvals[0]);
         }
       else if (nlon == (int) grid.xsize)
         {
@@ -133,8 +131,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
       if (nlat == 2)
         {
           if (input_darray(gfp, 2, grid.yvals) != 2) return gridID;
-          for (i = 0; i < (int) grid.ysize; i++)
-            grid.yvals[i] = grid.yvals[0] + i * (grid.yvals[1] - grid.yvals[0]);
+          for (i = 0; i < (int) grid.ysize; i++) grid.yvals[i] = grid.yvals[0] + i * (grid.yvals[1] - grid.yvals[0]);
         }
       else if (nlat == (int) grid.ysize)
         {
@@ -166,8 +163,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
           yw = (double *) Malloc(grid.ysize * sizeof(double));
           gaussaw(yvals, yw, grid.ysize);
           Free(yw);
-          for (i = 0; i < (int) grid.ysize; i++)
-            yvals[i] = asin(yvals[i]) * RAD2DEG;
+          for (i = 0; i < (int) grid.ysize; i++) yvals[i] = asin(yvals[i]) * RAD2DEG;
 
           for (i = 0; i < (int) grid.ysize; i++)
             if (fabs(yvals[i] - grid.yvals[i]) > ((yvals[0] - yvals[1]) / 500)) break;

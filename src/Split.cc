@@ -122,8 +122,7 @@ Split(void *process)
       vlistIDs = (int *) Malloc(nsplit * sizeof(int));
       streamIDs = (int *) Malloc(nsplit * sizeof(int));
       std::vector<int> codes(nsplit);
-      for (int index = 0; index < nsplit; ++index)
-        codes[index] = itmp[index];
+      for (int index = 0; index < nsplit; ++index) codes[index] = itmp[index];
 
       for (int index = 0; index < nsplit; ++index)
         {
@@ -186,8 +185,7 @@ Split(void *process)
       vlistIDs = (int *) Malloc(nsplit * sizeof(int));
       streamIDs = (int *) Malloc(nsplit * sizeof(int));
       std::vector<int> params(nsplit);
-      for (int index = 0; index < nsplit; ++index)
-        params[index] = itmp[index];
+      for (int index = 0; index < nsplit; ++index) params[index] = itmp[index];
 
       for (int index = 0; index < nsplit; ++index)
         {
@@ -239,8 +237,7 @@ Split(void *process)
       vlistIDs = (int *) Malloc(nsplit * sizeof(int));
       streamIDs = (int *) Malloc(nsplit * sizeof(int));
       std::vector<int> tabnums(nsplit);
-      for (int index = 0; index < nsplit; ++index)
-        tabnums[index] = itmp[index];
+      for (int index = 0; index < nsplit; ++index) tabnums[index] = itmp[index];
 
       for (int index = 0; index < nsplit; ++index)
         {
@@ -321,8 +318,7 @@ Split(void *process)
       vlistIDs = (int *) Malloc(nsplit * sizeof(int));
       streamIDs = (int *) Malloc(nsplit * sizeof(int));
       std::vector<double> levels(nsplit);
-      for (int index = 0; index < nsplit; ++index)
-        levels[index] = ftmp[index];
+      for (int index = 0; index < nsplit; ++index) levels[index] = ftmp[index];
 
       for (int index = 0; index < nsplit; ++index)
         {
@@ -360,8 +356,7 @@ Split(void *process)
       vlistIDs = (int *) Malloc(nsplit * sizeof(int));
       streamIDs = (int *) Malloc(nsplit * sizeof(int));
       std::vector<int> gridIDs(nsplit);
-      for (int index = 0; index < nsplit; ++index)
-        gridIDs[index] = vlistGrid(vlistID1, index);
+      for (int index = 0; index < nsplit; ++index) gridIDs[index] = vlistGrid(vlistID1, index);
 
       for (int index = 0; index < nsplit; ++index)
         {
@@ -396,8 +391,7 @@ Split(void *process)
       vlistIDs = (int *) Malloc(nsplit * sizeof(int));
       streamIDs = (int *) Malloc(nsplit * sizeof(int));
       std::vector<int> zaxisIDs(nsplit);
-      for (int index = 0; index < nsplit; ++index)
-        zaxisIDs[index] = vlistZaxis(vlistID1, index);
+      for (int index = 0; index < nsplit; ++index) zaxisIDs[index] = vlistZaxis(vlistID1, index);
 
       for (int index = 0; index < nsplit; ++index)
         {
@@ -449,8 +443,7 @@ Split(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      for (int index = 0; index < nsplit; index++)
-        pstreamDefTimestep(streamIDs[index], tsID);
+      for (int index = 0; index < nsplit; index++) pstreamDefTimestep(streamIDs[index], tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
         {

@@ -71,14 +71,12 @@ cdiOpenError(int cdiErrno, const char *fmt, const char *path)
                       ? "4"
                       : ((filetype == CDI_FILETYPE_NC2) ? "2" : ((filetype == CDI_FILETYPE_NC5) ? "5" : ""));
 #if defined HAVE_LIBNETCDF
-            fprintf(stderr,
-                    "CDO was build with a NetCDF version which doesn't support "
-                    "NetCDF%s data!\n",
+            fprintf(stderr, "CDO was build with a NetCDF version which doesn't support "
+                            "NetCDF%s data!\n",
                     ncv);
 #else
-            fprintf(stderr,
-                    "To create a CDO application with NetCDF%s support use: "
-                    "./configure --with-netcdf=<NetCDF%s root directory> ...\n",
+            fprintf(stderr, "To create a CDO application with NetCDF%s support use: "
+                            "./configure --with-netcdf=<NetCDF%s root directory> ...\n",
                     ncv, ncv);
 #endif
             break;

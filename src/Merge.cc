@@ -177,8 +177,7 @@ Merge(void *process)
       vlistMerge(vlistID2, vlistIDs[index]);
     }
 
-  for (index = 0; index < nmerge; index++)
-    numsteps[index] = -1;
+  for (index = 0; index < nmerge; index++) numsteps[index] = -1;
 
   int numconst = 0;
   for (index = 0; index < nmerge; index++)
@@ -206,8 +205,7 @@ Merge(void *process)
 
   if (cdoVerbose)
     {
-      for (index = 0; index < nmerge; index++)
-        vlistPrint(vlistIDs[index]);
+      for (index = 0; index < nmerge; index++) vlistPrint(vlistIDs[index]);
       vlistPrint(vlistID2);
     }
 
@@ -315,8 +313,7 @@ Merge(void *process)
       tsID++;
     }
 
-  for (index = 0; index < nmerge; index++)
-    pstreamClose(streamIDs[index]);
+  for (index = 0; index < nmerge; index++) pstreamClose(streamIDs[index]);
 
   pstreamClose(streamID2);
 

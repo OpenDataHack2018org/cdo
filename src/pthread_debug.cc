@@ -92,16 +92,16 @@ print_pthread_mutexattr(const char *caller, pthread_mutexattr_t *m_attr)
 {
   (void) caller;
   (void) m_attr;
-  /*
+/*
 #if defined(_POSIX_THREAD_PRIO_PROTECT) && defined(_POSIX_THREAD_PRIO_INHERIT)
-  {
-  int protocol;
-  pthread_mutexattr_getprotocol(m_attr, &protocol);
-  POUT3(caller, protocol, PTHREAD_PRIO_INHERIT, PTHREAD_PRIO_PROTECT,
+{
+int protocol;
+pthread_mutexattr_getprotocol(m_attr, &protocol);
+POUT3(caller, protocol, PTHREAD_PRIO_INHERIT, PTHREAD_PRIO_PROTECT,
 PTHREAD_PRIO_NONE);
-  }
+}
 #endif
-  */
+*/
 #if defined(PTHREAD_MUTEX_FAST_NP)
   {
     int kind;

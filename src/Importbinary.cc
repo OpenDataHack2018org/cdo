@@ -86,8 +86,7 @@ y_is_gauss(double *gridyvals, int ysize)
       yw = (double *) Malloc(ysize * sizeof(double));
       gaussaw(yvals, yw, (size_t) ysize);
       Free(yw);
-      for (i = 0; i < (int) ysize; i++)
-        yvals[i] = asin(yvals[i]) / M_PI * 180.0;
+      for (i = 0; i < (int) ysize; i++) yvals[i] = asin(yvals[i]) / M_PI * 180.0;
 
       for (i = 0; i < (int) ysize; i++)
         if (fabs(yvals[i] - gridyvals[i]) > ((yvals[0] - yvals[1]) / 500)) break;
@@ -378,8 +377,7 @@ Importbinary(void *process)
             {
               told = 0;
               tcur = 1;
-              while (pfi.fnums[tcur - 1] == -1)
-                tcur++;
+              while (pfi.fnums[tcur - 1] == -1) tcur++;
             }
           else
             { /* tcur!=0 */
@@ -491,29 +489,25 @@ Importbinary(void *process)
               if (var_dfrm[recID] == 1)
                 {
                   unsigned char *carray = (unsigned char *) (rec + recoffset);
-                  for (i = 0; i < gridsize; ++i)
-                    array[i] = (double) carray[i];
+                  for (i = 0; i < gridsize; ++i) array[i] = (double) carray[i];
                 }
               else if (var_dfrm[recID] == 2)
                 {
                   unsigned short *sarray = (unsigned short *) (rec + recoffset);
                   if (pfi.bswap) gabswp2(sarray, gridsize);
-                  for (i = 0; i < gridsize; ++i)
-                    array[i] = (double) sarray[i];
+                  for (i = 0; i < gridsize; ++i) array[i] = (double) sarray[i];
                 }
               else if (var_dfrm[recID] == -2)
                 {
                   short *sarray = (short *) (rec + recoffset);
                   if (pfi.bswap) gabswp2(sarray, gridsize);
-                  for (i = 0; i < gridsize; ++i)
-                    array[i] = (double) sarray[i];
+                  for (i = 0; i < gridsize; ++i) array[i] = (double) sarray[i];
                 }
               else if (var_dfrm[recID] == 4)
                 {
                   int *iarray = (int *) (rec + recoffset);
                   if (pfi.bswap) gabswp(iarray, gridsize);
-                  for (i = 0; i < gridsize; ++i)
-                    array[i] = (double) iarray[i];
+                  for (i = 0; i < gridsize; ++i) array[i] = (double) iarray[i];
                 }
               else
                 {
@@ -521,15 +515,13 @@ Importbinary(void *process)
                     {
                       double *darray = (double *) (rec + recoffset);
                       if (pfi.bswap) gabswp(darray, gridsize);
-                      for (i = 0; i < gridsize; ++i)
-                        array[i] = darray[i];
+                      for (i = 0; i < gridsize; ++i) array[i] = darray[i];
                     }
                   else
                     {
                       float *farray = (float *) (rec + recoffset);
                       if (pfi.bswap) gabswp(farray, gridsize);
-                      for (i = 0; i < gridsize; ++i)
-                        array[i] = (double) farray[i];
+                      for (i = 0; i < gridsize; ++i) array[i] = (double) farray[i];
                     }
                 }
 

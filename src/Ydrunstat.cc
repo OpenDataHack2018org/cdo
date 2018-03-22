@@ -323,8 +323,7 @@ ydstatDestroy(YDAY_STATS *stats)
               for (varID = 0; varID < nvars; varID++)
                 {
                   nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
-                  for (levelID = 0; levelID < nlevels; levelID++)
-                    Free(stats->vars1[dayoy][varID][levelID].ptr);
+                  for (levelID = 0; levelID < nlevels; levelID++) Free(stats->vars1[dayoy][varID][levelID].ptr);
                   Free(stats->vars1[dayoy][varID]);
                 }
               Free(stats->vars1[dayoy]);
@@ -334,8 +333,7 @@ ydstatDestroy(YDAY_STATS *stats)
               for (varID = 0; varID < nvars; varID++)
                 {
                   nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
-                  for (levelID = 0; levelID < nlevels; levelID++)
-                    Free(stats->vars2[dayoy][varID][levelID].ptr);
+                  for (levelID = 0; levelID < nlevels; levelID++) Free(stats->vars2[dayoy][varID][levelID].ptr);
                   Free(stats->vars2[dayoy][varID]);
                 }
               Free(stats->vars2[dayoy]);

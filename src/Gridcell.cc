@@ -60,8 +60,7 @@ grid_cell_area(int gridID, double *array)
             cdoAbort("%s: Can't compute grid cell area for this grid!", __func__);
 
           size_t ngp = gridInqSize(gridID);
-          for (size_t i = 0; i < ngp; ++i)
-            array[i] *= PlanetRadius * PlanetRadius;
+          for (size_t i = 0; i < ngp; ++i) array[i] *= PlanetRadius * PlanetRadius;
         }
     }
   else
@@ -179,17 +178,14 @@ Gridcell(void *process)
         }
       else
         {
-          for (size_t i = 0; i < gridsize; ++i)
-            mask[i] = 1;
+          for (size_t i = 0; i < gridsize; ++i) mask[i] = 1;
         }
 
-      for (size_t i = 0; i < gridsize; ++i)
-        array[i] = mask[i];
+      for (size_t i = 0; i < gridsize; ++i) array[i] = mask[i];
     }
   else if (operatorID == GRIDCELLIDX)
     {
-      for (size_t i = 0; i < gridsize; ++i)
-        array[i] = i + 1;
+      for (size_t i = 0; i < gridsize; ++i) array[i] = i + 1;
     }
   else if (operatorID == GRIDDX || operatorID == GRIDDY)
     {

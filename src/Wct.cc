@@ -74,8 +74,7 @@ farexpr(field_type *field1, field_type field2, double (*expression)(double, doub
     }
   else
     {
-      for (i = 0; i < len; i++)
-        array1[i] = expression(array1[i], array2[i], missval1);
+      for (i = 0; i < len; i++) array1[i] = expression(array1[i], array2[i], missval1);
     }
 
   field1->nmiss = arrayNumMV(len, array1, missval1);

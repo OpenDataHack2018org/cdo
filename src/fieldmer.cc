@@ -53,8 +53,7 @@ mermin(field_type field1, field_type *field2)
 
   for (size_t i = 0; i < nx; ++i)
     {
-      for (size_t j = 0; j < ny; j++)
-        v[j] = field1.ptr[j * nx + i];
+      for (size_t j = 0; j < ny; j++) v[j] = field1.ptr[j * nx + i];
 
       if (field1.nmiss > 0)
         {
@@ -85,8 +84,7 @@ mermax(field_type field1, field_type *field2)
 
   for (size_t i = 0; i < nx; ++i)
     {
-      for (size_t j = 0; j < ny; j++)
-        v[j] = field1.ptr[j * nx + i];
+      for (size_t j = 0; j < ny; j++) v[j] = field1.ptr[j * nx + i];
 
       if (field1.nmiss > 0)
         {
@@ -117,8 +115,7 @@ merrange(field_type field1, field_type *field2)
 
   for (size_t i = 0; i < nx; ++i)
     {
-      for (size_t j = 0; j < ny; j++)
-        v[j] = field1.ptr[j * nx + i];
+      for (size_t j = 0; j < ny; j++) v[j] = field1.ptr[j * nx + i];
 
       if (field1.nmiss > 0)
         {
@@ -149,8 +146,7 @@ mersum(field_type field1, field_type *field2)
 
   for (size_t i = 0; i < nx; ++i)
     {
-      for (size_t j = 0; j < ny; j++)
-        v[j] = field1.ptr[j * nx + i];
+      for (size_t j = 0; j < ny; j++) v[j] = field1.ptr[j * nx + i];
 
       if (field1.nmiss > 0)
         {
@@ -182,10 +178,8 @@ mermeanw(field_type field1, field_type *field2)
 
   for (size_t i = 0; i < nx; ++i)
     {
-      for (size_t j = 0; j < ny; j++)
-        v[j] = field1.ptr[j * nx + i];
-      for (size_t j = 0; j < ny; j++)
-        w[j] = field1.weight[j * nx + i];
+      for (size_t j = 0; j < ny; j++) v[j] = field1.ptr[j * nx + i];
+      for (size_t j = 0; j < ny; j++) w[j] = field1.weight[j * nx + i];
 
       if (field1.nmiss)
         {
@@ -218,10 +212,8 @@ meravgw(field_type field1, field_type *field2)
 
   for (size_t i = 0; i < nx; ++i)
     {
-      for (size_t j = 0; j < ny; j++)
-        v[j] = field1.ptr[j * nx + i];
-      for (size_t j = 0; j < ny; j++)
-        w[j] = field1.weight[j * nx + i];
+      for (size_t j = 0; j < ny; j++) v[j] = field1.ptr[j * nx + i];
+      for (size_t j = 0; j < ny; j++) w[j] = field1.weight[j * nx + i];
 
       if (field1.nmiss)
         {
@@ -421,8 +413,7 @@ merpctl(field_type field1, field_type *field2, int p)
         {
           if (ny > 0)
             {
-              for (size_t j = 0; j < ny; j++)
-                array2[j] = array[j * nx + i];
+              for (size_t j = 0; j < ny; j++) array2[j] = array[j * nx + i];
               field2->ptr[i] = percentile(array2, ny, p);
             }
           else

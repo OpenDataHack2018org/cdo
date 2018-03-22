@@ -74,12 +74,10 @@ Setbox(void *process)
 
   cdoInitialize(process);
 
-  SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0,
-                                 "constant, western and eastern longitude and "
-                                 "southern and northern latitude");
-  SETCINDEXBOX = cdoOperatorAdd("setcindexbox", 0, 0,
-                                "constant, index of first and last longitude "
-                                "and index of first and last latitude");
+  SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0, "constant, western and eastern longitude and "
+                                                        "southern and northern latitude");
+  SETCINDEXBOX = cdoOperatorAdd("setcindexbox", 0, 0, "constant, index of first and last longitude "
+                                                      "and index of first and last latitude");
 
   operatorID = cdoOperatorID();
 

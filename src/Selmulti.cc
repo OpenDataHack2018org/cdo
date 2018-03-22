@@ -24,9 +24,8 @@
 
 // NOTE: All operators in this module works only on GRIB edition 1 files!
 
-extern "C"
-{
-  void streamGrbChangeParameterIdentification(int code, int ltype, int lev);
+extern "C" {
+void streamGrbChangeParameterIdentification(int code, int ltype, int lev);
 }
 
 /*
@@ -200,8 +199,7 @@ Selmulti(void *process)
   if (CdoDebug::cdoDebugExt)
     {
       printf("Given operator arguments (nr=%d): \n", operatorArgc());
-      for (int i = 0; i < operatorArgc(); i++)
-        printf("%s", operatorArgv()[i]);
+      for (int i = 0; i < operatorArgc(); i++) printf("%s", operatorArgv()[i]);
       printf("\n");
     }
   if (!multiSelectionParser(filenameOrString))
@@ -249,12 +247,10 @@ Selmulti(void *process)
           double level = zaxisInqLevel(zaxisID, levelID);
 
           if (operatorID == DELMULTI)
-            vlistDefFlag(vlistID1, varID, levelID,
-                         TRUE);  // set initially, override bellow if in selection
+            vlistDefFlag(vlistID1, varID, levelID, TRUE);  // set initially, override bellow if in selection
           if (operatorID == CHANGEMULTI)
             {
-              vlistDefFlag(vlistID1, varID, levelID,
-                           TRUE);  // change operation copies all fields
+              vlistDefFlag(vlistID1, varID, levelID, TRUE);  // change operation copies all fields
               continue;
             }
 
@@ -666,8 +662,7 @@ static char *
 removeSpaces(char *pline)
 {
   if (pline == NULL) return NULL;
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   return pline;
 }
 
@@ -675,11 +670,9 @@ static char *
 skipSeparator(char *pline)
 {
   if (pline == NULL) return NULL;
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   if (*pline == '=' || *pline == ':' || *pline == '/' || *pline == ',') pline++;
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   return pline;
 }
 
@@ -871,8 +864,7 @@ multiSelectionParser(const char *filenameOrString)
       if (line[0] == '\0') continue;
       pline = line;
       if (CdoDebug::cdoDebugExt >= 30) cdoPrint(": Line: %s", pline);
-      while (isspace((int) *pline))
-        pline++;
+      while (isspace((int) *pline)) pline++;
       if (pline[0] == '\0') continue;
       strpos = strContains(pline, "SELECT, ");
       selectionRec = 0;  // default is 0;  sel_or_del_or_change:  0:  operator

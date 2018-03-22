@@ -165,7 +165,6 @@ XTimstat(void *process)
   int varID;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
-  size_t nmiss;
   bool lvfrac = false;
   int nwpv;  // number of words per value; real:1  complex:2
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
@@ -395,8 +394,8 @@ XTimstat(void *process)
           else
             {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, operfunc) if (maxrecs > 1)
+#pragma omp parallel for default(none) shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, \
+                                              operfunc) if (maxrecs > 1)
 #endif
               for (int recID = 0; recID < maxrecs; recID++)
                 {
@@ -415,8 +414,7 @@ XTimstat(void *process)
                       if (samp1[varID][levelID].ptr == NULL)
                         {
                           samp1[varID][levelID].ptr = (double *) malloc(nwpv * gridsize * sizeof(double));
-                          for (size_t i = 0; i < nwpv * gridsize; i++)
-                            samp1[varID][levelID].ptr[i] = nsets;
+                          for (size_t i = 0; i < nwpv * gridsize; i++) samp1[varID][levelID].ptr[i] = nsets;
                         }
 
                       for (size_t i = 0; i < nwpv * gridsize; i++)

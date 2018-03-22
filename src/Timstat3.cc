@@ -99,8 +99,7 @@ Timstat3(void *process)
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  for (int i = 0; i < NIN; ++i)
-    reached_eof[i] = 0;
+  for (int i = 0; i < NIN; ++i) reached_eof[i] = 0;
 
   for (int i = 0; i < NIN; ++i)
     {
@@ -114,10 +113,8 @@ Timstat3(void *process)
       out[i].ptr = (double *) Malloc(gridsize * sizeof(double));
     }
 
-  for (int iw = 0; iw < NFWORK; ++iw)
-    fwork[iw] = (field_type **) Malloc(nvars * sizeof(field_type *));
-  for (int iw = 0; iw < NIWORK; ++iw)
-    iwork[iw] = (int ***) Malloc(nvars * sizeof(int **));
+  for (int iw = 0; iw < NFWORK; ++iw) fwork[iw] = (field_type **) Malloc(nvars * sizeof(field_type *));
+  for (int iw = 0; iw < NIWORK; ++iw) iwork[iw] = (int ***) Malloc(nvars * sizeof(int **));
 
   for (varID = 0; varID < nvars; ++varID)
     {
@@ -127,10 +124,8 @@ Timstat3(void *process)
       missval = missval1 = vlistInqVarMissval(vlistID[0], varID);
       // missval2 = vlistInqVarMissval(vlistID[1], varID);
 
-      for (int iw = 0; iw < NFWORK; ++iw)
-        fwork[iw][varID] = (field_type *) Malloc(nlevs * sizeof(field_type));
-      for (int iw = 0; iw < NIWORK; ++iw)
-        iwork[iw][varID] = (int **) Malloc(nlevs * sizeof(int *));
+      for (int iw = 0; iw < NFWORK; ++iw) fwork[iw][varID] = (field_type *) Malloc(nlevs * sizeof(field_type));
+      for (int iw = 0; iw < NIWORK; ++iw) iwork[iw][varID] = (int **) Malloc(nlevs * sizeof(int *));
 
       for (levelID = 0; levelID < nlevs; ++levelID)
         {
@@ -303,31 +298,22 @@ Timstat3(void *process)
       nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID[0], varID));
       for (levelID = 0; levelID < nlevs; levelID++)
         {
-          for (int iw = 0; iw < NFWORK; ++iw)
-            Free(fwork[iw][varID][levelID].ptr);
-          for (int iw = 0; iw < NIWORK; ++iw)
-            Free(iwork[iw][varID][levelID]);
+          for (int iw = 0; iw < NFWORK; ++iw) Free(fwork[iw][varID][levelID].ptr);
+          for (int iw = 0; iw < NIWORK; ++iw) Free(iwork[iw][varID][levelID]);
         }
 
-      for (int iw = 0; iw < NFWORK; ++iw)
-        Free(fwork[iw][varID]);
-      for (int iw = 0; iw < NIWORK; ++iw)
-        Free(iwork[iw][varID]);
+      for (int iw = 0; iw < NFWORK; ++iw) Free(fwork[iw][varID]);
+      for (int iw = 0; iw < NIWORK; ++iw) Free(iwork[iw][varID]);
     }
 
-  for (int iw = 0; iw < NFWORK; iw++)
-    Free(fwork[iw]);
-  for (int iw = 0; iw < NIWORK; iw++)
-    Free(iwork[iw]);
+  for (int iw = 0; iw < NFWORK; iw++) Free(fwork[iw]);
+  for (int iw = 0; iw < NIWORK; iw++) Free(iwork[iw]);
 
   pstreamClose(streamID3);
-  for (is = 0; is < NIN; ++is)
-    pstreamClose(streamID[is]);
+  for (is = 0; is < NIN; ++is) pstreamClose(streamID[is]);
 
-  for (int i = 0; i < NIN; ++i)
-    Free(in[i].ptr);
-  for (int i = 0; i < NOUT; ++i)
-    Free(out[i].ptr);
+  for (int i = 0; i < NIN; ++i) Free(in[i].ptr);
+  for (int i = 0; i < NOUT; ++i) Free(out[i].ptr);
 
   cdoFinish();
 

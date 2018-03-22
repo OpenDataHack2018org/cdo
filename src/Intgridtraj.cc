@@ -193,8 +193,7 @@ Intgridtraj(void *process)
                   double *single1 = vardata1[varID] + offset;
                   double *single2 = vardata2[varID] + offset;
 
-                  for (size_t i = 0; i < gridsize; i++)
-                    array[i] = single1[i] * fac1 + single2[i] * fac2;
+                  for (size_t i = 0; i < gridsize; i++) array[i] = single1[i] * fac1 + single2[i] * fac2;
 
                   field1.grid = gridID1;
                   field1.nmiss = nmiss;

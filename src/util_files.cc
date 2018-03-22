@@ -38,8 +38,7 @@ userFileOverwrite(const char *restrict filename)
       char line[1024];
       readline(stdin, line, 1024);
       char *pline = line;
-      while (isspace((int) *pline))
-        pline++;
+      while (isspace((int) *pline)) pline++;
       int len = (int) strlen(pline);
       if (len == 3)
         {

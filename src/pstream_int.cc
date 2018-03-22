@@ -15,6 +15,10 @@
   GNU General Public License for more details.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h" /* _FILE_OFFSET_BITS influence off_t */
+#endif
+
 #include <cdi.h>
 #include "pstream_int.h"
 #include "cdoDebugOutput.h"
@@ -27,10 +31,9 @@ pstreamClose(int pstreamID)
   PstreamType *pstreamptr = pstreamToPointer(pstreamID);
   if (pstreamptr == NULL) ERROR("Internal problem, stream ", pstreamID, " not open!");
 
-  Cdo_Debug(CdoDebug::PSTREAM, "Adding ", pstreamptr->getNvals(),
-            " to pstream ", pstreamptr->self, " ", pstreamptr->m_name);
-  if(pstreamptr->rthreadID == pthread_self())
-  processSelf().addNvals(pstreamptr->getNvals());
+  Cdo_Debug(CdoDebug::PSTREAM, "Adding ", pstreamptr->getNvals(), " to pstream ", pstreamptr->self, " ",
+            pstreamptr->m_name);
+  if (pstreamptr->rthreadID == pthread_self()) processSelf().addNvals(pstreamptr->getNvals());
   pstreamptr->close();
 }
 int

@@ -53,9 +53,8 @@
 
 #define MAXARG 10
 
-extern "C"
-{
-  void streamGrbChangeModeUvRelativeToGrid(int mode);
+extern "C" {
+void streamGrbChangeModeUvRelativeToGrid(int mode);
 }
 
 int UVDESTAG;
@@ -254,14 +253,12 @@ DestaggerUV()
   if (isdigit(*operatorArgv()[0]))
     {
       lvar = false;  // We have a list of codes
-      for (int i = 0; i < 2; i++)
-        chcodes[i] = parameter2int(operatorArgv()[i]);
+      for (int i = 0; i < 2; i++) chcodes[i] = parameter2int(operatorArgv()[i]);
     }
   else
     {
       lvar = true;  // We have a list of variables
-      for (int i = 0; i < 2; i++)
-        chvars[i] = operatorArgv()[i];
+      for (int i = 0; i < 2; i++) chvars[i] = operatorArgv()[i];
     }
 
   destagGridOffsets[0] = -0.5;
@@ -269,8 +266,7 @@ DestaggerUV()
 
   if (nch > 2)
     {
-      for (int i = 2; i < (2 + 2); i++)
-        destagGridOffsets[i - 2] = parameter2double(operatorArgv()[i]);
+      for (int i = 2; i < (2 + 2); i++) destagGridOffsets[i - 2] = parameter2double(operatorArgv()[i]);
     }
 
   if (CdoDebug::cdoDebugExt)
@@ -371,10 +367,8 @@ DestaggerUV()
               varID2stg = varID2;
               if (gridID0 != CDI_UNDEFID)
                 {
-                  vlistChangeVarGrid(vlistID2, varID1stg,
-                                     gridID0);  // set the variable onto the non-staggered grid
-                  vlistChangeVarGrid(vlistID2, varID2stg,
-                                     gridID0);  // set the variable onto the non-staggered grid
+                  vlistChangeVarGrid(vlistID2, varID1stg, gridID0);  // set the variable onto the non-staggered grid
+                  vlistChangeVarGrid(vlistID2, varID2stg, gridID0);  // set the variable onto the non-staggered grid
                 }
               // Allow a next level-type UV-pair to be found;
               // NOTE: There may be separate CDO staggerd variables for (33/34;
@@ -542,10 +536,8 @@ DestaggerUV()
 
   if (varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID)
     {
-      vlistChangeVarGrid(vlistID2, varID1stg,
-                         gridID0);  // set the variable onto the non-staggered grid
-      vlistChangeVarGrid(vlistID2, varID2stg,
-                         gridID0);  // set the variable onto the non-staggered grid
+      vlistChangeVarGrid(vlistID2, varID1stg, gridID0);  // set the variable onto the non-staggered grid
+      vlistChangeVarGrid(vlistID2, varID2stg, gridID0);  // set the variable onto the non-staggered grid
     }
 
   pstreamDefVlist(streamID2, vlistID2);  // from this point the stream is using
@@ -809,7 +801,7 @@ rot_uv_north(int gridID, double *us, double *vs)
 
   if (gridInqSize(gridID) != (nx * ny))
     cdoAbort("Incorrect gridsize (%zu) != nx*ny (%zu * %zu)", gridInqSize(gridID), nx, ny);
-    // this should never happen
+// this should never happen
 
 #define OPTrotuvNorth 1  // ACTIVATE SPEED - OPTIMIZATION
 
@@ -1314,13 +1306,11 @@ TransformUV(int operatorID)
 
   if (lvar)
     {
-      for (int i = 0; i < nch; i++)
-        chvars[i] = operatorArgv()[i];
+      for (int i = 0; i < nch; i++) chvars[i] = operatorArgv()[i];
     }
   else
     {
-      for (int i = 0; i < nch; i++)
-        chcodes[i] = parameter2int(operatorArgv()[i]);
+      for (int i = 0; i < nch; i++) chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -1340,8 +1330,7 @@ TransformUV(int operatorID)
   streamGrbChangeModeUvRelativeToGrid(0);  // U & V are NOT grid relative
 
   bool lfound[MAXARG];
-  for (int i = 0; i < nch; i++)
-    lfound[i] = false;
+  for (int i = 0; i < nch; i++) lfound[i] = false;
 
   if (lvar)
     {
@@ -1440,7 +1429,7 @@ TransformUV(int operatorID)
           level = zaxisInqLevel(zaxisID, levelID);
 
           if (vardata[varID] == NULL)
-            {                        // This means that it is not eighter U neither V.
+            {                             // This means that it is not eighter U neither V.
               recinfo[recID].varID = -1;  // We will NOT record/store this field in memory
               recinfo[recID].levelID = -1;
               // We will stream-copy this data
@@ -1610,15 +1599,13 @@ TransformUV(int operatorID)
                                 {
                                   printf("Xvals (size=%zu):\n", gridInqSize(gridIDcurvl));
                                   size_t ii;
-                                  for (ii = 0; ii < 10; ii++)
-                                    printf("%4.3f ", gridInqXval(gridIDcurvl, ii));
+                                  for (ii = 0; ii < 10; ii++) printf("%4.3f ", gridInqXval(gridIDcurvl, ii));
                                   printf("\n...\n");
                                   for (ii = gridInqSize(gridIDcurvl) - 10; ii < gridInqSize(gridIDcurvl); ii++)
                                     printf("%4.3f ", gridInqXval(gridIDcurvl, ii));
                                   printf("\n");
                                   printf("Yvals (size=%zu):\n", gridInqSize(gridIDcurvl));
-                                  for (ii = 0; ii < 10; ii++)
-                                    printf("%4.3f ", gridInqYval(gridIDcurvl, ii));
+                                  for (ii = 0; ii < 10; ii++) printf("%4.3f ", gridInqYval(gridIDcurvl, ii));
                                   printf("\n...\n");
                                   for (ii = gridInqSize(gridIDcurvl) - 10; ii < gridInqSize(gridIDcurvl); ii++)
                                     printf("%4.3f ", gridInqYval(gridIDcurvl, ii));
@@ -1694,9 +1681,8 @@ TransformUV(int operatorID)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if (gridIDcurvl != -1)
-    gridDestroy(gridIDcurvl);  // at the end must Free the allocated curvilinear
-                               // grid definition...
+  if (gridIDcurvl != -1) gridDestroy(gridIDcurvl);  // at the end must Free the allocated curvilinear
+                                                    // grid definition...
 
   for (varID = 0; varID < nvars; varID++)
     {

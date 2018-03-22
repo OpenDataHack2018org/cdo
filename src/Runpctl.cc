@@ -71,8 +71,7 @@ Runpctl(void *process)
   field_type ***vars1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
   double *array = (double *) Malloc(ndates * sizeof(double));
 
-  for (int its = 0; its < ndates; its++)
-    vars1[its] = field_malloc(vlistID1, FIELD_PTR);
+  for (int its = 0; its < ndates; its++) vars1[its] = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID;
   for (tsID = 0; tsID < ndates; tsID++)
@@ -154,8 +153,7 @@ Runpctl(void *process)
       dtlist_shift(dtlist);
 
       vars1[ndates] = vars1[0];
-      for (int inp = 0; inp < ndates; inp++)
-        vars1[inp] = vars1[inp + 1];
+      for (int inp = 0; inp < ndates; inp++) vars1[inp] = vars1[inp + 1];
 
       int nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if (nrecs == 0) break;
@@ -172,8 +170,7 @@ Runpctl(void *process)
       tsID++;
     }
 
-  for (int its = 0; its < ndates; its++)
-    field_free(vars1[its], vlistID1);
+  for (int its = 0; its < ndates; its++) field_free(vars1[its], vlistID1);
 
   Free(vars1);
   Free(array);

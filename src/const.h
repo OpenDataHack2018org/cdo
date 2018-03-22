@@ -15,19 +15,19 @@
   GNU General Public License for more details.
 */
 
-#ifndef _CONST_H
-#define _CONST_H
+#ifndef CONST_H
+#define CONST_H
 
-#define MIN_PS 20000.
-#define MAX_PS 120000.
+constexpr double MIN_PS = 20000.;
+constexpr double MAX_PS = 120000.;
 
-#define MIN_FIS -100000.
-#define MAX_FIS 100000.
+constexpr double MIN_FIS = -100000.;
+constexpr double MAX_FIS = 100000.;
 
-#define MIN_T 150.
-#define MAX_T 400.
+constexpr double MIN_T = 150.;
+constexpr double MAX_T = 400.;
 
-#define MIN_Q 0.0
-#define MAX_Q 0.1
+constexpr double MIN_Q = 0.0;
+constexpr double MAX_Q = 0.1;
 
-#endif /* _CONST_H */
+#endif /* CONST_H */

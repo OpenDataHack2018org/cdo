@@ -51,13 +51,7 @@ paramToString(int param, char *paramstr, int maxlen)
     fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
 }
 
-typedef enum
-{
-  CODE_NUMBER,
-  PARAMETER_ID,
-  VARIABLE_NAME,
-  STANDARD_NAME
-} pt_mode_t;
+typedef enum { CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME } pt_mode_t;
 
 typedef struct
 {
@@ -288,16 +282,14 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2, v
                   if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32)
                     {
                       int *ivals = (int *) Malloc(nvalues * sizeof(int));
-                      for (int i = 0; i < nvalues; ++i)
-                        ivals[i] = literal_to_int(kv->values[i]);
+                      for (int i = 0; i < nvalues; ++i) ivals[i] = literal_to_int(kv->values[i]);
                       cdiDefAttInt(vlistID2, varID, key, dtype, nvalues, ivals);
                       Free(ivals);
                     }
                   else if (dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64)
                     {
                       double *dvals = (double *) Malloc(nvalues * sizeof(double));
-                      for (int i = 0; i < nvalues; ++i)
-                        dvals[i] = literal_to_double(kv->values[i]);
+                      for (int i = 0; i < nvalues; ++i) dvals[i] = literal_to_double(kv->values[i]);
                       cdiDefAttFlt(vlistID2, varID, key, dtype, nvalues, dvals);
                       Free(dvals);
                     }
@@ -413,8 +405,7 @@ Setpartab(void *process)
   memset(vars, 0, nvars * sizeof(var_t));
 
   if (convert_data)
-    for (varID = 0; varID < nvars; ++varID)
-      vars[varID].convert = true;
+    for (varID = 0; varID < nvars; ++varID) vars[varID].convert = true;
 
   if (tableformat == 0)
     {

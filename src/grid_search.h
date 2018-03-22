@@ -14,32 +14,56 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef GRID_SEARCH_H_
-#define GRID_SEARCH_H_
+#ifndef GRID_SEARCH_H
+#define GRID_SEARCH_H
 
 #include <stdbool.h>
+#include <knn_weights.h>
 
 #define GS_NOT_FOUND SIZE_MAX
 
-enum struct GridsearchMethod
+constexpr double
+square(const double x) noexcept
+{
+  return x * x;
+}
+
+constexpr double
+squareDistance(const double *restrict a, const double *restrict b) noexcept
+{
+  return square(a[0] - b[0]) + square(a[1] - b[1]) + square(a[2] - b[2]);
+}
+
+inline void
+cdoLLtoXYZ(double lon, double lat, double *restrict xyz)
+{
+  double cos_lat = cos(lat);
+  xyz[0] = cos_lat * cos(lon);
+  xyz[1] = cos_lat * sin(lon);
+  xyz[2] = sin(lat);
+}
+
+enum struct PointSearchMethod
 {
   full,
   nanoflann,
-  kdtree
+  kdtree,
+  spherepart,
+  latbins
 };
 
-struct gridsearch
+struct GridSearch
 {
   bool extrapolate;
   bool is_cyclic;
   bool is_reg2d;
   bool is_curve;
-  GridsearchMethod method_nn;
+  PointSearchMethod method;
   size_t n;
   size_t dims[2];
 
   void *search_container;
-  double search_radius;
+  double searchRadius;
 
   // reg2d search
   double *reg2d_center_lon, *reg2d_center_lat;
@@ -53,31 +77,15 @@ struct gridsearch
   void *pointcloud;
 };
 
-struct gsknn
-{
-  size_t ndist;
-  size_t size;
-  bool *mask;
-  size_t *add;
-  size_t *tmpadd;
-  double *dist;
-  double *tmpdist;
-};
+void grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights);
 
-struct gsknn *gridsearch_knn_new(size_t size);
-void gridsearch_knn_delete(struct gsknn *knn);
-size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat);
-
-struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons,
-                                           const double *restrict lats);
-struct gridsearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
-                                     const double *restrict lats);
-void gridsearch_delete(struct gridsearch *gs);
-size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
-size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
-                           double *dist);
-void gridsearch_extrapolate(struct gridsearch *gs);
-void gridsearch_bound_poly(struct gridsearch *gs, size_t dims[2], size_t n, const double *restrict lons,
-                           const double *restrict lats);
+GridSearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons,
+                                    const double *restrict lats);
+GridSearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
+                              const double *restrict lats);
+void gridsearch_delete(GridSearch *gs);
+size_t gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double *dist);
+size_t gridsearch_qnearest(GridSearch *gs, double lon, double lat, size_t nnn, size_t *adds, double *dist);
+void gridsearch_extrapolate(GridSearch *gs);
 
 #endif

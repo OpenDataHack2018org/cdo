@@ -223,8 +223,7 @@ FC(void *process)
 
   int nvars = vlistNvars(vlistID2);
   bool *vars = (bool *) Malloc(nvars * sizeof(bool));
-  for (varID = 0; varID < nvars; varID++)
-    vars[varID] = gridID1 == vlistInqVarGrid(vlistID1, varID);
+  for (varID = 0; varID < nvars; varID++) vars[varID] = gridID1 == vlistInqVarGrid(vlistID1, varID);
 
   if (gridID1 != -1) vlistChangeGrid(vlistID2, gridID1, gridID2);
 

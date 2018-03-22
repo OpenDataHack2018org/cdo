@@ -509,21 +509,19 @@ Apollo                                           : neg.   = TRUE, else FALSE.
 #define LOGICAL_STRICT /* Other Fortran have .eqv./.neqv. == .eq./.ne.   */
 #endif
 
-#define C2FLOGICALV(A, I)            \
-  do                                 \
-    {                                \
-      int __i;                       \
-      for (__i = 0; __i < I; __i++)  \
-        A[__i] = C2FLOGICAL(A[__i]); \
-    }                                \
+#define C2FLOGICALV(A, I)                                        \
+  do                                                             \
+    {                                                            \
+      int __i;                                                   \
+      for (__i = 0; __i < I; __i++) A[__i] = C2FLOGICAL(A[__i]); \
+    }                                                            \
   while (0)
-#define F2CLOGICALV(A, I)            \
-  do                                 \
-    {                                \
-      int __i;                       \
-      for (__i = 0; __i < I; __i++)  \
-        A[__i] = F2CLOGICAL(A[__i]); \
-    }                                \
+#define F2CLOGICALV(A, I)                                        \
+  do                                                             \
+    {                                                            \
+      int __i;                                                   \
+      for (__i = 0; __i < I; __i++) A[__i] = F2CLOGICAL(A[__i]); \
+    }                                                            \
   while (0)
 
 #if defined(apolloFortran)
@@ -598,11 +596,9 @@ int sizeofcstr;
      Useful size of string must be the same in both languages. */
   for (i = 0; i < sizeofcstr / elem_len; i++)
     {
-      for (j = 1; j < elem_len && *cstr; j++)
-        *fstr++ = *cstr++;
+      for (j = 1; j < elem_len && *cstr; j++) *fstr++ = *cstr++;
       cstr += 1 + elem_len - j;
-      for (; j < elem_len; j++)
-        *fstr++ = ' ';
+      for (; j < elem_len; j++) *fstr++ = ' ';
     } /* 95109 - Seems to be returning the original fstr. */
   return fstr - sizeofcstr + sizeofcstr / elem_len;
 }
@@ -626,8 +622,7 @@ int sizeofcstr;
   for (i = 0; i < sizeofcstr / elem_len; i++)
     {
       *--cstr = '\0';
-      for (j = 1; j < elem_len; j++)
-        *--cstr = *--fstr;
+      for (j = 1; j < elem_len; j++) *--cstr = *--fstr;
     }
   return cstr;
 }
@@ -1090,9 +1085,8 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
    if using -Aa, otherwise we have a problem.
  */
 #ifndef MAX_PREPRO_ARGS
-#if !defined(__GNUC__)                                                                                       \
-    && (defined(VAXUltrix) || defined(__CF__APOLLO67) || (defined(sun) && !defined(__sun)) || defined(_CRAY) \
-        || defined(__ultrix__) || (defined(__hpux) && defined(__CF__KnR)))
+#if !defined(__GNUC__) && (defined(VAXUltrix) || defined(__CF__APOLLO67) || (defined(sun) && !defined(__sun)) \
+                           || defined(_CRAY) || defined(__ultrix__) || (defined(__hpux) && defined(__CF__KnR)))
 #define MAX_PREPRO_ARGS 31
 #else
 #define MAX_PREPRO_ARGS 99
@@ -1136,22 +1130,25 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
                   TP, TQ, TR)                                                                                        \
   S(T1, 1)                                                                                                           \
   S(T2, 2)                                                                                                           \
-  S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14)   \
-      S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20) S(TL, 21) S(TM, 22) S(TN, 23) S(TO, 24) S(TP, 25)  \
-          S(TQ, 26) S(TR, 27)
+  S(T3, 3)                                                                                                           \
+  S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14) S(TF, 15)  \
+      S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20) S(TL, 21) S(TM, 22) S(TN, 23) S(TO, 24) S(TP, 25) S(TQ, 26)  \
+          S(TR, 27)
 
-#define CFARGT14FS(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                             \
-  F(T1, 1, 0)                                                                                                   \
-  F(T2, 2, 1)                                                                                                   \
-  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) \
-      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) M CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
+#define CFARGT14FS(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                              \
+  F(T1, 1, 0)                                                                                                    \
+  F(T2, 2, 1)                                                                                                    \
+  F(T3, 3, 1)                                                                                                    \
+  F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1) \
+      F(TD, 13, 1) F(TE, 14, 1) M CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
 #define CFARGT27FS(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,  \
                    TN, TO, TP, TQ, TR)                                                                               \
   F(T1, 1, 0)                                                                                                        \
   F(T2, 2, 1)                                                                                                        \
-  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1)      \
-      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1)        \
-          F(TK, 20, 1) F(TL, 21, 1) F(TM, 22, 1) F(TN, 23, 1) F(TO, 24, 1) F(TP, 25, 1) F(TQ, 26, 1) F(TR, 27, 1)    \
+  F(T3, 3, 1)                                                                                                        \
+  F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1)     \
+      F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1) F(TK, 20, 1)        \
+          F(TL, 21, 1) F(TM, 22, 1) F(TN, 23, 1) F(TO, 24, 1) F(TP, 25, 1) F(TQ, 26, 1) F(TR, 27, 1)                 \
               M CFARGT27S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, \
                           TN, TO, TP, TQ, TR)
 
@@ -1169,97 +1166,108 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
  #define CFARGT14(F,S,M,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE) \
        CFARGT14FS(F,S,M,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)
 */
-#define CFARGT14(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                               \
-  F(T1, 1, 0)                                                                                                   \
-  F(T2, 2, 1)                                                                                                   \
-  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) \
-      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) M CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
+#define CFARGT14(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                                \
+  F(T1, 1, 0)                                                                                                    \
+  F(T2, 2, 1)                                                                                                    \
+  F(T3, 3, 1)                                                                                                    \
+  F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1) \
+      F(TD, 13, 1) F(TE, 14, 1) M CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
 #define CFARGT27(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, \
                  TO, TP, TQ, TR)                                                                                      \
   F(T1, 1, 0)                                                                                                         \
   F(T2, 2, 1)                                                                                                         \
-  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1)       \
-      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1)         \
-          F(TK, 20, 1) F(TL, 21, 1) F(TM, 22, 1) F(TN, 23, 1) F(TO, 24, 1) F(TP, 25, 1) F(TQ, 26, 1) F(TR, 27, 1)     \
+  F(T3, 3, 1)                                                                                                         \
+  F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1)      \
+      F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1) F(TK, 20, 1)         \
+          F(TL, 21, 1) F(TM, 22, 1) F(TN, 23, 1) F(TO, 24, 1) F(TP, 25, 1) F(TQ, 26, 1) F(TR, 27, 1)                  \
               M CFARGT27S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,  \
                           TN, TO, TP, TQ, TR)
 
-#define CFARGT20(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)         \
-  F(T1, 1, 0)                                                                                                     \
-  F(T2, 2, 1)                                                                                                     \
-  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1)   \
-      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1)     \
-          F(TK, 20, 1) S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) \
-              S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20)
-#define CFARGTA14(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
-                  AA, AB, AC, AD, AE)                                                                                 \
-  F(T1, A1, 1, 0)                                                                                                     \
-  F(T2, A2, 2, 1)                                                                                                     \
-  F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1)     \
-      F(TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) S(T1, 1) S(T2, 2) S(T3, 3) \
-          S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14)
-#if MAX_PREPRO_ARGS > 31
-#define CFARGTA20(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3,  \
-                  A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                                \
-  F(T1, A1, 1, 0)                                                                                                    \
-  F(T2, A2, 2, 1)                                                                                                    \
-  F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1)    \
-      F(TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) F(TF, AF, 15, 1)          \
-          F(TG, AG, 16, 1) F(TH, AH, 17, 1) F(TI, AI, 18, 1) F(TJ, AJ, 19, 1) F(TK, AK, 20, 1) S(T1, 1) S(T2, 2)     \
-              S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) \
-                  S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20)
-#define CFARGTA27(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN,    \
-                  TO, TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL,  \
-                  AM, AN, AO, AP, AQ, AR)                                                                              \
-  F(T1, A1, 1, 0)                                                                                                      \
-  F(T2, A2, 2, 1)                                                                                                      \
-  F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1)      \
-      F(TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) F(TF, AF, 15, 1)            \
-          F(TG, AG, 16, 1) F(TH, AH, 17, 1) F(TI, AI, 18, 1) F(TJ, AJ, 19, 1) F(TK, AK, 20, 1) F(TL, AL, 21, 1)        \
-              F(TM, AM, 22, 1) F(TN, AN, 23, 1) F(TO, AO, 24, 1) F(TP, AP, 25, 1) F(TQ, AQ, 26, 1) F(TR, AR, 27, 1)    \
-                  S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) \
-                      S(TC, 12) S(TD, 13) S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20)        \
-                          S(TL, 21) S(TM, 22) S(TN, 23) S(TO, 24) S(TP, 25) S(TQ, 26) S(TR, 27)
-#endif
-#else
-#define CFARGT14(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                                      \
-  F(T1, 1, 0)                                                                                                          \
-  S(T1, 1)                                                                                                             \
-  F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) \
-      S(T7, 7) F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1)    \
-          S(TC, 12) F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14)
-#define CFARGT27(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN,  \
-                 TO, TP, TQ, TR)                                                                                       \
-  F(T1, 1, 0)                                                                                                          \
-  S(T1, 1)                                                                                                             \
-  F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) \
-      S(T7, 7) F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1)    \
-          S(TC, 12) F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14) F(TF, 15, 1) S(TF, 15) F(TG, 16, 1) S(TG, 16)        \
-              F(TH, 17, 1) S(TH, 17) F(TI, 18, 1) S(TI, 18) F(TJ, 19, 1) S(TJ, 19) F(TK, 20, 1) S(TK, 20) F(TL, 21, 1) \
-                  S(TL, 21) F(TM, 22, 1) S(TM, 22) F(TN, 23, 1) S(TN, 23) F(TO, 24, 1) S(TO, 24) F(TP, 25, 1)          \
-                      S(TP, 25) F(TQ, 26, 1) S(TQ, 26) F(TR, 27, 1) S(TR, 27)
-
 #define CFARGT20(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)              \
   F(T1, 1, 0)                                                                                                          \
-  S(T1, 1)                                                                                                             \
-  F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) \
-      S(T7, 7) F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1)    \
-          S(TC, 12) F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14) F(TF, 15, 1) S(TF, 15) F(TG, 16, 1) S(TG, 16)        \
-              F(TH, 17, 1) S(TH, 17) F(TI, 18, 1) S(TI, 18) F(TJ, 19, 1) S(TJ, 19) F(TK, 20, 1) S(TK, 20)
-#define CFARGTA14(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
-                  AA, AB, AC, AD, AE)                                                                                 \
+  F(T2, 2, 1)                                                                                                          \
+  F(T3, 3, 1)                                                                                                          \
+  F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1)       \
+      F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1) F(TK, 20, 1) S(T1, 1) \
+          S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12)        \
+              S(TD, 13) S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20)
+#define CFARGTA14(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9,    \
+                  AA, AB, AC, AD, AE)                                                                                  \
+  F(T1, A1, 1, 0)                                                                                                      \
+  F(T2, A2, 2, 1)                                                                                                      \
+  F(T3, A3, 3, 1)                                                                                                      \
+  F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1) F(TA, AA, 10, 1)     \
+      F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5) \
+          S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14)
+#if MAX_PREPRO_ARGS > 31
+#define CFARGTA20(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3,    \
+                  A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                                  \
+  F(T1, A1, 1, 0)                                                                                                      \
+  F(T2, A2, 2, 1)                                                                                                      \
+  F(T3, A3, 3, 1)                                                                                                      \
+  F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1) F(TA, AA, 10, 1)     \
+      F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) F(TF, AF, 15, 1) F(TG, AG, 16, 1)            \
+          F(TH, AH, 17, 1) F(TI, AI, 18, 1) F(TJ, AJ, 19, 1) F(TK, AK, 20, 1) S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4)      \
+              S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14) S(TF, 15) \
+                  S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20)
+#define CFARGTA27(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN,   \
+                  TO, TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, \
+                  AM, AN, AO, AP, AQ, AR)                                                                             \
   F(T1, A1, 1, 0)                                                                                                     \
+  F(T2, A2, 2, 1)                                                                                                     \
+  F(T3, A3, 3, 1)                                                                                                     \
+  F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1) F(TA, AA, 10, 1)    \
+      F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) F(TF, AF, 15, 1) F(TG, AG, 16, 1)           \
+          F(TH, AH, 17, 1) F(TI, AI, 18, 1) F(TJ, AJ, 19, 1) F(TK, AK, 20, 1) F(TL, AL, 21, 1) F(TM, AM, 22, 1)       \
+              F(TN, AN, 23, 1) F(TO, AO, 24, 1) F(TP, AP, 25, 1) F(TQ, AQ, 26, 1) F(TR, AR, 27, 1) S(T1, 1) S(T2, 2)  \
+                  S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12)        \
+                      S(TD, 13) S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20) S(TL, 21)       \
+                          S(TM, 22) S(TN, 23) S(TO, 24) S(TP, 25) S(TQ, 26) S(TR, 27)
+#endif
+#else
+#define CFARGT14(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                                    \
+  F(T1, 1, 0)                                                                                                        \
+  S(T1, 1)                                                                                                           \
+  F(T2, 2, 1)                                                                                                        \
+  S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) S(T7, 7)  \
+      F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1) S(TC, 12) \
+          F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14)
+#define CFARGT27(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, \
+                 TO, TP, TQ, TR)                                                                                      \
+  F(T1, 1, 0)                                                                                                         \
   S(T1, 1)                                                                                                            \
-  F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) \
-      S(T6, 6) F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)  \
+  F(T2, 2, 1)                                                                                                         \
+  S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) S(T7, 7)   \
+      F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1) S(TC, 12)  \
+          F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14) F(TF, 15, 1) S(TF, 15) F(TG, 16, 1) S(TG, 16) F(TH, 17, 1)    \
+              S(TH, 17) F(TI, 18, 1) S(TI, 18) F(TJ, 19, 1) S(TJ, 19) F(TK, 20, 1) S(TK, 20) F(TL, 21, 1) S(TL, 21)   \
+                  F(TM, 22, 1) S(TM, 22) F(TN, 23, 1) S(TN, 23) F(TO, 24, 1) S(TO, 24) F(TP, 25, 1) S(TP, 25)         \
+                      F(TQ, 26, 1) S(TQ, 26) F(TR, 27, 1) S(TR, 27)
+
+#define CFARGT20(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)            \
+  F(T1, 1, 0)                                                                                                        \
+  S(T1, 1)                                                                                                           \
+  F(T2, 2, 1)                                                                                                        \
+  S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) S(T7, 7)  \
+      F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1) S(TC, 12) \
+          F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14) F(TF, 15, 1) S(TF, 15) F(TG, 16, 1) S(TG, 16) F(TH, 17, 1)   \
+              S(TH, 17) F(TI, 18, 1) S(TI, 18) F(TJ, 19, 1) S(TJ, 19) F(TK, 20, 1) S(TK, 20)
+#define CFARGTA14(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, \
+                  AA, AB, AC, AD, AE)                                                                               \
+  F(T1, A1, 1, 0)                                                                                                   \
+  S(T1, 1)                                                                                                          \
+  F(T2, A2, 2, 1)                                                                                                   \
+  S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) S(T6, 6)      \
+      F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)         \
           F(TB, AB, 11, 1) S(TB, 11) F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13) F(TE, AE, 14, 1) S(TE, 14)
 #if MAX_PREPRO_ARGS > 31
 #define CFARGTA20(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3,   \
                   A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                                 \
   F(T1, A1, 1, 0)                                                                                                     \
   S(T1, 1)                                                                                                            \
-  F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) \
-      S(T6, 6) F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)  \
+  F(T2, A2, 2, 1)                                                                                                     \
+  S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) S(T6, 6)        \
+      F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)           \
           F(TB, AB, 11, 1) S(TB, 11) F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13) F(TE, AE, 14, 1) S(TE, 14) \
               F(TF, AF, 15, 1) S(TF, 15) F(TG, AG, 16, 1) S(TG, 16) F(TH, AH, 17, 1) S(TH, 17) F(TI, AI, 18, 1)       \
                   S(TI, 18) F(TJ, AJ, 19, 1) S(TJ, 19) F(TK, AK, 20, 1) S(TK, 20)
@@ -1268,8 +1276,9 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
                   AM, AN, AO, AP, AQ, AR)                                                                             \
   F(T1, A1, 1, 0)                                                                                                     \
   S(T1, 1)                                                                                                            \
-  F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) \
-      S(T6, 6) F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)  \
+  F(T2, A2, 2, 1)                                                                                                     \
+  S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) S(T6, 6)        \
+      F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)           \
           F(TB, AB, 11, 1) S(TB, 11) F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13) F(TE, AE, 14, 1) S(TE, 14) \
               F(TF, AF, 15, 1) S(TF, 15) F(TG, AG, 16, 1) S(TG, 16) F(TH, AH, 17, 1) S(TH, 17) F(TI, AI, 18, 1)       \
                   S(TI, 18) F(TJ, AJ, 19, 1) S(TJ, 19) F(TK, AK, 20, 1) S(TK, 20) F(TL, AL, 21, 1) S(TL, 21)          \
@@ -1463,8 +1472,9 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
     {                                                                                                                  \
       VVCF(T1, A1, B1)                                                                                                 \
       VVCF(T2, A2, B2)                                                                                                 \
-      VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8)            \
-          VVCF(T9, A9, B9) VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14)   \
+      VVCF(T3, A3, B3)                                                                                                 \
+      VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8) VVCF(T9, A9, B9)            \
+          VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14)                    \
               CPPPROTOCLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) ACF(LN, T1, A1, 1)     \
                   ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3) ACF(LN, T4, A4, 4) ACF(LN, T5, A5, 5) ACF(LN, T6, A6, 6)       \
                       ACF(LN, T7, A7, 7) ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9) ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11) \
@@ -1473,8 +1483,9 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
                                                      TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE));     \
       WCF(T1, A1, 1)                                                                                                   \
       WCF(T2, A2, 2)                                                                                                   \
-      WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)         \
-          WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14)                              \
+      WCF(T3, A3, 3)                                                                                                   \
+      WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) WCF(TA, AA, 10)        \
+          WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14)                                              \
     }                                                                                                                  \
   while (0)
 #endif
@@ -1507,30 +1518,32 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
   CCALLSFFUN20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, \
                A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)
 #else
-#define CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2,  \
-                     A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                          \
-  do                                                                                                                  \
-    {                                                                                                                 \
-      VVCF(T1, A1, B1)                                                                                                \
-      VVCF(T2, A2, B2)                                                                                                \
-      VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8) VVCF(     \
-          T9, A9, B9) VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14)       \
-          VVCF(TF, AF, B15) VVCF(TG, AG, B16) VVCF(TH, AH, B17) VVCF(TI, AI, B18) VVCF(TJ, AJ, B19) VVCF(TK, AK, B20) \
-              CPPPROTOCLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ,   \
-                                TK) ACF(LN, T1, A1, 1) ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3) ACF(LN, T4, A4, 4)       \
-                  ACF(LN, T5, A5, 5) ACF(LN, T6, A6, 6) ACF(LN, T7, A7, 7) ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9)      \
-                      ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11) ACF(LN, TC, AC, 12) ACF(LN, TD, AD, 13)                 \
-                          ACF(LN, TE, AE, 14) ACF(LN, TF, AF, 15) ACF(LN, TG, AG, 16) ACF(LN, TH, AH, 17)             \
-                              ACF(LN, TI, AI, 18) ACF(LN, TJ, AJ, 19) ACF(LN, TK, AK, 20)                             \
-                                  CFC_(UN, LN)(CFARGTA20(AACF, JCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                                                         TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, A5, A6, A7,  \
-                                                         A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK));        \
-      WCF(T1, A1, 1)                                                                                                  \
-      WCF(T2, A2, 2)                                                                                                  \
-      WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)        \
-          WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14) WCF(TF, AF, 15)             \
-              WCF(TG, AG, 16) WCF(TH, AH, 17) WCF(TI, AI, 18) WCF(TJ, AJ, 19) WCF(TK, AK, 20)                         \
-    }                                                                                                                 \
+#define CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, \
+                     A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                         \
+  do                                                                                                                 \
+    {                                                                                                                \
+      VVCF(T1, A1, B1)                                                                                               \
+      VVCF(T2, A2, B2)                                                                                               \
+      VVCF(T3, A3, B3)                                                                                               \
+      VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8) VVCF(T9, A9, B9) VVCF(    \
+          TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14) VVCF(TF, AF, B15)     \
+          VVCF(TG, AG, B16) VVCF(TH, AH, B17) VVCF(TI, AI, B18) VVCF(TJ, AJ, B19) VVCF(TK, AK, B20)                  \
+              CPPPROTOCLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ,  \
+                                TK) ACF(LN, T1, A1, 1) ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3) ACF(LN, T4, A4, 4)      \
+                  ACF(LN, T5, A5, 5) ACF(LN, T6, A6, 6) ACF(LN, T7, A7, 7) ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9)     \
+                      ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11) ACF(LN, TC, AC, 12) ACF(LN, TD, AD, 13)                \
+                          ACF(LN, TE, AE, 14) ACF(LN, TF, AF, 15) ACF(LN, TG, AG, 16) ACF(LN, TH, AH, 17)            \
+                              ACF(LN, TI, AI, 18) ACF(LN, TJ, AJ, 19) ACF(LN, TK, AK, 20)                            \
+                                  CFC_(UN, LN)(CFARGTA20(AACF, JCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,  \
+                                                         TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, A5, A6, A7, \
+                                                         A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK));       \
+      WCF(T1, A1, 1)                                                                                                 \
+      WCF(T2, A2, 2)                                                                                                 \
+      WCF(T3, A3, 3)                                                                                                 \
+      WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) WCF(TA, AA, 10)      \
+          WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14) WCF(TF, AF, 15) WCF(TG, AG, 16)            \
+              WCF(TH, AH, 17) WCF(TI, AI, 18) WCF(TJ, AJ, 19) WCF(TK, AK, 20)                                        \
+    }                                                                                                                \
   while (0)
 #endif
 #endif /* MAX_PREPRO_ARGS */
@@ -1585,31 +1598,32 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
     {                                                                                                                  \
       VVCF(T1, A1, B1)                                                                                                 \
       VVCF(T2, A2, B2)                                                                                                 \
-      VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8)            \
-          VVCF(T9, A9, B9) VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14)   \
-              VVCF(TF, AF, B15) VVCF(TG, AG, B16) VVCF(TH, AH, B17) VVCF(TI, AI, B18) VVCF(TJ, AJ, B19)                \
-                  VVCF(TK, AK, B20) VVCF(TL, AL, B21) VVCF(TM, AM, B22) VVCF(TN, AN, B23) VVCF(TO, AO, B24)            \
-                      VVCF(TP, AP, B25) VVCF(TQ, AQ, B26) VVCF(TR, AR, B27) CPPPROTOCLSFSUB27(                         \
-                          UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL,  \
-                          TM, TN, TO, TP, TQ, TR) ACF(LN, T1, A1, 1) ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3)             \
-                          ACF(LN, T4, A4, 4) ACF(LN, T5, A5, 5) ACF(LN, T6, A6, 6) ACF(LN, T7, A7, 7)                  \
-                              ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9) ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11)            \
-                                  ACF(LN, TC, AC, 12) ACF(LN, TD, AD, 13) ACF(LN, TE, AE, 14) ACF(LN, TF, AF, 15)      \
-                                      ACF(LN, TG, AG, 16) ACF(LN, TH, AH, 17) ACF(LN, TI, AI, 18) ACF(LN, TJ, AJ, 19)  \
-                                          ACF(LN, TK, AK, 20) ACF(LN, TL, AL, 21) ACF(LN, TM, AM, 22)                  \
-                                              ACF(LN, TN, AN, 23) ACF(LN, TO, AO, 24) ACF(LN, TP, AP, 25)              \
-                                                  ACF(LN, TQ, AQ, 26) ACF(LN, TR, AR, 27) CFC_(UN, LN)(                \
-                                                      CFARGTA27(AACF, JCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                                                                TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO,    \
-                                                                TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA,    \
-                                                                AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, AM, AN,    \
-                                                                AO, AP, AQ, AR));                                      \
+      VVCF(T3, A3, B3)                                                                                                 \
+      VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8) VVCF(T9, A9, B9) VVCF(      \
+          TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14) VVCF(TF, AF, B15)       \
+          VVCF(TG, AG, B16) VVCF(TH, AH, B17) VVCF(TI, AI, B18) VVCF(TJ, AJ, B19) VVCF(TK, AK, B20) VVCF(TL, AL, B21)  \
+              VVCF(TM, AM, B22) VVCF(TN, AN, B23) VVCF(TO, AO, B24) VVCF(TP, AP, B25) VVCF(TQ, AQ, B26)                \
+                  VVCF(TR, AR, B27) CPPPROTOCLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE,  \
+                                                      TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR)              \
+                      ACF(LN, T1, A1, 1) ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3) ACF(LN, T4, A4, 4) ACF(LN, T5, A5, 5)   \
+                          ACF(LN, T6, A6, 6) ACF(LN, T7, A7, 7) ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9)                  \
+                              ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11) ACF(LN, TC, AC, 12) ACF(LN, TD, AD, 13)          \
+                                  ACF(LN, TE, AE, 14) ACF(LN, TF, AF, 15) ACF(LN, TG, AG, 16) ACF(LN, TH, AH, 17)      \
+                                      ACF(LN, TI, AI, 18) ACF(LN, TJ, AJ, 19) ACF(LN, TK, AK, 20) ACF(LN, TL, AL, 21)  \
+                                          ACF(LN, TM, AM, 22) ACF(LN, TN, AN, 23) ACF(LN, TO, AO, 24)                  \
+                                              ACF(LN, TP, AP, 25) ACF(LN, TQ, AQ, 26) ACF(LN, TR, AR, 27) CFC_(        \
+                                                  UN, LN)(CFARGTA27(AACF, JCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, \
+                                                                    TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,    \
+                                                                    TN, TO, TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7,    \
+                                                                    A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ,    \
+                                                                    AK, AL, AM, AN, AO, AP, AQ, AR));                  \
       WCF(T1, A1, 1)                                                                                                   \
       WCF(T2, A2, 2)                                                                                                   \
-      WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)         \
-          WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14) WCF(TF, AF, 15)              \
-              WCF(TG, AG, 16) WCF(TH, AH, 17) WCF(TI, AI, 18) WCF(TJ, AJ, 19) WCF(TK, AK, 20) WCF(TL, AL, 21)          \
-                  WCF(TM, AM, 22) WCF(TN, AN, 23) WCF(TO, AO, 24) WCF(TP, AP, 25) WCF(TQ, AQ, 26) WCF(TR, AR, 27)      \
+      WCF(T3, A3, 3)                                                                                                   \
+      WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) WCF(TA, AA, 10)        \
+          WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14) WCF(TF, AF, 15) WCF(TG, AG, 16)              \
+              WCF(TH, AH, 17) WCF(TI, AI, 18) WCF(TJ, AJ, 19) WCF(TK, AK, 20) WCF(TL, AL, 21) WCF(TM, AM, 22)          \
+                  WCF(TN, AN, 23) WCF(TO, AO, 24) WCF(TP, AP, 25) WCF(TQ, AQ, 26) WCF(TR, AR, 27)                      \
     }                                                                                                                  \
   while (0)
 #endif
@@ -2012,13 +2026,17 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define LONGVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define LONGVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define LONGVVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGLONGV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)     /* added by MR December 2005 */
-#define LONGLONGVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)    /* added by MR December 2005 */
-#define LONGLONGVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)   /* added by MR December 2005 */
-#define LONGLONGVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)  /* added by MR December 2005 \
-                                                                                          */
-#define LONGLONGVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 \
-                                                                                          */
+#define LONGLONGV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)   /* added by MR December 2005 */
+#define LONGLONGVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)  /* added by MR December 2005 */
+#define LONGLONGVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
+#define LONGLONGVVVV_cfSTR(N, T, A, B, C, D, E)            \
+  _(CFARGS, N)                                             \
+  (T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 \
+                               */
+#define LONGLONGVVVVV_cfSTR(N, T, A, B, C, D, E)           \
+  _(CFARGS, N)                                             \
+  (T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 \
+                               */
 #define LONGLONGVVVVVV_cfSTR(N, T, A, B, C, D, E) \
   _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
 #define LONGLONGVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
@@ -2063,11 +2081,12 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
        ? B.f.dsc$w_length = B.clen                     \
        : (memset((A) + B.clen, ' ', C - B.clen - 1), A[B.f.dsc$w_length = C - 1] = '\0'));
 /* PSTRING_cfC to beware of array A which does not contain any \0.      */
-#define PSTRING_cfC(M, I, A, B, C)                                                                                   \
-  (B.dsc$a_pointer = A, C == sizeof(char *) ? B.dsc$w_length = strlen(A)                                             \
-                                            : (A[C - 1] = '\0', B.dsc$w_length = strlen(A),                          \
-                                               (unsigned) memset((A) + B.dsc$w_length, ' ', C - B.dsc$w_length - 1), \
-                                               B.dsc$w_length = C - 1));
+#define PSTRING_cfC(M, I, A, B, C)                     \
+  (B.dsc$a_pointer = A,                                \
+   C == sizeof(char *)                                 \
+       ? B.dsc$w_length = strlen(A)                    \
+       : (A[C - 1] = '\0', B.dsc$w_length = strlen(A), \
+          (unsigned) memset((A) + B.dsc$w_length, ' ', C - B.dsc$w_length - 1), B.dsc$w_length = C - 1));
 #else
 #define STRING_cfC(M, I, A, B, C)                      \
   (B.nombre = A, B.clen = (unsigned) strlen(A),        \
@@ -2256,35 +2275,37 @@ debugging only.*/
 /* HP/UX 9.01 cc requires the blank between '_Icf(3,G,T0,UN,LN) CCCF(T1,1,0)' */
 
 #ifndef __CF__KnR
-#define PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                \
-  _(T0, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                                                 \
-  static _Icf(2, U, T0, CFFUN(UN),                                                                           \
-              0)(CFARGT14FS(UCF, HCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE))           \
+#define PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                  \
+  _(T0, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                                                   \
+  static _Icf(2, U, T0, CFFUN(UN),                                                                             \
+              0)(CFARGT14FS(UCF, HCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE))             \
   {       CFARGT14S(VCF,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)    _(T0,_cfE) \
  CCF(LN,T1,1)  CCF(LN,T2,2)  CCF(LN,T3,3)  CCF(LN,T4,4)  CCF(LN,T5,5)          \
  CCF(LN,T6,6)  CCF(LN,T7,7)  CCF(LN,T8,8)  CCF(LN,T9,9)  CCF(LN,TA,10)         \
  CCF(LN,TB,11) CCF(LN,TC,12) CCF(LN,TD,13) CCF(LN,TE,14)    _Icf(3,G,T0,UN,LN) \
- CFARGT14(CCCF,JCF,ABSOFT_cf1(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE));                               \
-    WCF(T1, A1, 1)                                                                                           \
-    WCF(T2, A2, 2)                                                                                           \
-    WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) \
-        WCF(TA, A10, 10) WCF(TB, A11, 11) WCF(TC, A12, 12) WCF(TD, A13, 13) WCF(TE, A14, 14) _(T0, _cfX)     \
+ CFARGT14(CCCF,JCF,ABSOFT_cf1(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE));                                 \
+    WCF(T1, A1, 1)                                                                                             \
+    WCF(T2, A2, 2)                                                                                             \
+    WCF(T3, A3, 3)                                                                                             \
+    WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) WCF(TA, A10, 10) \
+        WCF(TB, A11, 11) WCF(TC, A12, 12) WCF(TD, A13, 13) WCF(TE, A14, 14) _(T0, _cfX)                        \
   }
 #else
-#define PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                \
-  _(T0, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                                                 \
-  static _Icf(2, U, T0, CFFUN(UN),                                                                           \
-              0)(CFARGT14FS(UUCF, HHCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE))         \
-      CFARGT14FS(UUUCF, HHHCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE);                  \
+#define PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                  \
+  _(T0, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                                                   \
+  static _Icf(2, U, T0, CFFUN(UN),                                                                             \
+              0)(CFARGT14FS(UUCF, HHCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE))           \
+      CFARGT14FS(UUUCF, HHHCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE);                    \
   {       CFARGT14S(VCF,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)    _(T0,_cfE) \
  CCF(LN,T1,1)  CCF(LN,T2,2)  CCF(LN,T3,3)  CCF(LN,T4,4)  CCF(LN,T5,5)          \
  CCF(LN,T6,6)  CCF(LN,T7,7)  CCF(LN,T8,8)  CCF(LN,T9,9)  CCF(LN,TA,10)         \
  CCF(LN,TB,11) CCF(LN,TC,12) CCF(LN,TD,13) CCF(LN,TE,14)    _Icf(3,G,T0,UN,LN) \
- CFARGT14(CCCF,JCF,ABSOFT_cf1(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE));                               \
-    WCF(T1, A1, 1)                                                                                           \
-    WCF(T2, A2, 2)                                                                                           \
-    WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) \
-        WCF(TA, A10, 10) WCF(TB, A11, 11) WCF(TC, A12, 12) WCF(TD, A13, 13) WCF(TE, A14, 14) _(T0, _cfX)     \
+ CFARGT14(CCCF,JCF,ABSOFT_cf1(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE));                                 \
+    WCF(T1, A1, 1)                                                                                             \
+    WCF(T2, A2, 2)                                                                                             \
+    WCF(T3, A3, 3)                                                                                             \
+    WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) WCF(TA, A10, 10) \
+        WCF(TB, A11, 11) WCF(TC, A12, 12) WCF(TD, A13, 13) WCF(TE, A14, 14) _(T0, _cfX)                        \
   }
 #endif
 

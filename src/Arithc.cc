@@ -61,8 +61,7 @@ fill_vars(int vlistID)
     }
   else
     {
-      for (varID = 0; varID < nvars; ++varID)
-        vars[varID] = 1;
+      for (varID = 0; varID < nvars; ++varID) vars[varID] = 1;
     }
 
   return vars;

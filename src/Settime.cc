@@ -303,8 +303,7 @@ Settime(void *process)
                 {
                   incperiod = (int) strtol(timeunits, NULL, 10);
                   if (ich == '-' || ich == '+') timeunits++;
-                  while (isdigit((int) *timeunits))
-                    timeunits++;
+                  while (isdigit((int) *timeunits)) timeunits++;
                 }
               get_tunits(timeunits, &incperiod, &incunit, &tunit);
             }
@@ -348,8 +347,7 @@ Settime(void *process)
       const char *timeunits = operatorArgv()[0];
       incperiod = (int) strtol(timeunits, NULL, 10);
       if (timeunits[0] == '-' || timeunits[0] == '+') timeunits++;
-      while (isdigit((int) *timeunits))
-        timeunits++;
+      while (isdigit((int) *timeunits)) timeunits++;
 
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
@@ -362,8 +360,7 @@ Settime(void *process)
       const char *timeunits = operatorArgv()[0];
       incperiod = (int) strtol(timeunits, NULL, 10);
       if (timeunits[0] == '-' || timeunits[0] == '+') timeunits++;
-      while (isdigit((int) *timeunits))
-        timeunits++;
+      while (isdigit((int) *timeunits)) timeunits++;
 
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
@@ -430,8 +427,7 @@ Settime(void *process)
 
   if (ntsteps == 0)
     {
-      for (varID = 0; varID < nvars; ++varID)
-        vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
+      for (varID = 0; varID < nvars; ++varID) vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
   int calendar = taxisInqCalendar(taxisID1);

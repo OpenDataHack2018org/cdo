@@ -39,7 +39,7 @@ Cat(void *process)
   int taxisID2 = CDI_UNDEFID;
   size_t nmiss;
   double tw0 = 0, tw = 0;
-  double *array = NULL;
+  std::vector<double> array;
 
   cdoInitialize(process);
 
@@ -101,8 +101,7 @@ Cat(void *process)
               if (ntsteps == 0 && nfiles > 1)
                 {
                   lconstvars = false;
-                  for (varID = 0; varID < nvars; ++varID)
-                    vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
+                  for (varID = 0; varID < nvars; ++varID) vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
                 }
 
               pstreamDefVlist(streamID2, vlistID2);
@@ -110,8 +109,8 @@ Cat(void *process)
 
           if (!lcopy)
             {
-              size_t gridsize = (size_t) vlistGridsizeMax(vlistID1);
-              array = (double *) Malloc(gridsize * sizeof(double));
+              size_t gridsizemax = (size_t) vlistGridsizeMax(vlistID1);
+              array.resize(gridsizemax);
             }
         }
       else
@@ -146,8 +145,8 @@ Cat(void *process)
                 }
               else
                 {
-                  pstreamReadRecord(streamID1, array, &nmiss);
-                  pstreamWriteRecord(streamID2, array, nmiss);
+                  pstreamReadRecord(streamID1, &array[0], &nmiss);
+                  pstreamWriteRecord(streamID2, &array[0], nmiss);
                 }
             }
 
@@ -164,8 +163,6 @@ Cat(void *process)
   pstreamClose(streamID2);
 
   if (cdoTimer) timer_stop(timer_cat);
-
-  if (array) Free(array);
 
   cdoFinish();
 

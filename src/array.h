@@ -93,16 +93,14 @@ template <typename T>
 void
 arrayFill(size_t len, T *restrict array, T value)
 {
-  for (size_t i = 0; i < len; ++i)
-    array[i] = value;
+  for (size_t i = 0; i < len; ++i) array[i] = value;
 }
 
 template <typename T>
 void
 arrayCopy(size_t len, const T *restrict array1, T *restrict array2)
 {
-  for (size_t i = 0; i < len; ++i)
-    array2[i] = array1[i];
+  for (size_t i = 0; i < len; ++i) array2[i] = array1[i];
 }
 
 size_t arrayNumMV(size_t len, const double *restrict array, double missval);

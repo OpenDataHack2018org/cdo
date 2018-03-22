@@ -90,8 +90,7 @@ Deltat(void *process)
             }
           else
             {
-              for (size_t i = 0; i < gridsize; ++i)
-                array2[i] = array1[i] - array0[i];
+              for (size_t i = 0; i < gridsize; ++i) array2[i] = array1[i] - array0[i];
             }
 
           arrayCopy(gridsize, array1, array0);

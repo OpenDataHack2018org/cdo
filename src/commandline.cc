@@ -36,8 +36,7 @@ void
 initCommandLine(void)
 {
   size_t maxlen = 1;
-  for (int iarg = 0; iarg < gargc; iarg++)
-    maxlen += strlen(gargv[iarg]) + 1;
+  for (int iarg = 0; iarg < gargc; iarg++) maxlen += strlen(gargv[iarg]) + 1;
 
   CDO_CommandLine = (char *) Malloc(maxlen);
   atexit(freeCommandLine);

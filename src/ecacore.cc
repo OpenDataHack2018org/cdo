@@ -235,8 +235,7 @@ eca1(const ECA_REQUEST_1 *request)
                   if (IS_NOT_SET(samp2[levelID].ptr))
                     {
                       samp2[levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
-                      for (size_t i = 0; i < gridsize; i++)
-                        samp2[levelID].ptr[i] = nsets;
+                      for (size_t i = 0; i < gridsize; i++) samp2[levelID].ptr[i] = nsets;
                     }
                   for (size_t i = 0; i < gridsize; i++)
                     {
@@ -352,20 +351,17 @@ eca1(const ECA_REQUEST_1 *request)
 
   if (IS_SET(var13))
     {
-      for (levelID = 0; levelID < nlevels; levelID++)
-        Free(var13[levelID].ptr);
+      for (levelID = 0; levelID < nlevels; levelID++) Free(var13[levelID].ptr);
       Free(var13);
     }
   if (IS_SET(var21))
     {
-      for (levelID = 0; levelID < nlevels; levelID++)
-        Free(var21[levelID].ptr);
+      for (levelID = 0; levelID < nlevels; levelID++) Free(var21[levelID].ptr);
       Free(var21);
     }
   if (IS_SET(var23))
     {
-      for (levelID = 0; levelID < nlevels; levelID++)
-        Free(var23[levelID].ptr);
+      for (levelID = 0; levelID < nlevels; levelID++) Free(var23[levelID].ptr);
       Free(var23);
     }
 
@@ -599,8 +595,7 @@ eca2(const ECA_REQUEST_2 *request)
                   if (IS_NOT_SET(samp3[levelID].ptr))
                     {
                       samp3[levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
-                      for (size_t i = 0; i < gridsize; i++)
-                        samp3[levelID].ptr[i] = nsets;
+                      for (size_t i = 0; i < gridsize; i++) samp3[levelID].ptr[i] = nsets;
                     }
                   for (size_t i = 0; i < gridsize; i++)
                     {
@@ -715,20 +710,17 @@ eca2(const ECA_REQUEST_2 *request)
 
   if (IS_SET(total))
     {
-      for (levelID = 0; levelID < nlevels; levelID++)
-        Free(total[levelID].ptr);
+      for (levelID = 0; levelID < nlevels; levelID++) Free(total[levelID].ptr);
       Free(total);
     }
   if (IS_SET(var15))
     {
-      for (levelID = 0; levelID < nlevels; levelID++)
-        Free(var15[levelID].ptr);
+      for (levelID = 0; levelID < nlevels; levelID++) Free(var15[levelID].ptr);
       Free(var15);
     }
   if (IS_SET(var22))
     {
-      for (levelID = 0; levelID < nlevels; levelID++)
-        Free(var22[levelID].ptr);
+      for (levelID = 0; levelID < nlevels; levelID++) Free(var22[levelID].ptr);
       Free(var22);
     }
 
@@ -909,8 +901,7 @@ eca3(const ECA_REQUEST_3 *request)
 
       if (nrecs == 0 && nsets == 0) break;
 
-      for (levelID = 0; levelID < nlevels; levelID++)
-        request->f3(&var1[levelID], var2[levelID]);
+      for (levelID = 0; levelID < nlevels; levelID++) request->f3(&var1[levelID], var2[levelID]);
 
       taxisDefVdate(otaxisID, ovdate);
       taxisDefVtime(otaxisID, ovtime);
@@ -1037,8 +1028,7 @@ eca4(const ECA_REQUEST_4 *request)
     }
   else
     {
-      for (size_t i = 0; i < gridsize; ++i)
-        yvals[i] = 20;  // Northern hemisphere
+      for (size_t i = 0; i < gridsize; ++i) yvals[i] = 20;  // Northern hemisphere
     }
 
   /* Two fields are needed because of the definition of gsl for northern and
@@ -1274,8 +1264,8 @@ eca4(const ECA_REQUEST_4 *request)
                   resetAtJul = TRUE;
                 }
 
-                /* count the day with temperature larger/smaller than the
-                 * given limit */
+/* count the day with temperature larger/smaller than the
+ * given limit */
 #ifdef _OPENMP
 #pragma omp sections
 #endif
@@ -1300,8 +1290,7 @@ eca4(const ECA_REQUEST_4 *request)
 
               if (month < 7)
                 {
-                  for (size_t i = 0; i < gridsize; i++)
-                    /* dictinct between northern and southern sphere */
+                  for (size_t i = 0; i < gridsize; i++) /* dictinct between northern and southern sphere */
                     /* start with south */
                     if (yvals[i] < 0)
                       {

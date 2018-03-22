@@ -106,8 +106,7 @@ EOF3d(void *process)
   if (nts == -1)
     {
       nts = 0;
-      while (cdoStreamInqTimestep(streamID1, nts))
-        nts++;
+      while (cdoStreamInqTimestep(streamID1, nts)) nts++;
 
       if (cdoVerbose) cdoPrint("Counted %i timeSteps", nts);
 
@@ -165,12 +164,10 @@ EOF3d(void *process)
       for (int tsID = 0; tsID < nts; tsID++)
         {
           datafields[varID][tsID] = (double *) Malloc(temp_size * sizeof(double));
-          for (size_t i = 0; i < temp_size; ++i)
-            datafields[varID][tsID][i] = 0;
+          for (size_t i = 0; i < temp_size; ++i) datafields[varID][tsID][i] = 0;
         }
       datacounts[varID] = (int *) Malloc(temp_size * sizeof(int));
-      for (size_t i = 0; i < temp_size; i++)
-        datacounts[varID][i] = 0;
+      for (size_t i = 0; i < temp_size; i++) datacounts[varID][i] = 0;
 
       eigenvectors[varID] = (double **) Malloc(n_eig * sizeof(double *));
       eigenvalues[varID] = (double **) Malloc(nts * sizeof(double *));
@@ -180,8 +177,7 @@ EOF3d(void *process)
           if (i < n_eig)
             {
               eigenvectors[varID][i] = (double *) Malloc(temp_size * sizeof(double));
-              for (size_t i2 = 0; i2 < temp_size; ++i2)
-                eigenvectors[varID][i][i2] = missval;
+              for (size_t i2 = 0; i2 < temp_size; ++i2) eigenvectors[varID][i][i2] = missval;
             }
 
           eigenvalues[varID][i] = (double *) Malloc(1 * sizeof(double));
@@ -195,8 +191,7 @@ EOF3d(void *process)
              nts, n, gridsizemax, "time_space");
 
   double *weight = (double *) Malloc(maxlevs * gridsizemax * sizeof(double));
-  for (size_t i = 0; i < maxlevs * gridsizemax; ++i)
-    weight[i] = 1.;
+  for (size_t i = 0; i < maxlevs * gridsizemax; ++i) weight[i] = 1.;
 
   if (weight_mode == WEIGHT_ON)
     {
@@ -209,8 +204,7 @@ EOF3d(void *process)
       else
         {
           for (size_t k = 1; k < maxlevs; ++k)
-            for (size_t i = 0; i < gridsizemax; ++i)
-              weight[k * gridsizemax + i] = weight[i];
+            for (size_t i = 0; i < gridsizemax; ++i) weight[k * gridsizemax + i] = weight[i];
         }
     }
 
@@ -293,8 +287,7 @@ EOF3d(void *process)
       if (weight_mode == WEIGHT_ON)
         {
           sum_w = 0;
-          for (size_t i = 0; i < npack; i++)
-            sum_w += weight[pack[i]];
+          for (size_t i = 0; i < npack; i++) sum_w += weight[pack[i]];
         }
 
       if (npack < 1)
@@ -308,8 +301,7 @@ EOF3d(void *process)
         }
 
       cov = (double **) Malloc(nts * sizeof(double *));
-      for (int j1 = 0; j1 < nts; j1++)
-        cov[j1] = (double *) Malloc(nts * sizeof(double));
+      for (int j1 = 0; j1 < nts; j1++) cov[j1] = (double *) Malloc(nts * sizeof(double));
       eigv = (double *) Malloc(n * sizeof(double));
 
       if (cdoVerbose)
@@ -328,8 +320,7 @@ EOF3d(void *process)
             {
               double *df2p = datafields[varID][j2];
               double sum = 0;
-              for (size_t i = 0; i < npack; i++)
-                sum += weight[pack[i] % gridsizemax] * df1p[pack[i]] * df2p[pack[i]];
+              for (size_t i = 0; i < npack; i++) sum += weight[pack[i] % gridsizemax] * df1p[pack[i]] * df2p[pack[i]];
               cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
             }
         }
@@ -351,8 +342,7 @@ EOF3d(void *process)
 
       if (cdoVerbose) cdoPrint("Processed SVD decomposition for var %d from %d x %d matrix", varID, n, n);
 
-      for (int eofID = 0; eofID < n; eofID++)
-        eigenvalues[varID][eofID][0] = eigv[eofID];
+      for (int eofID = 0; eofID < n; eofID++) eigenvalues[varID][eofID][0] = eigv[eofID];
 
       if (cdoTimer) timer_stop(timer_eig);
 
@@ -366,8 +356,7 @@ EOF3d(void *process)
           for (size_t i = 0; i < npack; i++)
             {
               double sum = 0;
-              for (int j = 0; j < nts; j++)
-                sum += datafields[varID][j][pack[i]] * cov[eofID][j];
+              for (int j = 0; j < nts; j++) sum += datafields[varID][j][pack[i]] * cov[eofID][j];
 
               eigenvec[pack[i]] = sum;
             }
@@ -387,16 +376,14 @@ EOF3d(void *process)
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(sum, npack, eigenvec, pack)
 #endif
-              for (size_t i = 0; i < npack; i++)
-                eigenvec[pack[i]] /= sum;
+              for (size_t i = 0; i < npack; i++) eigenvec[pack[i]] /= sum;
             }
           else
             {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(eigenvec, pack, missval, npack)
 #endif
-              for (size_t i = 0; i < npack; i++)
-                eigenvec[pack[i]] = missval;
+              for (size_t i = 0; i < npack; i++) eigenvec[pack[i]] = missval;
             }
         } /* for ( eofID = 0; eofID < n_eig; eofID++ )     */
 
@@ -424,8 +411,7 @@ EOF3d(void *process)
   gridDefYvals(gridID2, &yvals);
 
   ngrids = vlistNgrids(vlistID2);
-  for (int i = 0; i < ngrids; i++)
-    vlistChangeGridIndex(vlistID2, i, gridID2);
+  for (int i = 0; i < ngrids; i++) vlistChangeGridIndex(vlistID2, i, gridID2);
 
   int zaxisID2 = zaxisCreate(ZAXIS_GENERIC, 1);
   double zvals = 0;
@@ -434,8 +420,7 @@ EOF3d(void *process)
   zaxisDefLongname(zaxisID2, "Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
 
   int nzaxis = vlistNzaxis(vlistID2);
-  for (int i = 0; i < nzaxis; i++)
-    vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
+  for (int i = 0; i < nzaxis; i++) vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 
   /*  eigenvectors */
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());

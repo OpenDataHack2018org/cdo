@@ -113,16 +113,14 @@ Tests(void *process)
           else if (operatorID == STUDENTT)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval)
-                                ? missval
-                                : student_t(degree_of_freedom, array1[i], processInqPrompt());
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval : student_t(degree_of_freedom, array1[i],
+                                                                                   processInqPrompt());
             }
           else if (operatorID == CHISQUARE)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval)
-                                ? missval
-                                : chi_square(degree_of_freedom, array1[i], processInqPrompt());
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval : chi_square(degree_of_freedom, array1[i],
+                                                                                    processInqPrompt());
             }
           else if (operatorID == BETA)
             {

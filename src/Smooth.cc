@@ -48,57 +48,6 @@ typedef struct
   double weightR;
 } smoothpoint_t;
 
-double intlin(double x, double y1, double x1, double y2, double x2);
-
-double
-smooth_knn_compute_weights(size_t numNeighbors, const bool *restrict src_grid_mask, struct gsknn *knn,
-                           double search_radius, double weight0, double weightR)
-{
-  bool *restrict nbr_mask = knn->mask;
-  const size_t *restrict nbr_add = knn->add;
-  double *restrict nbr_dist = knn->dist;
-
-  // Compute weights based on inverse distance if mask is false, eliminate those
-  // points
-  double dist_tot = 0.;  // sum of neighbor distances (for normalizing)
-
-  for (size_t n = 0; n < numNeighbors; ++n)
-    {
-      nbr_mask[n] = false;
-      if (nbr_add[n] < SIZE_MAX && src_grid_mask[nbr_add[n]])
-        {
-          nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightR, search_radius);
-          dist_tot += nbr_dist[n];
-          nbr_mask[n] = true;
-        }
-    }
-
-  return dist_tot;
-}
-
-size_t
-smooth_knn_normalize_weights(size_t numNeighbors, double dist_tot, struct gsknn *knn)
-{
-  const bool *restrict nbr_mask = knn->mask;
-  size_t *restrict nbr_add = knn->add;
-  double *restrict nbr_dist = knn->dist;
-
-  // Normalize weights and store the link
-  size_t nadds = 0;
-
-  for (size_t n = 0; n < numNeighbors; ++n)
-    {
-      if (nbr_mask[n])
-        {
-          nbr_dist[nadds] = nbr_dist[n] / dist_tot;
-          nbr_add[nadds] = nbr_add[n];
-          nadds++;
-        }
-    }
-
-  return nadds;
-}
-
 static void
 smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss,
        smoothpoint_t spoint)
@@ -108,9 +57,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   size_t numNeighbors = spoint.maxpoints;
   if (numNeighbors > gridsize) numNeighbors = gridsize;
 
-  bool *mask = (bool *) Malloc(gridsize * sizeof(bool));
-  for (size_t i = 0; i < gridsize; ++i)
-    mask[i] = !DBL_IS_EQUAL(array1[i], missval);
+  uint8_t *mask = (uint8_t *) Malloc(gridsize * sizeof(uint8_t));
+  for (size_t i = 0; i < gridsize; ++i) mask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
   std::vector<double> xvals(gridsize);
   std::vector<double> yvals(gridsize);
@@ -130,9 +78,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
-  struct gsknn **knn = (struct gsknn **) Malloc(Threading::ompNumThreads * sizeof(struct gsknn *));
-  for (int i = 0; i < Threading::ompNumThreads; i++)
-    knn[i] = gridsearch_knn_new(numNeighbors);
+  std::vector<knnWeightsType> knnWeights;
+  for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
   clock_t start, finish;
 
@@ -140,13 +87,13 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   bool xIsCyclic = false;
   size_t dims[2] = { gridsize, 0 };
-  struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, gridsize, &xvals[0], &yvals[0]);
+  GridSearch *gs = gridsearch_create(xIsCyclic, dims, gridsize, &xvals[0], &yvals[0]);
 
-  gs->search_radius = spoint.radius;
+  gs->searchRadius = spoint.radius;
 
   finish = clock();
 
-  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (cdoVerbose) progressInit();
 
@@ -156,8 +103,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for schedule(dynamic) default(none)  reduction(+:findex)  reduction(+:nmissx) \
-  shared(cdoVerbose, knn, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
+#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) reduction(+ : nmissx) shared( \
+    cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -166,28 +113,13 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
       findex++;
       if (cdoVerbose && cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / gridsize);
 
-      size_t nadds = gridsearch_knn(gs, knn[ompthID], xvals[i], yvals[i]);
+      grid_search_nbr(gs, xvals[i], yvals[i], knnWeights[ompthID]);
 
-      // Compute weights based on inverse distance if mask is false, eliminate
-      // those points
-      double dist_tot
-          = smooth_knn_compute_weights(nadds, mask, knn[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
-
-      // Normalize weights and store the link
-      nadds = smooth_knn_normalize_weights(nadds, dist_tot, knn[ompthID]);
+      // Compute weights based on inverse distance if mask is false, eliminate those points
+      size_t nadds = knnWeights[ompthID].compute_weights(mask, spoint.radius, spoint.weight0, spoint.weightR);
       if (nadds)
         {
-          const size_t *restrict nbr_add = knn[ompthID]->add;
-          const double *restrict nbr_dist = knn[ompthID]->dist;
-          /*
-          printf("n %u %d nadds %u dis %g\n", i, nbr_add[0], nadds,
-          nbr_dist[0]); for ( size_t n = 0; n < nadds; ++n ) printf("   n %u add
-          %d dis %g\n", n, nbr_add[n], nbr_dist[n]);
-          */
-          double result = 0;
-          for (size_t n = 0; n < nadds; ++n)
-            result += array1[nbr_add[n]] * nbr_dist[n];
-          array2[i] = result;
+          array2[i] = knnWeights[ompthID].array_weights_sum(array1);
         }
       else
         {
@@ -200,12 +132,9 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   finish = clock();
 
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (gs) gridsearch_delete(gs);
-
-  for (int i = 0; i < Threading::ompNumThreads; i++)
-    gridsearch_knn_delete(knn[i]);
 
   if (gridID0 != gridID) gridDestroy(gridID);
 
@@ -213,7 +142,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 }
 
 static inline void
-smooth9_sum(size_t ij, bool *mask, double sfac, const double *restrict array, double *avg, double *divavg)
+smooth9_sum(size_t ij, uint8_t *mask, double sfac, const double *restrict array, double *avg, double *divavg)
 {
   if (mask[ij])
     {
@@ -230,10 +159,9 @@ smooth9(int gridID, double missval, const double *restrict array1, double *restr
   size_t nlat = gridInqYsize(gridID);
   int grid_is_cyclic = gridIsCircular(gridID);
 
-  bool *mask = (bool *) Malloc(gridsize * sizeof(bool));
+  uint8_t *mask = (uint8_t *) Malloc(gridsize * sizeof(uint8_t));
 
-  for (size_t i = 0; i < gridsize; ++i)
-    mask[i] = !DBL_IS_EQUAL(missval, array1[i]);
+  for (size_t i = 0; i < gridsize; ++i) mask[i] = !DBL_IS_EQUAL(missval, array1[i]);
 
   *nmiss = 0;
   for (size_t i = 0; i < nlat; i++)
@@ -463,8 +391,8 @@ Smooth(void *process)
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if (gridsizemax < spoint.maxpoints) spoint.maxpoints = gridsizemax;
   if (cdoVerbose)
-    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
-             xnsmooth, spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
+    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g", xnsmooth,
+             spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
 
   spoint.radius *= DEG2RAD;
 

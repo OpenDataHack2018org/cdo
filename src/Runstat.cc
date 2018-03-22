@@ -154,8 +154,7 @@ Runstat(void *process)
           if (lrange)
             {
               pvars2->nmiss = pvars1->nmiss;
-              for (size_t i = 0; i < gridsize; i++)
-                pvars2->ptr[i] = pvars1->ptr[i];
+              for (size_t i = 0; i < gridsize; i++) pvars2->ptr[i] = pvars1->ptr[i];
             }
 
           if (runstat_nomiss && nmiss > 0)
@@ -166,11 +165,9 @@ Runstat(void *process)
             {
               double missval = pvars1->missval;
 
-              for (size_t i = 0; i < gridsize; i++)
-                imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
+              for (size_t i = 0; i < gridsize; i++) imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
-              for (size_t i = 0; i < gridsize; i++)
-                psamp1->ptr[i] = (double) imask[i];
+              for (size_t i = 0; i < gridsize; i++) psamp1->ptr[i] = (double) imask[i];
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(tsID, gridsize, imask, samp1, varID, levelID)
@@ -313,8 +310,7 @@ Runstat(void *process)
           if (lrange)
             {
               pvars2->nmiss = pvars1->nmiss;
-              for (size_t i = 0; i < gridsize; i++)
-                pvars2->ptr[i] = pvars1->ptr[i];
+              for (size_t i = 0; i < gridsize; i++) pvars2->ptr[i] = pvars1->ptr[i];
             }
 
           if (runstat_nomiss && nmiss > 0) cdoAbort("Missing values supported swichted off!");
@@ -323,11 +319,9 @@ Runstat(void *process)
             {
               double missval = pvars1->missval;
 
-              for (size_t i = 0; i < gridsize; i++)
-                imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
+              for (size_t i = 0; i < gridsize; i++) imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
-              for (size_t i = 0; i < gridsize; i++)
-                psamp1->ptr[i] = (double) imask[i];
+              for (size_t i = 0; i < gridsize; i++) psamp1->ptr[i] = (double) imask[i];
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(ndates, imask, gridsize, samp1, varID, levelID)

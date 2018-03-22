@@ -172,8 +172,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
             fi = 0;
           }
         fprintf(old, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi / g, pf1[k], t, q);
-        for (int iv = 0; iv < nvars; ++iv)
-          fprintf(old, " %18.10f", vars1[iv][ijk]);
+        for (int iv = 0; iv < nvars; ++iv) fprintf(old, " %18.10f", vars1[iv][ijk]);
         fprintf(old, "\n");
       }
 #endif
@@ -416,9 +415,8 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
         }
 
       /* correct surface pressure */
-      dfi = fiadj
-            - (fi2[jlev + 1]
-               + (fi2[jlev] - fi2[jlev + 1]) * log(ph2[jlev + 1] / p_firef) / log(ph2[jlev + 1] / ph2[jlev]));
+      dfi = fiadj - (fi2[jlev + 1]
+                     + (fi2[jlev] - fi2[jlev + 1]) * log(ph2[jlev + 1] / p_firef) / log(ph2[jlev + 1] / ph2[jlev]));
       double ztv = (1.0 + epsm1i * zq2[nlev2 - 1]) * zt2[nlev2 - 1];
       ps2[ij] = ps2[ij] * exp(dfi / (rair * ztv));
     }
@@ -426,11 +424,9 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
   /******* final calculation of specific humidity profiles */
   if (ltq)
     {
-      for (int k = 0; k < nlev2; ++k)
-        pf2[k] = af2[k] + bf2[k] * ps2[ij];
+      for (int k = 0; k < nlev2; ++k) pf2[k] = af2[k] + bf2[k] * ps2[ij];
 
-      for (int k = 0; k < nlev2; ++k)
-        zq2[k] = rh2[k] * epsilon * esat(zt2[k]) / pf2[k];
+      for (int k = 0; k < nlev2; ++k) zq2[k] = rh2[k] * epsilon * esat(zt2[k]) / pf2[k];
     }
 
 #if defined(OUTPUT)
@@ -451,8 +447,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
             fi = 0;
           }
         fprintf(new, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi / g, pf2[k], t, q);
-        for (int iv = 0; iv < nvars; ++iv)
-          fprintf(new, " %18.10f", vars2[iv][ijk]);
+        for (int iv = 0; iv < nvars; ++iv) fprintf(new, " %18.10f", vars2[iv][ijk]);
         fprintf(new, "\n");
       }
 #endif
@@ -535,8 +530,7 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
       for (int i = 0; i < Threading::ompNumThreads; i++)
         {
           vars_pbl_2[i].resize(nvars);
-          for (int iv = 0; iv < nvars; ++iv)
-            vars_pbl_2[i][iv].resize(nlev2);
+          for (int iv = 0; iv < nvars; ++iv) vars_pbl_2[i][iv].resize(nlev2);
         }
     }
 
@@ -636,8 +630,7 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
     {
       int ompthID = cdo_omp_get_thread_num();
 
-      for (int iv = 0; iv < nvars; ++iv)
-        vars_pbl[iv] = &vars_pbl_2[ompthID][iv][0];
+      for (int iv = 0; iv < nvars; ++iv) vars_pbl[iv] = &vars_pbl_2[ompthID][iv][0];
 
       if (imiss && imiss[ij]) continue;
 
@@ -790,8 +783,7 @@ main(int argc, char *argv[])
   vars2[3] = ci2;
   vars2[4] = cc2;
 
-  for (ij = 0; ij < NGP; ++ij)
-    fis2[ij] = fis1[ij];
+  for (ij = 0; ij < NGP; ++ij) fis2[ij] = fis1[ij];
 
   if (ltq)
     hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, t1, q1, 40, a2, b2, fis2, ps2, t2, q2, 5, vars1, vars2, tscor, pscor,
@@ -810,8 +802,7 @@ main(int argc, char *argv[])
     if (fabs(t2[k * NGP] - ot2[k]) > 0.001) lerror = 1;
 
   if (lerror)
-    for (k = 0; k < 40; ++k)
-      printf("%d %g %g %g\n", k, t2[k * NGP], ot2[k], fabs(t2[k * NGP] - ot2[k]));
+    for (k = 0; k < 40; ++k) printf("%d %g %g %g\n", k, t2[k * NGP], ot2[k], fabs(t2[k * NGP] - ot2[k]));
 
   return 0;
 }

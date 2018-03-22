@@ -121,8 +121,7 @@ Vertwind(void *process)
       for (levelID = 0; levelID < nlevel; ++levelID)
         {
           size_t offset = (size_t) levelID * gridsize;
-          for (size_t i = 0; i < gridsize; ++i)
-            fpress[offset + i] = level[levelID];
+          for (size_t i = 0; i < gridsize; ++i) fpress[offset + i] = level[levelID];
         }
     }
   else if (zaxisInqType(zaxisID) == ZAXIS_HYBRID)
@@ -143,8 +142,7 @@ Vertwind(void *process)
     cdoAbort("Unsupported Z-Axis type!");
 
   vlistClearFlag(vlistID1);
-  for (levelID = 0; levelID < nlevel; ++levelID)
-    vlistDefFlag(vlistID1, omegaID, levelID, TRUE);
+  for (levelID = 0; levelID < nlevel; ++levelID) vlistDefFlag(vlistID1, omegaID, levelID, TRUE);
 
   int vlistID2 = vlistCreate();
   cdoVlistCopyFlag(vlistID2, vlistID1);

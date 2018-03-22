@@ -27,8 +27,8 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *res
   double coslon_dst = cos(plon);
   double sinlon_dst = sin(plon);
 
-  double dist_min = BIGNUM;
-  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = BIGNUM;
+  double dist_min = DBL_MAX;
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = DBL_MAX;
 
   size_t jjf = 0, jjl = ny - 1;
   if (plon >= src_center_lon[0] && plon <= src_center_lon[nx - 1])
@@ -103,7 +103,7 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *res
 
   Free(sincoslon);
 
-  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = ONE / (nbr_dist[n] + TINY);
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = 1.0 / (nbr_dist[n] + TINY);
   double distance = 0.0;
   for (unsigned n = 0; n < 4; ++n) distance += nbr_dist[n];
   for (unsigned n = 0; n < 4; ++n) nbr_dist[n] /= distance;
@@ -112,9 +112,8 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *res
 }
 
 int
-grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-                  double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
-                  const double *restrict src_center_lon)
+grid_search_reg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                  double plat, double plon)
 {
   /*
     Output variables:
@@ -134,6 +133,9 @@ grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restr
     double src_center_lon[]        ! longitude of each src grid center
   */
   int search_result = 0;
+  const size_t *restrict src_grid_dims = src_grid->dims;
+  const double *restrict src_center_lat = src_grid->reg2d_center_lat;
+  const double *restrict src_center_lon = src_grid->reg2d_center_lon;
 
   for (unsigned n = 0; n < 4; ++n) src_add[n] = 0;
 
@@ -175,7 +177,7 @@ grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restr
 
       search_result = 1;
 
-      return (search_result);
+      return search_result;
     }
 
   /*
@@ -184,7 +186,7 @@ grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restr
     closest points. Go ahead and compute weights here, but store in src_lats and
     return -add to prevent the parent routine from computing bilinear weights.
   */
-  if (!src_grid->lextrapolate) return (search_result);
+  if (!src_grid->lextrapolate) return search_result;
 
   /*
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);

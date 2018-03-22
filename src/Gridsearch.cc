@@ -238,8 +238,7 @@ cell_search(int gridIDsrc, int gridIDtgt)
       if (cdoVerbose && num_srch_cells > 0)
         {
           printf("tgt cell %ld: found %ld src cells\n", tgt_cell_add, num_srch_cells);
-          for (long n = 0; n < num_srch_cells; ++n)
-            printf("   %ld: %ld\n", n + 1, srch_add[n]);
+          for (long n = 0; n < num_srch_cells; ++n) printf("   %ld: %ld\n", n + 1, srch_add[n]);
         }
     }
 

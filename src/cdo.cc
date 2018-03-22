@@ -99,12 +99,11 @@ static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 const char *CDO_username;
 
-extern "C"
-{
-  void streamGrbDefDataScanningMode(int scanmode);
+extern "C" {
+void streamGrbDefDataScanningMode(int scanmode);
 }
 
-void gridsearch_set_method(const char *methodstr);
+void setPointSearchMethod(const char *methodstr);
 
 #define PRINT_RLIMIT(resource)                                                           \
   {                                                                                      \
@@ -139,8 +138,7 @@ cdo_stackframe(void)
   fprintf(stderr, "[bt] Execution path:\n");
   if (messages)
     {
-      for (int i = 0; i < frames; ++i)
-        fprintf(stderr, "[bt] %s\n", messages[i]);
+      for (int i = 0; i < frames; ++i) fprintf(stderr, "[bt] %s\n", messages[i]);
       free(messages);
     }
 #endif
@@ -172,7 +170,7 @@ cdo_feenableexcept(int excepts)
 }
 
 static void
-cdo_sig_handler(int signo)
+cdoSignalHandler(int signo)
 {
   if (signo == SIGFPE)
     {
@@ -207,8 +205,8 @@ cdo_version(void)
   const char *typenames[] = { "srv", "ext", "ieg", "grb1", "grb2", "nc1", "nc2", "nc4", "nc4c", "nc5" };
 
   fprintf(stderr, "%s\n", CDO_version);
-#if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
-  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
+#ifdef SYSTEM_TYPE
+  fprintf(stderr, "System: %s\n", SYSTEM_TYPE);
 #endif
 #if defined(CXX_COMPILER)
   fprintf(stderr, "CXX Compiler: %s\n", CXX_COMPILER);
@@ -257,25 +255,19 @@ cdo_usage(void)
   fprintf(stderr, "    -a             Generate an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (I8/I16/I32/F32/F64 for "
-                  "nc1/nc2/nc4/nc4c/nc5; F32/F64 for grb2/srv/ext/ieg; P1 - "
-                  "P24 for grb1/grb2)\n");
-  fprintf(stderr, "                   Add L or B to set the byteorder to "
-                  "Little or Big endian\n");
+                  "nc1/nc2/nc4/nc4c/nc5; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2)\n");
+  fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
   fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
   fprintf(stderr, "    -C, --color    Colorized output messages\n");
   fprintf(stderr, "    --enableexcept <except>\n");
   fprintf(stderr, "                   Set individual floating-point traps "
-                  "(DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, "
-                  "ALL_EXCEPT)\n");
+                  "(DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
   fprintf(stderr, "    -f, --format <format>\n");
-  fprintf(stderr, "                   Format of the output file. "
-                  "(grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg)\n");
+  fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
-  fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, "
-                  "r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
+  fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h, --help     Help information for the operators\n");
-  fprintf(stderr, "    --history      Do not append to NetCDF \"history\" "
-                  "global attribute\n");
+  fprintf(stderr, "    --history      Do not append to NetCDF \"history\" global attribute\n");
   fprintf(stderr, "    --netcdf_hdr_pad, --hdr_pad, --header_pad <nbr>\n");
   fprintf(stderr, "                   Pad NetCDF output header with nbr bytes\n");
   /*
@@ -289,12 +281,8 @@ cdo_usage(void)
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
   fprintf(stderr, "    -k <chunktype> NetCDF4 chunk type: auto, grid or lines\n");
   fprintf(stderr, "    -L             Lock IO (sequential access)\n");
-  fprintf(stderr, "    -M             Switch to indicate that the I/O streams "
-                  "have missing values\n");
-  fprintf(stderr,
-          "    -m <missval>   Set the missing value of non NetCDF files "
-          "(default: %g)\n",
-          cdiInqMissval());
+  fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
+  fprintf(stderr, "    -m <missval>   Set the missing value of non NetCDF files (default: %g)\n", cdiInqMissval());
   fprintf(stderr, "    --no_warnings  Inhibit warning messages\n");
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
   fprintf(stderr, "    --operators    List of all operators\n");
@@ -302,24 +290,19 @@ cdo_usage(void)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
   fprintf(stderr, "    --percentile <method>\n");
-  fprintf(stderr, "                   Percentile method: nrank, nist, numpy, "
-                  "numpy_lower, numpy_higher, numpy_nearest\n");
+  fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
   fprintf(stderr, "    --precision <float_digits[,double_digits]>\n");
-  fprintf(stderr, "                   Precision to use in displaying "
-                  "floating-point data (default: 7,15)\n");
+  fprintf(stderr, "                   Precision to use in displaying floating-point data (default: 7,15)\n");
+  if (ITSME) fprintf(stderr, "    --pointsearchmethod [full/kdtree/nanoflann/latbins]\n");
   fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions\n");
-  if (ITSME) fprintf(stderr, "    --remap_genweights 0/1\n");
-  fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to "
-                  "regular grid (cgribex only)\n");
+  if (ITSME) fprintf(stderr, "    --remap_genweights [0/1]\n");
+  fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (cgribex only)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
-  fprintf(stderr, "    -S             Create an extra output stream for the "
-                  "module TIMSTAT. This stream\n");
-  fprintf(stderr, "                   contains the number of non missing "
-                  "values for each output period.\n");
+  fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
+  fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
   fprintf(stderr, "    -s, --silent   Silent mode\n");
   fprintf(stderr, "    --sortname     Alphanumeric sorting of NetCDF parameter names\n");
-  fprintf(stderr, "    -t <codetab>   Set GRIB1 default parameter code table "
-                  "name or file (cgribex only)\n");
+  fprintf(stderr, "    -t <codetab>   Set GRIB1 default parameter code table name or file (cgribex only)\n");
   fprintf(stderr, "                   Predefined tables: ");
   for (int id = 0; id < tableInqNumber(); id++)
     if ((name = tableInqNamePtr(id))) fprintf(stderr, " %s", name);
@@ -337,9 +320,7 @@ cdo_usage(void)
   fprintf(stderr, "        zip[_1-9]  Deflate compression of NetCDF4 variables\n");
 #ifdef HIRLAM_EXTENSIONS
   fprintf(stderr, "    --Dkext <debLev>   Setting debugLevel for extensions\n");
-  fprintf(stderr, "    --outputGribDataScanningMode <mode>   Setting grib "
-                  "scanning mode for data in output file <0, 64, 96>; Default "
-                  "is 64\n");
+  fprintf(stderr, "    --outputGribDataScanningMode <mode>   Setting grib scanning mode for data in output file <0, 64, 96>; Default is 64\n");
 #endif  // HIRLAM_EXTENSIONS
   reset_text_color(stderr);
   fprintf(stderr, "\n");
@@ -479,8 +460,7 @@ setDefaultDataType(const char *datatypestr)
           else
             {
               fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
-              fprintf(stderr, "Use I8/I16/I32/F32/F64 for "
-                              "nc1/nc2/nc4/nc4c/nc5; F32/F64 for "
+              fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c/nc5; F32/F64 for "
                               "grb2/srv/ext/ieg; P1 - P24 for grb1/grb2.\n");
               exit(EXIT_FAILURE);
             }
@@ -496,10 +476,7 @@ setDefaultDataType(const char *datatypestr)
               else if (nbits == 32)
                 cdoDefaultDataType = CDI_DATATYPE_INT32;
               else
-                {
-                  fprintf(stderr, "Unsupported number of bits = %d for datatype INT!\n", nbits);
-                  exit(EXIT_FAILURE);
-                }
+                cdoAbort("Unsupported number of bits = %d for datatype INT!", nbits);
             }
           else if (dtype == D_UINT)
             {
@@ -510,10 +487,7 @@ setDefaultDataType(const char *datatypestr)
               else if (nbits == 32)
                 cdoDefaultDataType = CDI_DATATYPE_UINT32;
               else
-                {
-                  fprintf(stderr, "Unsupported number of bits = %d for datatype UINT!\n", nbits);
-                  exit(EXIT_FAILURE);
-                }
+                cdoAbort("Unsupported number of bits = %d for datatype UINT!", nbits);
             }
           else if (dtype == D_FLT)
             {
@@ -522,10 +496,7 @@ setDefaultDataType(const char *datatypestr)
               else if (nbits == 64)
                 cdoDefaultDataType = CDI_DATATYPE_FLT64;
               else
-                {
-                  fprintf(stderr, "Unsupported number of bits = %d for datatype FLT!\n", nbits);
-                  exit(EXIT_FAILURE);
-                }
+                cdoAbort("Unsupported number of bits = %d for datatype FLT!", nbits);
             }
           else if (dtype == D_CPX)
             {
@@ -534,10 +505,7 @@ setDefaultDataType(const char *datatypestr)
               else if (nbits == 64)
                 cdoDefaultDataType = CDI_DATATYPE_CPX64;
               else
-                {
-                  fprintf(stderr, "Unsupported number of bits = %d for datatype CPX!\n", nbits);
-                  exit(EXIT_FAILURE);
-                }
+                cdoAbort("Unsupported number of bits = %d for datatype CPX!", nbits);
             }
         }
     }
@@ -556,8 +524,7 @@ setDefaultDataType(const char *datatypestr)
         }
       else
         {
-          fprintf(stderr, "Unsupported character in number of bytes: >%s< !\n", datatypestr);
-          exit(EXIT_FAILURE);
+          cdoAbort("Unsupported character in number of bytes: >%s< !", datatypestr);
         }
     }
 }
@@ -591,7 +558,7 @@ grb1/grb2.\n"); exit(EXIT_FAILURE);
       if ( *datatypestr == 'l' || *datatypestr == 'L' )
         {
           if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
-          datatypestr++;setDefaultDataTypeByte
+          datatypestr++;
         }
       else if ( *datatypestr == 'b' || *datatypestr == 'B' )
         {
@@ -600,8 +567,7 @@ grb1/grb2.\n"); exit(EXIT_FAILURE);
         }
       else
         {
-          fprintf(stderr, "Unsupported character in number of bytes: %s!\n",
-datatypestr); exit(EXIT_FAILURE);
+          cdoAbort("Unsupported character in number of bytes: %s!", datatypestr);
         }
     }
 }
@@ -631,9 +597,9 @@ setDefaultFileType(const char *filetypestr, int labort)
         {
           if ( labort )
             {
-              fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
-              fprintf(stderr, "Available filetypes: grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg\n");
-              exit(EXIT_FAILURE);
+              cdoWarning("Unsupported filetype %s!", filetypestr);
+              cdoWarning("Available filetypes: grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg");
+              cdoAbort("Unsupported filetype %s!", filetypestr);
             }
           else
             {
@@ -652,11 +618,8 @@ setDefaultFileType(const char *filetypestr, int labort)
             {
               fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
               fprintf(stderr, "Use format[_nbits] with:\n");
-              fprintf(stderr, "    format = grb1, grb2, nc1, nc2, nc4, nc4c, "
-                              "nc5, srv, ext or ieg\n");
-              fprintf(stderr, "    nbits  = 32/64 for "
-                              "grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg; 1 - 24 "
-                              "for grb1/grb2\n");
+              fprintf(stderr, "    format = grb1, grb2, nc1, nc2, nc4, nc4c, nc5, srv, ext or ieg\n");
+              fprintf(stderr, "    nbits  = 32/64 for grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg; 1 - 24 for grb1/grb2\n");
               exit(EXIT_FAILURE);
             }
         }
@@ -682,8 +645,7 @@ getMemAlignment(void)
       for (int k = 0; k < 4; ++k)
         if (iptr % ma_check[k]) ma_result[k] = 0;
     }
-  for (int i = 0; i < NTESTS; ++i)
-    free(ptr[i]);
+  for (int i = 0; i < NTESTS; ++i) free(ptr[i]);
 
   for (int i = NTESTS - 1; i >= 0; i--)
     {
@@ -692,8 +654,7 @@ getMemAlignment(void)
       for (int k = 0; k < 4; ++k)
         if (iptr % ma_check[k]) ma_result[k] = 0;
     }
-  for (int i = 0; i < NTESTS; ++i)
-    free(ptr[i]);
+  for (int i = 0; i < NTESTS; ++i) free(ptr[i]);
 
   for (int k = 0; k < 4; ++k)
     if (ma_result[k]) ma = ma_check[k];
@@ -731,8 +692,7 @@ defineCompress(const char *arg)
     }
   else
     {
-      fprintf(stderr, "Compression type '%s' unsupported!\n", arg);
-      exit(EXIT_FAILURE);
+      cdoAbort("Compression type '%s' unsupported!", arg);
     }
 }
 
@@ -746,10 +706,7 @@ defineChunktype(const char *arg)
   else if (STR_IS_EQ("lines", arg))
     cdoChunkType = CDI_CHUNK_LINES;
   else
-    {
-      fprintf(stderr, "Chunk type '%s' unsupported!\n", arg);
-      exit(EXIT_FAILURE);
-    }
+    cdoAbort("Chunk type '%s' unsupported!", arg);
 }
 
 static void
@@ -757,8 +714,7 @@ defineVarnames(const char *arg)
 {
   size_t len = strlen(arg);
   size_t istart = 0;
-  while (istart < len && (arg[istart] == ' ' || arg[istart] == ','))
-    istart++;
+  while (istart < len && (arg[istart] == ' ' || arg[istart] == ',')) istart++;
 
   len -= istart;
 
@@ -972,8 +928,8 @@ print_system_info()
 #if defined(_OPENACC)
   fprintf(stderr, "OPENACC VERSION     = %d\n", _OPENACC);
 #endif
-  /* OPENMP 3:  201107 */
-  /* OPENMP 4:  201307 gcc 4.9 */
+/* OPENMP 3:  201107 */
+/* OPENMP 4:  201307 gcc 4.9 */
 #ifdef _OPENMP
   fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif
@@ -1134,7 +1090,7 @@ parse_options_long(int argc, char *argv[])
   int c;
   int lnetcdf_hdr_pad;
   int luse_fftw;
-  int lgridsearchnn;
+  int lpointsearchmethod;
   int lgridsearchradius;
   int lremap_genweights;
   int lprecision;
@@ -1158,7 +1114,7 @@ parse_options_long(int argc, char *argv[])
       { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1  },
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1  },
       { "use_fftw",          required_argument,          &luse_fftw,  1  },
-      { "gridsearchnn",      required_argument,      &lgridsearchnn,  1  },
+      { "pointsearchmethod", required_argument, &lpointsearchmethod,  1  },
       { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
       { "enableexcept",      required_argument,      &lenableexcept,  1  },
@@ -1202,7 +1158,7 @@ parse_options_long(int argc, char *argv[])
       lpercentile = 0;
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
-      lgridsearchnn = 0;
+      lpointsearchmethod = 0;
       lgridsearchradius = 0;
       lremap_genweights = 0;
       lenableexcept = 0;
@@ -1222,12 +1178,12 @@ parse_options_long(int argc, char *argv[])
           // cdo_usage();
           // fprintf(stderr, "Illegal option!\n");
           return -1;
-          // break;
+        // break;
         case ':':
           // cdo_usage();
           // fprintf(stderr, "Option requires an argument!\n");
           return -1;
-          // break;
+        // break;
         case 0:
           if (lnetcdf_hdr_pad)
             {
@@ -1259,7 +1215,7 @@ parse_options_long(int argc, char *argv[])
                 except = FE_ALL_EXCEPT;
               if (except < 0) cdoAbort("option --%s: unsupported argument: %s", "enableexcept", CDO_optarg);
               cdo_feenableexcept(except);
-              if (signal(SIGFPE, cdo_sig_handler) == SIG_ERR) cdoWarning("can't catch SIGFPE!");
+              if (signal(SIGFPE, cdoSignalHandler) == SIG_ERR) cdoWarning("can't catch SIGFPE!");
             }
           else if (ltimestat_date)
             {
@@ -1288,16 +1244,16 @@ parse_options_long(int argc, char *argv[])
                 cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", intarg);
               CDO_Use_FFTW = intarg;
             }
-          else if (lgridsearchnn)
+          else if (lpointsearchmethod)
             {
-              gridsearch_set_method(CDO_optarg);
+              setPointSearchMethod(CDO_optarg);
             }
           else if (lgridsearchradius)
             {
-              extern double gridsearch_radius;
+              extern double pointSearchRadius;
               double fval = radius_str_to_deg(CDO_optarg);
               if (fval < 0 || fval > 180) cdoAbort("%s=%g out of bounds (0-180 deg)!", "gridsearchradius", fval);
-              gridsearch_radius = fval;
+              pointSearchRadius = fval;
             }
           else if (lremap_genweights)
             {
@@ -1363,8 +1319,7 @@ parse_options_long(int argc, char *argv[])
             /* printf("host: %s %s\n", host, cdoExpName); */
             cdoExpMode = STR_IS_EQ(host, cdoExpName) ? CDO_EXP_REMOTE : CDO_EXP_LOCAL;
 #else
-            fprintf(stderr, "Function gethostname not available!\n");
-            exit(EXIT_FAILURE);
+            cdoAbort("Function gethostname not available!");
 #endif
             break;
           }
@@ -1381,13 +1336,7 @@ parse_options_long(int argc, char *argv[])
         case 'O': cdoOverwriteMode = TRUE; break;
         case 'P':
           if (*CDO_optarg < '1' || *CDO_optarg > '9')
-            {
-              fprintf(stderr,
-                      "Unexpected character in number of OpenMP threads (-P "
-                      "<nthreads>): %s!\n",
-                      CDO_optarg);
-              exit(EXIT_FAILURE);
-            }
+            cdoAbort("Unexpected character in number of OpenMP threads (-P <nthreads>): %s!", CDO_optarg);
           numThreads = atoi(CDO_optarg);
           break;
         case 'p':
@@ -1675,7 +1624,6 @@ void init_modules()
   add_module("Wind"          , {Wind          , WindHelp          , WindOperators          , 1 , CDI_REAL , 1  , 1  });
   add_module("Writegrid"     , {Writegrid     , {}                , WritegridOperators     , 1 , CDI_REAL , 1  , 1  }); // no cdi output
   add_module("Writerandom"   , {Writerandom   , {}                , WriterandomOperators   , 1 , CDI_REAL , 1  , 1  });
-  add_module("YAR"           , {YAR           , {}                , YAROperators           , 0 , CDI_REAL , 1  , 1  });
   add_module("Yearmonstat"   , {Yearmonstat   , YearmonstatHelp   , YearmonstatOperators   , 1 , CDI_REAL , 1  , 1  });
   add_module("Ydayarith"     , {Ydayarith     , YdayarithHelp     , YdayarithOperators     , 1 , CDI_REAL , 2  , 1  });
   add_module("Ydaypctl"      , {Ydaypctl      , YdaypctlHelp      , YdaypctlOperators      , 1 , CDI_REAL , 3  , 1  });
@@ -1802,10 +1750,9 @@ void init_aliases()
 
 int main(int argc, char *argv[])
 {
-  int lstop = FALSE;
+  bool lstop = false;
   int noff = 0;
   int status = 0;
-  const char *operatorArg = NULL;
 
   cdo_init_is_tty();
 
@@ -1824,9 +1771,9 @@ int main(int argc, char *argv[])
 
   get_env_vars();
   init_modules();
-  status = parse_options_long(argc, argv);
 
-  if ( status != 0 ) return -1;
+  status = parse_options_long(argc, argv);
+  if (status != 0) return -1;
 
   cdo_set_options();
 #ifdef DEBUG
@@ -1918,17 +1865,12 @@ int main(int argc, char *argv[])
         }
 
       if ( Help ) cdo_usage();
-      lstop = TRUE;
+      lstop = true;
     }
 
   if ( lstop ) return status;
 
   if ( cdoDefaultTableID != CDI_UNDEFID ) cdiDefTableID(cdoDefaultTableID);
-
-  extern int (*proj_lonlat_to_lcc_func)();
-  proj_lonlat_to_lcc_func = (int (*)()) proj_lonlat_to_lcc;
-  extern int (*proj_lcc_to_lonlat_func)();
-  proj_lcc_to_lonlat_func = (int (*)()) proj_lcc_to_lonlat;
   
   const char *operatorName = get_original(getOperatorName(argv[CDO_optind]));
 
@@ -1955,7 +1897,6 @@ int main(int argc, char *argv[])
 
       timer_start(timer_total);
 
-
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
       getProcess(0)->m_module.func(getProcess(0));
@@ -1978,9 +1919,7 @@ int main(int argc, char *argv[])
       Free(cdoVarnames);
     }
 
-  /* problems with alias!!! if ( operatorName ) Free(operatorName); */ 
-
-  /* malloc_stats(); */
+  // malloc_stats();
 
   if ( cdoGridSearchDir ) Free(cdoGridSearchDir);
 

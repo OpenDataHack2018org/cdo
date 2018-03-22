@@ -94,10 +94,8 @@ Splittime(void *process)
   const char *seas_name[4];
   get_season_name(seas_name);
 
-  for (int i = 0; i < MAX_STREAMS; i++)
-    streamIDs[i] = -1;
-  for (int i = 0; i < MAX_STREAMS; i++)
-    tsIDs[i] = 0;
+  for (int i = 0; i < MAX_STREAMS; i++) streamIDs[i] = -1;
+  for (int i = 0; i < MAX_STREAMS; i++) tsIDs[i] = 0;
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

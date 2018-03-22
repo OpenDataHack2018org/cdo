@@ -203,8 +203,7 @@ Ensstat(void *process)
     }
 
   /* check that the contents is always the same */
-  for (int fileID = 1; fileID < nfiles; fileID++)
-    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
+  for (int fileID = 1; fileID < nfiles; fileID++) vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
   int vlistID1 = ef[0].vlistID;
   int vlistID2 = vlistDuplicate(vlistID1);
@@ -337,8 +336,7 @@ CLEANUP:
   if (lwarning) cdoWarning("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
   if (lerror) cdoAbort("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
 
-  for (int fileID = 0; fileID < nfiles; fileID++)
-    pstreamClose(ef[fileID].streamID);
+  for (int fileID = 0; fileID < nfiles; fileID++) pstreamClose(ef[fileID].streamID);
 
   pstreamClose(streamID2);
 

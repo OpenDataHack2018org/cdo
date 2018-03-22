@@ -34,9 +34,8 @@
 #define HAVE_OPENMP4 1
 #endif
 
-extern "C"
-{
-  void gaussaw(double *pa, double *pw, size_t nlat);
+extern "C" {
+void gaussaw(double *pa, double *pw, size_t nlat);
 }
 
 static void
@@ -381,11 +380,9 @@ after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, do
   double *work = (double *) Malloc(3 * waves * sizeof(double));
 
   gaussaw(gmu, gwt, nlat);
-  for (int jgl = 0; jgl < nlat; ++jgl)
-    gwt[jgl] *= 0.5;
+  for (int jgl = 0; jgl < nlat; ++jgl) gwt[jgl] *= 0.5;
 
-  for (int jgl = 0; jgl < nlat; ++jgl)
-    coslat[jgl] = sqrt(1.0 - gmu[jgl] * gmu[jgl]);
+  for (int jgl = 0; jgl < nlat; ++jgl) coslat[jgl] = sqrt(1.0 - gmu[jgl] * gmu[jgl]);
 
   for (int jgl = 0; jgl < nlat / 2; jgl++)
     {

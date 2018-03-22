@@ -391,13 +391,12 @@ union yyalloc
 #if defined __GNUC__ && 1 < __GNUC__
 #define YYCOPY(Dst, Src, Count) __builtin_memcpy(Dst, Src, (Count) * sizeof(*(Src)))
 #else
-#define YYCOPY(Dst, Src, Count)           \
-  do                                      \
-    {                                     \
-      YYSIZE_T yyi;                       \
-      for (yyi = 0; yyi < (Count); yyi++) \
-        (Dst)[yyi] = (Src)[yyi];          \
-    }                                     \
+#define YYCOPY(Dst, Src, Count)                                    \
+  do                                                               \
+    {                                                              \
+      YYSIZE_T yyi;                                                \
+      for (yyi = 0; yyi < (Count); yyi++) (Dst)[yyi] = (Src)[yyi]; \
+    }                                                              \
   while (0)
 #endif
 #endif
@@ -717,8 +716,7 @@ static YYSIZE_T
 yystrlen(const char *yystr)
 {
   YYSIZE_T yylen;
-  for (yylen = 0; yystr[yylen]; yylen++)
-    continue;
+  for (yylen = 0; yystr[yylen]; yylen++) continue;
   return yylen;
 }
 #endif
@@ -736,8 +734,7 @@ yystpcpy(char *yydest, const char *yysrc)
   char *yyd = yydest;
   const char *yys = yysrc;
 
-  while ((*yyd++ = *yys++) != '\0')
-    continue;
+  while ((*yyd++ = *yys++) != '\0') continue;
 
   return yyd - 1;
 }
@@ -760,15 +757,14 @@ yytnamerr(char *yyres, const char *yystr)
       YYSIZE_T yyn = 0;
       char const *yyp = yystr;
 
-      for (;;)
-        switch (*++yyp)
+      for (;;) switch (*++yyp)
           {
           case '\'':
           case ',': goto do_not_strip_quotes;
 
           case '\\':
             if (*++yyp != '\\') goto do_not_strip_quotes;
-            /* Fall through.  */
+          /* Fall through.  */
           default:
             if (yyres) yyres[yyn] = *yyp;
             yyn++;
@@ -1010,9 +1006,9 @@ yyparse(parseParamType *parse_arg, void *scanner)
   yychar = YYEMPTY; /* Cause a token to be read.  */
   goto yysetstate;
 
-  /*------------------------------------------------------------.
-  | yynewstate -- Push a new state, which is found in yystate.  |
-  `------------------------------------------------------------*/
+/*------------------------------------------------------------.
+| yynewstate -- Push a new state, which is found in yystate.  |
+`------------------------------------------------------------*/
 yynewstate:
   /* In all cases, when you get here, the value and location stacks
      have just been pushed.  So pushing a state here evens the stacks.  */
@@ -1644,7 +1640,7 @@ yyabortlab:
 yyexhaustedlab:
   yyerror(parse_arg, scanner, YY_("memory exhausted"));
   yyresult = 2;
-  /* Fall through.  */
+/* Fall through.  */
 #endif
 
 yyreturn:
@@ -1785,8 +1781,7 @@ expr_opr(int oper, int nops, ...)
   p->u.opr.nops = nops;
   va_list ap;
   va_start(ap, nops);
-  for (int i = 0; i < nops; i++)
-    p->u.opr.op[i] = va_arg(ap, nodeType *);
+  for (int i = 0; i < nops; i++) p->u.opr.op[i] = va_arg(ap, nodeType *);
   va_end(ap);
 
   return p;
@@ -1799,8 +1794,7 @@ freeNode(nodeType *p)
 
   if (p->type == typeOpr)
     {
-      for (int i = 0; i < p->u.opr.nops; i++)
-        freeNode(p->u.opr.op[i]);
+      for (int i = 0; i < p->u.opr.nops; i++) freeNode(p->u.opr.op[i]);
     }
 
   Free(p);

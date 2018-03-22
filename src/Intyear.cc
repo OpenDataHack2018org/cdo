@@ -151,8 +151,7 @@ Intyear(void *process)
                 }
               else
                 {
-                  for (size_t i = 0; i < gridsize; i++)
-                    array3[i] = array1[i] * fac1 + array2[i] * fac2;
+                  for (size_t i = 0; i < gridsize; i++) array3[i] = array1[i] * fac1 + array2[i] * fac2;
                 }
 
               pstreamDefRecord(streamIDs[iy], varID, levelID);
@@ -163,8 +162,7 @@ Intyear(void *process)
       tsID++;
     }
 
-  for (int iy = 0; iy < nyears; iy++)
-    pstreamClose(streamIDs[iy]);
+  for (int iy = 0; iy < nyears; iy++) pstreamClose(streamIDs[iy]);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

@@ -78,8 +78,7 @@ ncctop(double cptop, long nlev, long nlevp1, double *vct_a, double *vct_b)
 
   /* full level pressure */
 
-  for (long jk = 0; jk < nlev; ++jk)
-    zp[jk] = (zph[jk] + zph[jk + 1]) * 0.5;
+  for (long jk = 0; jk < nlev; ++jk) zp[jk] = (zph[jk] + zph[jk + 1]) * 0.5;
 
   /* search for pressure level cptop (Pa) */
 
@@ -132,8 +131,7 @@ vctFromFile(const char *filename, int *nvct)
   int nvct2 = 2 * i;
   int nlevh2 = i - 1;
 
-  for (i = 0; i < nlevh2 + 1; ++i)
-    vct2[i + nvct2 / 2] = vct2[i + maxvct / 2];
+  for (i = 0; i < nlevh2 + 1; ++i) vct2[i + nvct2 / 2] = vct2[i + maxvct / 2];
 
   vct2 = (double *) Realloc(vct2, nvct2 * sizeof(double));
 
@@ -148,8 +146,7 @@ vert_sum(double *sum, double *var3d, size_t gridsize, long nlevel)
   size_t i;
   int k;
 
-  for (i = 0; i < gridsize; ++i)
-    sum[i] = 0;
+  for (i = 0; i < gridsize; ++i) sum[i] = 0;
 
   for (k = 0; k < nlevel; ++k)
     for (i = 0; i < gridsize; ++i)
@@ -164,8 +161,7 @@ vert_sumw(double *sum, double *var3d, size_t gridsize, long nlevel, double *delt
   size_t i;
   int k;
 
-  for (i = 0; i < gridsize; ++i)
-    sum[i] = 0;
+  for (i = 0; i < gridsize; ++i) sum[i] = 0;
 
   for (k = 0; k < nlevel; ++k)
     for (i = 0; i < gridsize; ++i)
@@ -289,8 +285,7 @@ Remapeta(void *process)
   double *b2 = vct2 + nvct2 / 2;
 
   if (cdoVerbose)
-    for (i = 0; i < nhlevf2 + 1; ++i)
-      cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2 / 2 + i]);
+    for (i = 0; i < nhlevf2 + 1; ++i) cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2 / 2 + i]);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -347,8 +342,7 @@ Remapeta(void *process)
 
   int zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nhlevf2);
   double *lev2 = (double *) Malloc(nhlevf2 * sizeof(double));
-  for (i = 0; i < nhlevf2; ++i)
-    lev2[i] = i + 1;
+  for (i = 0; i < nhlevf2; ++i) lev2[i] = i + 1;
   zaxisDefLevels(zaxisID2, lev2);
   Free(lev2);
 
@@ -375,8 +369,7 @@ Remapeta(void *process)
   double *a1 = vct1;
   double *b1 = vct1 + nvct1 / 2;
   if (cdoVerbose)
-    for (i = 0; i < nvct1 / 2; ++i)
-      cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1 / 2 + i]);
+    for (i = 0; i < nvct1 / 2; ++i) cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1 / 2 + i]);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -571,8 +564,7 @@ Remapeta(void *process)
               else if (varID == presID)
                 {
                   if (lnpsID != -1)
-                    for (size_t i = 0; i < gridsize; ++i)
-                      ps1[i] = exp(array[i]);
+                    for (size_t i = 0; i < gridsize; ++i) ps1[i] = exp(array[i]);
                   else if (psID != -1)
                     arrayCopy(gridsize, array, ps1);
                 }
@@ -617,8 +609,7 @@ Remapeta(void *process)
         }
 
       if (lfis2 == false)
-        for (size_t i = 0; i < gridsize; i++)
-          fis2[i] = fis1[i];
+        for (size_t i = 0; i < gridsize; i++) fis2[i] = fis1[i];
 
       if (ltq)
         {
@@ -671,8 +662,7 @@ Remapeta(void *process)
         }
 
       if (zaxisIDh != -1 && lnpsID != -1)
-        for (size_t i = 0; i < gridsize; ++i)
-          ps2[i] = log(ps2[i]);
+        for (size_t i = 0; i < gridsize; ++i) ps2[i] = log(ps2[i]);
 
       if (zaxisIDh != -1 && presID != -1)
         {
@@ -713,8 +703,7 @@ Remapeta(void *process)
               corr_hum(gridsize, single2, MIN_Q);
 
               if (levelID < nctop)
-                for (size_t i = 0; i < gridsize; ++i)
-                  single2[i] = cconst;
+                for (size_t i = 0; i < gridsize; ++i) single2[i] = cconst;
 
               arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_Q || maxval > MAX_Q)
@@ -773,8 +762,7 @@ Remapeta(void *process)
                       printf("%d %g %g %g %g %g\n",i, single2[i], sum1[i],
                   sum2[i], sum1[i]/sum2[i], single2[i]*sum1[i]/sum2[i]);
                   */
-                  for (size_t i = 0; i < gridsize; ++i)
-                    single2[i] = single2[i] * sum1[i] / sum2[i];
+                  for (size_t i = 0; i < gridsize; ++i) single2[i] = single2[i] * sum1[i] / sum2[i];
                 }
 
               setmissval(gridsize, imiss, missval, single2);

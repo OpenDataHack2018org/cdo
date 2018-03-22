@@ -64,8 +64,7 @@ hsv_to_rgb(int rgb[], double h, double s, double v)
     rgb[0] = rgb[1] = rgb[2] = (int) floor(255.999 * v);
   else
     {
-      while (h >= 360.0)
-        h -= 360.0;
+      while (h >= 360.0) h -= 360.0;
       h /= 60.0;
       i = (int) h;
       f = h - i;
@@ -121,8 +120,7 @@ cmyk_to_rgb(int rgb[], double cmyk[])
 
   /* CMYK is in 0-100, RGB will be in 0-255 range */
 
-  for (i = 0; i < 3; i++)
-    rgb[i] = (int) floor((100.0 - cmyk[i] - cmyk[3]) * 2.55999);
+  for (i = 0; i < 3; i++) rgb[i] = (int) floor((100.0 - cmyk[i] - cmyk[3]) * 2.55999);
 }
 
 int
@@ -414,8 +412,7 @@ cptRead(FILE *fp, CPT *cpt)
 
   if (!annot)
     { /* Must set default annotation flags */
-      for (i = 0; i < ncolors; i++)
-        cpt->lut[i].annot = 1;
+      for (i = 0; i < ncolors; i++) cpt->lut[i].annot = 1;
       cpt->lut[i - 1].annot = 3;
     }
 
@@ -465,9 +462,8 @@ cptWriteC(FILE *fp, CPT cpt, const char *name)
   fprintf(fp, "\nstatic LUT %s[] = {\n", lut_name);
   for (n = 0; n < cpt.ncolors; n++)
     {
-      fprintf(fp,
-              "  { %7g, %7g, %7g, {%3d, %3d, %3d}, {%3d, %3d, %3d}, {%3d, %3d, "
-              "%3d}, %d, %d},\n",
+      fprintf(fp, "  { %7g, %7g, %7g, {%3d, %3d, %3d}, {%3d, %3d, %3d}, {%3d, %3d, "
+                  "%3d}, %d, %d},\n",
               cpt.lut[n].z_low, cpt.lut[n].z_high, cpt.lut[n].i_dz, cpt.lut[n].rgb_low[0], cpt.lut[n].rgb_low[1],
               cpt.lut[n].rgb_low[2], cpt.lut[n].rgb_high[0], cpt.lut[n].rgb_high[1], cpt.lut[n].rgb_high[2],
               cpt.lut[n].rgb_diff[0], cpt.lut[n].rgb_diff[1], cpt.lut[n].rgb_diff[2], cpt.lut[n].annot,

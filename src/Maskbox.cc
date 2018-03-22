@@ -92,8 +92,7 @@ ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 
   if (cdoVerbose)
     {
-      for (z = 0; z < number; z++)
-        fprintf(stderr, "%d %g %g\n", (z + 1), xvals[z], yvals[z]);
+      for (z = 0; z < number; z++) fprintf(stderr, "%d %g %g\n", (z + 1), xvals[z], yvals[z]);
     }
 
   return number;
@@ -323,8 +322,7 @@ Maskbox(void *process)
   size_t gridsize = gridInqSize(gridID);
   std::vector<double> array(gridsize);
   std::vector<bool> mask(gridsize);
-  for (size_t i = 0; i < gridsize; ++i)
-    mask[i] = true;
+  for (size_t i = 0; i < gridsize; ++i) mask[i] = true;
 
   if (operatorID == MASKLONLATBOX)
     {

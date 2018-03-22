@@ -82,8 +82,7 @@ magvector(const char *plotfile, int operatorID, const char *varname, long nlon, 
     {
       fprintf(stderr, "Num params %d\n", nparam);
 
-      for (i = 0; i < nparam; i++)
-        fprintf(stderr, "Param %s\n", params[i]);
+      for (i = 0; i < nparam; i++) fprintf(stderr, "Param %s\n", params[i]);
       fflush(stderr);
     }
 
@@ -127,15 +126,13 @@ magvector(const char *plotfile, int operatorID, const char *varname, long nlon, 
 
   if (nlon > 1)
     {
-      for (i = 1; i < nlon; ++i)
-        dlon += (grid_center_lon[i] - grid_center_lon[i - 1]);
+      for (i = 1; i < nlon; ++i) dlon += (grid_center_lon[i] - grid_center_lon[i - 1]);
       dlon /= (nlon - 1);
     }
 
   if (nlat > 1)
     {
-      for (i = 1; i < nlat; ++i)
-        dlat += (grid_center_lat[nlon * i] - grid_center_lat[nlon * (i - 1)]);
+      for (i = 1; i < nlat; ++i) dlat += (grid_center_lat[nlon * i] - grid_center_lat[nlon * (i - 1)]);
       dlat /= (nlat - 1);
     }
 
@@ -334,8 +331,7 @@ Magvector(void *process)
     {
       if (DBG)
         {
-          for (int i = 0; i < nparam; i++)
-            fprintf(stderr, "Param %d is %s!\n", i + 1, pnames[i]);
+          for (int i = 0; i < nparam; i++) fprintf(stderr, "Param %d is %s!\n", i + 1, pnames[i]);
         }
 
       VerifyVectorParameters(nparam, pnames, operatorID);

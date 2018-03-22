@@ -64,8 +64,7 @@ Deltime(void *process)
       sarg = operatorArgv()[0];
       dday = atoi(sarg);
       dmon = 0;
-      while (isdigit(*sarg))
-        sarg++;
+      while (isdigit(*sarg)) sarg++;
       if (isalpha(*sarg))
         {
           char smon[32];

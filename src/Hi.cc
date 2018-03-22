@@ -78,8 +78,7 @@ farexpr(field_type *field1, field_type field2, field_type field3, double (*expre
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        array1[i] = expression(array1[i], array2[i], array3[i], missval1);
+      for (size_t i = 0; i < len; i++) array1[i] = expression(array1[i], array2[i], array3[i], missval1);
     }
 
   field1->nmiss = arrayNumMV(len, array1, missval1);

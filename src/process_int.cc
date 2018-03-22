@@ -36,6 +36,7 @@
 #include "exception.h"
 #include "process_int.h"
 #include "pstream_int.h"
+#include "text.h"
 #include "util_files.h"
 #include "util_operatorStrings.h"
 
@@ -72,9 +73,8 @@ processSelf(void)
     }
 
   pthread_mutex_unlock(&processMutex);
-  ERROR("Could not find process for thread: ", thID);
-
 #endif
+
   return Process.find(0)->second;
 }
 
@@ -371,8 +371,7 @@ createProcesses(int argc, const char **argv)
 
   if (idx != argc - cntOutFiles)
     {
-      CdoError::Abort(Cdo::progname, " To many inputs for operator '", lastAdded->operatorName, "'\n", Cdo::progname,
-                      " ", CdoDebug::argvToString(argc, argv));
+      CdoError::Abort(Cdo::progname, " Too many input streams for operator '", lastAdded->operatorName, "'!");
     }
 
   while (!call_stack.empty())
@@ -470,8 +469,7 @@ cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
           struct stat stbuf;
 
           int rstatus = stat(outStream->m_name.c_str(), &stbuf);
-          /* If permanent file already exists, query user whether to overwrite
-           * or exit */
+          /* If permanent file already exists, query user whether to overwrite or exit */
           if (rstatus != -1) process.query_user_exit(outStream->m_name.c_str());
         }
 
@@ -595,8 +593,7 @@ cdoGetObase()
   ProcessType &process = processSelf();
   if (obase.find(process.m_ID) == obase.end())
     {
-      ERROR("no obase found, please check the module if this operator is "
-            "defined for obase usage");
+      ERROR("no obase found, please check the module if this operator is defined for obase usage");
     }
 
   return obase[process.m_ID];
@@ -606,15 +603,14 @@ void
 cdoInitialize(void *p_process)
 {
 #if defined(_OPENMP)
-  omp_set_num_threads(Threading::ompNumThreads);  // Has to be called for every
-                                                  // module (pthread)!
+  omp_set_num_threads(Threading::ompNumThreads);  // Has to be called for every module (pthread)!
 #endif
   ProcessType *process = (ProcessType *) p_process;
 
   // std::cout << arg->processID << std::endl;
   Cdo_Debug(CdoDebug::PROCESS, "Initializing process: ", process->m_operatorCommand);
   process->threadID = pthread_self();
-  // std::cout << "SomeMarker" << Process.size() << std::endl;
+// std::cout << "SomeMarker" << Process.size() << std::endl;
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PSTREAM) Cdo_Debug(CdoDebug::PROCESS, "process ", processSelf().m_ID, " thread ", pthread_self());
@@ -719,7 +715,10 @@ runProcesses()
           /*TEMP*/
           if (Options::silentMode == 0)
             {
-              std::cerr << idProcessPair.second.prompt<< ": Process started" << std::endl;
+              set_text_color(stderr, RESET, GREEN);
+              fprintf(stderr, "%s: ", idProcessPair.second.prompt);
+              reset_text_color(stderr);
+              std::cerr << "Process started" << std::endl;
             }
           threadIDs.push_back(idProcessPair.second.run());
         }

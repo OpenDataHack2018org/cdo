@@ -62,11 +62,9 @@ readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t len)
 static char *
 skipSeparator(char *pline)
 {
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   if (*pline == '=' || *pline == ':') pline++;
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
 
   return pline;
 }
@@ -74,12 +72,10 @@ skipSeparator(char *pline)
 static char *
 getElementName(char *pline, char *name)
 {
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   size_t len = strlen(pline);
   size_t pos = 0;
-  while (pos < len && !isspace((int) *(pline + pos)) && *(pline + pos) != '=' && *(pline + pos) != ':')
-    pos++;
+  while (pos < len && !isspace((int) *(pline + pos)) && *(pline + pos) != '=' && *(pline + pos) != ':') pos++;
 
   strncpy(name, pline, pos);
   name[pos] = 0;
@@ -91,8 +87,7 @@ getElementName(char *pline, char *name)
 static char *
 getElementValue(char *pline)
 {
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   size_t len = strlen(pline);
   if (*pline != '"' && *pline != '\'')
     for (size_t i = 1; i < len; ++i)
@@ -126,8 +121,7 @@ cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
     {
       linenumber++;
       pline = line;
-      while (isspace((int) *pline))
-        pline++;
+      while (isspace((int) *pline)) pline++;
       if (*pline == '#' || *pline == '!' || *pline == '\0') continue;
       //  len = (int) strlen(pline);
 
@@ -189,8 +183,7 @@ dump_json(const char *js, jsmntok_t *t, size_t count, int level)
       j = 0;
       for (i = 0; i < t->size; i++)
         {
-          for (k = 0; k < level; k++)
-            printf("  ");
+          for (k = 0; k < level; k++) printf("  ");
           j += dump_json(js, t + 1 + j, count - j, level + 1);
           printf(": ");
           j += dump_json(js, t + 1 + j, count - j, level + 1);
@@ -204,8 +197,7 @@ dump_json(const char *js, jsmntok_t *t, size_t count, int level)
       printf("\n");
       for (i = 0; i < t->size; i++)
         {
-          for (k = 0; k < level - 1; k++)
-            printf("  ");
+          for (k = 0; k < level - 1; k++) printf("  ");
           printf("   - ");
           j += dump_json(js, t + 1 + j, count - j, level + 1);
           printf("\n");

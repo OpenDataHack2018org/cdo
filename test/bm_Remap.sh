@@ -46,6 +46,21 @@ done
 #      4024MB     5836MB     1240MB
 ####################################################
 #
+# CDO 1.9.4 ----------------------------------------
+# switched to nanoflann
+#
+# result on hama2 (2,8 GHz Core i7) : gcc 7.3.0 avx2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.5    1.1   0.5   145     73
+# curv    8.8    9.8   9.3   142    155
+#
+# result on bailung: gcc 7.2 sse4_2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.6    1.4   0.6   187    128
+# curv     14     14    14   187    243
+#
 # CDO 1.8.0 ----------------------------------------
 #
 # result on hama2: gcc 6.1.0 avx2

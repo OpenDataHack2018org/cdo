@@ -176,8 +176,7 @@ Ensval(void *process)
   int nvars = vlistNvars(ef[0].vlistID);
   if (cdoVerbose) cdoPrint("nvars %i", nvars);
 
-  for (fileID = 1; fileID < nfiles; fileID++)
-    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
+  for (fileID = 1; fileID < nfiles; fileID++) vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
   int vlistID1 = ef[0].vlistID;
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -240,8 +239,7 @@ Ensval(void *process)
 
       ngrids = vlistNgrids(vlistID2[stream]);
       // fprintf(stderr,"ngrids %i\n",ngrids);
-      for (i = 0; i < ngrids; i++)
-        vlistChangeGridIndex(vlistID2[stream], i, gridID2);
+      for (i = 0; i < ngrids; i++) vlistChangeGridIndex(vlistID2[stream], i, gridID2);
 
       vlistDefTaxis(vlistID2[stream], taxisID2[stream]);
       pstreamDefVlist(streamID2[stream], vlistID2[stream]);
@@ -308,8 +306,7 @@ Ensval(void *process)
           }
           else*/
           {
-            for (size_t i = 0; i < gridsize; i++)
-              weights[i] = 1. / gridsize;
+            for (size_t i = 0; i < gridsize; i++) weights[i] = 1. / gridsize;
             sum_weights = 1.;
           }
 
@@ -555,8 +552,7 @@ Ensval(void *process)
       pstreamClose(streamID);
     }
 
-  for (stream = 0; stream < nostreams; stream++)
-    pstreamClose(streamID2[stream]);
+  for (stream = 0; stream < nostreams; stream++) pstreamClose(streamID2[stream]);
 
   for (fileID = 0; fileID < nfiles; fileID++)
     if (ef[fileID].array) Free(ef[fileID].array);

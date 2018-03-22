@@ -163,10 +163,8 @@ gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, dou
   grid->xvals = (double *) Malloc(nlon * sizeof(double));
   grid->yvals = (double *) Malloc(nlat * sizeof(double));
 
-  for (size_t i = 0; i < nlon; ++i)
-    grid->xvals[i] = lon1 + inc / 2 + i * inc;
-  for (size_t i = 0; i < nlat; ++i)
-    grid->yvals[i] = lat1 + inc / 2 + i * inc;
+  for (size_t i = 0; i < nlon; ++i) grid->xvals[i] = lon1 + inc / 2 + i * inc;
+  for (size_t i = 0; i < nlat; ++i) grid->yvals[i] = lat1 + inc / 2 + i * inc;
 
   if (gridtype == GRID_LONLAT)
     {
@@ -176,8 +174,7 @@ gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, dou
   else
     {
       std::vector<double> yvals(nlat);
-      for (size_t j = 0; j < nlat; ++j)
-        yvals[j] = grid->yvals[j];
+      for (size_t j = 0; j < nlat; ++j) yvals[j] = grid->yvals[j];
       size_t gridsize = nlon * nlat;
       grid->xvals = (double *) Realloc(grid->xvals, gridsize * sizeof(double));
       grid->yvals = (double *) Realloc(grid->yvals, gridsize * sizeof(double));
@@ -237,8 +234,7 @@ grid_from_name(const char *gridnameptr)
       if (isdigit((int) *pline))
         {
           grid.ntr = atoi(pline);
-          while (isdigit((int) *pline))
-            pline++;
+          while (isdigit((int) *pline)) pline++;
           if (cmpstrlen(pline, "grid", len) == 0)
             grid.type = GRID_GAUSSIAN;
           else if (cmpstrlen(pline, "zon", len) == 0)
@@ -270,8 +266,7 @@ grid_from_name(const char *gridnameptr)
       if (isdigit((int) *pline))
         {
           grid.ntr = atoi(pline);
-          while (isdigit((int) *pline))
-            pline++;
+          while (isdigit((int) *pline)) pline++;
           if (cmpstrlen(pline, "grid", len) == 0)
             grid.type = GRID_GAUSSIAN;
           else if (cmpstrlen(pline, "zon", len) == 0)
@@ -304,12 +299,10 @@ grid_from_name(const char *gridnameptr)
         {
           grid.type = GRID_LONLAT;
           grid.xsize = atoi(pline);
-          while (isdigit((int) *pline))
-            pline++;
+          while (isdigit((int) *pline)) pline++;
           pline++;
           grid.ysize = atoi(pline);
-          while (isdigit((int) *pline))
-            pline++;
+          while (isdigit((int) *pline)) pline++;
 
           grid.def_xfirst = true;
           grid.def_yfirst = true;
@@ -328,8 +321,7 @@ grid_from_name(const char *gridnameptr)
           grid.xvals = (double *) Malloc(sizeof(double));
           grid.yvals = (double *) Malloc(sizeof(double));
           grid.xvals[0] = atof(pline);
-          while (isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-')
-            pline++;
+          while (isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-') pline++;
           if (*pline == '_') pline++;
           if (!(pline[0] == 'l' && pline[1] == 'a' && pline[2] == 't')) return gridID;
           pline += 3;
@@ -410,14 +402,12 @@ grid_from_name(const char *gridnameptr)
         {
           grid.type = GRID_GENERIC;
           grid.xsize = atoi(pline);
-          while (isdigit((int) *pline))
-            pline++;
+          while (isdigit((int) *pline)) pline++;
           if (*pline)
             {
               pline++;
               grid.ysize = atoi(pline);
-              while (isdigit((int) *pline))
-                pline++;
+              while (isdigit((int) *pline)) pline++;
             }
           else if (grid.xsize == 1)
             {

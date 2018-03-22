@@ -98,8 +98,7 @@ Ymonarith(void *process)
 
   if (opertype == SEASONAL) get_season_name(seas_name);
 
-  for (mon = 0; mon < MAX_MON; mon++)
-    vardata2[mon] = NULL;
+  for (mon = 0; mon < MAX_MON; mon++) vardata2[mon] = NULL;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))

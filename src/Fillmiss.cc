@@ -29,10 +29,6 @@
 #include "grid_search.h"
 #include "cdoOptions.h"
 
-extern "C"
-{
-#include "clipping/geometry.h"
-}
 
 void
 fillmiss(field_type *field1, field_type *field2, int nfill)
@@ -374,20 +370,12 @@ fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
               }
           }
       for (j = 0; j < ny; j++)
-        for (i = 0; i < nx; i++)
-          matrix1[j][i] = matrix2[j][i];
+        for (i = 0; i < nx; i++) matrix1[j][i] = matrix2[j][i];
     }
 
   Free(matrix2);
   Free(matrix1);
 }
-
-int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist,
-                    double plon, double plat);
-double nbr_compute_weights(size_t numNeighbors, const int *restrict src_grid_mask, uint8_t *restrict nbr_mask,
-                           const size_t *restrict nbr_add, double *restrict nbr_dist);
-size_t nbr_normalize_weights(size_t numNeighbors, double dist_tot, const uint8_t *restrict nbr_mask,
-                             size_t *restrict nbr_add, double *restrict nbr_dist);
 
 static void
 setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
@@ -446,17 +434,13 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   if (nv != nvals) cdoAbort("Internal problem, number of valid values differ!");
 
-  // mask at nearest neighbors
-  VECTOR_2D(uint8_t, nbr_mask, Threading::ompNumThreads, numNeighbors);
-  // source address at nearest neighbors
-  VECTOR_2D(size_t, nbr_add, Threading::ompNumThreads, numNeighbors);
-  // angular distance four nearest neighbors
-  VECTOR_2D(double, nbr_dist, Threading::ompNumThreads, numNeighbors);
+  std::vector<knnWeightsType> knnWeights;
+  for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
   clock_t start, finish;
   start = clock();
 
-  struct gridsearch *gs = NULL;
+  GridSearch *gs = NULL;
 
   if (nmiss)
     {
@@ -468,7 +452,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   finish = clock();
 
-  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   progressInit();
 
@@ -477,8 +461,8 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex)  shared(nbr_mask, nbr_add, nbr_dist)  \
-  shared(mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(knnWeights) shared( \
+    mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
 #endif
   for (size_t i = 0; i < nmiss; ++i)
     {
@@ -487,29 +471,22 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      grid_search_nbr(gs, numNeighbors, &nbr_add[ompthID][0], &nbr_dist[ompthID][0], xvals[mindex[i]],
-                      yvals[mindex[i]]);
+      grid_search_nbr(gs, xvals[mindex[i]], yvals[mindex[i]], knnWeights[ompthID]);
 
-      /* Compute weights based on inverse distance if mask is false, eliminate
-       * those points */
-      double dist_tot
-          = nbr_compute_weights(numNeighbors, NULL, &nbr_mask[ompthID][0], &nbr_add[ompthID][0], &nbr_dist[ompthID][0]);
-
-      /* Normalize weights and store the link */
-      size_t nadds = nbr_normalize_weights(numNeighbors, dist_tot, &nbr_mask[ompthID][0], &nbr_add[ompthID][0],
-                                           &nbr_dist[ompthID][0]);
+      // Compute weights based on inverse distance if mask is false, eliminate those points
+      size_t nadds = knnWeights[ompthID].compute_weights();
       if (nadds)
         {
           double result = 0;
           for (size_t n = 0; n < nadds; ++n)
-            result += array1[vindex[nbr_add[ompthID][n]]] * nbr_dist[ompthID][n];
+            result += array1[vindex[knnWeights[ompthID].m_addr[n]]] * knnWeights[ompthID].m_dist[n];
           array2[mindex[i]] = result;
         }
     }
 
   finish = clock();
 
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (gs) gridsearch_delete(gs);
 

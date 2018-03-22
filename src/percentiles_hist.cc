@@ -53,8 +53,7 @@ histDefBounds(HISTOGRAM *hist, double a, double b)
   hist->step = (hist->max - hist->min) / hist->nbins;
   hist->nsamp = 0;
 
-  for (i = 0; i < hist->nbins; i++)
-    INT_PTR(hist->ptr)[i] = 0;
+  for (i = 0; i < hist->nbins; i++) INT_PTR(hist->ptr)[i] = 0;
 }
 
 static void
@@ -78,12 +77,9 @@ histBin(HISTOGRAM *hist)
 
   values = (double *) Malloc(hist->nsamp * sizeof(double));
 
-  for (i = 0; i < hist->nsamp; i++)
-    values[i] = DBL_PTR(hist->ptr)[i];
-  for (i = 0; i < hist->nbins; i++)
-    INT_PTR(hist->ptr)[i] = 0;
-  for (i = 0; i < hist->nsamp; i++)
-    histBinValue(hist, values[i]);
+  for (i = 0; i < hist->nsamp; i++) values[i] = DBL_PTR(hist->ptr)[i];
+  for (i = 0; i < hist->nbins; i++) INT_PTR(hist->ptr)[i] = 0;
+  for (i = 0; i < hist->nsamp; i++) histBinValue(hist, values[i]);
 
   Free(values);
 }
@@ -240,8 +236,7 @@ hsetDestroy(HISTOGRAM_SET *hset)
           nhists = gridInqSize(hset->grids[varID]);
           for (levelID = hset->nlevels[varID]; levelID-- > 0;)
             {
-              for (histID = nhists; histID-- > 0;)
-                Free(hset->histograms[varID][levelID][histID].ptr);
+              for (histID = nhists; histID-- > 0;) Free(hset->histograms[varID][levelID][histID].ptr);
               Free(hset->histograms[varID][levelID]);
             }
           Free(hset->histograms[varID]);
@@ -349,8 +344,7 @@ hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID, const field_t
     }
   else
     {
-      for (i = 0; i < nhists; i++)
-        nign += histAddValue(&hists[i], array[i]);
+      for (i = 0; i < nhists; i++) nign += histAddValue(&hists[i], array[i]);
     }
 
   if (nign) cdoWarning("%d out of %d grid values are out of bounds and have been ignored (%s)", nign, nhists, __func__);

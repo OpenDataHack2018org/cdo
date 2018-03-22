@@ -112,7 +112,7 @@ cdo_task_start(void *task, void *(*task_routine)(void *), void *task_arg)
 
   cdo_task_t *task_info = (cdo_task_t *) task;
 
-  // ensure worker is waiting
+// ensure worker is waiting
 #ifdef HAVE_LIBPTHREAD
   if (CDO_task) pthread_mutex_lock(&(task_info->work_mtx));
 #endif
@@ -128,7 +128,7 @@ cdo_task_start(void *task, void *(*task_routine)(void *), void *task_arg)
 #endif
   if (run_task) task_info->result = task_info->routine(task_info->arg);
 
-    // wake-up signal
+// wake-up signal
 #ifdef HAVE_LIBPTHREAD
   if (CDO_task)
     {

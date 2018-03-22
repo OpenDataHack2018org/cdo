@@ -123,8 +123,7 @@ Replace(void *process)
               cdoZaxisInqLevels(vlistInqVarZaxis(vlistID1, varID1), level1);
               cdoZaxisInqLevels(vlistInqVarZaxis(vlistID2, varID2), level2);
 
-              for (levelID = 0; levelID < nlevel1; levelID++)
-                varlevel[idx][levelID] = -1;
+              for (levelID = 0; levelID < nlevel1; levelID++) varlevel[idx][levelID] = -1;
 
               for (int l2 = 0; l2 < nlevel2; l2++)
                 {

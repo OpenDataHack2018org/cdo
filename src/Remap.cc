@@ -26,8 +26,8 @@
       Interpolate remapnn         Nearest neighbor remapping
       Interpolate remaplaf        Largest area fraction remapping
       Genweights  gencon          Generate first order conservative remap
-   weights Genweights  gencon2         Generate second order conservative remap
-   weights Genweights  genbil          Generate bilinear interpolation weights
+      Genweights  gencon2         Generate second order conservative remap
+      Genweights  genbil          Generate bilinear interpolation weights
       Genweights  genbic          Generate bicubic interpolation weights
       Genweights  gendis          Generate distance-weighted averaging weights
       Genweights  gennn           Generate nearest neighbor weights
@@ -63,7 +63,7 @@ enum
   GENDIS,
   GENNN,
   GENLAF,
-  REMAPXXX,
+  REMAP,
   REMAPYCON,
   GENYCON
 };
@@ -75,66 +75,65 @@ enum
 };
 
 static void
-get_maptype(int operfunc, RemapType *mapType, SubmapType *submapType, int *numNeighbors, int *remap_order)
+getMaptype(int operfunc, RemapMethod &mapType, SubmapType &submapType, int &numNeighbors, int &remapOrder)
 {
+  remapOrder = 1;
   switch (operfunc)
     {
     case REMAPYCON:
     case GENYCON:
-      *mapType = RemapType::CONSERV_YAC;
-      *remap_order = 1;
+      mapType = RemapMethod::CONSERV_YAC;
       break;
     case REMAPCON:
     case GENCON:
-      *mapType = RemapType::CONSERV;
-      *remap_order = 1;
+      mapType = RemapMethod::CONSERV;
       break;
     case REMAPCON2:
     case GENCON2:
-      *mapType = RemapType::CONSERV;
-      *remap_order = 2;
+      mapType = RemapMethod::CONSERV;
+      remapOrder = 2;
       break;
     case REMAPLAF:
     case GENLAF:
-      *mapType = RemapType::CONSERV_YAC;
-      *submapType = SubmapType::LAF;
+      mapType = RemapMethod::CONSERV_YAC;
+      submapType = SubmapType::LAF;
       break;
     case REMAPSUM:
-      *mapType = RemapType::CONSERV;
-      *submapType = SubmapType::SUM;
+      mapType = RemapMethod::CONSERV;
+      submapType = SubmapType::SUM;
       break;
     case REMAPBIL:
-    case GENBIL: *mapType = RemapType::BILINEAR; break;
+    case GENBIL: mapType = RemapMethod::BILINEAR; break;
     case REMAPBIC:
-    case GENBIC: *mapType = RemapType::BICUBIC; break;
+    case GENBIC: mapType = RemapMethod::BICUBIC; break;
     case REMAPDIS:
     case GENDIS:
-      *mapType = RemapType::DISTWGT;
-      if (*numNeighbors == 0) *numNeighbors = 4;
+      mapType = RemapMethod::DISTWGT;
+      if (numNeighbors == 0) numNeighbors = 4;
       break;
     case REMAPNN:
     case GENNN:
-      *mapType = RemapType::DISTWGT;
-      *numNeighbors = 1;
+      mapType = RemapMethod::DISTWGT;
+      numNeighbors = 1;
       break;
     default: cdoAbort("Unknown mapping method"); break;
     }
 }
 
 static int
-maptype2operfunc(RemapType mapType, SubmapType submapType, int numNeighbors, int remap_order)
+maptype2operfunc(RemapMethod mapType, SubmapType submapType, int numNeighbors, int remapOrder)
 {
   int operfunc = -1;
 
-  if (mapType == RemapType::CONSERV)
-    operfunc = (remap_order == 2) ? REMAPCON2 : REMAPCON;
-  else if (mapType == RemapType::CONSERV_YAC)
+  if (mapType == RemapMethod::CONSERV)
+    operfunc = (remapOrder == 2) ? REMAPCON2 : REMAPCON;
+  else if (mapType == RemapMethod::CONSERV_YAC)
     operfunc = (submapType == SubmapType::LAF) ? REMAPLAF : REMAPYCON;
-  else if (mapType == RemapType::BILINEAR)
+  else if (mapType == RemapMethod::BILINEAR)
     operfunc = REMAPBIL;
-  else if (mapType == RemapType::BICUBIC)
+  else if (mapType == RemapMethod::BICUBIC)
     operfunc = REMAPBIC;
-  else if (mapType == RemapType::DISTWGT)
+  else if (mapType == RemapMethod::DISTWGT)
     operfunc = (numNeighbors == 1) ? REMAPNN : REMAPDIS;
   else
     cdoAbort("Unsupported mapping method (mapType = %d)", mapType);
@@ -143,16 +142,15 @@ maptype2operfunc(RemapType mapType, SubmapType submapType, int numNeighbors, int
 }
 
 static void
-print_remap_info(int operfunc, bool remap_genweights, remapgrid_t *src_grid, remapgrid_t *tgt_grid, size_t nmiss)
+remapPrintInfo(int operfunc, bool remap_genweights, RemapGrid &src_grid, RemapGrid &tgt_grid, size_t nmiss)
 {
   char line[256], tmpstr[256];
-
   line[0] = 0;
 
   if (operfunc == REMAPBIL || operfunc == GENBIL)
-    strcpy(line, "SCRIP bilinear");
+    strcpy(line, "Bilinear");
   else if (operfunc == REMAPBIC || operfunc == GENBIC)
-    strcpy(line, "SCRIP bicubic");
+    strcpy(line, "Bicubic");
   else if (operfunc == REMAPNN || operfunc == GENNN)
     strcpy(line, "Nearest neighbor");
   else if (operfunc == REMAPDIS || operfunc == GENDIS)
@@ -173,24 +171,24 @@ print_remap_info(int operfunc, bool remap_genweights, remapgrid_t *src_grid, rem
   else
     strcat(line, " remapping from ");
 
-  strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
-  if (src_grid->rank == 2)
-    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid->dims[0], src_grid->dims[1]);
+  strcat(line, gridNamePtr(gridInqType(src_grid.gridID)));
+  if (src_grid.rank == 2)
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid.dims[0], src_grid.dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid.dims[0]);
   strcat(line, tmpstr);
   strcat(line, " to ");
-  strcat(line, gridNamePtr(gridInqType(tgt_grid->gridID)));
-  if (tgt_grid->rank == 2)
-    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", tgt_grid->dims[0], tgt_grid->dims[1]);
+  strcat(line, gridNamePtr(gridInqType(tgt_grid.gridID)));
+  if (tgt_grid.rank == 2)
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", tgt_grid.dims[0], tgt_grid.dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", tgt_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", tgt_grid.dims[0]);
   strcat(line, tmpstr);
   strcat(line, " grid");
 
   if (nmiss > 0)
     {
-      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%zu)", gridInqSize(src_grid->gridID) - nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%zu)", gridInqSize(src_grid.gridID) - nmiss);
       strcat(line, tmpstr);
     }
 
@@ -198,7 +196,7 @@ print_remap_info(int operfunc, bool remap_genweights, remapgrid_t *src_grid, rem
 }
 
 static void
-print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_grid, size_t nmiss)
+remapPrintWarning(const char *remap_file, int operfunc, RemapGrid &src_grid, size_t nmiss)
 {
   char line[256];
   char tmpstr[256];
@@ -209,17 +207,17 @@ print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_grid,
   strcat(line, "Remap weights from ");
   strcat(line, remap_file);
   strcat(line, " not used, ");
-  strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
-  if (src_grid->rank == 2)
-    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid->dims[0], src_grid->dims[1]);
+  strcat(line, gridNamePtr(gridInqType(src_grid.gridID)));
+  if (src_grid.rank == 2)
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid.dims[0], src_grid.dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid.dims[0]);
   strcat(line, tmpstr);
   strcat(line, " grid");
 
   if (nmiss > 0)
     {
-      snprintf(tmpstr, sizeof(tmpstr), " with mask (%zu)", gridInqSize(src_grid->gridID) - nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), " with mask (%zu)", gridInqSize(src_grid.gridID) - nmiss);
       strcat(line, tmpstr);
     }
 
@@ -229,9 +227,8 @@ print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_grid,
 }
 
 double remap_threshhold = 2;
-double gridsearch_radius = 180;
+double pointSearchRadius = 180;
 int remap_test = 0;
-int remap_order = 1;
 int remap_non_global = FALSE;
 int remap_num_srch_bins = 180;
 static bool lremap_num_srch_bins = false;
@@ -243,7 +240,7 @@ double remap_frac_min = 0;
 bool REMAP_genweights = true;
 
 static void
-get_remap_env(void)
+remapGetenv(void)
 {
   char *envstr;
 
@@ -268,22 +265,7 @@ get_remap_env(void)
           if (cdoVerbose) cdoPrint("Set REMAP_MAX_ITER to %d", ival);
         }
     }
-  /*
-  envstr = getenv("REMAP_ORDER");
-  if ( envstr )
-    {
-      int ival = atoi(envstr);
-      if ( ival > 0 )
-        {
-          remap_order = ival;
-          if ( remap_order == 0 ) remap_order = 1;
-          if ( remap_order != 1 && remap_order != 2 )
-            cdoAbort("REMAP_ORDER must be 1 or 2");
-          if ( cdoVerbose )
-            cdoPrint("Set REMAP_ORDER to %d", remap_order);
-        }
-    }
-  */
+
   envstr = getenv("REMAP_TEST");
   if (envstr)
     {
@@ -334,8 +316,8 @@ get_remap_env(void)
     {
       double fval = radius_str_to_deg(envstr);
       if (fval < 0 || fval > 180) cdoAbort("%s=%g out of bounds (0-180 deg)!", "CDO_REMAP_RADIUS", fval);
-      gridsearch_radius = fval;
-      if (cdoVerbose) cdoPrint("Set CDO_REMAP_RADIUS to %g", gridsearch_radius);
+      pointSearchRadius = fval;
+      if (cdoVerbose) cdoPrint("Set CDO_REMAP_RADIUS to %g", pointSearchRadius);
     }
 
   envstr = getenv("CDO_GRIDSEARCH_RADIUS");
@@ -343,11 +325,11 @@ get_remap_env(void)
     {
       double fval = radius_str_to_deg(envstr);
       if (fval < 0 || fval > 180) cdoAbort("%s=%g out of bounds (0-180 deg)!", "CDO_GRIDSEARCH_RADIUS", fval);
-      gridsearch_radius = fval;
-      if (cdoVerbose) cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", gridsearch_radius);
+      pointSearchRadius = fval;
+      if (cdoVerbose) cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", pointSearchRadius);
     }
 
-  if (cdoVerbose) cdoPrint("remap_radius = %g deg", gridsearch_radius);
+  if (cdoVerbose) cdoPrint("Point search radius = %g deg", pointSearchRadius);
 
   envstr = getenv("REMAP_AREA_MIN");
   if (envstr)
@@ -382,21 +364,6 @@ get_remap_env(void)
           if (cdoVerbose) cdoPrint("Set REMAP_NON_GLOBAL to %d", remap_non_global);
         }
     }
-
-  int remap_store_link_fast = TRUE;
-
-  envstr = getenv("REMAP_STORE_LINK_FAST");
-  if (envstr)
-    {
-      int ival = atoi(envstr);
-      if (ival >= 0)
-        {
-          remap_store_link_fast = ival;
-          if (cdoVerbose) cdoPrint("Set REMAP_STORE_LINK_FAST to %d", remap_store_link_fast);
-        }
-    }
-
-  remap_set_int(REMAP_STORE_LINK_FAST, remap_store_link_fast);
 
   envstr = getenv("REMAP_EXTRAPOLATE");
   if (envstr)
@@ -450,7 +417,7 @@ get_remap_env(void)
 }
 
 static bool
-is_global_grid(int gridID)
+gridIsGlobal(int gridID)
 {
   bool global_grid = true;
   bool non_global = remap_non_global || !gridIsCircular(gridID);
@@ -466,19 +433,15 @@ is_global_grid(int gridID)
 }
 
 static void
-scale_gridbox_area(size_t gridsize, const double *restrict array1, size_t gridsize2, double *restrict array2,
-                   const double *restrict grid2_area)
+scaleGridboxArea(size_t gridsize, const double *restrict array1, size_t gridsize2, double *restrict array2,
+                 const double *restrict grid2_area)
 {
   double array1sum = 0;
-  for (size_t i = 0; i < gridsize; i++)
-    array1sum += array1[i];
+  for (size_t i = 0; i < gridsize; i++) array1sum += array1[i];
 
   double array2sum = 0;
-  for (size_t i = 0; i < gridsize2; i++)
-    array2sum += grid2_area[i];
-
-  for (size_t i = 0; i < gridsize2; i++)
-    array2[i] = grid2_area[i] / array2sum * array1sum;
+  for (size_t i = 0; i < gridsize2; i++) array2sum += grid2_area[i];
+  for (size_t i = 0; i < gridsize2; i++) array2[i] = grid2_area[i] / array2sum * array1sum;
 
   static bool lgridboxinfo = true;
   if (lgridboxinfo)
@@ -508,13 +471,10 @@ set_remapgrids(int filetype, int vlistID, int ngrids, std::vector<bool> &remapgr
           if (gridtype == GRID_GAUSSIAN_REDUCED)
             {
               if (!cdoRegulargrid && filetype == CDI_FILETYPE_GRB)
-                cdoAbort("Unsupported grid type: %s, use CDO option -R to "
-                         "convert reduced to regular Gaussian grid!",
+                cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular Gaussian grid!",
                          gridNamePtr(gridtype));
               else
-                cdoAbort("Unsupported grid type: %s, use CDO operator "
-                         "-setgridtype,regular to convert reduced to regular "
-                         "Gaussian grid!",
+                cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular Gaussian grid!",
                          gridNamePtr(gridtype));
             }
           else if (gridtype == GRID_GENERIC && gridInqSize(gridID) <= 2)
@@ -567,7 +527,7 @@ set_max_remaps(int vlistID)
 }
 
 static NormOpt
-get_normOpt(void)
+getNormOpt(void)
 {
   NormOpt normOpt(NormOpt::FRACAREA);
 
@@ -611,7 +571,7 @@ get_normOpt(void)
 }
 
 static void
-remap_normalize(NormOpt normOpt, size_t gridsize, double *array, double missval, remapgrid_t *tgt_grid)
+remapNormalizeField(NormOpt normOpt, size_t gridsize, double *array, double missval, RemapGrid *tgt_grid)
 {
   // used only to check the result of remapcon
 
@@ -646,7 +606,7 @@ remap_normalize(NormOpt normOpt, size_t gridsize, double *array, double missval,
 }
 
 static void
-remap_set_frac_min(size_t gridsize, double *array, double missval, remapgrid_t *tgt_grid)
+remapSetFracMin(size_t gridsize, double *array, double missval, RemapGrid *tgt_grid)
 {
   if (remap_frac_min > 0)
     {
@@ -663,7 +623,7 @@ int timer_remap, timer_remap_init, timer_remap_sort;
 int timer_remap_bil, timer_remap_bic, timer_remap_dis, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
 
 static void
-init_remap_timer(void)
+remapTimerInit(void)
 {
   timer_remap = timer_new("remap");
   timer_remap_init = timer_new("remap init");
@@ -677,19 +637,19 @@ init_remap_timer(void)
 }
 
 static void
-links_per_value(remapvars_t *remapvars)
+remapLinksPerValue(RemapVars &rv)
 {
   long lpv = -1;
 
-  remapvars->links_per_value = lpv;
+  rv.links_per_value = lpv;
   return;
   /*
-  size_t num_links = remapvars->num_links;
+  size_t num_links = rv.num_links;
 
   if ( num_links > 0 )
     {
       lpv = 1;
-      const size_t *restrict dst_add = remapvars->tgt_cell_add;
+      const size_t *restrict dst_add = rv.tgt_cell_add;
       size_t n = 0;
       size_t ival = dst_add[n];
       for ( n = 1; n < num_links; ++n )
@@ -752,12 +712,12 @@ links_per_value(remapvars_t *remapvars)
 
   printf("lpv %zu\n", lpv);
 
-  remapvars->links_per_value = lpv;
+  rv.links_per_value = lpv;
   */
 }
 
 static void
-sort_remap_add(remapvars_t *remapvars)
+remapSortAddr(RemapVars &rv)
 {
   if (cdoTimer) timer_start(timer_remap_sort);
   if (sort_mode == MERGE_SORT)
@@ -766,13 +726,11 @@ sort_remap_add(remapvars_t *remapvars)
       ** The chunk size is determined by MERGE_SORT_LIMIT_SIZE in remaplib.c.
       ** OpenMP parallelism is supported
       */
-      sort_iter(remapvars->num_links, remapvars->num_wts, remapvars->tgt_cell_add, remapvars->src_cell_add,
-                remapvars->wts, Threading::ompNumThreads);
+      sort_iter(rv.num_links, rv.num_wts, &rv.tgt_cell_add[0], &rv.src_cell_add[0], &rv.wts[0], Threading::ompNumThreads);
     }
   else
     { /* use a pure heap sort without any support of parallelism */
-      sort_add(remapvars->num_links, remapvars->num_wts, remapvars->tgt_cell_add, remapvars->src_cell_add,
-               remapvars->wts);
+      sort_add(rv.num_links, rv.num_wts, &rv.tgt_cell_add[0], &rv.src_cell_add[0], &rv.wts[0]);
     }
   if (cdoTimer) timer_stop(timer_remap_sort);
 }
@@ -788,67 +746,58 @@ remapGenNumBins(int ysize)
 }
 
 static void
-remapSum(remapgrid_t *remapGrid, size_t gridsize, double *array, const char *tag)
+remapSum(RemapGrid *remapGrid, size_t gridsize, double *array, const char *tag)
 {
   for (size_t i = 0; i < gridsize; i++)
     printf("1 %zd %g %g %g %g\n", i, array[i], remapGrid->cell_frac[i], remapGrid->cell_area[i],
            remapGrid->cell_frac[i]);
 
   double sum = 0;
-  for (size_t i = 0; i < gridsize; i++)
-    sum += remapGrid->cell_area[i];
+  for (size_t i = 0; i < gridsize; i++) sum += remapGrid->cell_area[i];
 
   printf("%s array sum %g\n", tag, sum);
 }
 
-static void
-remapInit(remapType *remap)
+void
+remapInit(remapType &remap)
 {
-  remap->nused = 0;
-  remap->gridID = -1;
-  remap->gridsize = 0;
-  remap->nmiss = 0;
+  remap.nused = 0;
+  remap.gridID = -1;
+  remap.gridsize = 0;
+  remap.nmiss = 0;
 }
 
 static void
-remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
+remapGenWeights(RemapMethod mapType, remapType *remap, int numNeighbors)
 {
-  if (mapType == RemapType::CONSERV)
-    scrip_remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
-  else if (mapType == RemapType::BILINEAR)
-    scrip_remap_bilinear_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
-  else if (mapType == RemapType::BICUBIC)
-    scrip_remap_bicubic_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
-  else if (mapType == RemapType::DISTWGT)
-    remap_distwgt_weights(numNeighbors, &remap->src_grid, &remap->tgt_grid, &remap->vars);
-  else if (mapType == RemapType::CONSERV_YAC)
-    remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+  // clang-format off
+  if      (mapType == RemapMethod::CONSERV)     remapConservWeightsScrip(remap->search, remap->vars);
+  else if (mapType == RemapMethod::BILINEAR)    remapBilinearWeights(remap->search, remap->vars);
+  else if (mapType == RemapMethod::BICUBIC)     remapBicubicWeights(remap->search, remap->vars);
+  else if (mapType == RemapMethod::DISTWGT)     remapDistwgtWeights(numNeighbors, remap->search, remap->vars);
+  else if (mapType == RemapMethod::CONSERV_YAC) remapConservWeights(remap->search, remap->vars);
+  // clang-format on
 
-  if (mapType == RemapType::CONSERV && remap->vars.num_links != remap->vars.max_links)
-    resize_remap_vars(&remap->vars, remap->vars.num_links - remap->vars.max_links);
-
-  if (remap->vars.sort_add) sort_remap_add(&remap->vars);
-  if (remap->vars.links_per_value == -1) links_per_value(&remap->vars);
+  if (remap->vars.sort_add) remapSortAddr(remap->vars);
+  if (remap->vars.links_per_value == -1) remapLinksPerValue(remap->vars);
 }
 
 static void
-remapField(RemapType mapType, remapType *remap, int numNeighbors, double *array1, double *array2, double missval)
+remapField(RemapMethod mapType, remapType *remap, int numNeighbors, double *array1, double *array2, double missval)
 {
-  if (mapType == RemapType::BILINEAR)
-    scrip_remap_bilinear(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
-  else if (mapType == RemapType::BICUBIC)
-    scrip_remap_bicubic(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
-  else if (mapType == RemapType::DISTWGT)
-    remap_distwgt(numNeighbors, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
-  else if (mapType == RemapType::CONSERV_YAC)
-    remap_conserv(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+  // clang-format off
+  if      (mapType == RemapMethod::BILINEAR)    remapBilinear(remap->search, array1, array2, missval);
+  else if (mapType == RemapMethod::BICUBIC)     remapBicubic(remap->search, array1, array2, missval);
+  else if (mapType == RemapMethod::DISTWGT)     remapDistwgt(numNeighbors, remap->search, array1, array2, missval);
+  else if (mapType == RemapMethod::CONSERV_YAC) remapConserv(remap->search, array1, array2, missval);
+  // clang-format on
 }
 
 static void
 remapAddOperators(void)
 {
   // clang-format off
-  cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
+  cdoOperatorAdd("remap",        REMAP,        0, NULL);
   cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
   cdoOperatorAdd("remapcon",     REMAPCON,     0, NULL);
   cdoOperatorAdd("remapcon2",    REMAPCON2,    0, NULL);
@@ -872,22 +821,19 @@ remapAddOperators(void)
 void *
 Remap(void *argument)
 {
-  NormOpt normOpt(NormOpt::NONE);
-  RemapType mapType(RemapType::UNDEF);
+  RemapMethod mapType(RemapMethod::UNDEF);
   SubmapType submapType(SubmapType::NONE);
   bool remap_genweights = REMAP_genweights;
   int streamID2 = -1;
   int nrecs;
   int varID, levelID;
-  size_t gridsize2;
   size_t nmiss1, nmiss2;
   int r = -1;
   int nremaps = 0;
   int numNeighbors = 0;
-  char varname[CDI_MAX_NAME];
   char *remap_file = NULL;
 
-  if (cdoTimer) init_remap_timer();
+  if (cdoTimer) remapTimerInit();
 
   cdoInitialize(argument);
 
@@ -896,17 +842,17 @@ Remap(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
   bool writeRemapWeightsOnly = cdoOperatorF2(operatorID);
-  bool lremapxxx = operfunc == REMAPXXX;
+  bool lremap = operfunc == REMAP;
 
   remap_set_int(REMAP_WRITE_REMAP, writeRemapWeightsOnly);
 
   if (operfunc == REMAPDIS || operfunc == GENDIS || operfunc == REMAPNN || operfunc == GENNN) remap_extrapolate = true;
 
-  get_remap_env();
+  remapGetenv();
 
   if (cdoVerbose) cdoPrint("Extrapolation %s!", remap_extrapolate ? "enabled" : "disabled");
 
-  if (lremapxxx)
+  if (lremap)
     {
       operatorInputArg("grid description file or name, remap weights file (SCRIP NetCDF)");
       operatorCheckArgc(2);
@@ -954,24 +900,24 @@ Remap(void *argument)
   if (max_remaps < 1) cdoAbort("max_remaps out of range (>0)!");
 
   std::vector<remapType> remaps(max_remaps);
-  for (int r = 0; r < max_remaps; r++)
-    remapInit(&remaps[r]);
+  for (int r = 0; r < max_remaps; r++) remapInit(remaps[r]);
 
-  if (writeRemapWeightsOnly || lremapxxx) remap_genweights = true;
+  if (writeRemapWeightsOnly || lremap) remap_genweights = true;
 
-  if (lremapxxx)
+  int remapOrder = 0;
+  if (lremap)
     {
-      read_remap_scrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remap_order,
-                       &remaps[0].src_grid, &remaps[0].tgt_grid, &remaps[0].vars);
+      remapReadDataScrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remapOrder,
+                         remaps[0].src_grid, remaps[0].tgt_grid, remaps[0].vars);
 
-      if (remaps[0].vars.links_per_value == 0) links_per_value(&remaps[0].vars);
+      if (remaps[0].vars.links_per_value == 0) remapLinksPerValue(remaps[0].vars);
 
       nremaps = 1;
       size_t gridsize = remaps[0].src_grid.size;
       remaps[0].gridID = gridID1;
       remaps[0].gridsize = gridInqSize(gridID1);
 
-      if (mapType == RemapType::DISTWGT && !lextrapolate) remap_extrapolate = true;
+      if (mapType == RemapMethod::DISTWGT && !lextrapolate) remap_extrapolate = true;
       if (gridIsCircular(gridID1) && !lextrapolate) remap_extrapolate = true;
 
       if (gridInqType(gridID1) == GRID_GME) gridsize = remaps[0].src_grid.nvgp;
@@ -983,13 +929,13 @@ Remap(void *argument)
       for (size_t i = 0; i < gridsize; i++)
         if (remaps[0].src_grid.mask[i] == FALSE) remaps[0].nmiss++;
 
-      gridsize2 = gridInqSize(gridID2);
+      size_t gridsize2 = gridInqSize(gridID2);
       if (gridInqType(gridID2) == GRID_GME)
         {
           remaps[0].tgt_grid.nvgp = gridInqSize(gridID2);
-          remaps[0].tgt_grid.vgpm = (int *) Realloc(remaps[0].tgt_grid.vgpm, gridInqSize(gridID2) * sizeof(int));
+          remaps[0].tgt_grid.vgpm.resize(gridInqSize(gridID2));
           int gridID2_gme = gridToUnstructured(gridID2, 1);
-          gridInqMaskGME(gridID2_gme, remaps[0].tgt_grid.vgpm);
+          gridInqMaskGME(gridID2_gme, &remaps[0].tgt_grid.vgpm[0]);
           gridDestroy(gridID2_gme);
           size_t isize = 0;
           for (size_t i = 0; i < gridsize2; ++i)
@@ -1002,39 +948,33 @@ Remap(void *argument)
       */
       if (remaps[0].tgt_grid.size != gridsize2) cdoAbort("Size of target grid and weights from %s differ!", remap_file);
 
-      operfunc = maptype2operfunc(mapType, submapType, numNeighbors, remap_order);
+      operfunc = maptype2operfunc(mapType, submapType, numNeighbors, remapOrder);
 
-      if (remap_test) reorder_links(&remaps[0].vars);
+      if (remap_test) remapVarsReorder(remaps[0].vars);
     }
   else
     {
-      get_maptype(operfunc, &mapType, &submapType, &numNeighbors, &remap_order);
+      getMaptype(operfunc, mapType, submapType, numNeighbors, remapOrder);
     }
 
-  if (!remap_genweights && mapType == RemapType::CONSERV) remap_genweights = true;
+  if (!remap_genweights && mapType == RemapMethod::CONSERV) remap_genweights = true;
 
   remap_set_int(REMAP_GENWEIGHTS, (int) remap_genweights);
 
-  if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC) normOpt = get_normOpt();
+  NormOpt normOpt(NormOpt::NONE);
+  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC) normOpt = getNormOpt();
 
   size_t grid1sizemax = vlistGridsizeMax(vlistID1);
 
-  bool needGradiants = (mapType == RemapType::BICUBIC);
-  if (mapType == RemapType::CONSERV && remap_order == 2)
+  bool needGradients = (mapType == RemapMethod::BICUBIC);
+  if (mapType == RemapMethod::CONSERV && remapOrder == 2)
     {
       if (cdoVerbose) cdoPrint("Second order remapping");
-      needGradiants = true;
+      needGradients = true;
     }
-  else
-    remap_order = 1;
 
-  std::vector<double> grad1_lat, grad1_lon, grad1_latlon;
-  if (needGradiants)
-    {
-      grad1_lat.resize(grid1sizemax);
-      grad1_lon.resize(grid1sizemax);
-      grad1_latlon.resize(grid1sizemax);
-    }
+  gradientsType gradients;
+  if (needGradients) gradients.init(grid1sizemax);
 
   std::vector<double> array1(grid1sizemax);
   std::vector<int> imask(grid1sizemax);
@@ -1079,21 +1019,19 @@ Remap(void *argument)
 
           if (!skipVar)
             {
-              if (mapType != RemapType::CONSERV && mapType != RemapType::CONSERV_YAC && gridInqType(gridID1) == GRID_GME
+              if (mapType != RemapMethod::CONSERV && mapType != RemapMethod::CONSERV_YAC && gridInqType(gridID1) == GRID_GME
                   && gridInqType(gridID2) == GRID_GME)
-                cdoAbort("Only conservative remapping is available to remap "
-                         "between GME grids!");
+                cdoAbort("Only conservative remapping is available to remap between GME grids!");
 
               if (gridIsCircular(gridID1) && !lextrapolate) remap_extrapolate = true;
 
-              for (size_t i = 0; i < gridsize; i++)
-                imask[i] = !DBL_IS_EQUAL(array1[i], missval);
+              for (size_t i = 0; i < gridsize; i++) imask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
               for (r = nremaps - 1; r >= 0; r--)
                 {
                   if (gridID1 == remaps[r].gridID && nmiss1 == remaps[r].nmiss)
                     {
-                      if (memcmp(&imask[0], remaps[r].src_grid.mask, remaps[r].src_grid.size * sizeof(int)) == 0)
+                      if (memcmp(&imask[0], &remaps[r].src_grid.mask[0], remaps[r].src_grid.size * sizeof(int)) == 0)
                         {
                           remaps[r].nused++;
                           break;
@@ -1113,21 +1051,21 @@ Remap(void *argument)
                   else
                     {
                       int n0 = (max_remaps > 1 && remaps[0].nused > remaps[1].nused);
-                      remapVarsFree(&remaps[n0].vars);
-                      remapGridFree(&remaps[n0].src_grid);
-                      remapGridFree(&remaps[n0].tgt_grid);
-                      for (r = n0 + 1; r < nremaps; r++)
-                        memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
+                      remapVarsFree(remaps[n0].vars);
+                      remapGridFree(remaps[n0].src_grid);
+                      remapGridFree(remaps[n0].tgt_grid);
+                      remapSearchFree(remaps[n0].search);
+                      for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
                       r = nremaps - 1;
-                      remapInit(&remaps[r]);
+                      remapInit(remaps[r]);
                     }
 
                   if (remaps[r].gridID != gridID1)
                     {
                       if (gridIsCircular(gridID1) && !lextrapolate) remap_extrapolate = true;
                       remaps[r].src_grid.non_global = false;
-                      if (mapType == RemapType::DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1
-                          && !is_global_grid(gridID1))
+                      if (mapType == RemapMethod::DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1
+                          && !gridIsGlobal(gridID1))
                         remaps[r].src_grid.non_global = true;
                       /*
                         remaps[r].src_grid.luse_cell_area = FALSE;
@@ -1135,7 +1073,7 @@ Remap(void *argument)
                       */
                       if (gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == false)
                         {
-                          remap_num_srch_bins = (!remap_extrapolate && mapType == RemapType::DISTWGT)
+                          remap_num_srch_bins = (!remap_extrapolate && mapType == RemapMethod::DISTWGT)
                                                     ? 1
                                                     : remapGenNumBins(gridInqYsize(gridID1));
                         }
@@ -1145,15 +1083,14 @@ Remap(void *argument)
                       remaps[r].vars.normOpt = normOpt;
                       remaps[r].vars.pinit = false;
 
-                      if ((mapType == RemapType::BILINEAR || mapType == RemapType::BICUBIC)
+                      if ((mapType == RemapMethod::BILINEAR || mapType == RemapMethod::BICUBIC)
                           && (gridInqType(gridID1) == GRID_GME || gridInqType(gridID1) == GRID_UNSTRUCTURED))
-                        cdoAbort("Bilinear/bicubic interpolation doesn't "
-                                 "support unstructured source grids!");
+                        cdoAbort("Bilinear/bicubic interpolation doesn't support unstructured source grids!");
 
                       // Initialize grid information for both grids
                       if (cdoTimer) timer_start(timer_remap_init);
-                      remap_grids_init(mapType, remap_extrapolate, gridID1, &remaps[r].src_grid, gridID2,
-                                       &remaps[r].tgt_grid);
+                      remapInitGrids(mapType, remap_extrapolate, gridID1, remaps[r].src_grid, gridID2, remaps[r].tgt_grid);
+                      remapSearchInit(mapType, remaps[r].search, remaps[r].src_grid, remaps[r].tgt_grid);
                       if (cdoTimer) timer_stop(timer_remap_init);
                     }
 
@@ -1166,22 +1103,20 @@ Remap(void *argument)
                         if (remaps[r].src_grid.vgpm[i]) imask[j++] = imask[i];
                     }
 
-                  arrayCopy(remaps[r].src_grid.size, &imask[0], remaps[r].src_grid.mask);
+                  arrayCopy(remaps[r].src_grid.size, &imask[0], &remaps[r].src_grid.mask[0]);
 
-                  if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
+                  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
                     {
-                      arrayFill(remaps[r].src_grid.size, remaps[r].src_grid.cell_area, 0.0);
-                      arrayFill(remaps[r].src_grid.size, remaps[r].src_grid.cell_frac, 0.0);
-                      arrayFill(remaps[r].tgt_grid.size, remaps[r].tgt_grid.cell_area, 0.0);
+                      arrayFill(remaps[r].src_grid.size, &remaps[r].src_grid.cell_area[0], 0.0);
+                      arrayFill(remaps[r].src_grid.size, &remaps[r].src_grid.cell_frac[0], 0.0);
+                      arrayFill(remaps[r].tgt_grid.size, &remaps[r].tgt_grid.cell_area[0], 0.0);
                     }
-                  arrayFill(remaps[r].tgt_grid.size, remaps[r].tgt_grid.cell_frac, 0.0);
+                  arrayFill(remaps[r].tgt_grid.size, &remaps[r].tgt_grid.cell_frac[0], 0.0);
 
                   // initialize some remapping variables
-                  if (cdoTimer) timer_start(timer_remap_init);
-                  remap_vars_init(mapType, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
-                  if (cdoTimer) timer_stop(timer_remap_init);
+                  remapVarsInit(mapType, remaps[r].vars);
 
-                  print_remap_info(operfunc, remap_genweights, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
+                  remapPrintInfo(operfunc, remap_genweights, remaps[r].src_grid, remaps[r].tgt_grid, nmiss1);
 
                   if (remap_genweights)
                     {
@@ -1189,7 +1124,7 @@ Remap(void *argument)
 
                       if (writeRemapWeightsOnly) goto WRITE_REMAP;
 
-                      if (remap_test) reorder_links(&remaps[r].vars);
+                      if (remap_test) remapVarsReorder(remaps[r].vars);
                     }
                 }
 
@@ -1199,46 +1134,38 @@ Remap(void *argument)
                     if (remaps[r].src_grid.vgpm[i]) array1[j++] = array1[i];
                 }
 
+              size_t gridsize2 = gridInqSize(gridID2);
+
               if (remap_genweights)
                 {
                   remaps[r].nused++;
 
-                  if (needGradiants)
+                  if (needGradients)
                     {
-                      if (remaps[r].src_grid.rank != 2 && remap_order == 2)
-                        cdoAbort("Second order remapping is not available for "
-                                 "unstructured grids!");
+                      if (remaps[r].src_grid.rank != 2 && remapOrder == 2)
+                        cdoAbort("Second order remapping is not available for unstructured grids!");
 
-                      remap_gradients(remaps[r].src_grid, &array1[0], &grad1_lat[0], &grad1_lon[0], &grad1_latlon[0]);
+                      remapGradients(remaps[r].src_grid, &array1[0], gradients);
                     }
 
                   if (operfunc == REMAPLAF)
-                    remap_laf(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-                              remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add,
-                              &array1[0]);
+                    remap_laf(&array2[0], missval, gridsize2, remaps[r].vars, &array1[0]);
                   else if (operfunc == REMAPSUM)
-                    remap_sum(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-                              remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add,
-                              &array1[0]);
+                    remap_sum(&array2[0], missval, gridsize2, remaps[r].vars, &array1[0]);
                   else
-                    remap(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-                          remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add, &array1[0],
-                          &grad1_lat[0], &grad1_lon[0], &grad1_latlon[0], remaps[r].vars.links,
-                          remaps[r].vars.links_per_value);
+                    remap(&array2[0], missval, gridsize2, remaps[r].vars, &array1[0], gradients);
                 }
               else
                 {
                   remapField(mapType, &remaps[r], numNeighbors, &array1[0], &array2[0], missval);
                 }
 
-              gridsize2 = gridInqSize(gridID2);
-
               if (operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON)
                 {
                   // used only to check the result of remapcon
-                  if (0) remap_normalize(remaps[r].vars.normOpt, gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
+                  if (0) remapNormalizeField(remaps[r].vars.normOpt, gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
 
-                  remap_set_frac_min(gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
+                  remapSetFracMin(gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
                 }
 
               if (operfunc == REMAPSUM)
@@ -1247,14 +1174,17 @@ Remap(void *argument)
                   remapSum(&remaps[r].tgt_grid, gridsize2, &array2[0], "tgt");
                 }
 
-              vlistInqVarName(vlistID1, varID, varname);
               if (operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON)
-                if (strcmp(varname, "gridbox_area") == 0)
-                  scale_gridbox_area(gridsize, &array1[0], gridsize2, &array2[0], remaps[r].tgt_grid.cell_area);
+                {
+                  char varname[CDI_MAX_NAME];
+                  vlistInqVarName(vlistID1, varID, varname);
+                  if (strcmp(varname, "gridbox_area") == 0)
+                    scaleGridboxArea(gridsize, &array1[0], gridsize2, &array2[0], &remaps[r].tgt_grid.cell_area[0]);
+                }
 
               // calculate some statistics
               if (cdoVerbose)
-                remap_stat(remap_order, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars, &array1[0], &array2[0],
+                remapStat(remapOrder, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars, &array1[0], &array2[0],
                            missval);
 
               if (gridInqType(gridID2) == GRID_GME)
@@ -1284,19 +1214,20 @@ Remap(void *argument)
 WRITE_REMAP:
 
   if (writeRemapWeightsOnly)
-    write_remap_scrip(cdoGetStreamName(1).c_str(), mapType, submapType, numNeighbors, remap_order, remaps[r].src_grid,
-                      remaps[r].tgt_grid, remaps[r].vars);
+    remapWriteDataScrip(cdoGetStreamName(1).c_str(), mapType, submapType, numNeighbors, remapOrder, remaps[r].src_grid,
+                        remaps[r].tgt_grid, remaps[r].vars);
 
   pstreamClose(streamID1);
 
-  if (lremapxxx && remap_genweights && remaps[0].nused == 0)
-    print_remap_warning(remap_file, operfunc, &remaps[0].src_grid, remaps[0].nmiss);
+  if (lremap && remap_genweights && remaps[0].nused == 0)
+    remapPrintWarning(remap_file, operfunc, remaps[0].src_grid, remaps[0].nmiss);
 
   for (int r = 0; r < nremaps; r++)
     {
-      remapVarsFree(&remaps[r].vars);
-      remapGridFree(&remaps[r].src_grid);
-      remapGridFree(&remaps[r].tgt_grid);
+      remapVarsFree(remaps[r].vars);
+      remapGridFree(remaps[r].src_grid);
+      remapGridFree(remaps[r].tgt_grid);
+      remapSearchFree(remaps[r].search);
     }
 
   cdoFinish();

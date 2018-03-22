@@ -5,6 +5,44 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Remap regional grid
+#
+GRID=spain.grid
+cat > $GRID <<EOF
+gridtype=lonlat
+xsize=20
+ysize=18
+xfirst=-13
+yfirst=33
+xinc=.8
+yinc=.8
+EOF
+RMODS="bil bic dis nn con con2 ycon laf"
+IFILE=tsurf_spain.grb
+for RMOD in $RMODS; do
+  OFILE=tsurf_spain_${RMOD}
+  for extra in def off on; do
+      EXTRA="$extra"
+      if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
+      REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},${GRID} $IFILE ${OFILE}_${extra}_ref
+  done
+done
+exit
+########################################################################
+#
+# MapReduce
+#
+for grid  in r18x9 icon_cell; do
+  REFGRID="${grid}_grid"
+  $CDO -f nc -temp,$REFGRID data_${grid}.nc
+  $CDO -f nc -gtc,273.15 -temp,$REFGRID mask_${grid}.nc
+  $CDO -f nc reducegrid,mask_${grid}.nc data_${grid}.nc reduced_${grid}.nc
+  $CDO griddes reduced_${grid}.nc > griddes.${grid}
+  rm -f data_${grid}.nc mask_${grid}.nc reduced_${grid}.nc
+done
+exit
+########################################################################
+#
 # Timstat2
 #
 IFILE=ts_mm_5years
@@ -101,31 +139,6 @@ IFILE=t21_geosp_tsurf_sea.grb
 $CDO $FORMAT setmisstoc,0 $IFILE setmisstoc_ref
 $CDO $FORMAT setmisstonn $IFILE setmisstonn_ref
 $CDO $FORMAT setmisstodis $IFILE setmisstodis_ref
-exit
-########################################################################
-#
-# Remap regional grid
-#
-GRID=spain.grid
-cat > $GRID <<EOF
-gridtype=lonlat
-xsize=20
-ysize=18
-xfirst=-13
-yfirst=33
-xinc=.8
-yinc=.8
-EOF
-RMODS="bil bic dis nn con con2 ycon laf"
-IFILE=tsurf_spain.grb
-for RMOD in $RMODS; do
-  OFILE=tsurf_spain_${RMOD}
-  for extra in def off on; do
-      EXTRA="$extra"
-      if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
-      REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},${GRID} $IFILE ${OFILE}_${extra}_ref
-  done
-done
 exit
 ########################################################################
 #
@@ -307,19 +320,6 @@ STATS="min max sum avg mean std std1 var var1"
 IFILE=t21_geosp_tsurf.grb
 for STAT in $STATS; do
   $CDO $FORMAT mer$STAT $IFILE mer${STAT}_ref
-done
-exit
-########################################################################
-#
-# MapReduce
-#
-for grid  in r18x9 icon_cell; do
-  REFGRID="${grid}_grid"
-  $CDO -f nc -temp,$REFGRID data_${grid}.nc
-  $CDO -f nc -gtc,273.15 -temp,$REFGRID mask_${grid}.nc
-  $CDO -f nc reducegrid,mask_${grid}.nc data_${grid}.nc reduced_${grid}.nc
-  $CDO griddes reduced_${grid}.nc > griddes.${grid}
-  rm -f data_${grid}.nc mask_${grid}.nc reduced_${grid}.nc
 done
 exit
 ########################################################################

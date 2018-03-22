@@ -40,8 +40,7 @@ cdo_read_timestepmask(const char *maskfile, int *n)
   if (nts == -1)
     {
       nts = 0;
-      while (streamInqTimestep(streamID, nts))
-        nts++;
+      while (streamInqTimestep(streamID, nts)) nts++;
 
       if (cdoVerbose) cdoPrint("%s: counted %i timeSteps in %s", __func__, nts, maskfile);
 
@@ -106,8 +105,7 @@ cdo_read_mask(const char *maskfile, size_t *n)
   streamInqRecord(streamID, &varID, &levelID);
   streamReadRecord(streamID, dmask, &nmiss);
 
-  for (size_t i = 0; i < gridsize; ++i)
-    imask[i] = IS_NOT_EQUAL(dmask[i], 0);
+  for (size_t i = 0; i < gridsize; ++i) imask[i] = IS_NOT_EQUAL(dmask[i], 0);
 
   Free(dmask);
 

@@ -125,9 +125,8 @@ namelistbuf_to_pmlist(listbuf_t *listbuf)
       switch (status)
         {
         case NAMELIST_ERROR_INVAL:
-          fprintf(stderr,
-                  "Namelist error: Invalid character in %s (line=%d "
-                  "character='%c')!\n",
+          fprintf(stderr, "Namelist error: Invalid character in %s (line=%d "
+                          "character='%c')!\n",
                   name, p->lineno, listbuf->buffer[p->pos]);
           break;
         case NAMELIST_ERROR_PART:

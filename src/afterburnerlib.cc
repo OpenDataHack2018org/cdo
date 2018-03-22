@@ -119,15 +119,13 @@ alloc_dp(int words, const char *array_name)
 static void
 IniQuaSum(double *dest, const double *restrict src, int len)
 {
-  for (int i = 0; i < len; i++)
-    dest[i] = src[i] * src[i];
+  for (int i = 0; i < len; i++) dest[i] = src[i] * src[i];
 }
 
 static void
 AddQuaSum(double *dest, const double *restrict src, int len)
 {
-  for (int i = 0; i < len; i++)
-    dest[i] += src[i] * src[i];
+  for (int i = 0; i < len; i++) dest[i] += src[i] * src[i];
 }
 
 static void
@@ -135,8 +133,7 @@ VarQuaSum(double *Variance, const double *restrict Sum, int len, int n)
 {
   const double rn1 = 1.0 / (n - 1);
 
-  for (int i = 0; i < len; i++)
-    Variance[i] = (Variance[i] - Sum[i] * Sum[i] * n) * rn1;
+  for (int i = 0; i < len; i++) Variance[i] = (Variance[i] - Sum[i] * Sum[i] * n) * rn1;
 
   for (int i = 0; i < len; i++)
     if (Variance[i] > 0.0)
@@ -163,15 +160,13 @@ AddVector(double *dest, const double *src, size_t len, size_t *nmiss, double mis
 static void
 Add2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, size_t len)
 {
-  for (size_t i = 0; i < len; i++)
-    dest[i] = srcA[i] + srcB[i];
+  for (size_t i = 0; i < len; i++) dest[i] = srcA[i] + srcB[i];
 }
 
 static void
 Sub2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, size_t len)
 {
-  for (size_t i = 0; i < len; i++)
-    dest[i] = srcA[i] - srcB[i];
+  for (size_t i = 0; i < len; i++) dest[i] = srcA[i] - srcB[i];
 }
 
 static void
@@ -189,8 +184,7 @@ MultVectorScalar(double *dest, const double *restrict src, double factor, size_t
     }
   else
     {
-      for (size_t i = 0; i < len; i++)
-        dest[i] = src[i] * factor;
+      for (size_t i = 0; i < len; i++) dest[i] = src[i] * factor;
     }
 }
 
@@ -221,8 +215,7 @@ after_read_vct(const char *vctfile, double **vct, int *nvct)
   FILE *fp = fopen(vctfile, "r");
   if (fp == NULL) SysError("Open failed on %s", vctfile);
 
-  while (fgets(line, 1023, fp))
-    nvct++;
+  while (fgets(line, 1023, fp)) nvct++;
 
   *nvct *= 2;
   *vct = (double *) Malloc(*nvct * sizeof(double));
@@ -740,8 +733,7 @@ after_processPL(struct Control *globs, struct Variable *vars)
   if (vars[PS].comp && vars[LNPS].grid)
     {
       if (vars[PS].grid == NULL) vars[PS].grid = alloc_dp(globs->DimGP, "Ps");
-      for (l = 0; l < globs->DimGP; l++)
-        vars[PS].grid[l] = exp(vars[LNPS].grid[l]);
+      for (l = 0; l < globs->DimGP; l++) vars[PS].grid[l] = exp(vars[LNPS].grid[l]);
     }
 
   if (globs->Type >= 70)
@@ -904,13 +896,11 @@ theta(double *pthetaf, double *pthetah, double *ph, double *ps, double *tf, doub
 
   const double kappa = PlanetRD / C_RCPD;
 
-  for (int h = 0; h < dimgp; h++)
-    thetah[h] = 0.0;
+  for (int h = 0; h < dimgp; h++) thetah[h] = 0.0;
   thetah += dimgp;
   for (int l = 0; l < levels - 1; l++)
     {
-      for (int h = 0; h < dimgp; h++)
-        thetah[h] = 0.5 * (tf[h] + tf[h + dimgp]) * pow((ps[h] / ph[h]), kappa);
+      for (int h = 0; h < dimgp; h++) thetah[h] = 0.5 * (tf[h] + tf[h + dimgp]) * pow((ps[h] / ph[h]), kappa);
 
       ph += dimgp;
       tf += dimgp;
@@ -919,15 +909,13 @@ theta(double *pthetaf, double *pthetah, double *ph, double *ps, double *tf, doub
 
   arrayCopy(dimgp, ts, thetah);
   thetah = pthetah;
-  for (int h = 0; h < dim3gp; h++)
-    thetaf[h] = 0.5 * (thetah[h] + thetah[h + dimgp]);
+  for (int h = 0; h < dim3gp; h++) thetaf[h] = 0.5 * (thetah[h] + thetah[h + dimgp]);
 }
 
 static void
 windSpeed(double *uvspeed, double *u, double *v, int dim3gp)
 {
-  for (int i = 0; i < dim3gp; i++)
-    uvspeed[i] = sqrt(u[i] * u[i] + v[i] * v[i]);
+  for (int i = 0; i < dim3gp; i++) uvspeed[i] = sqrt(u[i] * u[i] + v[i] * v[i]);
 }
 
 static void
@@ -941,8 +929,7 @@ Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind, doub
 
   /* Compute half level part of vertical velocity */
 
-  for (i = 0; i < dimgp; i++)
-    omega[i] = 0.0;
+  for (i = 0; i < dimgp; i++) omega[i] = 0.0;
 
   for (j = 0; j < nlev; j++)
     {
@@ -983,11 +970,10 @@ Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind, doub
 #if defined(_OPENMP)
 #pragma omp parallel for
 #endif
-      for (i = 0; i < dimgp; i++)
-        omega[i] = 0.5 * (omega[i] + omega[i + dimgp]);
+      for (i = 0; i < dimgp; i++) omega[i] = 0.5 * (omega[i] + omega[i + dimgp]);
     }
 
-    /* compute full level part of vertical velocity */
+/* compute full level part of vertical velocity */
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i, omega, halfp, fullp, uwind, vwind, DeltaHybrid, Cterm, Pterm)
@@ -1058,8 +1044,7 @@ MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor, int
 #if defined(_OPENMP)
 #pragma omp parallel for
 #endif
-      for (i = 0; i < nhor; i++)
-        geop[i] = geop[i + nhor] + PlanetRD * gt[i] * (1.0 + vtmp * gq[i]) * z2log2;
+      for (i = 0; i < nhor; i++) geop[i] = geop[i + nhor] + PlanetRD * gt[i] * (1.0 + vtmp * gq[i]) * z2log2;
     }
   else /* No humidity */
     {
@@ -1073,8 +1058,7 @@ MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor, int
 #ifdef HAVE_OPENMP4
 #pragma omp simd
 #endif
-        for (i = nhor * (j - 1); i < nhor * j; i++)
-          geop[i] = geopl[i] + PlanetRD * gt[i] * log(phl[i] / ph[i]);
+        for (i = nhor * (j - 1); i < nhor * j; i++) geop[i] = geopl[i] + PlanetRD * gt[i] * log(phl[i] / ph[i]);
 
 #if defined(SX)
 #pragma vdir nodep
@@ -1082,8 +1066,7 @@ MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor, int
 #ifdef HAVE_OPENMP4
 #pragma omp simd
 #endif
-      for (i = 0; i < nhor; i++)
-        geop[i] = geopl[i] + PlanetRD * gt[i] * z2log2;
+      for (i = 0; i < nhor; i++) geop[i] = geopl[i] + PlanetRD * gt[i] * z2log2;
     }
 
 #if defined(SX)
@@ -1092,8 +1075,7 @@ MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor, int
 #if defined(_OPENMP)
 #pragma omp parallel for
 #endif
-  for (i = 0; i < nhor * (nlev + 1); i++)
-    geop[i] *= zrg;
+  for (i = 0; i < nhor * (nlev + 1); i++) geop[i] *= zrg;
 }
 
 #define SCALESLP (101325.0)
@@ -1109,8 +1091,7 @@ LayerWater(double *ww, double *ll, double pmax, double pmin, int DimGP, int Half
   int MaxLev, MinLev;
   double pph[MaxLevel];
 
-  for (k = 0; k < HalfLevels; k++)
-    pph[k] = vct[k] + vct[k + HalfLevels] * SCALESLP;
+  for (k = 0; k < HalfLevels; k++) pph[k] = vct[k] + vct[k + HalfLevels] * SCALESLP;
   for (k = 0; k < HalfLevels; k++)
     if (pph[k] > pmax) break;
   MaxLev = k - 1;
@@ -1122,11 +1103,9 @@ LayerWater(double *ww, double *ll, double pmax, double pmin, int DimGP, int Half
 
   for (k = MaxLev; k <= MinLev; k++)
     {
-      for (i = 0; i < DimGP; i++)
-        ll[i] += ww[i + k * DimGP] * (pph[k + 1] - pph[k]);
+      for (i = 0; i < DimGP; i++) ll[i] += ww[i + k * DimGP] * (pph[k + 1] - pph[k]);
     }
-  for (i = 0; i < DimGP; i++)
-    ll[i] /= PlanetGrav;
+  for (i = 0; i < DimGP; i++) ll[i] /= PlanetGrav;
 }
 
 /* ================================================= */
@@ -1141,8 +1120,7 @@ LayerCloud(double *cc, double *ll, double pmax, double pmin, int DimGP, int Half
   double pph[MaxLevel];
   double ZEPSEC = 1.0e-12;
 
-  for (k = 0; k < HalfLevels; k++)
-    pph[k] = vct[k] + vct[k + HalfLevels] * SCALESLP;
+  for (k = 0; k < HalfLevels; k++) pph[k] = vct[k] + vct[k + HalfLevels] * SCALESLP;
   for (k = 0; k < HalfLevels; k++)
     if (pph[k] > pmax) break;
   MaxLev = k - 1;
@@ -1150,8 +1128,7 @@ LayerCloud(double *cc, double *ll, double pmax, double pmin, int DimGP, int Half
     if (pph[k] < pmin) break;
   MinLev = k;
 
-  for (i = 0; i < DimGP; i++)
-    ll[i] = 1. - cc[i + MaxLev * DimGP];
+  for (i = 0; i < DimGP; i++) ll[i] = 1. - cc[i + MaxLev * DimGP];
 
   for (k = MaxLev + 1; k <= MinLev; k++)
     {
@@ -1159,8 +1136,7 @@ LayerCloud(double *cc, double *ll, double pmax, double pmin, int DimGP, int Half
         ll[i] *= (1. - MAX(cc[i + (k - 1) * DimGP], cc[i + k * DimGP]))
                  / (1. - MIN(cc[i + (k - 1) * DimGP], 1. - ZEPSEC));
     }
-  for (i = 0; i < DimGP; i++)
-    ll[i] = 1. - ll[i];
+  for (i = 0; i < DimGP; i++) ll[i] = 1. - ll[i];
 }
 
 /* Grid Point Computations */
@@ -1216,8 +1192,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[GEOPOTHEIGHT].hybrid
           = (double *) Realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP + globs->DimGP) * sizeof(double));
       arrayCopy(globs->DimGP, globs->Orography, vars[GEOPOTHEIGHT].hybrid + globs->Dim3GP);
-      for (int i = 0; i < globs->DimGP; i++)
-        vars[GEOPOTHEIGHT].hybrid[globs->Dim3GP + i] /= PlanetGrav;
+      for (int i = 0; i < globs->DimGP; i++) vars[GEOPOTHEIGHT].hybrid[globs->Dim3GP + i] /= PlanetGrav;
     }
 
   if (vars[DPSDX].needed || vars[DPSDY].needed)
@@ -1272,8 +1247,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[PS].plev = 1;
       vars[PS].sfit = TRUE; /* ??? */
       vars[PS].hybrid = alloc_dp(globs->DimGP, "vars[PS].hybrid");
-      for (int l = 0; l < globs->DimGP; l++)
-        vars[PS].hybrid[l] = exp(vars[LNPS].hybrid[l]);
+      for (int l = 0; l < globs->DimGP; l++) vars[PS].hybrid[l] = exp(vars[LNPS].hybrid[l]);
     }
 
   if (vars[SLP].comp)
@@ -1760,8 +1734,7 @@ after_processML(struct Control *globs, struct Variable *vars)
           vars[PS_PROG].hybrid = alloc_dp(globs->DimGP, "PS_PROG");
           if (vars[LNPS].hybrid)
             {
-              for (l = 0; l < globs->DimGP; l++)
-                vars[PS_PROG].hybrid[l] = exp(vars[LNPS].hybrid[l]);
+              for (l = 0; l < globs->DimGP; l++) vars[PS_PROG].hybrid[l] = exp(vars[LNPS].hybrid[l]);
             }
           else if (vars[PS].hybrid)
             {
@@ -1907,8 +1880,7 @@ after_processML(struct Control *globs, struct Variable *vars)
           if (globs->pnmiss == NULL) globs->pnmiss = (size_t *) Malloc(globs->NumLevelRequest * sizeof(size_t));
           genindmiss(globs->vert_index, pressureLevel, globs->DimGP, globs->NumLevelRequest, vars[PS_PROG].hybrid,
                      globs->pnmiss);
-          for (i = 0; i < globs->NumLevelRequest; i++)
-            nmiss += globs->pnmiss[i];
+          for (i = 0; i < globs->NumLevelRequest; i++) nmiss += globs->pnmiss[i];
         }
 
       for (code = 0; code < MaxCodes; code++)
@@ -2431,8 +2403,7 @@ after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, 
           if (vars[code].samp == NULL)
             {
               vars[code].samp = (int *) Malloc(dataSize * sizeof(int));
-              for (size_t i = 0; i < dataSize; i++)
-                vars[code].samp[i] = globs->MeanCount0;
+              for (size_t i = 0; i < dataSize; i++) vars[code].samp[i] = globs->MeanCount0;
             }
 
           for (size_t i = 0; i < gridSize; i++)
@@ -2507,8 +2478,7 @@ after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int
           if (vars[code].samp == NULL)
             {
               vars[code].samp = (int *) Malloc(dataSize * sizeof(int));
-              for (size_t i = 0; i < dataSize; i++)
-                vars[code].samp[i] = globs->MeanCount0;
+              for (size_t i = 0; i < dataSize; i++) vars[code].samp[i] = globs->MeanCount0;
             }
 
           double *dataptr = vars[code].hybrid0 + dataOffset;
@@ -2654,8 +2624,7 @@ after_AnalysisDependencies(struct Variable *vars, int ncodes)
 {
   int code;
 
-  for (code = 0; code < ncodes; code++)
-    vars[code].needed = vars[code].selected;
+  for (code = 0; code < ncodes; code++) vars[code].needed = vars[code].selected;
 
   MakeDependencies(vars, PS, LNPS);
 
@@ -2667,8 +2636,7 @@ after_EchamDependencies(struct Variable *vars, int ncodes, int type, int source)
 {
   int code;
 
-  for (code = 0; code < ncodes; code++)
-    vars[code].needed = vars[code].selected;
+  for (code = 0; code < ncodes; code++) vars[code].needed = vars[code].selected;
 
   for (code = 0; code < ncodes; code++)
     if (vars[code].detected == FALSE) vars[code].ivarID = -1;
@@ -2834,9 +2802,7 @@ after_legini_setup(struct Control *globs, struct Variable *vars)
   else
     after_legini(ntr, nlat, globs->poli, globs->pold, globs->coslat);
 
-  for (int jgl = 0; jgl < nlat; ++jgl)
-    globs->rcoslat[jgl] = 1.0 / globs->coslat[jgl];
+  for (int jgl = 0; jgl < nlat; ++jgl) globs->rcoslat[jgl] = 1.0 / globs->coslat[jgl];
 
-  for (int jgl = 0; jgl < nlat; ++jgl)
-    globs->DerivationFactor[jgl] = globs->rcoslat[jgl] / PlanetRadius;
+  for (int jgl = 0; jgl < nlat; ++jgl) globs->DerivationFactor[jgl] = globs->rcoslat[jgl] / PlanetRadius;
 }

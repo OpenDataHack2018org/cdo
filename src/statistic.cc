@@ -167,8 +167,7 @@ make_symmetric_matrix_triangular(double **a, int n, double *d, double *e)
       h = scale = 0;
       if (i > 1)
         {
-          for (k = 0; k < i; k++)
-            scale += fabs(a[i][k]);
+          for (k = 0; k < i; k++) scale += fabs(a[i][k]);
           if (DBL_IS_EQUAL(scale, 0.))
             e[i] = a[i][i - 1];
           else
@@ -188,10 +187,8 @@ make_symmetric_matrix_triangular(double **a, int n, double *d, double *e)
                 {
                   a[j][i] = a[i][j] / h;
                   g = 0;
-                  for (k = 0; k <= j; k++)
-                    g += a[j][k] * a[i][k];
-                  for (k = j + 1; k < i; k++)
-                    g += a[k][j] * a[i][k];
+                  for (k = 0; k <= j; k++) g += a[j][k] * a[i][k];
+                  for (k = j + 1; k < i; k++) g += a[k][j] * a[i][k];
                   e[j] = g / h;
                   f += e[j] * a[i][j];
                 }
@@ -200,8 +197,7 @@ make_symmetric_matrix_triangular(double **a, int n, double *d, double *e)
                 {
                   f = a[i][j];
                   e[j] = g = e[j] - hh * f;
-                  for (k = 0; k <= j; k++)
-                    a[j][k] -= f * e[k] + g * a[i][k];
+                  for (k = 0; k <= j; k++) a[j][k] -= f * e[k] + g * a[i][k];
                 }
             }
         }
@@ -219,16 +215,13 @@ make_symmetric_matrix_triangular(double **a, int n, double *d, double *e)
           for (j = 0; j < i; j++)
             {
               g = 0;
-              for (k = 0; k < i; k++)
-                g += a[i][k] * a[k][j];
-              for (k = 0; k < i; k++)
-                a[k][j] -= g * a[k][i];
+              for (k = 0; k < i; k++) g += a[i][k] * a[k][j];
+              for (k = 0; k < i; k++) a[k][j] -= g * a[k][i];
             }
         }
       d[i] = a[i][i];
       a[i][i] = 1;
-      for (j = 0; j < i; j++)
-        a[j][i] = a[i][j] = 0;
+      for (j = 0; j < i; j++) a[j][i] = a[i][j] = 0;
     }
 }
 
@@ -263,8 +256,7 @@ eigen_solution_of_triangular_matrix(double *d, double *e, int n, double **a, con
   double b, c, f, g, p, r, s;
   static const double eps = 1e-6;
 
-  for (i = 1; i < n; i++)
-    e[i - 1] = e[i];
+  for (i = 1; i < n; i++) e[i - 1] = e[i];
 
   e[n - 1] = 0;
   for (l = 0; l < n; l++)
@@ -282,9 +274,7 @@ eigen_solution_of_triangular_matrix(double *d, double *e, int n, double **a, con
           iter++;
           if (iter == MAX_ITER)
             {
-              fprintf(stderr,
-                      "%s: ERROR! Too many iterations while determining the eigensolution!\n",
-                      prompt);
+              fprintf(stderr, "%s: ERROR! Too many iterations while determining the eigensolution!\n", prompt);
               exit(1);
             }
           g = (d[l + 1] - d[l]) / (2 * e[l]);
@@ -377,12 +367,10 @@ inverse_of_matrix(double **a, double **b, int n)
     {
       for (i = 0; i < n; i++)
         {
-          for (j = 0; j < n; j++)
-            col[j] = 0;
+          for (j = 0; j < n; j++) col[j] = 0;
           col[i] = 1;
           lu_backsubstitution(a, n, index, col);
-          for (j = 0; j < n; j++)
-            b[j][i] = col[j];
+          for (j = 0; j < n; j++) b[j][i] = col[j];
         }
     }
 
@@ -416,16 +404,14 @@ lu_decomposition(double **a, int n, int *index, int *sign)
       for (i = 0; i < j; i++)
         {
           sum = a[i][j];
-          for (k = 0; k < i; k++)
-            sum -= a[i][k] * a[k][j];
+          for (k = 0; k < i; k++) sum -= a[i][k] * a[k][j];
           a[i][j] = sum;
         }
       big = 0;
       for (i = j; i < n; i++)
         {
           sum = a[i][j];
-          for (k = 0; k < j; k++)
-            sum -= a[i][k] * a[k][j];
+          for (k = 0; k < j; k++) sum -= a[i][k] * a[k][j];
           a[i][j] = sum;
           if ((temp = v[i] * fabs(sum)) >= big)
             {
@@ -451,8 +437,7 @@ lu_decomposition(double **a, int n, int *index, int *sign)
       if (j != n)
         {
           temp = 1 / a[j][j];
-          for (i = j + 1; i < n; i++)
-            a[i][j] *= temp;
+          for (i = j + 1; i < n; i++) a[i][j] *= temp;
         }
     }
 
@@ -475,8 +460,7 @@ lu_backsubstitution(double **a, int n, int *index, double *b)
       b[ip] = b[i];
 
       if (ii)
-        for (j = ii; j < i; j++)
-          sum -= a[i][j] * b[j];
+        for (j = ii; j < i; j++) sum -= a[i][j] * b[j];
       else if (fabs(sum) > 0)
         ii = i;
 
@@ -485,8 +469,7 @@ lu_backsubstitution(double **a, int n, int *index, double *b)
   for (i = n - 1; i >= 0; i--)
     {
       sum = b[i];
-      for (j = i + 1; j < n; j++)
-        sum -= a[i][j] * b[j];
+      for (j = i + 1; j < n; j++) sum -= a[i][j] * b[j];
       b[i] = sum / a[i][i];
     }
 }
@@ -518,8 +501,7 @@ fft(double *real, double *imag, int n, int sign)
           imag[j] = temp_i;
         }
 
-      for (bit = n >> 1; j & bit; bit >>= 1)
-        j ^= bit;
+      for (bit = n >> 1; j & bit; bit >>= 1) j ^= bit;
       j |= bit;
     }
 
@@ -652,8 +634,7 @@ lngamma(double x)
   temp = a + 5.5;
   temp -= (a + 0.5) * log(temp);
   ser = 1.000000000190015;
-  for (j = 0; j <= 5; j++)
-    ser += cof[j] / ++b;
+  for (j = 0; j <= 5; j++) ser += cof[j] / ++b;
   return -temp + log(2.5066282746310005 * ser / a);
 }
 
@@ -662,9 +643,7 @@ incomplete_gamma(double a, double x, const char *prompt)
 {
   if (x < 0 || a <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"incomplete_gamma\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"incomplete_gamma\")\n", prompt);
       exit(4);
     }
   if (x < (a + 1))
@@ -731,9 +710,8 @@ beta(double a, double b, const char *prompt)
 {
   if (a <= 0 || b <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"beta\")\n",
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
+                      "\"beta\")\n",
               prompt);
       exit(4);
     }
@@ -747,9 +725,7 @@ incomplete_beta(double a, double b, double x, const char *prompt)
 
   if (a <= 0 || b <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"incomplete_beta\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"incomplete_beta\")\n", prompt);
       exit(4);
     }
 
@@ -832,9 +808,7 @@ normal_inv(double p, const char *prompt)
 
   if (p <= 0 || p >= 1)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"normal_inv\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"normal_inv\")\n", prompt);
       exit(4);
     }
 
@@ -863,9 +837,7 @@ student_t_density(double n, double x, const char *prompt)
 {
   if (n <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t_density\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t_density\")\n", prompt);
       exit(4);
     }
   return exp(lngamma((n + 1) / 2) - lngamma(n / 2)) / sqrt(n / 2) * pow((1 + x * x / n), -(n + 1) / 2);
@@ -876,8 +848,7 @@ student_t(double n, double x, const char *prompt)
 {
   if (n <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t\")\n", prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t\")\n", prompt);
       exit(4);
     }
   if (x > 0)
@@ -897,8 +868,7 @@ student_t_inv(double n, double p, const char *prompt)
 
   if (n <= 0 || p <= 0 || p >= 1)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t_inv\")\n", prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t_inv\")\n", prompt);
       exit(4);
     }
 
@@ -928,9 +898,7 @@ chi_square_density(double n, double x, const char *prompt)
 {
   if (n <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_density\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_density\")\n", prompt);
       exit(4);
     }
   return x <= 0 ? 0 : pow(2, -n / 2) * pow(x, n / 2 - 1) * exp(-x / 2 - lngamma(n / 2));
@@ -941,9 +909,7 @@ chi_square(double n, double x, const char *prompt)
 {
   if (n <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square\")\n", prompt);
       exit(4);
     }
   return x <= 0 ? 0 : incomplete_gamma(n / 2, x / 2, prompt);
@@ -959,9 +925,7 @@ chi_square_inv(double n, double p, const char *prompt)
 
   if (n <= 0 || p <= 0 || p >= 1)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_inv\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_inv\")\n", prompt);
       exit(4);
     }
 
@@ -1000,9 +964,7 @@ chi_square_constants(double n, double p, double *c1, double *c2, const char *pro
 
   if (n <= 0 || p <= 0 || p >= 1)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_constants\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_constants\")\n", prompt);
       exit(4);
     }
 
@@ -1053,9 +1015,7 @@ beta_distr_density(double a, double b, double x, const char *prompt)
 {
   if (a <= 0 || b <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_density\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_density\")\n", prompt);
       exit(4);
     }
   return x <= 0 ? 0 : x >= 1 ? 1 : pow(x, a - 1) * pow(1 - x, b - 1) / beta(a, b, prompt);
@@ -1077,9 +1037,7 @@ beta_distr_inv(double a, double b, double p, const char *prompt)
 
   if (a <= 0 || b <= 0 || p <= 0 || p >= 1)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_inv\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_inv\")\n", prompt);
       exit(4);
     }
 
@@ -1126,9 +1084,7 @@ beta_distr_constants(double a, double b, double p, double *c1, double *c2, const
 
   if (a <= 0 || b <= 0 || p <= 0 || p >= 1)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_constants\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_constants\")\n", prompt);
       exit(4);
     }
 
@@ -1186,9 +1142,7 @@ fisher(double m, double n, double x, const char *prompt)
 {
   if (m <= 0 || n <= 0)
     {
-      fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"fisher\")\n",
-              prompt);
+      fprintf(stderr, "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"fisher\")\n", prompt);
       exit(4);
     }
   return incomplete_beta(m / 2, n / 2, n / (n + m * x), prompt);
@@ -1312,10 +1266,8 @@ annihilate_1side(double **M, long i, long j, long n)
       mj[r] = -sk * Mi[r] + ck * Mj[r];
     }
 
-  for (r = 0; r < n; r++)
-    Mi[r] = mi[r];
-  for (r = 0; r < n; r++)
-    Mj[r] = mj[r];
+  for (r = 0; r < n; r++) Mi[r] = mi[r];
+  for (r = 0; r < n; r++) Mj[r] = mj[r];
 
   Free(mi);
   Free(mj);
@@ -1339,8 +1291,7 @@ jacobi_1side(double **M, double *A, long n)
       annihilations = (int **) Malloc((n * n) * sizeof(int *));
     }
 
-  for (i = 0; i < n * n; i++)
-    annihilations[i] = &annihilations_buff[2 * i];
+  for (i = 0; i < n * n; i++) annihilations[i] = &annihilations_buff[2 * i];
 
   for (k = 1; k < n + 1; k++)
     {
@@ -1422,18 +1373,16 @@ jacobi_1side(double **M, double *A, long n)
       n_iter++;
     }
 
-  if (cdoVerbose)
-    cdoPrint("Finished one-sided jacobi scheme for eigenvalue computation after %i iterations", n_iter);
+  if (cdoVerbose) cdoPrint("Finished one-sided jacobi scheme for eigenvalue computation after %i iterations", n_iter);
 
   //  fprintf(stderr,"finished after %i sweeps (n_finished
   //  %i)\n",n_iter,n_finished);
 
   if (n_iter == max_jacobi_iter && n_finished < count)
     {
-      fprintf(stderr,
-              "statistics-module (Warning): Eigenvalue computation with one-sided jacobi scheme\n"
-              "                             did not converge properly. %i of %i pairs of columns did\n"
-              "                             not achieve requested orthogonality of %10.6g\n",
+      fprintf(stderr, "statistics-module (Warning): Eigenvalue computation with one-sided jacobi scheme\n"
+                      "                             did not converge properly. %i of %i pairs of columns did\n"
+                      "                             not achieve requested orthogonality of %10.6g\n",
               count - n_finished, count, fnorm_precision);
 
       if (n_finished == 0)
@@ -1452,11 +1401,9 @@ jacobi_1side(double **M, double *A, long n)
   for (i = 0; i < n; i++)
     {
       A[i] = 0;
-      for (r = 0; r < n; r++)
-        A[i] += M[i][r] * M[i][r];
+      for (r = 0; r < n; r++) A[i] += M[i][r] * M[i][r];
       A[i] = sqrt(A[i]);
-      for (r = 0; r < n; r++)
-        M[i][r] /= A[i];
+      for (r = 0; r < n; r++) M[i][r] /= A[i];
     }
 
   heap_sort(A, M, n);

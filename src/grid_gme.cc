@@ -346,11 +346,9 @@ boundary(struct polygon *poly, int kip1s, int kip1e, int kip2s, int kip2e, int k
                     }
                 }
               if (jd < 6)
-                for (jm = 0; jm < ptmp1->type; jm++)
-                  ptmp1->boundary[jm] = cc2gc(&v[jm]);
+                for (jm = 0; jm < ptmp1->type; jm++) ptmp1->boundary[jm] = cc2gc(&v[jm]);
               else
-                for (jm = 0; jm < ptmp1->type; jm++)
-                  ptmp1->boundary[ptmp1->type - jm - 1] = cc2gc(&v[jm]);
+                for (jm = 0; jm < ptmp1->type; jm++) ptmp1->boundary[ptmp1->type - jm - 1] = cc2gc(&v[jm]);
             }
         }
     }
@@ -1051,8 +1049,7 @@ initmask(int *mask, int ni, int nd)
     {
       for (tmp7 = 0; tmp7 < tmp2; tmp7++)
         {
-          for (tmp6 = 0; tmp6 < tmp1; tmp6++)
-            *ptmp1++ = 1;
+          for (tmp6 = 0; tmp6 < tmp1; tmp6++) *ptmp1++ = 1;
         }
     }
 
@@ -1071,8 +1068,7 @@ initmask(int *mask, int ni, int nd)
           tmp1 *= maskinfo.dim[0].extent;
           tmp1 *= maskinfo.dim[1].extent;
           ptmp1 += tmp1 * (jd - 1);
-          for (tmp6 = 0; tmp6 < tmp2; tmp6++)
-            *ptmp1++ = 0;
+          for (tmp6 = 0; tmp6 < tmp2; tmp6++) *ptmp1++ = 0;
           break;
         case 5:
           tmp1 = 1;
@@ -1082,8 +1078,7 @@ initmask(int *mask, int ni, int nd)
           tmp1 *= maskinfo.dim[0].extent;
           tmp1 *= maskinfo.dim[1].extent;
           ptmp1 += tmp1 * (jd - 1);
-          for (tmp6 = 0; tmp6 < tmp2; tmp6++)
-            *ptmp1++ = 0;
+          for (tmp6 = 0; tmp6 < tmp2; tmp6++) *ptmp1++ = 0;
 
           tmp1 = 4;
           section.addr = (char *) mask;
@@ -1114,8 +1109,7 @@ initmask(int *mask, int ni, int nd)
           ptmp1 += tmp1 * ni;
           tmp1 *= maskinfo.dim[1].extent;
           ptmp1 += tmp1 * (jd - 1);
-          for (tmp6 = 0; tmp6 < tmp2; tmp6++)
-            *ptmp1++ = 0;
+          for (tmp6 = 0; tmp6 < tmp2; tmp6++) *ptmp1++ = 0;
 
           tmp1 = 4;
           section.addr = (char *) mask;
@@ -1147,8 +1141,7 @@ initmask(int *mask, int ni, int nd)
           tmp1 *= maskinfo.dim[0].extent;
           tmp1 *= maskinfo.dim[1].extent;
           ptmp1 += tmp1 * (jd - 1);
-          for (tmp6 = 0; tmp6 < tmp2; tmp6++)
-            *ptmp1++ = 0;
+          for (tmp6 = 0; tmp6 < tmp2; tmp6++) *ptmp1++ = 0;
 
           tmp1 = 1;
           ptmp1 = mask;
@@ -1158,8 +1151,7 @@ initmask(int *mask, int ni, int nd)
           ptmp1 += tmp1 * ni;
           tmp1 *= maskinfo.dim[1].extent;
           ptmp1 += tmp1 * (jd - 1);
-          for (tmp6 = 0; tmp6 < tmp2; tmp6++)
-            *ptmp1++ = 0;
+          for (tmp6 = 0; tmp6 < tmp2; tmp6++) *ptmp1++ = 0;
 
           tmp1 = 4;
           section.addr = (char *) mask;
@@ -1190,8 +1182,7 @@ initmask(int *mask, int ni, int nd)
           tmp1 *= maskinfo.dim[0].extent;
           tmp1 *= maskinfo.dim[1].extent;
           ptmp1 += tmp1 * (jd - 1);
-          for (tmp6 = 0; tmp6 < tmp2; tmp6++)
-            *ptmp1++ = 0;
+          for (tmp6 = 0; tmp6 < tmp2; tmp6++) *ptmp1++ = 0;
 
           tmp1 = 1;
           ptmp1 = mask;
@@ -1201,8 +1192,7 @@ initmask(int *mask, int ni, int nd)
           ptmp1 += tmp1 * ni;
           tmp1 *= maskinfo.dim[1].extent;
           ptmp1 += tmp1 * (jd - 1);
-          for (tmp6 = 0; tmp6 < tmp2; tmp6++)
-            *ptmp1++ = 0;
+          for (tmp6 = 0; tmp6 < tmp2; tmp6++) *ptmp1++ = 0;
 
           tmp1 = 4;
           section.addr = (char *) mask;
@@ -1292,14 +1282,11 @@ gme_grid_restore(double *p, int ni, int nd)
         case 2:
         case 3:
         case 4:
-          for (j = 0; j <= ni; j++)
-            p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
+          for (j = 0; j <= ni; j++) p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
           break;
         case 5:
-          for (j = 0; j <= ni; j++)
-            p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
-          for (j = 0; j <= ni; j++)
-            p[tmp4 * (j + 1) + tmp5 * 5 + tmp3] = p[j + tmp4 + tmp5 + tmp3];
+          for (j = 0; j <= ni; j++) p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
+          for (j = 0; j <= ni; j++) p[tmp4 * (j + 1) + tmp5 * 5 + tmp3] = p[j + tmp4 + tmp5 + tmp3];
           break;
         case 6:
           for (j = 0; j <= ni; j++)
@@ -1314,14 +1301,11 @@ gme_grid_restore(double *p, int ni, int nd)
             p[j + tmp4 * (ni + 1) + tmp5 * jd + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 * (jd - 4) + tmp3];
           for (j = 0; j <= ni; j++)
             p[ni + tmp4 * (j + 1) + tmp5 * jd + tmp3] = p[ni - j + tmp4 * (ni + 1) + tmp5 * (jd - 5) + tmp3];
-          for (j = 0; j <= ni; j++)
-            p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
+          for (j = 0; j <= ni; j++) p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
           break;
         case 10:
-          for (j = 0; j <= ni; j++)
-            p[j + tmp4 + tmp5 * 10 + tmp3] = p[tmp4 * (j + 1) + tmp5 * 9 + tmp3];
-          for (j = 0; j <= ni; j++)
-            p[tmp4 * (j + 1) + tmp5 * 10 + tmp3] = p[j + tmp4 + tmp5 * 6 + tmp3];
+          for (j = 0; j <= ni; j++) p[j + tmp4 + tmp5 * 10 + tmp3] = p[tmp4 * (j + 1) + tmp5 * 9 + tmp3];
+          for (j = 0; j <= ni; j++) p[tmp4 * (j + 1) + tmp5 * 10 + tmp3] = p[j + tmp4 + tmp5 * 6 + tmp3];
           for (j = 0; j <= ni; j++)
             p[j + tmp4 * (ni + 1) + tmp5 * 10 + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 + tmp3];
           for (j = 0; j <= ni; j++)
@@ -1345,9 +1329,8 @@ gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon,
       fprintf(stderr, "gme_grid: Calculation of the global GME grid failed (ni=%d)!\n", ni);
       if ((size_t)(ni + 1) * (ni + 1) * nd > gridsize)
         {
-          fprintf(stderr,
-                  "gme_grid: Resulting grid size is greater than the "
-                  "predetermined grid size of %zu.\n",
+          fprintf(stderr, "gme_grid: Resulting grid size is greater than the "
+                          "predetermined grid size of %zu.\n",
                   gridsize);
           fprintf(stderr, "gme_grid: Maybe this is only a part of a global GME "
                           "grid without further information.\n");

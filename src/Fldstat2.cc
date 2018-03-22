@@ -129,8 +129,7 @@ Fldstat2(void *process)
 
   int ngrids = vlistNgrids(vlistID1);
 
-  for (int index = 0; index < ngrids; index++)
-    vlistChangeGridIndex(vlistID3, index, gridID3);
+  for (int index = 0; index < ngrids; index++) vlistChangeGridIndex(vlistID3, index, gridID3);
 
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
