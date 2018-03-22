@@ -516,7 +516,7 @@ cdoStreamOpenAppend(int p_outFileIndex)
   if (outStream->ispipe)
     {
       Cdo_Debug(CdoDebug::PROCESS, "pipe ", outStream->pipe->name.c_str());
-      cdoAbort("this operator doesn't work with pipes!");
+      cdoAbort("This operator doesn't work with pipes!");
     }
   else
     {
@@ -593,7 +593,7 @@ cdoGetObase()
   ProcessType &process = processSelf();
   if (obase.find(process.m_ID) == obase.end())
     {
-      ERROR("no obase found, please check the module if this operator is defined for obase usage");
+      ERROR("No obase found, please check the module if this operator is defined for obase usage");
     }
 
   return obase[process.m_ID];
@@ -698,13 +698,14 @@ cdoStreamInqVlist(int pstreamID)
 {
   int vlistID = pstreamInqVlist(pstreamID);
   if (vlistNumber(vlistID) == CDI_COMP && cdoStreamNumber() == CDI_REAL)
-    cdoAbort("Complex fields are not supported by this operator!");
+    cdoAbort("Fields with complex numbers are not supported by this operator!");
 
   if (vlistNumber(vlistID) == CDI_REAL && cdoStreamNumber() == CDI_COMP)
-    cdoAbort("This operator needs complex fields!");
+    cdoAbort("This operator needs fields with complex numbers!");
   processDefVarNum(vlistNvars(vlistID));
   return vlistID;
 }
+
 void
 runProcesses()
 {
