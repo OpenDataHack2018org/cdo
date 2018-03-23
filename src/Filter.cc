@@ -132,8 +132,8 @@ Filter(void *process)
     std::vector<double> array1;
     std::vector<double> array2;
 #ifdef HAVE_LIBFFTW3
-    std::vector<fftw_complex> in_fft;
-    std::vector<fftw_complex> out_fft;
+    fftw_complex *in_fft;
+    fftw_complex *out_fft;
     fftw_plan p_T2S;
     fftw_plan p_S2T;
 #endif
@@ -252,10 +252,10 @@ Filter(void *process)
 #ifdef HAVE_LIBFFTW3
       for (int i = 0; i < Threading::ompNumThreads; i++)
         {
-          ompmem[i].in_fft.resize(nts);
-          ompmem[i].out_fft.resize(nts);
-          ompmem[i].p_T2S = fftw_plan_dft_1d(nts, ompmem[i].in_fft.data(), ompmem[i].out_fft.data(), 1, FFTW_ESTIMATE);
-          ompmem[i].p_S2T = fftw_plan_dft_1d(nts, ompmem[i].out_fft.data(), ompmem[i].in_fft.data(), -1, FFTW_ESTIMATE);
+          ompmem[i].in_fft = (fftw_complex *) Malloc(nts * sizeof(fftw_complex));
+          ompmem[i].out_fft = (fftw_complex *) Malloc(nts * sizeof(fftw_complex));
+          ompmem[i].p_T2S = fftw_plan_dft_1d(nts, ompmem[i].in_fft, ompmem[i].out_fft, 1, FFTW_ESTIMATE);
+          ompmem[i].p_S2T = fftw_plan_dft_1d(nts, ompmem[i].out_fft, ompmem[i].in_fft, -1, FFTW_ESTIMATE);
         }
 #endif
     }
@@ -325,7 +325,7 @@ Filter(void *process)
                       ompmem[ompthID].in_fft[tsID][1] = 0;
                     }
 
-                  filter_fftw(nts, fmasc, ompmem[ompthID].out_fft.data(), &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
+                  filter_fftw(nts, fmasc, ompmem[ompthID].out_fft, &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
 
                   for (int tsID = 0; tsID < nts; tsID++)
                     vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;
@@ -353,6 +353,17 @@ Filter(void *process)
                 }
             }
         }
+    }
+
+  if (use_fftw)
+    {
+#ifdef HAVE_LIBFFTW3
+      for (int i = 0; i < Threading::ompNumThreads; i++)
+        {
+          Free(ompmem[i].in_fft);
+          Free(ompmem[i].out_fft);
+        }
+#endif
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
