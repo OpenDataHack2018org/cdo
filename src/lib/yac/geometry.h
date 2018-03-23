@@ -51,7 +51,18 @@
 #include "grid.h"
 #include "utils.h"
 
+#ifndef M_SQRT1_2
+#define M_SQRT1_2 (0.707106781186547524401) /* sqrt(0.5) */
+#endif
+
+#define SIN_COS_M_PI_2 ((struct sin_cos_angle){.sin = 1.0, .cos = 0.0}) /* PI/2 */
+#define SIN_COS_M_PI ((struct sin_cos_angle){.sin = 0.0, .cos = -1.0}) /* PI */
+#define SIN_COS_ZERO ((struct sin_cos_angle){.sin = 0.0, .cos = 1.0}) /* 0.0 */
+#define SIN_COS_TOL \
+  ((struct sin_cos_angle){.sin = yac_angle_tol, .cos = yac_cos_angle_tol}) /* yac_angle_tol */
+
 extern const double yac_angle_tol;
+extern const double yac_cos_angle_tol;
 
 struct line {
    struct {
@@ -69,6 +80,10 @@ struct edge {
    enum yac_edge_type edge_type;
 };
 
+struct sin_cos_angle {
+  double sin, cos;
+};
+
 /**
  * defines a spherical cap, which is used as a convex hull to describe the extents of subdomain
  */
@@ -77,18 +92,7 @@ struct bounding_circle {
    //! the middle point of the spherical cap in cartesian coordinates (is a unit vector)
    double base_vector[3];
    //! angle between the middle point and the boundary of the spherical cap
-   double inc_angle; // height >= pi -> everything
-};
-
-/**
- * defines a spherical cap, which is used as a convex hull to describe the extents of subdomain
- */
-struct reduced_bounding_circle {
-
-   //! the middle point of the spherical cap in cartesian coordinates (is a unit vector)
-   double base_vector[3];
-   //! cosine of angle between the middle point and the boundary of the spherical cap
-   double cos_inc_angle;
+   struct sin_cos_angle inc_angle;
 };
 
 /** \example test_check_overlap.c
@@ -125,24 +129,21 @@ int yac_check_overlap_cells2 (struct grid_cell const cell_a,
 
 /**
  * checks whether a given point is within a given cell \n
- * @param[in] point
  * @param[in] point_coords
  * @param[in] cell
  * @return 0 if the point is not in the cell
  */
-int yac_point_in_cell (struct point point, double point_coords[3],
-                       struct grid_cell cell);
+int yac_point_in_cell (double point_coords[3], struct grid_cell cell);
 
 /**
  * checks whether a given point is within a given cell \n
- * @param[in] point
  * @param[in] point_coords
  * @param[in] cell
  * @param[in] bnd_circle
  * @return 0 if the point is not in the cell
  */
-int yac_point_in_cell2 (struct point point,  double point_coords[3],
-                        struct grid_cell cell, struct bounding_circle bnd_circle);
+int yac_point_in_cell2 (double point_coords[3], struct grid_cell cell,
+                        struct bounding_circle bnd_circle);
 
 /**
  * computes the angle between two longitude coordinates (in rad) \n
@@ -593,6 +594,9 @@ unsigned yac_point_in_bounding_circle_vec(double point_vector[3],
  */
 static inline void LLtoXYZ(double lon, double lat, double p_out[]) {
 
+   while (lon < -M_PI) lon += 2.0 * M_PI;
+   while (lon >= M_PI) lon -= 2.0 * M_PI;
+
    double cos_lat = cos(lat);
    p_out[0] = cos_lat * cos(lon);
    p_out[1] = cos_lat * sin(lon);
@@ -661,12 +665,8 @@ static inline double get_vector_angle(double a[3], double b[3]) {
 
    double dot_product = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 
-   // the acos most accurate in the range [-0.5;0.5]
-   if (fabs(dot_product) <= 0.5) // the range in which the acos is most accurate
-
-      return acos(dot_product);
-
-   else {
+   // the acos most accurate in the range [-M_SQRT1_2;M_SQRT1_2]
+   if (fabs(dot_product) > M_SQRT1_2) {
 
       double cross_ab[3];
 
@@ -676,10 +676,14 @@ static inline double get_vector_angle(double a[3], double b[3]) {
                                   cross_ab[1]*cross_ab[1]+
                                   cross_ab[2]*cross_ab[2]));
 
-      if (dot_product < 0.0) // if the angle is bigger than (PI / 2)
-         return MIN(M_PI - asin_tmp, M_PI);
-      else
+      if (dot_product > 0.0) // if the angle is smaller than (PI / 2)
          return MAX(asin_tmp,0.0);
+      else
+         return MIN(M_PI - asin_tmp, M_PI);
+
+   } else {
+
+      return acos(dot_product);
    }
 
    /*
@@ -692,6 +696,131 @@ static inline double get_vector_angle(double a[3], double b[3]) {
 
    return fabs(atan2(cross_abs, dot));
    */
+}
+
+static inline struct sin_cos_angle get_vector_angle_2(
+  double a[3], double b[3]) {
+
+  double cross_ab[3];
+  crossproduct_ld(a, b, cross_ab);
+
+  struct sin_cos_angle angle = {
+    .sin = sqrt(cross_ab[0]*cross_ab[0] +
+                cross_ab[1]*cross_ab[1] +
+                cross_ab[2]*cross_ab[2]),
+    .cos = a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
+  };
+
+  return angle;
+}
+
+// works for angles in the range [0;2*PI[
+static inline int compare_angles(
+  struct sin_cos_angle a, struct sin_cos_angle b) {
+
+  int a_below_pi = (a.sin > 0.0) || ((a.sin == 0.0) && (a.cos > 0));
+  int b_below_pi = (b.sin > 0.0) || ((b.sin == 0.0) && (b.cos > 0));
+
+  if (a_below_pi == b_below_pi) {
+    int ret = ((a.cos < b.cos) - (a.cos > b.cos));
+    if (a_below_pi) return ret;
+    else return -ret;
+  } else
+    return b_below_pi - a_below_pi;
+}
+
+//! computes (a+b), if (a+b) >= 2*PI, the result is (a+b-2*PI)
+//! a and be have to be in the range [0;2*PI[
+//! \returns 1 if (a+b) is >= 2*PI
+static inline int sum_angles(
+  struct sin_cos_angle a, struct sin_cos_angle b,
+  struct sin_cos_angle * restrict sum) {
+
+  struct sin_cos_angle sum_;
+
+  sum_.sin = a.sin * b.cos + a.cos * b.sin;
+  sum_.cos = a.cos * b.cos - a.sin * b.sin;
+
+  *sum = sum_;
+
+  // if a or b is smaller than the result
+  return (compare_angles(sum_, a) < 0) || (compare_angles(sum_, b) < 0);
+}
+
+//! computes (a+b), if (a+b) >= 2*PI, the result is (a+b-2*PI)
+//! a and be have to be in the range [0;2*PI[
+static inline struct sin_cos_angle sum_angles_no_check(
+  struct sin_cos_angle a, struct sin_cos_angle b) {
+
+  return (struct sin_cos_angle){.sin = a.sin * b.cos + a.cos * b.sin,
+                                .cos = a.cos * b.cos - a.sin * b.sin};
+}
+
+//! computes (a-b), if (a-b) < 0, the result is (a+b+2*PI)
+//! a and be have to be in the range [0;2*PI[
+//! \returns 1 if (a-b) < 0
+static inline int sub_angles(
+  struct sin_cos_angle a, struct sin_cos_angle b,
+  struct sin_cos_angle * restrict sub) {
+
+  sub->sin = a.sin * b.cos - a.cos * b.sin;
+  sub->cos = a.cos * b.cos + a.sin * b.sin;
+
+  return compare_angles(a, b) < 0;
+}
+
+//! computes (a-b), if (a-b) < 0, the result is (a+b+2*PI)
+//! a and be have to be in the range [0;2*PI[
+static inline struct sin_cos_angle sub_angles_no_check(
+  struct sin_cos_angle a, struct sin_cos_angle b) {
+
+  return (struct sin_cos_angle){.sin = a.sin * b.cos - a.cos * b.sin,
+                                .cos = a.cos * b.cos + a.sin * b.sin};
+}
+
+//! return angles in the range of [0;2PI[
+static inline double compute_angle(struct sin_cos_angle angle) {
+
+  // the acos and asin are most accurate in the range [-M_SQRT1_2;M_SQRT1_2]
+  if (angle.cos > M_SQRT1_2) {
+
+    double angle_ = asin(angle.sin);
+
+    if (angle_ < 0.0) angle_ += 2.0 * M_PI;
+    return angle_;
+
+  } else if (angle.cos > - M_SQRT1_2) {
+
+    double angle_ = acos(angle.cos);
+
+    if (angle.sin > 0.0) return angle_;
+    else return 2.0 * M_PI - angle_;
+
+  } else {
+    return M_PI - asin(angle.sin);
+  }
+}
+
+//! computes angle / 2
+static inline struct sin_cos_angle half_angle(struct sin_cos_angle angle) {
+
+  {
+    double x = angle.sin;
+    double y = (1.0 + fabs(angle.cos));
+
+    double scale = 1.0 / sqrt(x * x + y * y);
+
+    x *= scale;
+    y *= scale;
+
+    if (angle.cos >= 0) {
+      // first quadrant
+      if (angle.sin >= 0) return (struct sin_cos_angle){.sin = x, .cos = y};
+      // fourth quadrant
+      else return (struct sin_cos_angle){.sin = -x, .cos = -y};
+      // second and third quadrant
+    } else return (struct sin_cos_angle){.sin = y, .cos = x};
+  }
 }
 
 /**
@@ -724,6 +853,58 @@ static inline int points_are_identically(double * a, double * b) {
    }
 }
 
+/** normalises a vector */
+static inline void normalise_vector(double v[]) {
+
+   double norm = 1.0 / sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+
+   v[0] *= norm;
+   v[1] *= norm;
+   v[2] *= norm;
+}
+
+/** rotate vector v_in around the given axis by a given angle
+ * @param[in] axis axis around which v_in is to rotated
+ * @param[in] angle rotation angle
+ * @param[in] v_in vector to be rotated
+ * @param[out] v_out rotated vector
+ */
+static inline void rotate_vector2(
+  double axis[], struct sin_cos_angle angle, double v_in[], double v_out[]) {
+
+  // using Rodrigues' rotation formula
+  // v_out = v_in * cos(angle) +
+  //         (axis x v_in) * sin(angle) +
+  //         axis * (axis * v_in) * (1 - cos(angle))
+
+  double cross_axis_v_in[3];
+  crossproduct_d(axis, v_in, cross_axis_v_in);
+
+  double dot_axis_v_in = axis[0]*v_in[0] + axis[1]*v_in[1] + axis[2]*v_in[2];
+  double temp = dot_axis_v_in * (1.0 - angle.cos);
+
+  v_out[0] =
+    v_in[0] * angle.cos + cross_axis_v_in[0] * angle.sin + axis[0] * temp;
+  v_out[1] =
+    v_in[1] * angle.cos + cross_axis_v_in[1] * angle.sin + axis[1] * temp;
+  v_out[2] =
+    v_in[2] * angle.cos + cross_axis_v_in[2] * angle.sin + axis[2] * temp;
+}
+
+/** rotate vector v_in around the given axis by a given angle
+ * @param[in] axis axis around which v_in is to rotated
+ * @param[in] angle rotation angle
+ * @param[in] v_in vector to be rotated
+ * @param[out] v_out rotated vector
+ */
+static inline void rotate_vector(
+  double axis[], double angle, double v_in[], double v_out[]) {
+
+  rotate_vector2(
+    axis, (struct sin_cos_angle){.sin = sin(angle), .cos = cos(angle)},
+    v_in, v_out);
+}
+
 /**
  * computes the great circle distance in rad for two points given in lon-lat coordinates
  * @param[in] a point coordinates of point a (in rad)
@@ -745,5 +926,50 @@ double yac_get_point_angle(struct point * a, struct point * b);
  */
 int yac_do_intersect (struct edge edge_a, double a[3], double b[3],
                       struct edge edge_b, double c[3], double d[3]);
+
+/**
+ * splits given cell into triangles
+ * @param[in] cell cell to be triangulated
+ * @param[in] start_corner start algorithm at corner with this index
+ *                         (0 <= start_corner < n; with n being number of cell
+ *                          corners)
+ * @param[out] triangles triangles that are the result of the triangulation
+ * @remark the user needs to provide (n-2) initialised grid_cells for the
+ *         argument triangles (n being the number of cell corners of the cell)
+ * @remark this routine currently only works for convex grid cells
+ * @remark the algorithm ignores that actual edge types for cells with more than
+ *         3 corners and assumes them to be great circle edges
+ */
+void yac_triangulate_cell(
+  struct grid_cell cell, unsigned start_corner, struct grid_cell * triangles);
+
+/**
+ * splits given indices of a cell into triangles
+ * @param[in] cell_indices cell indices to be triangulated
+ * @param[in] num_corners  number of corners of the cell
+ * @param[in] start_corner start algorithm at corner with this index
+ *                         (0 <= start_corner < n; with n being number of cell
+ *                          corners)
+ * @param[out] triangle_indices triangle indices that are the result of the
+ *                              triangulation
+ * @remark the user needs to provide provide an array of size 3*(num_corners-2)
+ *         for the argument triangle_indices
+ */
+void yac_triangulate_cell_indices(
+  unsigned const * cell_indices, unsigned num_corners, unsigned start_corner,
+  unsigned * triangle_indices);
+
+/**
+ * computes a spherical triangle that contains all given vertices,
+ * the algorithm tries to minimise the size of the triangle
+ * @param[in] vertices vertices that are supposed to be within the triangle
+ * @param[in] num_vertices number of vertices in vertices
+ * @param[out] triangle bounding triangle
+ * @param[in] num_tests with increasing number of tests computation time and
+ *                      chance of smaller bounding triangle increases
+ * @remark num_tests has to be > 0
+ */
+void yac_compute_bnd_triangle(
+  double * vertices, size_t num_vertices, double * triangle, size_t num_tests);
 
 #endif // GEOMETRY_H

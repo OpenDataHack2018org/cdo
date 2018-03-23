@@ -39,62 +39,17 @@
 
 #include "grid.h"
 #include "interval_tree.h"
-//#include "grid_search.h"
-
-enum yac_node_flags {
-   U_IS_LEAF = 1,
-   T_IS_LEAF = 2,
-   I_IS_INTERVAL_TREE = 4,
-};
-
-union I_list
-{
-  struct {
-    struct interval_node * head_node;
-    unsigned num_nodes;
-  } ivt;
-  unsigned *list;
-};
-
-struct sphere_part_node {
-
-   unsigned flags;
-
-   union I_list I;
-   void * U, * T;
-
-   unsigned I_size, U_size, T_size;
-
-   double I_angle;
-   double sin_I_angle;
-   double cos_I_angle;
-
-   double gc_norm_vector[3];
-};
-
-struct point_sphere_part_node {
-
-   unsigned flags;
-
-   void * U, * T;
-
-   unsigned U_size, T_size;
-
-   double gc_norm_vector[3];
-};
-
-
-#define YAC_DEBUG_SPHERE_PART
-#ifdef YAC_DEBUG_SPHERE_PART
-struct sphere_part_node * yac_get_sphere_part_tree(struct grid_search * search);
+#ifdef YAC
+#include "grid_search.h"
 #endif
 
 /**
  * \file sphere_part.h
  * \brief algorithm for searching cells and points on a grid
  *
- * \ref init_sphere_part_node generates a tree structure, which makes it easy to look for cells and points.
- * A documentation of the respective algorithm can be found at \ref sphere_part_docu.
+ * \ref yac_sphere_part_search_new generates a tree structure, which makes it
+ * easy to look for cells and points. A documentation of the respective
+ * algorithm can be found at \ref sphere_part_docu.
  */
  
 /**
@@ -145,13 +100,13 @@ struct sphere_part_node * yac_get_sphere_part_tree(struct grid_search * search);
  * - returns list of matching polygons
  */
 
-//struct grid_search * yac_sphere_part_search_new (struct grid * grid_data);
-
+#ifdef YAC
+struct grid_search * yac_sphere_part_search_new (struct grid * grid_data);
+#endif
 struct point_sphere_part_search;
 
 struct point_sphere_part_search * yac_point_sphere_part_search_new (
-  unsigned num_points, double * x_coordinates, double * y_coordinates);
-void *cdo_point_sphere_part_search_new(unsigned num_points, double *coordinates_xyz);
+  size_t num_points, double * coordinates_xyz);
 
 void yac_delete_point_sphere_part_search(
   struct point_sphere_part_search * search);
@@ -161,33 +116,36 @@ void yac_delete_point_sphere_part_search(
  * this routine and the matching yac_point_sphere_part_search_new call.
  */
 void yac_point_sphere_part_search_NN(struct point_sphere_part_search * search,
-                                     unsigned num_points, double * x_coordinates,
-                                     double * y_coordinates,
+                                     size_t num_points,
+                                     double * coordinates_xyz,
                                      double * cos_angles,
+                                     double ** result_coordinates_xyz,
+                                     size_t * result_coordinates_xyz_array_size,
                                      unsigned ** local_point_ids,
-                                     unsigned * local_point_ids_array_size,
-                                     unsigned * num_local_point_ids);
+                                     size_t * local_point_ids_array_size,
+                                     size_t * num_local_point_ids);
 
 /**
  * This routine does a n nearest neighbour search between the points provided to
  * this routine and the matching yac_point_sphere_part_search_new call.
  */
 void yac_point_sphere_part_search_NNN(struct point_sphere_part_search * search,
-                                      unsigned num_points, double * x_coordinates,
-                                      double * y_coordinates, unsigned n,
+                                      size_t num_points,
+                                      double * coordinates_xyz, unsigned n,
                                       double ** cos_angles,
-                                      unsigned * cos_angles_array_size,
+                                      size_t * cos_angles_array_size,
+                                      double ** result_coordinates_xyz,
+                                      size_t * result_coordinates_xyz_array_size,
                                       unsigned ** local_point_ids,
-                                      unsigned * local_point_ids_array_size,
-                                      unsigned * num_local_point_ids);
+                                      size_t * local_point_ids_array_size,
+                                      size_t * num_local_point_ids);
 
 /**
  * This routine returns true if the provided point_sphere_part_search contains
  * a point that is within the provided bounding circle.
  */
-/*
+#ifdef YAC
 int yac_point_sphere_part_search_bnd_circle_contains_points(
-  struct point_sphere_part_search * search,
-  struct reduced_bounding_circle circle);
-*/
+  struct point_sphere_part_search * search, struct bounding_circle circle);
+#endif
 #endif // SPHERE_PART_H

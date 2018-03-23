@@ -43,29 +43,32 @@
 
 // angle tolerance
 const double yac_angle_tol = 1e-9;
+const double yac_cos_angle_tol = 0.9999999999999999995; // cos(yac_angle_tol)
+                                                        // this is actually 1.0
 static double const tol = 1.0e-10;
 
-static int vector_is_between (double a[], double b[], double p[],
-                              double * angle_ab, double dot_ab) {
+//! computes square of the lenght of the vector ab
+static inline double sq_len_diff_vec(double a[], double b[]) {
+  double ab[3] = {a[0]-b[0], a[1]-b[1], a[2]-b[2]};
+  return ab[0] * ab[0] + ab[1] * ab[1] + ab[2] * ab[2];
+}
 
-   double dot_ap = a[0]*p[0] + a[1]*p[1] + a[2]*p[2];
-   double dot_pb = p[0]*b[0] + p[1]*b[1] + p[2]*b[2];
+/**
+ * determines whether vector p is between vectors a and b
+ * (it is assumed, that a, b, and p are in the same plane)
+ */
+static inline int vector_is_between (
+  double a[], double b[], double p[], double sq_len_diff_ab) {
 
-   // catches most obvious false-cases
-   if ((dot_ap < dot_ab - 0.1) ||
-       (dot_pb < dot_ab - 0.1))
-   return 0;
+  // In case the angle between the vectors a and b is 180 degree, the angle
+  // between the vectors pa and pb is exactly 90 degree (Pythagorean theorem).
+  // In all other cases the angle between pa and pb must be bigger than 90
+  // degree for p to be between a and b
+  // from this we can deduce:
+  // ||ab||^2 >= ||ap||^2 + ||bp||^2 => (Pythagorean theorem)
 
-   if (*angle_ab < 0)
-      *angle_ab = get_vector_angle(a, b);
-
-/* determines whether p is between a and b
-   (a, b, p are in the same plane AB)
-   angle_ab is the angle between a and b */
-
-   return fabs(get_vector_angle(a, p) +
-               get_vector_angle(b, p) -
-               *angle_ab) < yac_angle_tol;
+  // the tol is required in case p is very close to a or b
+  return sq_len_diff_ab + tol >= sq_len_diff_vec(a,p) + sq_len_diff_vec(b,p);
 }
 
 static int vector_is_between_lat (double a[], double b[], double p[]) {
@@ -226,14 +229,13 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
          if (fabs(angle) < tol) {
 
             int result = 1;
-            double angle_cd = -1;
-            double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
+            double sq_len_diff_cd = sq_len_diff_vec(c, d);
 
-            if (vector_is_between(c, d, a, &angle_cd, dot_cd))
+            if (vector_is_between(c, d, a, sq_len_diff_cd))
                result |= 1 << 2;
             double tvec[] = {-a[0], -a[1], -a[2]};
-            if (vector_is_between(c, d, tvec, &angle_cd, dot_cd))
-	       result |= 1 << 3;
+            if (vector_is_between(c, d, tvec, sq_len_diff_cd))
+               result |= 1 << 3;
 
             return result;
          }
@@ -261,12 +263,13 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
             double angle_ab = -1;
             double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+            double sq_len_diff_ab = sq_len_diff_vec(a, b);
 
-            if (vector_is_between(a, b, c, &angle_ab, dot_ab))
+            if (vector_is_between(a, b, c, sq_len_diff_ab))
                result |= 1 << 0;
-	    double tvec[] = {-c[0], -c[1], -c[2]};
-            if (vector_is_between(a, b, tvec, &angle_ab, dot_ab))
-	       result |= 1 << 1;
+            double tvec[] = {-c[0], -c[1], -c[2]};
+            if (vector_is_between(a, b, tvec, sq_len_diff_ab))
+               result |= 1 << 1;
 
             return result;
          }
@@ -281,15 +284,13 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
       int ret_value = 1 << 4;
 
       int a_between_cd, b_between_cd, c_between_ab, d_between_ab;
-      double angle_ab = -1;
-      double angle_cd = -1;
-      double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-      double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
+      double sq_len_diff_ab = sq_len_diff_vec(a, b);
+      double sq_len_diff_cd = sq_len_diff_vec(c, d);
 
-      a_between_cd = vector_is_between(c, d, a, &angle_cd, dot_cd) << 0;
-      b_between_cd = vector_is_between(c, d, b, &angle_cd, dot_cd) << 1;
-      c_between_ab = vector_is_between(a, b, c, &angle_ab, dot_ab) << 2;
-      d_between_ab = vector_is_between(a, b, d, &angle_ab, dot_ab) << 3;
+      a_between_cd = vector_is_between(c, d, a, sq_len_diff_cd) << 0;
+      b_between_cd = vector_is_between(c, d, b, sq_len_diff_cd) << 1;
+      c_between_ab = vector_is_between(a, b, c, sq_len_diff_ab) << 2;
+      d_between_ab = vector_is_between(a, b, d, sq_len_diff_ab) << 3;
 
       switch (a_between_cd + b_between_cd + c_between_ab + d_between_ab) {
 
@@ -364,16 +365,14 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
     }
 
     int result;
-    double angle_ab = -1;
-    double angle_cd = -1;
-    double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-    double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
+    double sq_len_diff_ab = sq_len_diff_vec(a, b);
+    double sq_len_diff_cd = sq_len_diff_vec(c, d);
 
     result = 0;
-    if (vector_is_between(a, b, p_, &angle_ab, dot_ab)) result |= 1 << 0;
-    if (vector_is_between(a, b, q_, &angle_ab, dot_ab)) result |= 1 << 1;
-    if (vector_is_between(c, d, p_, &angle_cd, dot_cd)) result |= 1 << 2;
-    if (vector_is_between(c, d, q_, &angle_cd, dot_cd)) result |= 1 << 3;
+    if (vector_is_between(a, b, p_, sq_len_diff_ab)) result |= 1 << 0;
+    if (vector_is_between(a, b, q_, sq_len_diff_ab)) result |= 1 << 1;
+    if (vector_is_between(c, d, p_, sq_len_diff_cd)) result |= 1 << 2;
+    if (vector_is_between(c, d, q_, sq_len_diff_cd)) result |= 1 << 3;
 
     return result;
 }
@@ -444,13 +443,9 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
                              cross_cd[2] * a[2]) / length_cross_cd ;
 
          // if ab is not on the plane of cd
-         if (fabs(angle) >= tol)
-            return 0;
+         if (fabs(angle) >= tol) return 0;
 
-         double angle_cd = -1;
-         double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
-
-         return vector_is_between(c, d, a, &angle_cd, dot_cd);
+         return vector_is_between(c, d, a, sq_len_diff_vec(c, d));
       }
 
    } else {
@@ -467,42 +462,35 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
          if (fabs(angle) >= tol)
             return 0;
 
-         double angle_ab = -1;
-         double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-
-         return vector_is_between(a, b, c, &angle_ab, dot_ab);
+         return vector_is_between(a, b, c, sq_len_diff_vec(a, b));
       }
    }
 
    // if both great circles are nearly identically
    if (length_cross_abxcd / (length_cross_ab * length_cross_cd) < tol) {
 
-      double angle_ab = -1;
-      double angle_cd = -1;
-      double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-      double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
+      double sq_len_diff_cd = sq_len_diff_vec(c, d);
+      double sq_len_diff_ab = sq_len_diff_vec(a, b);
 
-      return vector_is_between(c, d, a, &angle_cd, dot_cd) ||
-             vector_is_between(c, d, b, &angle_cd, dot_cd) ||
-             vector_is_between(a, b, c, &angle_ab, dot_ab) ||
-             vector_is_between(a, b, d, &angle_ab, dot_ab);
+      return vector_is_between(c, d, a, sq_len_diff_cd) ||
+             vector_is_between(c, d, b, sq_len_diff_cd) ||
+             vector_is_between(a, b, c, sq_len_diff_ab) ||
+             vector_is_between(a, b, d, sq_len_diff_ab);
    }
 
     long double scale = 1.0l / length_cross_abxcd;
     // determine p and q
     double p_[3];
 
+    double sq_len_diff_ab = sq_len_diff_vec(a, b);
+    double sq_len_diff_cd = sq_len_diff_vec(c, d);
+
     p_[0]= cross_abxcd[0] * scale;
     p_[1]= cross_abxcd[1] * scale;
     p_[2]= cross_abxcd[2] * scale;
 
-    double angle_ab = -1;
-    double angle_cd = -1;
-    double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-    double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
-
-    if (vector_is_between(a, b, p_, &angle_ab, dot_ab) &&
-        vector_is_between(c, d, p_, &angle_cd, dot_cd))
+    if (vector_is_between(a, b, p_, sq_len_diff_ab) &&
+        vector_is_between(c, d, p_, sq_len_diff_cd))
        return 1;
 
     double q_[3];
@@ -510,8 +498,8 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
     q_[1]=-p_[1];
     q_[2]=-p_[2];
 
-    return vector_is_between(a, b, q_, &angle_ab, dot_ab) &&
-           vector_is_between(c, d, q_, &angle_cd, dot_cd);
+    return vector_is_between(a, b, q_, sq_len_diff_ab) &&
+           vector_is_between(c, d, q_, sq_len_diff_cd);
 
 }
 
@@ -956,13 +944,13 @@ int yac_loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
          ret_value |= 16;
 
       int a_between_cd, b_between_cd, c_between_ab, d_between_ab;
-      double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-      double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
+      double sq_len_diff_ab = sq_len_diff_vec(a, b);
+      double sq_len_diff_cd = sq_len_diff_vec(c, d);
 
-      a_between_cd = vector_is_between(c, d, a, &angle_cd, dot_cd) << 0;
-      b_between_cd = vector_is_between(c, d, b, &angle_cd, dot_cd) << 1;
-      c_between_ab = vector_is_between(a, b, c, &angle_ab, dot_ab) << 2;
-      d_between_ab = vector_is_between(a, b, d, &angle_ab, dot_ab) << 3;
+      a_between_cd = vector_is_between(c, d, a, sq_len_diff_cd) << 0;
+      b_between_cd = vector_is_between(c, d, b, sq_len_diff_cd) << 1;
+      c_between_ab = vector_is_between(a, b, c, sq_len_diff_ab) << 2;
+      d_between_ab = vector_is_between(a, b, d, sq_len_diff_ab) << 3;
 
       switch (a_between_cd + b_between_cd + c_between_ab + d_between_ab) {
 
@@ -1012,19 +1000,19 @@ int yac_loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
       q[0] = 0, q[1] = 0; q[2] = -1;
    }
 
-   double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-   double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
+   double sq_len_diff_ab = sq_len_diff_vec(a, b);
+   double sq_len_diff_cd = sq_len_diff_vec(c, d);
 
    if (ret_value & 16) {
-      if (vector_is_between(a, b, p, &angle_ab, dot_ab)) ret_value |= 1;
-      if (vector_is_between(a, b, q, &angle_ab, dot_ab)) ret_value |= 2;
-      if (vector_is_between(c, d, p, &angle_cd, dot_cd)) ret_value |= 4;
-      if (vector_is_between(c, d, q, &angle_cd, dot_cd)) ret_value |= 8;
+      if (vector_is_between(a, b, p, sq_len_diff_ab)) ret_value |= 1;
+      if (vector_is_between(a, b, q, sq_len_diff_ab)) ret_value |= 2;
+      if (vector_is_between(c, d, p, sq_len_diff_cd)) ret_value |= 4;
+      if (vector_is_between(c, d, q, sq_len_diff_cd)) ret_value |= 8;
    } else {
-      if (vector_is_between(a, b, p, &angle_ab, dot_ab)) ret_value |= 1;
-      else if (vector_is_between(a, b, q, &angle_ab, dot_ab)) ret_value |= 2;
-      if (vector_is_between(c, d, p, &angle_cd, dot_cd)) ret_value |= 4;
-      else if (vector_is_between(c, d, q, &angle_cd, dot_cd)) ret_value |= 8;
+      if (vector_is_between(a, b, p, sq_len_diff_ab)) ret_value |= 1;
+      else if (vector_is_between(a, b, q, sq_len_diff_ab)) ret_value |= 2;
+      if (vector_is_between(c, d, p, sq_len_diff_cd)) ret_value |= 4;
+      else if (vector_is_between(c, d, q, sq_len_diff_cd)) ret_value |= 8;
    }
 
    return ret_value;
@@ -1352,10 +1340,10 @@ int yac_loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
              fabs(a[2]-q[2]) < tol) ret_value |= 1 << 1;
       } else {
 
-         double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+         double sq_len_diff_ab = sq_len_diff_vec(a, b);
 
-         if (vector_is_between(a, b, p, &angle_ab, dot_ab)) ret_value |= 1 << 0;
-         if (vector_is_between(a, b, q, &angle_ab, dot_ab)) ret_value |= 1 << 1;
+         if (vector_is_between(a, b, p, sq_len_diff_ab)) ret_value |= 1 << 0;
+         if (vector_is_between(a, b, q, sq_len_diff_ab)) ret_value |= 1 << 1;
       }
    }
 
@@ -1576,10 +1564,9 @@ int yac_gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
       p[1] = t[1] + n[0] * s[1];
       p[2] = t[2] + n[0] * s[2];
 
-      double angle_ab = -1;
-      double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+      double sq_len_diff_ab = sq_len_diff_vec(a, b);
 
-      if (vector_is_between(a, b, p, &angle_ab, dot_ab)) result |= 1;
+      if (vector_is_between(a, b, p, sq_len_diff_ab)) result |= 1;
       if (vector_is_between_lat(c, d, p)) result |= 4;
 
       if (fabs(n[0] - n[1]) >= tol) {
@@ -1588,7 +1575,7 @@ int yac_gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
          q[1] = t[1] + n[1] * s[1];
          q[2] = t[2] + n[1] * s[2];
 
-         if (vector_is_between(a, b, q, &angle_ab, dot_ab)) result |= 2;
+         if (vector_is_between(a, b, q, sq_len_diff_ab)) result |= 2;
          if (vector_is_between_lat(c, d, q)) result |= 8;
       } else
          q[0] = p[0], q[1] = p[1], q[2] = p[2];
@@ -1624,7 +1611,7 @@ int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
       double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 
       return (fabs(get_vector_angle(cross_ab, c) - M_PI_2) < tol) &&
-             vector_is_between(a, b, c, &angle_ab, dot_ab);
+             vector_is_between(a, b, c, sq_len_diff_vec(a, b));
    }
 
    double t[3], s[3];
@@ -1697,9 +1684,9 @@ int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
       p[1] = t[1] + n[0] * s[1];
       p[2] = t[2] + n[0] * s[2];
 
-      double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+      double sq_len_diff_ab = sq_len_diff_vec(a, b);
 
-      if (vector_is_between(a, b, p, &angle_ab, dot_ab) &&
+      if (vector_is_between(a, b, p, sq_len_diff_ab) &&
           vector_is_between_lat(c, d, p))
          return 1;
 
@@ -1709,7 +1696,7 @@ int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
          p[1] = t[1] + n[1] * s[1];
          p[2] = t[2] + n[1] * s[2];
 
-         return vector_is_between(a, b, p, &angle_ab, dot_ab) &&
+         return vector_is_between(a, b, p, sq_len_diff_ab) &&
                 vector_is_between_lat(c, d, p);
       }  else
          return 0;

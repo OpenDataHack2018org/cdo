@@ -112,8 +112,6 @@ void yac_init_points(struct points * points, struct grid * base_grid, enum yac_l
  * returns a grid that has the points defined by the struct points as corners
  * @param[in] points points for which the point grid is to be generated
  * @return a point grid
- *
- * \remarks does not work for EDGE
  */
 struct grid * yac_get_point_grid(struct points * points);
 struct grid * yac_get_base_grid(struct points * points);
