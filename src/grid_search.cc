@@ -525,8 +525,10 @@ gs_nearest_spherepart(void *search_container, double lon, double lat, double sea
       *dist = acos(cos_angle);
       if ( *dist <= searchRadius )
         {
-          *addr = local_point_ids[0];
           nadd = 1;
+          *addr = local_point_ids[0];
+          for ( size_t i = 1; i < num_local_point_ids; ++i )
+            if ( local_point_ids[i] < *addr ) *addr = local_point_ids[i];
         }
     }
 
@@ -703,15 +705,15 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadi
 {
   size_t nadds = 0;
 
-  double query_pt[3];
-  cdoLLtoXYZ(lon, lat, query_pt);
-
-  if (!gs->extrapolate)
-    for (unsigned j = 0; j < 3; ++j)
-      if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return nadds;
-
   if (gs)
     {
+      double query_pt[3];
+      cdoLLtoXYZ(lon, lat, query_pt);
+
+      if (!gs->extrapolate)
+        for (unsigned j = 0; j < 3; ++j)
+          if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return nadds;
+
       size_t local_point_ids_array_size = 0;
       size_t num_local_point_ids;
       unsigned *local_point_ids = NULL;
@@ -721,12 +723,12 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadi
 
       yac_point_sphere_part_search_NNN((struct point_sphere_part_search *)gs->search_container, 1, query_pt, nnn, &cos_angles, &cos_angles_array_size,
                                        NULL, NULL, &local_point_ids, &local_point_ids_array_size, &num_local_point_ids);
-      nadds = num_local_point_ids;
-      if ( nadds )
+
+      if ( num_local_point_ids > 0 )
         {
-          size_t naddsmax = nadds;
+          size_t maxadds = (num_local_point_ids < nnn) ? num_local_point_ids : nnn;
           nadds = 0;
-          for (size_t i = 0; i < naddsmax; ++i)
+          for (size_t i = 0; i < maxadds; ++i)
             {
               if ( cos_angles[i] < -1 ) cos_angles[i] = -1;
               if ( cos_angles[i] >  1 ) cos_angles[i] =  1;
