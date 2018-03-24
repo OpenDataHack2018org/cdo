@@ -1723,8 +1723,6 @@ void init_aliases()
   add_alias("selvar"          , "selname");
   add_alias("delvar"          , "delname");
   add_alias("selindex"        , "selgridcell");
-  add_alias("remapcon1"       , "remaplaf");
-  add_alias("remapdis1"       , "remapnn");
   add_alias("scatter"         , "distgrid");
   add_alias("showvar"         , "showname");
   add_alias("selgridname"     , "selgrid");
