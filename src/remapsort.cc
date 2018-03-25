@@ -138,8 +138,7 @@ remap_heapsort(const size_t num_links, size_t *restrict add1, size_t *restrict a
           max_lvl = 2 * final_lvl + 2;
           if (chk_lvl1 == num_links - 1) max_lvl = chk_lvl1;
 
-          if ((add1[chk_lvl1] > add1[max_lvl])
-              || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
+          if ((add1[chk_lvl1] > add1[max_lvl]) || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
             {
               max_lvl = chk_lvl1;
             } /*
@@ -211,8 +210,7 @@ remap_heapsort(const size_t num_links, size_t *restrict add1, size_t *restrict a
           max_lvl = 2 * final_lvl + 2;
           if (max_lvl >= (size_t) lvl) max_lvl = chk_lvl1;
 
-          if ((add1[chk_lvl1] > add1[max_lvl])
-              || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
+          if ((add1[chk_lvl1] > add1[max_lvl]) || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
             {
               max_lvl = chk_lvl1;
             }
@@ -377,8 +375,8 @@ merge_lists(size_t *nl, size_t *l11, size_t *l12, size_t *l21, size_t *l22, size
 }
 
 static void
-sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,
-         int parent, int par_depth)
+sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights, int parent,
+         int par_depth)
 {
   /*
     This routine is the core of merge-sort. It does the following
@@ -443,7 +441,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   add2s[1] = &add2[add_srt[1]];
   nl[0] = num_links / nsplit;
   nl[1] = num_links - nl[0];
-// add_end[0] = nl[0];              add_end[1] = num_links;
+  // add_end[0] = nl[0];              add_end[1] = num_links;
 
 #ifdef _OPENMP
   int depth = (int) (log(parent) / log(2));
@@ -460,12 +458,12 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     }
 #endif
 
-//  printf("I am %i nl[0] %i nl[1] %i\n",parent,nl[0],nl[1]);
-//  printf("add_srt[0] %i add_Srt[1] %i\n",add_srt[0],add_srt[1]);
-//  if ( 1 )
-//      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i
-//      parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
-//	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
+    //  printf("I am %i nl[0] %i nl[1] %i\n",parent,nl[0],nl[1]);
+    //  printf("add_srt[0] %i add_Srt[1] %i\n",add_srt[0],add_srt[1]);
+    //  if ( 1 )
+    //      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i
+    //      parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
+    //	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(n, m, who_am_i) shared(weights) num_threads(2)
@@ -474,7 +472,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     {
 
       who_am_i = nsplit * parent + i;
-//    my_depth = (int) (log(parent)/log(2))+1;
+      //    my_depth = (int) (log(parent)/log(2))+1;
 
 #ifdef _OPENMP
 //      if ( 1 )
@@ -503,48 +501,47 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   merge_lists(nl, add1s[0], add2s[0], add1s[1], add2s[1], &idx[0]);  // MERGE THE SEGMENTS
 
   {
-  std::vector<size_t> tmp(num_links);
+    std::vector<size_t> tmp(num_links);
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i) num_threads(2)
 #endif
-  for (i = 0; i < num_links; i++) tmp[i] = add1[idx[i]];
+    for (i = 0; i < num_links; i++) tmp[i] = add1[idx[i]];
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i) num_threads(2)
 #endif
-  for (i = 0; i < num_links; i++)
-    {
-      add1[i] = tmp[i];
-      tmp[i] = add2[idx[i]];
-    }
+    for (i = 0; i < num_links; i++)
+      {
+        add1[i] = tmp[i];
+        tmp[i] = add2[idx[i]];
+      }
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i) num_threads(2)
 #endif
-  for (i = 0; i < num_links; i++) add2[i] = tmp[i];
+    for (i = 0; i < num_links; i++) add2[i] = tmp[i];
   }
 
   {
-  std::vector<double> tmp(num_links*num_wts);
+    std::vector<double> tmp(num_links * num_wts);
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i, n) num_threads(2)
 #endif
-  for (i = 0; i < num_links; i++)
-    for (n = 0; n < num_wts; n++) tmp[num_wts * i + n] = weights[num_wts * idx[i] + n];
+    for (i = 0; i < num_links; i++)
+      for (n = 0; n < num_wts; n++) tmp[num_wts * i + n] = weights[num_wts * idx[i] + n];
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i, n) num_threads(2)
 #endif
-  for (i = 0; i < num_links; i++)
-    for (n = 0; n < num_wts; n++) weights[num_wts * i + n] = tmp[num_wts * i + n];
+    for (i = 0; i < num_links; i++)
+      for (n = 0; n < num_wts; n++) weights[num_wts * i + n] = tmp[num_wts * i + n];
   }
 }
 
 void
-sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,
-          int parent)
+sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights, int parent)
 {
   /*
     This routine is an interface between the parallelized (merge-sort)

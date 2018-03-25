@@ -31,7 +31,8 @@
 #include "grid_search.h"
 #include "kdtreelib/kdtree.h"
 #include "nanoflann.hpp"
-extern "C" {
+extern "C"
+{
 #include "lib/yac/sphere_part.h"
 }
 
@@ -99,8 +100,8 @@ struct PointCloud
   // bool kdtree_get_bbox(BBOX& /* bb */) const { return false; }
 };
 
-typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloud<double>>,
-                                            PointCloud<double>, 3 /* dim */
+typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloud<double>>, PointCloud<double>,
+                                            3 /* dim */
                                             >
     nfTree_t;
 
@@ -202,7 +203,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
   kdata_t max[3] = { -1.e9, -1.e9, -1.e9 };
 
 #ifdef HAVE_OPENMP45
-#pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
+#pragma omp parallel for reduction(min : min[:3]) reduction(max : max[:3])
 #endif
   for (size_t i = 0; i < n; i++)
     {
@@ -245,7 +246,7 @@ gs_create_nanoflann(size_t n, const double *restrict lons, const double *restric
   // Generating  Point Cloud
   pointcloud->pts.resize(n);
 #ifdef HAVE_OPENMP45
-#pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
+#pragma omp parallel for reduction(min : min[:3]) reduction(max : max[:3])
 #endif
   for (size_t i = 0; i < n; i++)
     {
@@ -289,14 +290,14 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
 {
   if (cdoVerbose) cdoPrint("Init spherepart 3D: n=%zu  nthreads=%d", n, Threading::ompNumThreads);
 
-  double *coordinates_xyz = (double*) malloc(3 * n * sizeof(*coordinates_xyz));
+  double *coordinates_xyz = (double *) malloc(3 * n * sizeof(*coordinates_xyz));
   gs->coordinates_xyz = coordinates_xyz;
 
   double min[3] = { 1.e9, 1.e9, 1.e9 };
   double max[3] = { -1.e9, -1.e9, -1.e9 };
 
 #ifdef HAVE_OPENMP45
-#pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
+#pragma omp parallel for reduction(min : min[:3]) reduction(max : max[:3])
 #endif
   for (size_t i = 0; i < n; i++)
     {
@@ -319,7 +320,8 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
 
   if (cdoVerbose) cdoPrint("BBOX: min=%g/%g/%g  max=%g/%g/%g", min[0], min[1], min[2], max[0], max[1], max[2]);
 
-  return (void *) yac_point_sphere_part_search_new(n, coordinates_xyz);;
+  return (void *) yac_point_sphere_part_search_new(n, coordinates_xyz);
+  ;
 }
 
 static void
@@ -348,7 +350,7 @@ gs_destroy_full(void *search_container)
 static void
 gs_destroy_spherepart(void *search_container)
 {
-  yac_delete_point_sphere_part_search((struct point_sphere_part_search *)search_container);
+  yac_delete_point_sphere_part_search((struct point_sphere_part_search *) search_container);
 }
 
 static void *
@@ -389,7 +391,7 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
   gs->dims[1] = dims[1];
 
   gs->method = pointSearchMethod;
-  if ( gs->method == PointSearchMethod::latbins ) gs->method = PointSearchMethod::nanoflann;
+  if (gs->method == PointSearchMethod::latbins) gs->method = PointSearchMethod::nanoflann;
 
   gs->n = n;
   if (n == 0) return gs;
@@ -404,7 +406,7 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
   else if (gs->method == PointSearchMethod::spherepart) gs->search_container = gs_create_spherepart(n, lons, lats, gs);
   else cdoAbort("%s::method undefined!", __func__);
   // clang-format on
-  
+
   gs->searchRadius = cdoDefaultSearchRadius();
 
   return gs;
@@ -439,7 +441,8 @@ gridsearch_delete(GridSearch *gs)
 }
 
 static size_t
-gs_nearest_kdtree(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist, GridSearch *gs)
+gs_nearest_kdtree(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
+                  GridSearch *gs)
 {
   kdTree_t *kdt = (kdTree_t *) search_container;
   if (kdt == NULL) return 0;
@@ -456,7 +459,6 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double searchR
 
   kdNode *node = kd_nearest(kdt->node, query_pt, &sqrDist, 3);
 
-
   if (node && sqrDist < sqrDistMax)
     {
       *addr = node->index;
@@ -468,7 +470,8 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double searchR
 }
 
 static size_t
-gs_nearest_nanoflann(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist, GridSearch *gs)
+gs_nearest_nanoflann(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
+                     GridSearch *gs)
 {
   nfTree_t *nft = (nfTree_t *) search_container;
   if (nft == NULL) return 0;
@@ -500,7 +503,8 @@ gs_nearest_nanoflann(void *search_container, double lon, double lat, double sear
 }
 
 static size_t
-gs_nearest_spherepart(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist, GridSearch *gs)
+gs_nearest_spherepart(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
+                      GridSearch *gs)
 {
   double query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
@@ -514,21 +518,21 @@ gs_nearest_spherepart(void *search_container, double lon, double lat, double sea
   unsigned *local_point_ids = NULL;
   double cos_angle;
 
-  yac_point_sphere_part_search_NN((struct point_sphere_part_search *)search_container, 1, query_pt, &cos_angle, NULL, NULL,
+  yac_point_sphere_part_search_NN((struct point_sphere_part_search *) search_container, 1, query_pt, &cos_angle, NULL, NULL,
                                   &local_point_ids, &local_point_ids_array_size, &num_local_point_ids);
 
   size_t nadd = 0;
-  if ( num_local_point_ids > 0 )
+  if (num_local_point_ids > 0)
     {
-      if ( cos_angle < -1 ) cos_angle = -1;
-      if ( cos_angle >  1 ) cos_angle =  1;
+      if (cos_angle < -1) cos_angle = -1;
+      if (cos_angle > 1) cos_angle = 1;
       *dist = acos(cos_angle);
-      if ( *dist <= searchRadius )
+      if (*dist <= searchRadius)
         {
           nadd = 1;
           *addr = local_point_ids[0];
-          for ( size_t i = 1; i < num_local_point_ids; ++i )
-            if ( local_point_ids[i] < *addr ) *addr = local_point_ids[i];
+          for (size_t i = 1; i < num_local_point_ids; ++i)
+            if (local_point_ids[i] < *addr) *addr = local_point_ids[i];
         }
     }
 
@@ -572,9 +576,8 @@ gs_nearest_full(void *search_container, double lon, double lat, double searchRad
   return 0;
 }
 
-bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4],
-                   double lats[4], double plon, double plat, const double *restrict center_lon,
-                   const double *restrict center_lat);
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+                   double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
 
 static size_t
 llindex_in_quad(GridSearch *gs, size_t index, double lon, double lat)
@@ -595,8 +598,7 @@ llindex_in_quad(GridSearch *gs, size_t index, double lon, double lat)
           if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
           if (k == 2 || k == 3) j = (j > 0) ? j - 1 : 0;
 
-          if (point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats, lon, lat, gs->plons, gs->plats))
-            return index;
+          if (point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats, lon, lat, gs->plons, gs->plats)) return index;
         }
     }
 
@@ -695,7 +697,7 @@ gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double searchRadiu
       if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return nadds;
 
   nadds = nft->knnRangeSearch(&query_pt[0], sqrDistMax, nnn, &adds[0], &dist[0]);
-  for ( size_t i = 0; i < nadds; ++i ) dist[i] = sqrt(dist[i]);
+  for (size_t i = 0; i < nadds; ++i) dist[i] = sqrt(dist[i]);
 
   return nadds;
 }
@@ -721,24 +723,25 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadi
       size_t cos_angles_array_size = 0;
       double *cos_angles = NULL;
 
-      yac_point_sphere_part_search_NNN((struct point_sphere_part_search *)gs->search_container, 1, query_pt, nnn, &cos_angles, &cos_angles_array_size,
-                                       NULL, NULL, &local_point_ids, &local_point_ids_array_size, &num_local_point_ids);
+      yac_point_sphere_part_search_NNN((struct point_sphere_part_search *) gs->search_container, 1, query_pt, nnn, &cos_angles,
+                                       &cos_angles_array_size, NULL, NULL, &local_point_ids, &local_point_ids_array_size,
+                                       &num_local_point_ids);
 
-      if ( num_local_point_ids > 0 )
+      if (num_local_point_ids > 0)
         {
           size_t maxadds = (num_local_point_ids < nnn) ? num_local_point_ids : nnn;
           nadds = 0;
           for (size_t i = 0; i < maxadds; ++i)
             {
-              if ( cos_angles[i] < -1 ) cos_angles[i] = -1;
-              if ( cos_angles[i] >  1 ) cos_angles[i] =  1;
+              if (cos_angles[i] < -1) cos_angles[i] = -1;
+              if (cos_angles[i] > 1) cos_angles[i] = 1;
               double angle = acos(cos_angles[i]);
-              if ( angle < searchRadius )
+              if (angle < searchRadius)
                 {
                   adds[nadds] = local_point_ids[i];
                   dist[nadds] = angle;
                   nadds++;
-                }       
+                }
             }
         }
 

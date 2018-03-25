@@ -87,16 +87,13 @@ size_t remap_max_iter = DEFAULT_MAX_ITER;  // Max iteration count for i, j itera
 void
 remap_set_int(int remapvar, int value)
 {
-  if (remapvar == REMAP_WRITE_REMAP)
-    remap_write_remap = value > 0;
-  else if (remapvar == REMAP_MAX_ITER)
-    remap_max_iter = value;
-  else if (remapvar == REMAP_NUM_SRCH_BINS)
-    remap_num_srch_bins = value;
-  else if (remapvar == REMAP_GENWEIGHTS)
-    remap_gen_weights = value > 0;
-  else
-    cdoAbort("Unsupported remap variable (%d)!", remapvar);
+  // clang-format off
+  if      (remapvar == REMAP_WRITE_REMAP)   remap_write_remap = value > 0;
+  else if (remapvar == REMAP_MAX_ITER)      remap_max_iter = value;
+  else if (remapvar == REMAP_NUM_SRCH_BINS) remap_num_srch_bins = value;
+  else if (remapvar == REMAP_GENWEIGHTS)    remap_gen_weights = value > 0;
+  else    cdoAbort("Unsupported remap variable (%d)!", remapvar);
+  // clang-format on
 }
 
 /*****************************************************************************/
@@ -137,8 +134,8 @@ boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const 
   float tmp_lats[4], tmp_lons[4];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, \
-                                              bound_box) private(idx, tmp_lats, tmp_lons)
+#pragma omp parallel for default(none) \
+    shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box) private(idx, tmp_lats, tmp_lons)
 #endif
   for (size_t n = 0; n < size; n++)
     {
@@ -233,16 +230,14 @@ check_lat_range(size_t nlats, double *lats)
 static void
 check_lon_boundbox_range(size_t nlons, float *bound_box)
 {
-  size_t n4;
-
   assert(bound_box != NULL);
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(nlons, bound_box) private(n4)
+#pragma omp parallel for default(none) shared(nlons, bound_box)
 #endif
   for (size_t n = 0; n < nlons; ++n)
     {
-      n4 = n << 2;
+      size_t n4 = n << 2;
       if (fabsf(bound_box[n4 + 3] - bound_box[n4 + 2]) > PI_f)
         {
           bound_box[n4 + 2] = 0.0f;
@@ -254,18 +249,16 @@ check_lon_boundbox_range(size_t nlons, float *bound_box)
 static void
 check_lat_boundbox_range(size_t nlats, float *restrict bound_box, double *restrict lats)
 {
-  size_t n4;
-
   assert(bound_box != NULL);
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n4)
+#pragma omp parallel for default(none) shared(nlats, bound_box, lats)
 #endif
   for (size_t n = 0; n < nlats; ++n)
     {
-      n4 = n << 2;
-      if ((float)lats[n] < bound_box[n4]) bound_box[n4] = -PIH_f;
-      if ((float)lats[n] > bound_box[n4 + 1]) bound_box[n4 + 1] = PIH_f;
+      size_t n4 = n << 2;
+      if ((float) lats[n] < bound_box[n4]) bound_box[n4] = -PIH_f;
+      if ((float) lats[n] > bound_box[n4 + 1]) bound_box[n4 + 1] = PIH_f;
     }
 }
 
@@ -361,8 +354,7 @@ remapDefineGrid(RemapMethod mapType, int gridID, RemapGrid &grid, const char *tx
   grid.dims[1] = gridInqYsize(gridID);
   if (gridInqType(grid.gridID) != GRID_UNSTRUCTURED)
     {
-      if (grid.dims[0] == 0)
-        cdoAbort("%s grid without longitude coordinates!", gridNamePtr(gridInqType(grid.gridID)));
+      if (grid.dims[0] == 0) cdoAbort("%s grid without longitude coordinates!", gridNamePtr(gridInqType(grid.gridID)));
       if (grid.dims[1] == 0) cdoAbort("%s grid without latitude coordinates!", gridNamePtr(gridInqType(grid.gridID)));
     }
 
@@ -374,7 +366,7 @@ remapDefineGrid(RemapMethod mapType, int gridID, RemapGrid &grid, const char *tx
 
   remapGridAlloc(mapType, grid);
 
-/* Initialize logical mask */
+  /* Initialize logical mask */
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(gridsize, grid)
@@ -391,8 +383,7 @@ remapDefineGrid(RemapMethod mapType, int gridID, RemapGrid &grid, const char *tx
 
   if (!remap_write_remap && grid.remap_grid_type == REMAP_GRID_TYPE_REG2D) return;
 
-  if (!(gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL)))
-    cdoAbort("%s grid cell center coordinates missing!", txt);
+  if (!(gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL))) cdoAbort("%s grid cell center coordinates missing!", txt);
 
   gridInqXvals(gridID, grid.cell_center_lon);
   gridInqYvals(gridID, grid.cell_center_lat);
@@ -413,10 +404,8 @@ remapDefineGrid(RemapMethod mapType, int gridID, RemapGrid &grid, const char *tx
         }
       else if (lgrid_gen_bounds)
         {
-          grid_cell_center_to_bounds_X2D(xunits, grid.dims[0], grid.dims[1], grid.cell_center_lon,
-                                         grid.cell_corner_lon, 0);
-          grid_cell_center_to_bounds_Y2D(yunits, grid.dims[0], grid.dims[1], grid.cell_center_lat,
-                                         grid.cell_corner_lat);
+          grid_cell_center_to_bounds_X2D(xunits, grid.dims[0], grid.dims[1], grid.cell_center_lon, grid.cell_corner_lon, 0);
+          grid_cell_center_to_bounds_Y2D(yunits, grid.dims[0], grid.dims[1], grid.cell_center_lat, grid.cell_corner_lat);
         }
       else
         {
@@ -464,20 +453,19 @@ cell_bounding_boxes(RemapGrid &grid, float *cell_bound_box, int remap_grid_basis
       if (grid.lneed_cell_corners)
         {
           if (cdoVerbose) cdoPrint("Grid: boundbox_from_corners");
-          boundbox_from_corners(grid.size, grid.num_cell_corners, grid.cell_corner_lon, grid.cell_corner_lat,
-                                cell_bound_box);
+          boundbox_from_corners(grid.size, grid.num_cell_corners, grid.cell_corner_lon, grid.cell_corner_lat, cell_bound_box);
         }
-      else // full grid search
+      else  // full grid search
         {
           if (cdoVerbose) cdoPrint("Grid: bounds missing -> full grid search!");
 
           size_t gridsize = grid.size;
           for (size_t i = 0; i < gridsize; ++i)
             {
-              cell_bound_box[i*4] = -PIH_f;
-              cell_bound_box[i*4 + 1] = PIH_f;
-              cell_bound_box[i*4 + 2] = 0.0f;
-              cell_bound_box[i*4 + 3] = PI2_f;
+              cell_bound_box[i * 4] = -PIH_f;
+              cell_bound_box[i * 4 + 1] = PIH_f;
+              cell_bound_box[i * 4 + 2] = 0.0f;
+              cell_bound_box[i * 4 + 3] = PI2_f;
             }
         }
     }
@@ -488,12 +476,10 @@ cell_bounding_boxes(RemapGrid &grid, float *cell_bound_box, int remap_grid_basis
 
       size_t nx = grid.dims[0];
       size_t ny = grid.dims[1];
-      boundbox_from_center(grid.is_cyclic, grid.size, nx, ny, grid.cell_center_lon, grid.cell_center_lat,
-                           cell_bound_box);
+      boundbox_from_center(grid.is_cyclic, grid.size, nx, ny, grid.cell_center_lon, grid.cell_center_lat, cell_bound_box);
     }
 
-  if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid.lneed_cell_corners)
-    check_lon_boundbox_range(grid.size, cell_bound_box);
+  if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid.lneed_cell_corners) check_lon_boundbox_range(grid.size, cell_bound_box);
 
   // Try to check for cells that overlap poles
   if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid.lneed_cell_corners)
@@ -590,12 +576,12 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
   search.gs = NULL;
 
   bool useGridsearch = mapType == RemapMethod::DISTWGT;
-  if ( src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D && pointSearchMethod != PointSearchMethod::latbins )
+  if (src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D && pointSearchMethod != PointSearchMethod::latbins)
     {
-       useGridsearch |= mapType == RemapMethod::BILINEAR;
-       useGridsearch |= mapType == RemapMethod::BICUBIC;
+      useGridsearch |= mapType == RemapMethod::BILINEAR;
+      useGridsearch |= mapType == RemapMethod::BICUBIC;
     }
-                    
+
   if (useGridsearch)
     {
 #ifdef _OPENMP
@@ -617,9 +603,11 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
     {
       if (!(src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D || tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D))
         {
+#ifdef _OPENMP
+          double start = cdoVerbose ? omp_get_wtime() : 0;
+#endif
           search.srcBins.cell_bound_box.resize(4 * src_grid.size);
-          if ( tgt_grid.luse_cell_corners )
-            search.tgtBins.cell_bound_box.resize(4 * tgt_grid.size);
+          if (tgt_grid.luse_cell_corners) search.tgtBins.cell_bound_box.resize(4 * tgt_grid.size);
 
           cell_bounding_boxes(src_grid, &search.srcBins.cell_bound_box[0], REMAP_GRID_BASIS_SRC);
           cell_bounding_boxes(tgt_grid, &search.tgtBins.cell_bound_box[0], REMAP_GRID_BASIS_TGT);
@@ -628,10 +616,13 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
           if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
             {
               calc_lat_bins(search.tgtBins);
-              vectorFree(search.srcBins.bin_lats);
               vectorFree(search.tgtBins.bin_lats);
+              vectorFree(search.srcBins.bin_lats);
               if (mapType == RemapMethod::CONSERV_YAC) vectorFree(search.tgtBins.cell_bound_box);
             }
+#ifdef _OPENMP
+          if (cdoVerbose) cdoPrint("Latitude bins created: %.2f seconds", omp_get_wtime() - start);
+#endif
         }
     }
 }
@@ -652,8 +643,7 @@ remapSearchFree(RemapSearch &search)
 }
 
 void
-remapInitGrids(RemapMethod mapType, bool lextrapolate, int gridID1, RemapGrid &src_grid, int gridID2,
-               RemapGrid &tgt_grid)
+remapInitGrids(RemapMethod mapType, bool lextrapolate, int gridID1, RemapGrid &src_grid, int gridID2, RemapGrid &tgt_grid)
 {
   int reg2d_src_gridID = gridID1;
   int reg2d_tgt_gridID = gridID2;
@@ -670,8 +660,7 @@ remapInitGrids(RemapMethod mapType, bool lextrapolate, int gridID1, RemapGrid &s
 
   if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
     {
-      if (IS_REG2D_GRID(gridID2) && mapType == RemapMethod::CONSERV_YAC)
-        tgt_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if (IS_REG2D_GRID(gridID2) && mapType == RemapMethod::CONSERV_YAC) tgt_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // else src_grid.remap_grid_type = -1;
     }
 
@@ -767,7 +756,7 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
   arrayMinMaxMeanMV(tgt_grid.size, array2, missval, &minval, &maxval, &mean);
   cdoPrint("  Grid2 min,mean,max: %g %g %g", minval, mean, maxval);
 
-  /* Conservation Test */
+  // Conservation Test
 
   if (src_grid.cell_area.size())
     {
@@ -851,7 +840,7 @@ remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gra
   double *restrict grad_lat = &gradients.grad_lat[0];
   double *restrict grad_lon = &gradients.grad_lon[0];
   double *restrict grad_latlon = &gradients.grad_latlon[0];
-      
+
   size_t grid_size = grid.size;
   size_t nx = grid.dims[0];
   size_t ny = grid.dims[1];

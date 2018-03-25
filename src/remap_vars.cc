@@ -47,7 +47,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVa
   const size_t *restrict src_add = &rv.src_cell_add[0];
   remaplink_t links = rv.links;
   long links_per_value = rv.links_per_value;
-  
+
   extern int timer_remap;
 
   // Check the order of the interpolation
@@ -130,7 +130,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVa
 
               for (size_t n = 0; n < num_links; ++n)
                 {
-                  //printf("%5zu %5zu %5zu %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
+                  // printf("%5zu %5zu %5zu %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
                   dst_array[dst_add[n]] += src_array[src_add[n]] * map_wts[num_wts * n];
                 }
             }
@@ -147,8 +147,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVa
         {
           for (size_t n = 0; n < num_links; ++n)
             {
-              dst_array[dst_add[n]] += src_array[src_add[n]] * map_wts[3 * n]
-                                       + src_grad1[src_add[n]] * map_wts[3 * n + 1]
+              dst_array[dst_add[n]] += src_array[src_add[n]] * map_wts[3 * n] + src_grad1[src_add[n]] * map_wts[3 * n + 1]
                                        + src_grad2[src_add[n]] * map_wts[3 * n + 2];
             }
         }
@@ -156,9 +155,9 @@ remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVa
         {
           for (size_t n = 0; n < num_links; ++n)
             {
-              dst_array[dst_add[n]]
-                  += src_array[src_add[n]] * map_wts[4 * n] + src_grad1[src_add[n]] * map_wts[4 * n + 1]
-                     + src_grad2[src_add[n]] * map_wts[4 * n + 2] + src_grad3[src_add[n]] * map_wts[4 * n + 3];
+              dst_array[dst_add[n]] += src_array[src_add[n]] * map_wts[4 * n] + src_grad1[src_add[n]] * map_wts[4 * n + 1]
+                                       + src_grad2[src_add[n]] * map_wts[4 * n + 2]
+                                       + src_grad3[src_add[n]] * map_wts[4 * n + 3];
             }
         }
     }
@@ -253,8 +252,8 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, const Rem
     if (DBL_IS_EQUAL(dst_array[dst_add[n]], missval)) dst_array[dst_add[n]] = 0.0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, \
-                                              map_wts, num_wts, dst_array, max_cls) schedule(dynamic, 1)
+#pragma omp parallel for default(none) shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, \
+                                              num_wts, dst_array, max_cls) schedule(dynamic, 1)
 #endif
   for (size_t i = 0; i < dst_size; ++i)
     {
@@ -421,7 +420,7 @@ remapVarsInit(RemapMethod mapType, RemapVars &rv)
 void
 remapVarsEnsureSize(RemapVars &rv, size_t size)
 {
-  if ( size >= rv.max_links )
+  if (size >= rv.max_links)
     {
       while (size >= rv.max_links) rv.max_links += rv.resize_increment;
 

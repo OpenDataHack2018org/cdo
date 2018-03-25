@@ -188,4 +188,3 @@ store_link_cnsrv(RemapVars &rv, long add1, long add2, long num_wts, double *weig
   for (long i = 0; i < num_wts; ++i) rv.wts[num_wts * nlink + i] = weights[i];
 
 } /* store_link_cnsrv */
-

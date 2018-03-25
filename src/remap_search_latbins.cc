@@ -29,8 +29,8 @@ calc_bin_addr(GridSearchBins &searchBins)
 
   for (size_t n = 0; n < nbins; ++n)
     {
-      bin_addr[n*2] = ncells;
-      bin_addr[n*2 + 1] = 0;
+      bin_addr[n * 2] = ncells;
+      bin_addr[n * 2 + 1] = 0;
     }
 
   for (size_t nele = 0; nele < ncells; ++nele)
@@ -64,8 +64,8 @@ calc_lat_bins(GridSearchBins &searchBins)
       searchBins.bin_lats.resize(2 * nbins);
       for (size_t n = 0; n < nbins; ++n)
         {
-          searchBins.bin_lats[n*2] = (n) *dlat - PIH;
-          searchBins.bin_lats[n*2 + 1] = (n + 1) * dlat - PIH;
+          searchBins.bin_lats[n * 2] = (n) *dlat - PIH;
+          searchBins.bin_lats[n * 2 + 1] = (n + 1) * dlat - PIH;
         }
 
       searchBins.bin_addr.resize(2 * nbins);
@@ -163,8 +163,8 @@ get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &sr
 }
 
 static int
-grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double *restrict nbr_dist, double plat,
-               double plon, const double *restrict src_center_lat, const double *restrict src_center_lon)
+grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
+               const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
   double distance;
@@ -319,8 +319,8 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
 }
 
 int
-grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-            double plat, double plon, GridSearchBins &srcBins)
+grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons, double plat,
+            double plon, GridSearchBins &srcBins)
 {
   /*
     Output variables:

@@ -532,11 +532,10 @@ after_srch_loop:
 */
 static void
 intersection(long *location, double *intrsct_lat, double *intrsct_lon, bool *lcoinc, double beglat, double beglon,
-             double endlat, double endlon, double *begseg, bool lbegin, bool lrevers, long num_srch_cells,
-             long srch_corners, const size_t *restrict srch_add, const double *restrict srch_corner_lat,
-             const double *restrict srch_corner_lon, long *last_loc, bool *lthresh, double *intrsct_lat_off,
-             double *intrsct_lon_off, bool *luse_last, double *intrsct_x, double *intrsct_y, int *avoid_pole_count,
-             double *avoid_pole_offset)
+             double endlat, double endlon, double *begseg, bool lbegin, bool lrevers, long num_srch_cells, long srch_corners,
+             const size_t *restrict srch_add, const double *restrict srch_corner_lat, const double *restrict srch_corner_lon,
+             long *last_loc, bool *lthresh, double *intrsct_lat_off, double *intrsct_lon_off, bool *luse_last,
+             double *intrsct_x, double *intrsct_y, int *avoid_pole_count, double *avoid_pole_offset)
 {
   /*
     Intent(in):
@@ -583,9 +582,9 @@ intersection(long *location, double *intrsct_lat, double *intrsct_lon, bool *lco
   if (beglat > north_thresh || beglat < south_thresh)
     {
       if (*lthresh) *location = *last_loc;
-      pole_intersection(location, intrsct_lat, intrsct_lon, lcoinc, lthresh, beglat, beglon, endlat, endlon, begseg,
-                        lrevers, num_srch_cells, srch_corners, srch_add, srch_corner_lat, srch_corner_lon, luse_last,
-                        intrsct_x, intrsct_y, avoid_pole_count, avoid_pole_offset);
+      pole_intersection(location, intrsct_lat, intrsct_lon, lcoinc, lthresh, beglat, beglon, endlat, endlon, begseg, lrevers,
+                        num_srch_cells, srch_corners, srch_add, srch_corner_lat, srch_corner_lon, luse_last, intrsct_x,
+                        intrsct_y, avoid_pole_count, avoid_pole_offset);
 
       if (*lthresh)
         {
@@ -971,8 +970,7 @@ phi_gradient(double in_phi1, double in_phi2, double dphi, double f1, double f2, 
 }
 
 static void
-line_integral(double *weights, double in_phi1, double in_phi2, double theta1, double theta2, double grid1_lon,
-              double grid2_lon)
+line_integral(double *weights, double in_phi1, double in_phi2, double theta1, double theta2, double grid1_lon, double grid2_lon)
 {
   /*
     Intent(in):
@@ -1027,8 +1025,8 @@ line_integral(double *weights, double in_phi1, double in_phi2, double theta1, do
 } /* line_integral */
 
 static void
-correct_pole(RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv, double *src_centroid_lat,
-             double *src_centroid_lon, double *tgt_centroid_lat, double *tgt_centroid_lon, grid_store_t *grid_store)
+correct_pole(RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv, double *src_centroid_lat, double *src_centroid_lon,
+             double *tgt_centroid_lat, double *tgt_centroid_lon, grid_store_t *grid_store)
 {
   /*
      Correct for situations where N/S pole not explicitly included in
@@ -1176,8 +1174,7 @@ normalize_weights(RemapGrid *tgt_grid, RemapVars &rv, double *src_centroid_lat, 
         {
           src_cell_add = rv.src_cell_add[n];
           tgt_cell_add = rv.tgt_cell_add[n];
-          norm_factor
-              = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? ONE / tgt_grid->cell_area[tgt_cell_add] : ZERO;
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? ONE / tgt_grid->cell_area[tgt_cell_add] : ZERO;
           norm_weight(norm_factor, &weights[n * 3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
         }
     }
@@ -1191,16 +1188,15 @@ normalize_weights(RemapGrid *tgt_grid, RemapVars &rv, double *src_centroid_lat, 
         {
           src_cell_add = rv.src_cell_add[n];
           tgt_cell_add = rv.tgt_cell_add[n];
-          norm_factor
-              = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? ONE / tgt_grid->cell_frac[tgt_cell_add] : ZERO;
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? ONE / tgt_grid->cell_frac[tgt_cell_add] : ZERO;
           norm_weight(norm_factor, &weights[n * 3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
         }
     }
   else if (rv.normOpt == NormOpt::NONE)
     {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(num_links, rv, weights, tgt_grid, src_centroid_lat, \
-                                              src_centroid_lon) private(src_cell_add, norm_factor)
+#pragma omp parallel for default(none) \
+    shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon) private(src_cell_add, norm_factor)
 #endif
       for (long n = 0; n < num_links; ++n)
         {
@@ -1224,7 +1220,7 @@ void
 remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
-  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   bool lcheck = true;
 
@@ -1325,8 +1321,7 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 
       // Get search cells
       long num_srch_cells = get_srch_cells(src_cell_add, rsearch.srcBins, rsearch.tgtBins,
-                                           &rsearch.srcBins.cell_bound_box[src_cell_add * 4],
-                                           srch_add[ompthID]);
+                                           &rsearch.srcBins.cell_bound_box[src_cell_add * 4], srch_add[ompthID]);
 
       if (num_srch_cells == 0) continue;
 
@@ -1421,21 +1416,21 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 
               /* Find next intersection of this segment with a gridline on grid 2. */
 
-              intersection(&tgt_cell_add, &intrsct_lat, &intrsct_lon, &lcoinc, beglat, beglon, endlat, endlon, begseg,
-                           lbegin, lrevers, num_srch_cells, srch_corners, srch_add[ompthID], srch_corner_lat[ompthID],
-                           srch_corner_lon[ompthID], &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off,
-                           &luse_last, &intrsct_x, &intrsct_y, &avoid_pole_count, &avoid_pole_offset);
+              intersection(&tgt_cell_add, &intrsct_lat, &intrsct_lon, &lcoinc, beglat, beglon, endlat, endlon, begseg, lbegin,
+                           lrevers, num_srch_cells, srch_corners, srch_add[ompthID], srch_corner_lat[ompthID],
+                           srch_corner_lon[ompthID], &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off, &luse_last,
+                           &intrsct_x, &intrsct_y, &avoid_pole_count, &avoid_pole_offset);
 
               lbegin = false;
 
               /* Compute line integral for this subsegment. */
 
               if (tgt_cell_add != -1)
-                line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
-                              src_grid->cell_center_lon[src_cell_add], tgt_grid->cell_center_lon[tgt_cell_add]);
+                line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat, src_grid->cell_center_lon[src_cell_add],
+                              tgt_grid->cell_center_lon[tgt_cell_add]);
               else
-                line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
-                              src_grid->cell_center_lon[src_cell_add], src_grid->cell_center_lon[src_cell_add]);
+                line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat, src_grid->cell_center_lon[src_cell_add],
+                              src_grid->cell_center_lon[src_cell_add]);
 
               /* If integrating in reverse order, change sign of weights */
 
@@ -1528,8 +1523,7 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 
       // Get search cells
       long num_srch_cells = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins,
-                                           &rsearch.tgtBins.cell_bound_box[tgt_cell_add * 4],
-                                           srch_add[ompthID]);
+                                           &rsearch.tgtBins.cell_bound_box[tgt_cell_add * 4], srch_add[ompthID]);
 
       if (num_srch_cells == 0) continue;
 
@@ -1622,21 +1616,21 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 
               /* Find next intersection of this segment with a gridline on grid 2. */
 
-              intersection(&src_cell_add, &intrsct_lat, &intrsct_lon, &lcoinc, beglat, beglon, endlat, endlon, begseg,
-                           lbegin, lrevers, num_srch_cells, srch_corners, srch_add[ompthID], srch_corner_lat[ompthID],
-                           srch_corner_lon[ompthID], &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off,
-                           &luse_last, &intrsct_x, &intrsct_y, &avoid_pole_count, &avoid_pole_offset);
+              intersection(&src_cell_add, &intrsct_lat, &intrsct_lon, &lcoinc, beglat, beglon, endlat, endlon, begseg, lbegin,
+                           lrevers, num_srch_cells, srch_corners, srch_add[ompthID], srch_corner_lat[ompthID],
+                           srch_corner_lon[ompthID], &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off, &luse_last,
+                           &intrsct_x, &intrsct_y, &avoid_pole_count, &avoid_pole_offset);
 
               lbegin = false;
 
               /* Compute line integral for this subsegment. */
 
               if (src_cell_add != -1)
-                line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
-                              src_grid->cell_center_lon[src_cell_add], tgt_grid->cell_center_lon[tgt_cell_add]);
+                line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat, src_grid->cell_center_lon[src_cell_add],
+                              tgt_grid->cell_center_lon[tgt_cell_add]);
               else
-                line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
-                              tgt_grid->cell_center_lon[tgt_cell_add], tgt_grid->cell_center_lon[tgt_cell_add]);
+                line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat, tgt_grid->cell_center_lon[tgt_cell_add],
+                              tgt_grid->cell_center_lon[tgt_cell_add]);
 
               /* If integrating in reverse order, change sign of weights */
 
@@ -1694,14 +1688,13 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
      one grid, need to correct only the area and centroid of that
      grid.  If missing from both, do complete weight calculation.
   */
-  correct_pole(src_grid, tgt_grid, rv, src_centroid_lat, src_centroid_lon, tgt_centroid_lat, tgt_centroid_lon,
-               grid_store);
+  correct_pole(src_grid, tgt_grid, rv, src_centroid_lat, src_centroid_lon, tgt_centroid_lat, tgt_centroid_lon, grid_store);
 
   grid_store_delete(grid_store);
   Free(grid_store);
 
   if (rv.num_links != rv.max_links) remapVarsResize(rv, rv.num_links);
-  
+
   /* Finish centroid computation */
 
   for (long n = 0; n < src_grid_size; ++n)

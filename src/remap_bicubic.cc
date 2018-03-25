@@ -51,7 +51,7 @@ unsigned num_src_points(const int *restrict mask, const size_t src_add[4], doubl
 static void
 renormalizeWeights(const double src_lats[4], double wgts[4][4])
 {
-  double sum_wgts = 0.0; // sum of weights for normalization
+  double sum_wgts = 0.0;  // sum of weights for normalization
   for (unsigned n = 0; n < 4; ++n) sum_wgts += fabs(src_lats[n]);
   for (unsigned n = 0; n < 4; ++n) wgts[n][0] = fabs(src_lats[n]) / sum_wgts;
   for (unsigned n = 0; n < 4; ++n) wgts[n][1] = 0.;
@@ -96,7 +96,7 @@ void
 remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
-  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   extern int timer_remap_bic;
 
@@ -122,8 +122,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
   // Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) \
-  shared(rsearch, weightlinks, tgt_grid_size, src_grid, tgt_grid, rv)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightlinks, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -157,7 +156,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
         {
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
-          double iw, jw; // current guess for bilinear coordinate
+          double iw, jw;  // current guess for bilinear coordinate
           if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
@@ -189,7 +188,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
   weightlinks2remaplinks4(tgt_grid_size, weightlinks, rv);
 
   if (cdoTimer) timer_stop(timer_remap_bic);
-} // scrip_remap_weights_bicubic
+}  // scrip_remap_weights_bicubic
 
 /*
   -----------------------------------------------------------------------
@@ -203,7 +202,7 @@ void
 remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
-  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
@@ -261,7 +260,7 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
         {
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
-          double iw, jw; // current guess for bilinear coordinate
+          double iw, jw;  // current guess for bilinear coordinate
           if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights

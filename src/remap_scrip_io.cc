@@ -31,7 +31,6 @@
 #include "remap.h"
 #include "commandline.h"
 
-
 #ifdef HAVE_LIBNETCDF
 static void
 nce(int istat)
@@ -263,8 +262,7 @@ remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType sub
       nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "history", strlen(history), history));
     }
 
-  if (CDO_Version_Info)
-    nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO", (int) strlen(cdoComment()) + 1, cdoComment()));
+  if (CDO_Version_Info) nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO", (int) strlen(cdoComment()) + 1, cdoComment()));
 
   // Prepare NetCDF dimension info
 
@@ -443,7 +441,8 @@ remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType sub
 /*****************************************************************************/
 
 #ifdef HAVE_LIBNETCDF
-static RemapMethod getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remapOrder)
+static RemapMethod
+getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remapOrder)
 {
   // Map method
   size_t attlen;
@@ -539,10 +538,10 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMetho
   int nc_rmpmatrix_id;     /* id for remapping matrix                  */
 
   char map_name[1024];
-  char normalize_opt[64];  /* character string for normalization option */
-  char convention[64];     /* character string for output convention    */
-  char src_grid_name[64];  /* grid name for source grid                 */
-  char tgt_grid_name[64];  /* grid name for dest   grid                 */
+  char normalize_opt[64]; /* character string for normalization option */
+  char convention[64];    /* character string for output convention    */
+  char src_grid_name[64]; /* grid name for source grid                 */
+  char tgt_grid_name[64]; /* grid name for dest   grid                 */
   char src_grid_units[64];
   char tgt_grid_units[64];
   size_t attlen, dimlen;

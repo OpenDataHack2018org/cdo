@@ -29,9 +29,9 @@
 constexpr double PI = M_PI;
 constexpr double PI2 = (2.0 * PI);
 constexpr double PIH = (0.5 * PI);
-constexpr float  PI_f = PI;
-constexpr float  PI2_f = PI2;
-constexpr float  PIH_f = PIH;
+constexpr float PI_f = PI;
+constexpr float PI2_f = PI2;
+constexpr float PIH_f = PIH;
 
 #define THREE 3.0
 #define TINY 1.e-14
@@ -39,7 +39,7 @@ constexpr float  PIH_f = PIH;
 #define REMAP_GRID_TYPE_REG2D 1
 #define REMAP_GRID_TYPE_CURVE2D 2
 #define REMAP_GRID_TYPE_UNSTRUCT 3
-//enum struct RemapGridType {REG2D, CURVE2D, UNSTRUCT}
+// enum struct RemapGridType {REG2D, CURVE2D, UNSTRUCT}
 
 #define REMAP_GRID_BASIS_SRC 1
 #define REMAP_GRID_BASIS_TGT 2
@@ -55,45 +55,45 @@ struct RemapGrid
 {
   int gridID;
   int remap_grid_type;
-  int rank;                         // rank of the grid
-  size_t size;                      // total points on the grid
-  size_t num_cell_corners;          // number of corners for each grid cell
+  int rank;                 // rank of the grid
+  size_t size;              // total points on the grid
+  size_t num_cell_corners;  // number of corners for each grid cell
 
   bool lneed_cell_corners;
-  bool luse_cell_corners;           // use corners for bounding boxes
+  bool luse_cell_corners;  // use corners for bounding boxes
 
   bool lextrapolate;
   bool non_global;
   bool is_cyclic;
 
-  size_t dims[2];                   // size of grid dimension
+  size_t dims[2];  // size of grid dimension
 
-  int nvgp;                         // size of vgpm
-  std::vector<int> vgpm;            // flag which cells are valid
+  int nvgp;               // size of vgpm
+  std::vector<int> vgpm;  // flag which cells are valid
 
-  std::vector<int> mask;            // flag which cells participate
+  std::vector<int> mask;  // flag which cells participate
 
-  double *reg2d_center_lon; // reg2d lon/lat coordinates for
-  double *reg2d_center_lat; // each grid center in radians
-  double *reg2d_corner_lon; // reg2d lon/lat coordinates for
-  double *reg2d_corner_lat; // each grid corner in radians
+  double *reg2d_center_lon;  // reg2d lon/lat coordinates for
+  double *reg2d_center_lat;  // each grid center in radians
+  double *reg2d_corner_lon;  // reg2d lon/lat coordinates for
+  double *reg2d_corner_lat;  // each grid corner in radians
 
   double *cell_center_lon;  // lon/lat coordinates for
   double *cell_center_lat;  // each grid center in radians
   double *cell_corner_lon;  // lon/lat coordinates for
   double *cell_corner_lat;  // each grid corner in radians
 
-  std::vector<double> cell_area;     // total area of each grid cell
-  std::vector<double> cell_frac;     // fractional area of grid cells participating in remapping
+  std::vector<double> cell_area;  // total area of each grid cell
+  std::vector<double> cell_frac;  // fractional area of grid cells participating in remapping
 };
 
 struct GridSearchBins
 {
-  unsigned nbins;                    // num of bins for restricted search
-  size_t ncells;                     // total number of grid cells (cell_bound_box)
-  std::vector<size_t> bin_addr;      // min,max adds for grid cells in this lat bin
-  std::vector<float> bin_lats;       // min,max latitude for each search bin
-  std::vector<float> cell_bound_box; // lon/lat bounding box for use
+  unsigned nbins;                     // num of bins for restricted search
+  size_t ncells;                      // total number of grid cells (cell_bound_box)
+  std::vector<size_t> bin_addr;       // min,max adds for grid cells in this lat bin
+  std::vector<float> bin_lats;        // min,max latitude for each search bin
+  std::vector<float> cell_bound_box;  // lon/lat bounding box for use
 };
 
 struct RemapSearch
@@ -127,8 +127,7 @@ struct remapType
 void remap_set_threshhold(double threshhold);
 void remap_set_int(int remapvar, int value);
 
-void remapInitGrids(RemapMethod mapType, bool lextrapolate, int gridID1, RemapGrid &src_grid, int gridID2,
-                    RemapGrid &tgt_grid);
+void remapInitGrids(RemapMethod mapType, bool lextrapolate, int gridID1, RemapGrid &src_grid, int gridID2, RemapGrid &tgt_grid);
 
 void remapGridInit(RemapGrid &grid);
 void remapGridFree(RemapGrid &grid);
@@ -137,7 +136,8 @@ void remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_gr
 void remapSearchFree(RemapSearch &search);
 
 void remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights);
-int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4], double src_lons[4]);
+int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4],
+                      double src_lons[4]);
 
 void remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv);
 void remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv);
@@ -147,42 +147,40 @@ void remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv);
 
 void remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval);
 void remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval);
-void remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval);
+void remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array,
+                  double missval);
 void remapConserv(RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval);
 
-void remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv,
-               const double *restrict array1, const double *restrict array2, double missval);
+void remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv, const double *restrict array1,
+               const double *restrict array2, double missval);
 void remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gradients);
 
 void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights);
 void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,
                int parent);
 
-void remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType submapType, int numNeighbors,
-                         int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv);
+void remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType submapType, int numNeighbors, int remapOrder,
+                         RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv);
 void remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMethod *mapType, SubmapType *submapType,
-                        int *numNeighbors, int *remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid,
-                        RemapVars &rv);
+                        int *numNeighbors, int *remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv);
 
 void calc_lat_bins(GridSearchBins &searchBins);
-size_t get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &srcBins,
-                      float *tgt_cell_bound_box, size_t *srch_add);
+size_t get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &srcBins, float *tgt_cell_bound_box,
+                      size_t *srch_add);
 
-int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat,
-                         double plon, const double *restrict src_center_lat, const double *restrict src_center_lon);
+int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
+                         const double *restrict src_center_lat, const double *restrict src_center_lon);
 
-int grid_search_reg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats,
-                      double *restrict src_lons, double plat, double plon);
+int grid_search_reg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                      double plat, double plon);
 
-bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4],
-                   double lats[4], double plon, double plat, const double *restrict center_lon,
-                   const double *restrict center_lat);
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+                   double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
 
 int grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
                 double plat, double plon, GridSearchBins &srcBins);
 
-bool find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig,
-                     double *jg);
+bool find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg);
 int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, size_t nym, const double *restrict xm,
                      const double *restrict ym);
 

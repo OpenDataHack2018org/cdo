@@ -18,8 +18,8 @@
 #include "remap.h"
 
 int
-grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat,
-                     double plon, const double *restrict src_center_lat, const double *restrict src_center_lon)
+grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
+                     const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
   double coslat_dst = cos(plat);

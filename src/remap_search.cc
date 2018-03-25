@@ -19,7 +19,6 @@
 #include "remap.h"
 #include "grid_search.h"
 
-
 // This routine finds the closest num_neighbor points to a search point and computes a distance to each of the neighbors
 #define MAX_SEARCH_CELLS 25
 static void
@@ -213,8 +212,8 @@ grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
   knnWeights.check_distance();
 }  // grid_search_nbr
 
-
-void remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights)
+void
+remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights)
 {
   int remap_grid_type = rsearch.srcGrid->remap_grid_type;
 
@@ -225,8 +224,8 @@ void remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeight
 }
 
 static int
-grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-                   double plat, double plon)
+grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats,
+                   double *restrict src_lons, double plat, double plon)
 {
   /*
     Input variables:
@@ -255,7 +254,7 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
   double dist;
   size_t addr;
   size_t nadds = gridsearch_nearest(gs, plon, plat, &addr, &dist);
-  if (nadds>0)
+  if (nadds > 0)
     {
       for (unsigned k = 0; k < 4; ++k)
         {
@@ -264,25 +263,24 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
           size_t i = addr - j * nx;
           if (k == 0 || k == 2) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
           if (k == 0 || k == 1) j = (j > 0) ? j - 1 : 0;
-          if (point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon,
-                            src_center_lat))
+          if (point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon, src_center_lat))
             {
               search_result = 1;
               return search_result;
             }
         }
     }
-  
+
   /*
     If no cell found, point is likely either in a box that straddles either pole or is outside the grid.
     Fall back to a distance-weighted average of the four closest points. Go ahead and compute weights here,
     but store in src_lats and return -add to prevent the parent routine from computing bilinear weights.
   */
-  if ( !src_grid->lextrapolate ) return search_result;
+  if (!src_grid->lextrapolate) return search_result;
 
   size_t ndist = 4;
   nadds = gridsearch_qnearest(gs, plon, plat, ndist, src_add, src_lats);
-  if ( nadds == 4 )
+  if (nadds == 4)
     {
       for (unsigned n = 0; n < 4; ++n) src_lats[n] = 1.0 / (src_lats[n] + TINY);
       double distance = 0.0;
@@ -294,8 +292,8 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
   return search_result;
 } /* grid_search_square */
 
-
-int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4], double src_lons[4])
+int
+remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4], double src_lons[4])
 {
   RemapGrid *src_grid = rsearch.srcGrid;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -305,7 +303,7 @@ int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src
     search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon);
   else
     {
-      if ( rsearch.gs )
+      if (rsearch.gs)
         search_result = grid_search_square(rsearch.gs, src_grid, src_add, src_lats, src_lons, plat, plon);
       else
         search_result = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);

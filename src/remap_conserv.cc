@@ -22,7 +22,8 @@
 #include "cdoOptions.h"
 #include "timer.h"
 
-extern "C" {
+extern "C"
+{
 #include "lib/yac/clipping.h"
 #include "lib/yac/area.h"
 #include "lib/yac/geometry.h"
@@ -596,8 +597,7 @@ remapNormalizeWeights(RemapGrid *tgt_grid, RemapVars &rv)
       for (size_t n = 0; n < num_links; ++n)
         {
           tgt_cell_add = rv.tgt_cell_add[n];
-          norm_factor
-              = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? 1. / tgt_grid->cell_area[tgt_cell_add] : 0.;
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? 1. / tgt_grid->cell_area[tgt_cell_add] : 0.;
           rv.wts[n * num_wts] *= norm_factor;
         }
     }
@@ -609,8 +609,7 @@ remapNormalizeWeights(RemapGrid *tgt_grid, RemapVars &rv)
       for (size_t n = 0; n < num_links; ++n)
         {
           tgt_cell_add = rv.tgt_cell_add[n];
-          norm_factor
-              = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? 1. / tgt_grid->cell_frac[tgt_cell_add] : 0.;
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? 1. / tgt_grid->cell_frac[tgt_cell_add] : 0.;
           rv.wts[n * num_wts] *= norm_factor;
         }
     }
@@ -654,8 +653,7 @@ set_yac_coordinates(int remap_grid_type, size_t cell_add, size_t num_cell_corner
     }
 
   double *coordinates_xyz = yac_grid_cell->coordinates_xyz;
-  for (size_t ic = 0; ic < num_cell_corners; ++ic)
-    LLtoXYZ(coordinates_x[ic], coordinates_y[ic], coordinates_xyz + ic * 3);
+  for (size_t ic = 0; ic < num_cell_corners; ++ic) LLtoXYZ(coordinates_x[ic], coordinates_y[ic], coordinates_xyz + ic * 3);
 }
 
 static void
@@ -681,7 +679,7 @@ void
 remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
-  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells
@@ -776,7 +774,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   double stimer = 0;
 #endif
 
-// Loop over destination grid
+  // Loop over destination grid
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(rsearch, \
@@ -805,8 +803,8 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D)
         {
           double tgt_cell_bound_box[4];
-          boundbox_from_corners_reg2d(tgt_cell_add, tgt_grid->dims, tgt_grid->reg2d_corner_lon,
-                                      tgt_grid->reg2d_corner_lat, tgt_cell_bound_box);
+          boundbox_from_corners_reg2d(tgt_cell_add, tgt_grid->dims, tgt_grid->reg2d_corner_lon, tgt_grid->reg2d_corner_lat,
+                                      tgt_cell_bound_box);
           restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
 
           num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
@@ -820,8 +818,8 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       else if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
         {
           double tgt_cell_bound_box[4];
-          boundbox_from_corners1(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon,
-                                 tgt_grid->cell_corner_lat, tgt_cell_bound_box);
+          boundbox_from_corners1(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
+                                 tgt_cell_bound_box);
           restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
 
           num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
@@ -835,12 +833,11 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       else
         {
           float tgt_cell_bound_box_r[4];
-          boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon,
-                                  tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
+          boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
+                                  tgt_cell_bound_box_r);
 
           num_srch_cells
-            = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r,
-                             srch_add[ompthID]);
+              = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r, srch_add[ompthID]);
         }
 #ifdef STIMER
       clock_t finish = clock();

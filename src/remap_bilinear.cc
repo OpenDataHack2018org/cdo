@@ -28,12 +28,12 @@ bool
 find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
 {
   bool lfound = false;
-  long iter;                     // iteration counters
-  double deli, delj;             // corrections to iw,jw
-  double dthp, dphp;             // difference between point and sw corner
-  double mat1, mat2, mat3, mat4; // matrix elements
-  double determinant;            // matrix determinant
-  double converge = 1.e-10;      // Convergence criterion
+  long iter;                      // iteration counters
+  double deli, delj;              // corrections to iw,jw
+  double dthp, dphp;              // difference between point and sw corner
+  double mat1, mat2, mat3, mat4;  // matrix elements
+  double determinant;             // matrix determinant
+  double converge = 1.e-10;       // Convergence criterion
   extern long remap_max_iter;
 
   /* Iterate to find iw,jw for bilinear approximation  */
@@ -125,7 +125,7 @@ num_src_points(const int *restrict mask, const size_t src_add[4], double src_lat
 static void
 renormalizeWeights(const double src_lats[4], double wgts[4])
 {
-  double sum_wgts = 0.0; // sum of weights for normalization
+  double sum_wgts = 0.0;  // sum of weights for normalization
   for (unsigned n = 0; n < 4; ++n) sum_wgts += fabs(src_lats[n]);
   for (unsigned n = 0; n < 4; ++n) wgts[n] = fabs(src_lats[n]) / sum_wgts;
 }
@@ -143,8 +143,7 @@ bilinearWarning(void)
 }
 
 static void
-bilinearRemap(double *restrict tgt_point, const double *restrict src_array, const double wgts[4],
-              const size_t src_add[4])
+bilinearRemap(double *restrict tgt_point, const double *restrict src_array, const double wgts[4], const size_t src_add[4])
 {
   // *tgt_point = 0.;
   // for ( unsigned n = 0; n < 4; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
@@ -163,7 +162,7 @@ void
 remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
-  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
@@ -269,7 +268,7 @@ void
 remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
-  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
