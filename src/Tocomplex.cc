@@ -43,11 +43,7 @@ Tocomplex(void *process)
   for (varID = 0; varID < nvars; ++varID)
     {
       int datatype = vlistInqVarDatatype(vlistID2, varID);
-      if (datatype == CDI_DATATYPE_FLT64)
-        datatype = CDI_DATATYPE_CPX64;
-      else
-        datatype = CDI_DATATYPE_CPX32;
-
+      datatype = (datatype == CDI_DATATYPE_FLT64) ? CDI_DATATYPE_CPX64 : CDI_DATATYPE_CPX32;
       vlistDefVarDatatype(vlistID2, varID, datatype);
     }
 
@@ -55,13 +51,13 @@ Tocomplex(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  if (cdoFiletype() != CDI_FILETYPE_EXT) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
+  // if (cdoFiletype() != CDI_FILETYPE_EXT) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(2 * gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
+  std::vector<double> array2(2 * gridsize);
 
   int tsID = 0;
   int tsID2 = 0;
@@ -77,7 +73,7 @@ Tocomplex(void *process)
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           if (operatorID == RETOCOMPLEX)
             {
@@ -96,7 +92,7 @@ Tocomplex(void *process)
                 }
             }
 
-          pstreamWriteRecord(streamID2, array2, nmiss);
+          pstreamWriteRecord(streamID2, array2.data(), nmiss);
         }
 
       tsID++;
@@ -104,9 +100,6 @@ Tocomplex(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array1) Free(array1);
-  if (array2) Free(array2);
 
   vlistDestroy(vlistID2);
 
