@@ -45,9 +45,9 @@ Arith(void *process)
   };
   int filltype = FILL_NONE;
   size_t nmiss;
-  int nrecs, nvars = 0;
-  int nlevels2 = 1;
+  int nrecs;
   int varID, levelID;
+  int nlevels2 = 1;
   int levelID2;
   std::vector<std::vector<size_t>> varnmiss;
   std::vector<std::vector<double>> vardata;
@@ -57,10 +57,10 @@ Arith(void *process)
   cdoInitialize(process);
 
   // clang-format off
-  cdoOperatorAdd("add",     func_add,     0, NULL);
-  cdoOperatorAdd("sub",     func_sub,     0, NULL);
-  cdoOperatorAdd("mul",     func_mul,     0, NULL);
-  cdoOperatorAdd("div",     func_div,     0, NULL);
+  cdoOperatorAdd("add",     func_add,     1, NULL);
+  cdoOperatorAdd("sub",     func_sub,     1, NULL);
+  cdoOperatorAdd("mul",     func_mul,     1, NULL);
+  cdoOperatorAdd("div",     func_div,     1, NULL);
   cdoOperatorAdd("min",     func_min,     0, NULL);
   cdoOperatorAdd("max",     func_max,     0, NULL);
   cdoOperatorAdd("atan2",   func_atan2,   0, NULL);
@@ -69,6 +69,7 @@ Arith(void *process)
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
+  bool opercplx = cdoOperatorF2(operatorID);
   operatorCheckArgc(0);
 
   int streamID1 = cdoStreamOpenRead(0);
@@ -152,15 +153,17 @@ Arith(void *process)
 
   if (filltype == FILL_NONE) vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  size_t gridsize = vlistGridsizeMax(vlistIDx1);
+  size_t nwpv = (vlistNumber(vlistIDx1) == CDI_COMP && vlistNumber(vlistIDx2) == CDI_COMP) ? 2 : 1;
+  if ( nwpv == 2 && opercplx == false ) cdoAbort("Fields with complex numbers are not supported by this operator!");
+  size_t gridsizemax = nwpv*vlistGridsizeMax(vlistIDx1);
 
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
-  field2.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field1.ptr = (double *) Malloc(gridsizemax * sizeof(double));
+  field2.ptr = (double *) Malloc(gridsizemax * sizeof(double));
   if (filltype == FILL_VAR || filltype == FILL_VARTS)
     {
-      vardata2.resize(gridsize * nlevels2);
+      vardata2.resize(gridsizemax * nlevels2);
       varnmiss2.resize(nlevels2);
     }
 
@@ -188,12 +191,12 @@ Arith(void *process)
 
       if (filltype == FILL_TS)
         {
-          nvars = vlistNvars(vlistIDx2);
+          int nvars = vlistNvars(vlistIDx2);
           vardata.resize(nvars);
           varnmiss.resize(nvars);
           for (varID = 0; varID < nvars; varID++)
             {
-              size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+              size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
               int nlev = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
               vardata[varID].resize(nlev * gridsize);
               varnmiss[varID].resize(nlev);
@@ -204,7 +207,7 @@ Arith(void *process)
   int vlistID3 = vlistDuplicate(vlistIDx1);
   if (filltype == FILL_TS && vlistIDx1 != vlistID1)
     {
-      nvars = vlistNvars(vlistID1);
+      int nvars = vlistNvars(vlistID1);
       for (varID = 0; varID < nvars; varID++) vlistDefVarMissval(vlistID3, varID, vlistInqVarMissval(vlistID1, varID));
     }
 
@@ -250,7 +253,6 @@ Arith(void *process)
         }
 
       taxisCopyTimestep(taxisID3, taxisIDx1);
-
       pstreamDefTimestep(streamID3, tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -263,7 +265,6 @@ Arith(void *process)
           if (tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS)
             {
               bool lstatus = nlevels2 > 1 ? varID == 0 : recID == 0;
-
               if (lstatus || (filltype != FILL_VAR && filltype != FILL_VARTS))
                 {
                   pstreamInqRecord(streamIDx2, &varID2, &levelID2);
@@ -275,14 +276,14 @@ Arith(void *process)
 
               if (filltype == FILL_TS)
                 {
-                  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+                  size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
                   size_t offset = gridsize * levelID;
                   arrayCopy(gridsize, fieldx2->ptr, &vardata[varID][offset]);
                   varnmiss[varID][levelID] = fieldx2->nmiss;
                 }
               else if (lstatus && (filltype == FILL_VAR || filltype == FILL_VARTS))
                 {
-                  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
+                  size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
                   size_t offset = gridsize * levelID2;
                   arrayCopy(gridsize, fieldx2->ptr, &vardata2[offset]);
                   varnmiss2[levelID2] = fieldx2->nmiss;
@@ -290,7 +291,7 @@ Arith(void *process)
             }
           else if (filltype == FILL_TS)
             {
-              size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID2));
+              size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, varID2));
               size_t offset = gridsize * levelID;
               arrayCopy(gridsize, &vardata[varID][offset], fieldx2->ptr);
               fieldx2->nmiss = varnmiss[varID][levelID];
@@ -302,7 +303,7 @@ Arith(void *process)
           if (filltype == FILL_VAR || filltype == FILL_VARTS)
             {
               levelID2 = (nlevels2 > 1) ? levelID : 0;
-              size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
+              size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
               size_t offset = gridsize * levelID2;
               arrayCopy(gridsize, &vardata2[offset], fieldx2->ptr);
               fieldx2->nmiss = varnmiss2[levelID2];
@@ -315,7 +316,10 @@ Arith(void *process)
               fieldx2->missval = vlistInqVarMissval(vlistIDx2, varID2);
             }
 
-          farfun(&field1, field2, operfunc);
+          if ( nwpv == 2 )
+            farfuncplx(&field1, field2, operfunc);
+          else
+            farfun(&field1, field2, operfunc);
 
           pstreamDefRecord(streamID3, varID, levelID);
           pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);

@@ -65,10 +65,11 @@ libcdo_la_SOURCES =            \
                expr_yacc.cc     \
                expr_yacc.h     \
                features.cc      \
-               field.cc         \
                field.h         \
-               field2.cc        \
+               field.cc         \
                fieldc.cc        \
+               field2.cc        \
+               field2cplx.cc    \
                fieldmem.cc      \
                fieldmer.cc      \
                fieldzon.cc      \

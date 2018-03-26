@@ -3,6 +3,12 @@
 	* Using CDI library version 1.9.4
 	* Version 1.9.4 release
 
+2018-03-26  Uwe Schulzweida
+
+	* New operator arg: argument or phase of the complex numbers
+	* New operator conj: complex conjugate
+	* add, sub, mul, div: added support for complex numbers
+
 2018-03-22  Uwe Schulzweida
 
 	* diff: added support for complex numbers (only for the real part)

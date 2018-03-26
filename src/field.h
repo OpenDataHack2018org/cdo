@@ -58,15 +58,13 @@ typedef struct
   bool lconst;
 } recinfo_type;
 
-/* fieldmem.cc */
-
+// fieldmem.cc
 void field_init(field_type *field);
 field_type **field_malloc(const int vlistID, const int ptype);
 field_type **field_calloc(const int vlistID, const int ptype);
 void field_free(field_type **field, const int vlistID);
 
-/* field.cc */
-
+// field.cc
 double fldfun(field_type field, int function);
 double fldrange(field_type field);
 double fldmin(field_type field);
@@ -90,13 +88,12 @@ int fldhvs(field_type *field, const size_t nlevels);
 double fldskew(field_type field);
 double fldkurt(field_type field);
 
-/* ENS VALIDATION */
+// ENS VALIDATION
 double fldbrs(field_type field);
 double fldrank(field_type field);
 double fldroc(field_type field);
 
-/* fieldzon.cc */
-
+// fieldzon.cc
 void zonfun(field_type field1, field_type *field2, const int function);
 void zonmin(field_type field1, field_type *field2);
 void zonmax(field_type field1, field_type *field2);
@@ -129,8 +126,7 @@ void fldrms(field_type field1, field_type field2, field_type *field3);
 
 void varrms(field_type field1, field_type field2, field_type *field3);
 
-/* fieldc.cc */
-
+// fieldc.cc
 void farcfun(field_type *field, const double rconst, const int function);
 
 void farcmul(field_type *field, const double rconst);
@@ -143,8 +139,7 @@ void farmod(field_type *field, const double divisor);
 void farinv(field_type *field);
 void farround(field_type *field);
 
-/* field2.cc */
-
+// field2.cc
 void farfun(field_type *field1, field_type field2, int function);
 
 void farcpy(field_type *field1, field_type field2);
@@ -169,5 +164,8 @@ void faratan2(field_type *field1, field_type field2);
 void farsetmiss(field_type *field1, field_type field2);
 
 void farcount(field_type *field1, field_type field2);
+
+// field2cplx.cc
+void farfuncplx(field_type *field1, field_type field2, int function);
 
 #endif /* FIELD_H */

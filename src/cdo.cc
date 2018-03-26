@@ -1422,7 +1422,7 @@ void init_modules()
                                                                                                   type       in out      */
   add_module("Adisit"        , {Adisit        , AdisitHelp        , AdisitOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Afterburner"   , {Afterburner   , AfterburnerHelp   , AfterburnerOperators   , 1 , CDI_REAL , -1 , 1  });
-  add_module("Arith"         , {Arith         , ArithHelp         , ArithOperators         , 1 , CDI_REAL , 2  , 1  });
+  add_module("Arith"         , {Arith         , ArithHelp         , ArithOperators         , 1 , CDI_BOTH , 2  , 1  });
   add_module("Arithc"        , {Arithc        , ArithcHelp        , ArithcOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Arithdays"     , {Arithdays     , ArithdaysHelp     , ArithdaysOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Arithlat"      , {Arithlat      , {}                , ArithlatOperators      , 1 , CDI_REAL , 1  , 1  });
