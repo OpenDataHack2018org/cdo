@@ -63,7 +63,8 @@ Math(void *process)
     NOT,
     CONJ,
     RE,
-    IM
+    IM,
+    ARG
   };
   int nrecs;
   int varID, levelID;
@@ -93,6 +94,7 @@ Math(void *process)
   cdoOperatorAdd("conj",  CONJ,  0, NULL);
   cdoOperatorAdd("re",    RE,    0, NULL);
   cdoOperatorAdd("im",    IM,    0, NULL);
+  cdoOperatorAdd("arg",   ARG,   0, NULL);
   // clang-format on
 
   int operatorID = cdoOperatorID();
@@ -112,7 +114,7 @@ Math(void *process)
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
-  if ( operfunc == RE || operfunc == IM )
+  if ( operfunc == RE || operfunc == IM  || operfunc == ARG )
     {
       int nvars = vlistNvars(vlistID2);
       for ( int varID = 0; varID < nvars; ++varID )
@@ -228,6 +230,7 @@ Math(void *process)
                     array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : IS_EQUAL(array1[i], 0);
                   break;
                 case RE:
+                case ARG:
                   for (i = 0; i < gridsize; i++) array2[i] = array1[i];
                   break;
                 default: cdoAbort("Operator not implemented for real data!"); break;
@@ -258,6 +261,10 @@ Math(void *process)
                   break;
                 case IM:
                   for (i = 0; i < gridsize; i++) array2[i] = array1[i * 2 + 1];
+                  break;
+                case ARG:
+                  for (i = 0; i < gridsize; i++)
+                    array2[i] = (array1[2 * i] == missval1 || array1[2 * i + 1] == missval1) ? missval1 : atan2 (array1[2 * i + 1], array1[2 * i]);
                   break;
                 default: cdoAbort("Fields with complex numbers are not supported by this operator!"); break;
                 }
