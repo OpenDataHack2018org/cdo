@@ -250,6 +250,14 @@ Math(void *process)
                       array2[i * 2 + 1] = 0;
                     }
                   break;
+                case SQRT:
+                  for (i = 0; i < gridsize; i++)
+                    {
+                      double abs = SQRTMN(ADDMN(MULMN(array1[2 * i], array1[2 * i]), MULMN(array1[2 * i + 1], array1[2 * i + 1])));
+                      array2[i * 2] = MULMN(1/sqrt(2.), SQRTMN(ADDMN(array1[i * 2], abs)));
+                      array2[i * 2 + 1] = MULMN(1/sqrt(2.), DIVMN(array1[2 * i + 1], SQRTMN(ADDMN(array1[2 * i], abs))));;
+                    }
+                  break;
                 case CONJ:
                   for (i = 0; i < gridsize; i++)
                     {
