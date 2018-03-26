@@ -5,6 +5,7 @@
 
 2018-03-26  Uwe Schulzweida
 
+	* New operator conj: complex conjugate
 	* add, sub, mul, div: added support for complex numbers
 
 2018-03-22  Uwe Schulzweida

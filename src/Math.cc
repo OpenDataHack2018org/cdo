@@ -60,7 +60,10 @@ Math(void *process)
     ATAN,
     POW,
     RECI,
-    NOT
+    NOT,
+    CONJ,
+    RE,
+    IM
   };
   int nrecs;
   int varID, levelID;
@@ -87,6 +90,9 @@ Math(void *process)
   cdoOperatorAdd("pow",   POW,   0, NULL);
   cdoOperatorAdd("reci",  RECI,  0, NULL);
   cdoOperatorAdd("not",   NOT,   0, NULL);
+  cdoOperatorAdd("conj",  CONJ,  0, NULL);
+  cdoOperatorAdd("re",    RE,    0, NULL);
+  cdoOperatorAdd("im",    IM,    0, NULL);
   // clang-format on
 
   int operatorID = cdoOperatorID();
@@ -105,6 +111,18 @@ Math(void *process)
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
+
+  if ( operfunc == RE || operfunc == IM )
+    {
+      int nvars = vlistNvars(vlistID2);
+      for ( int varID = 0; varID < nvars; ++varID )
+        {
+          if ( vlistInqVarDatatype(vlistID2, varID) == CDI_DATATYPE_CPX32)
+            vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT32);
+          if ( vlistInqVarDatatype(vlistID2, varID) == CDI_DATATYPE_CPX64)
+            vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
+        }
+    }
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -209,8 +227,13 @@ Math(void *process)
                   for (i = 0; i < gridsize; i++)
                     array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : IS_EQUAL(array1[i], 0);
                   break;
-                default: cdoAbort("operator not implemented!"); break;
+                case RE:
+                  for (i = 0; i < gridsize; i++) array2[i] = array1[i];
+                  break;
+                default: cdoAbort("Operator not implemented for real data!"); break;
                 }
+
+              nmiss = arrayNumMV(gridsize, &array2[0], missval1);
             }
           else
             {
@@ -223,11 +246,25 @@ Math(void *process)
                       array2[i * 2 + 1] = 0;
                     }
                   break;
-                default: cdoAbort("operator not implemented for complex numbers!"); break;
+                case CONJ:
+                  for (i = 0; i < gridsize; i++)
+                    {
+                      array2[i * 2] = array1[i * 2];
+                      array2[i * 2 + 1] = - array1[i * 2 + 1];
+                    }
+                  break;
+                case RE:
+                  for (i = 0; i < gridsize; i++) array2[i] = array1[i * 2];
+                  break;
+                case IM:
+                  for (i = 0; i < gridsize; i++) array2[i] = array1[i * 2 + 1];
+                  break;
+                default: cdoAbort("Fields with complex numbers are not supported by this operator!"); break;
                 }
+
+              nmiss = 0;
             }
 
-          nmiss = arrayNumMV(gridsize, &array2[0], missval1);
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, &array2[0], nmiss);
         }
