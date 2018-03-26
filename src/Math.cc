@@ -114,7 +114,7 @@ Math(void *process)
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
-  if ( operfunc == RE || operfunc == IM  || operfunc == ARG )
+  if ( operfunc == RE || operfunc == IM  || operfunc == ABS ||  operfunc == ARG )
     {
       int nvars = vlistNvars(vlistID2);
       for ( int varID = 0; varID < nvars; ++varID )
@@ -151,6 +151,7 @@ Math(void *process)
           pstreamReadRecord(streamID1, &array1[0], &nmiss);
 
           double missval1 = vlistInqVarMissval(vlistID1, varID);
+          double missval2 = missval1;
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           int number = vlistInqVarNumber(vlistID1, varID);
 
@@ -262,9 +263,13 @@ Math(void *process)
                 case IM:
                   for (i = 0; i < gridsize; i++) array2[i] = array1[i * 2 + 1];
                   break;
+                case ABS:
+                  for (i = 0; i < gridsize; i++)
+                    array2[i] = SQRTMN(ADDMN(MULMN(array1[2 * i], array1[2 * i]), MULMN(array1[2 * i + 1], array1[2 * i + 1])));
+                  break;
                 case ARG:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = (array1[2 * i] == missval1 || array1[2 * i + 1] == missval1) ? missval1 : atan2 (array1[2 * i + 1], array1[2 * i]);
+                    array2[i] = (DBL_IS_EQUAL(array1[2 * i], missval1) || DBL_IS_EQUAL(array1[2 * i + 1], missval1)) ? missval1 : atan2 (array1[2 * i + 1], array1[2 * i]);
                   break;
                 default: cdoAbort("Fields with complex numbers are not supported by this operator!"); break;
                 }
