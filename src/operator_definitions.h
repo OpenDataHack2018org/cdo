@@ -38,7 +38,7 @@
 #define  CommandOperators       {"command", "com", "cmd"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}
-#define  ComplextorectOperators {"complextorect"}
+#define  ComplextorectOperators {"complextorect", "complextopol"}
 #define  CondOperators          {"ifthen",  "ifnotthen"}
 #define  Cond2Operators         {"ifthenelse"}
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
