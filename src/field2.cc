@@ -564,8 +564,8 @@ farvar(field_type *field1, field_type field2, field_type field3, int divisor)
     {
       for (size_t i = 0; i < len; i++)
         {
-          temp = DIV(MULMN(array1[i], array1[i]), array3[i]);
-          array1[i] = DIV(SUBMN(array2[i], temp), array3[i] - divisor);
+          temp = DIVMN(MULMN(array1[i], array1[i]), array3[i]);
+          array1[i] = DIVMN(SUBMN(array2[i], temp), array3[i] - divisor);
           if (array1[i] < 0 && array1[i] > -1.e-5) array1[i] = 0;
         }
     }
