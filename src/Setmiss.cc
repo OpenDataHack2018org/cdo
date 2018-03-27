@@ -157,18 +157,16 @@ Setmiss(void *process)
             }
           else if (operatorID == SETCTOMISS)
             {
-#if defined(HAVE_ISNAN)
-              if (std::isnan(rconst))
+              if (DBL_IS_NAN(rconst))
                 {
                   for (size_t i = 0; i < gridsize; i++)
-                    if (std::isnan(array[i]))
+                    if (DBL_IS_NAN(array[i]))
                       {
                         array[i] = missval;
                         nmiss++;
                       }
                 }
               else
-#endif
                 {
                   for (size_t i = 0; i < gridsize; i++)
                     if (DBL_IS_EQUAL(array[i], rconst) || DBL_IS_EQUAL(array[i], (float) rconst))

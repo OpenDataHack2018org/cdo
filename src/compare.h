@@ -31,7 +31,7 @@
 #endif
 #else
 #ifndef DBL_IS_NAN
-#if defined(HAVE_DECL_ISNAN)
+#if defined(HAVE_DECL_ISNAN) && !defined(DISABLE_ISNAN)
 #define DBL_IS_NAN(x) (std::isnan(x))
 #elif defined(FP_NAN)
 #define DBL_IS_NAN(x) (fpclassify(x) == FP_NAN)

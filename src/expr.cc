@@ -898,7 +898,7 @@ ex_fun_var(int init, int funcID, nodeType *p1)
                   pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : exprfunc(p1data[i]);
                   if (errno == EDOM || errno == ERANGE)
                     pdata[i] = missval;
-                  else if (std::isnan(pdata[i]))
+                  else if (DBL_IS_NAN(pdata[i]))
                     pdata[i] = missval;
                 }
             }
@@ -910,7 +910,7 @@ ex_fun_var(int init, int funcID, nodeType *p1)
                   pdata[i] = exprfunc(p1data[i]);
                   if (errno == EDOM || errno == ERANGE)
                     pdata[i] = missval;
-                  else if (std::isnan(pdata[i]))
+                  else if (DBL_IS_NAN(pdata[i]))
                     pdata[i] = missval;
                 }
             }

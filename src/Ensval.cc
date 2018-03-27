@@ -520,7 +520,7 @@ Ensval(void *process)
           for (stream = 0; stream < nostreams; stream++)
             {
               pstreamDefRecord(streamID2[stream], varID, levelID);
-              if (std::isnan(r[stream]))
+              if (DBL_IS_NAN(r[stream]))
                 {
                   r[stream] = missval;
                   have_miss = 1;
