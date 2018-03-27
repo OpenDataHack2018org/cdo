@@ -163,7 +163,7 @@ Ensstat(void *process)
   if (operfunc == func_pctl)
     {
       operatorInputArg("percentile number");
-      pn = parameter2int(operatorArgv()[0]);
+      pn = parameter2double(operatorArgv()[0]);
       percentile_check_number(pn);
       argc--;
     }
