@@ -275,7 +275,7 @@ Timstat3(void *process)
               for (int j = 0; j < n_in; j++)
                 {
                   double fnvals = iwork[j][varID][levelID][i];
-                  temp1 = ADDMN(temp1, DIVMN(MULMN(MULMN(mean_factor[j], mean_factor[j]), var_factor[j]), fnvals));
+                  temp1 = ADDMN(temp1, DIVMN(MUL(MUL(mean_factor[j], mean_factor[j]), var_factor[j]), fnvals));
                 }
 
               double norm = SQRTMN(temp1);
