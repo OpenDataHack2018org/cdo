@@ -25,7 +25,7 @@
 // bilinear interpolation
 
 bool
-find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
+remapFindWeights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
 {
   bool lfound = false;
   long iter;                      // iteration counters
@@ -223,7 +223,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
           double iw, jw;  // current guess for bilinear coordinate
-          if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
+          if (remapFindWeights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
               bilinearSetWeights(iw, jw, wgts);
@@ -324,7 +324,7 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
           double iw, jw;  // current guess for bilinear coordinate
-          if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
+          if (remapFindWeights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
               bilinearSetWeights(iw, jw, wgts);

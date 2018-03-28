@@ -157,7 +157,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
           double iw, jw;  // current guess for bilinear coordinate
-          if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
+          if (remapFindWeights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
               bicubicSetWeights(iw, jw, wgts);
@@ -261,7 +261,7 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
           double iw, jw;  // current guess for bilinear coordinate
-          if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
+          if (remapFindWeights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
               bicubicSetWeights(iw, jw, wgts);
