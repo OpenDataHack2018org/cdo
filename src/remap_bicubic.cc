@@ -182,7 +182,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
         }
     }
 
-  weightLinksToRemapLinks4(tgt_grid_size, weightLinks, rv);
+  weightLinks4ToRemapLinks(tgt_grid_size, weightLinks, rv);
 
   if (cdoTimer) timer_stop(timer_remap_bic);
 }  // scrip_remap_weights_bicubic

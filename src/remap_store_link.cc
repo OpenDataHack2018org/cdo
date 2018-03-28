@@ -225,7 +225,7 @@ weightLinksToRemapLinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLink
 }
 
 void
-weightLinksToRemapLinks4(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks, RemapVars &rv)
+weightLinks4ToRemapLinks(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks, RemapVars &rv)
 {
   size_t nlinks = 0;
 
