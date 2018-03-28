@@ -21,13 +21,13 @@
 #include "remap_store_link.h"
 
 static bool
-compareAdds(const addweight_t &a, const addweight_t &b)
+compareAdds(const Addweight &a, const Addweight &b)
 {
   return a.add < b.add;
 }
 
 static bool
-compareAdds4(const addweight4_t &a, const addweight4_t &b)
+compareAdds4(const Addweight4 &a, const Addweight4 &b)
 {
   return a.add < b.add;
 }
@@ -35,35 +35,35 @@ compareAdds4(const addweight4_t &a, const addweight4_t &b)
 static int
 qcompareAdds(const void *a, const void *b)
 {
-  return ((const addweight_t *)a)->add < ((const addweight_t *)b)->add;
+  return ((const Addweight *)a)->add < ((const Addweight *)b)->add;
 }
 
 static int
 qcompareAdds4(const void *a, const void *b)
 {
-  return ((const addweight4_t *)a)->add < ((const addweight4_t *)b)->add;
+  return ((const Addweight4 *)a)->add < ((const Addweight4 *)b)->add;
 }
 
 static void
-sortAddweights(size_t numWeights, addweight_t *addweights)
+sortAddweights(size_t numWeights, Addweight *addweights)
 {
   size_t n;
   for (n = 1; n < numWeights; ++n)
     if (addweights[n].add < addweights[n - 1].add) break;
   if (n == numWeights) return;
 
-  qsort(addweights, numWeights, sizeof(addweight_t), qcompareAdds);
+  qsort(addweights, numWeights, sizeof(Addweight), qcompareAdds);
 }
 
 static void
-sortAddweights4(size_t numWeights, addweight4_t *addweights)
+sortAddweights4(Addweight4 *addweights)
 {
-  size_t n;
-  for (n = 1; n < numWeights; ++n)
+  unsigned n;
+  for (n = 1; n < 4; ++n)
     if (addweights[n].add < addweights[n - 1].add) break;
-  if (n == numWeights) return;
+  if (n == 4) return;
 
-  qsort(addweights, numWeights, sizeof(addweight4_t), qcompareAdds4);
+  qsort(addweights, 4, sizeof(Addweight4), qcompareAdds4);
 }
 
 void
@@ -76,7 +76,7 @@ sort_add_and_wgts(size_t numWeights, size_t *src_add, double *wgts)
 
   if (numWeights > 1)
     {
-      std::vector<addweight_t> addweights(numWeights);
+      std::vector<Addweight> addweights(numWeights);
 
       for (n = 0; n < numWeights; ++n)
         {
@@ -104,7 +104,7 @@ sort_add_and_wgts4(size_t numWeights, size_t *src_add, double wgts[4][4])
 
   if (numWeights > 1)
     {
-      std::vector<addweight4_t> addweights(numWeights);
+      std::vector<Addweight4> addweights(numWeights);
 
       for (n = 0; n < numWeights; ++n)
         {
@@ -123,7 +123,7 @@ sort_add_and_wgts4(size_t numWeights, size_t *src_add, double wgts[4][4])
 }
 
 void
-storeWeightlinks(int lalloc, size_t numWeights, size_t *srch_add, double *weights, size_t cell_add,
+storeWeightLinks(int lalloc, size_t numWeights, size_t *srch_add, double *weights, size_t cell_add,
                  std::vector<WeightLinks> &weightLinks)
 {
   weightLinks[cell_add].nlinks = 0;
@@ -131,9 +131,9 @@ storeWeightlinks(int lalloc, size_t numWeights, size_t *srch_add, double *weight
 
   if (numWeights)
     {
-      addweight_t *addweights = NULL;
+      Addweight *addweights = NULL;
       if (lalloc)
-        addweights = (addweight_t *) Malloc(numWeights * sizeof(addweight_t));
+        addweights = (Addweight*) Malloc(numWeights * sizeof(Addweight));
       else
         addweights = weightLinks[cell_add].addweights;
 
@@ -152,26 +152,22 @@ storeWeightlinks(int lalloc, size_t numWeights, size_t *srch_add, double *weight
 }
 
 void
-storeWeightlinks4(size_t numWeights, size_t *srch_add, double weights[4][4], size_t cell_add,
-                  std::vector<WeightLinks4> &weightLinks)
+storeWeightLinks4(size_t *srch_add, double weights[4][4], size_t cell_add, std::vector<WeightLinks4> &weightLinks)
 {
   weightLinks[cell_add].nlinks = 0;
   weightLinks[cell_add].offset = 0;
 
-  if (numWeights)
+  Addweight4 *addweights = weightLinks[cell_add].addweights;
+
+  for (unsigned n = 0; n < 4; ++n)
     {
-      addweight4_t *addweights = weightLinks[cell_add].addweights;
-
-      for (size_t n = 0; n < numWeights; ++n)
-        {
-          addweights[n].add = srch_add[n];
-          for (unsigned k = 0; k < 4; ++k) addweights[n].weight[k] = weights[n][k];
-        }
-
-      sortAddweights4(numWeights, addweights);
-
-      weightLinks[cell_add].nlinks = numWeights;
+      addweights[n].add = srch_add[n];
+      for (unsigned k = 0; k < 4; ++k) addweights[n].weight[k] = weights[n][k];
     }
+
+  sortAddweights4(addweights);
+
+  weightLinks[cell_add].nlinks = 4;
 }
 
 void
@@ -208,7 +204,7 @@ weightLinksToRemapLinks(int lalloc, size_t gridSize, std::vector<WeightLinks> &w
           if (num_links)
             {
               size_t offset = weightLinks[i].offset;
-              addweight_t *addweights = weightLinks[i].addweights;
+              Addweight *addweights = weightLinks[i].addweights;
               for (size_t ilink = 0; ilink < num_links; ++ilink)
                 {
                   src_cell_adds[offset + ilink] = addweights[ilink].add;
@@ -267,7 +263,7 @@ weightLinks4ToRemapLinks(size_t gridSize, std::vector<WeightLinks4> &weightLinks
           if (num_links)
             {
               size_t offset = weightLinks[i].offset;
-              addweight4_t *addweights = weightLinks[i].addweights;
+              Addweight4 *addweights = weightLinks[i].addweights;
               for (size_t ilink = 0; ilink < num_links; ++ilink)
                 {
                   src_cell_adds[offset + ilink] = addweights[ilink].add;
@@ -284,7 +280,7 @@ weightLinks4ToRemapLinks(size_t gridSize, std::vector<WeightLinks4> &weightLinks
 void
 weightLinksAlloc(size_t numNeighbors, size_t gridSize, std::vector<WeightLinks> &weightLinks)
 {
-  weightLinks[0].addweights = (addweight_t *) Malloc(numNeighbors * gridSize * sizeof(addweight_t));
+  weightLinks[0].addweights = (Addweight *) Malloc(numNeighbors * gridSize * sizeof(Addweight));
   for (size_t i = 1; i < gridSize; ++i)
     weightLinks[i].addweights = weightLinks[0].addweights + numNeighbors * i;
 }
@@ -292,7 +288,7 @@ weightLinksAlloc(size_t numNeighbors, size_t gridSize, std::vector<WeightLinks> 
 void
 weightLinks4Alloc(size_t gridSize, std::vector<WeightLinks4> &weightLinks)
 {
-  weightLinks[0].addweights = (addweight4_t *) Malloc(4 * gridSize * sizeof(addweight4_t));
+  weightLinks[0].addweights = (Addweight4 *) Malloc(4 * gridSize * sizeof(Addweight4));
   for (size_t i = 1; i < gridSize; ++i)
     weightLinks[i].addweights = weightLinks[0].addweights + 4 * i;
 }

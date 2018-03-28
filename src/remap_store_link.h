@@ -17,13 +17,13 @@
 #ifndef REMAP_STORE_LINK_H
 #define REMAP_STORE_LINK_H
 
-struct addweight_t
+struct Addweight
 {
   size_t add;
   double weight;
 };
 
-struct addweight4_t
+struct Addweight4
 {
   size_t add;
   double weight[4];
@@ -33,22 +33,21 @@ struct WeightLinks
 {
   size_t nlinks;
   size_t offset;
-  addweight_t *addweights;
+  Addweight *addweights;
 };
 
 struct WeightLinks4
 {
   size_t nlinks;
   size_t offset;
-  addweight4_t *addweights;
+  Addweight4 *addweights;
 };
 
 void weightLinksAlloc(size_t numNeighbors, size_t gridSize, std::vector<WeightLinks> &weightLinks);
 void weightLinks4Alloc(size_t gridSize, std::vector<WeightLinks4> &weightLinks);
-void storeWeightlinks(int lalloc, size_t numWeights, size_t *srch_add, double *weights, size_t cell_add,
+void storeWeightLinks(int lalloc, size_t numWeights, size_t *srch_add, double *weights, size_t cell_add,
                       std::vector<WeightLinks> &weightLinks);
-void storeWeightlinks4(size_t numWeights, size_t *srch_add, double weights[4][4], size_t cell_add,
-                       std::vector<WeightLinks4> &weightLinks);
+void storeWeightLinks4(size_t *srch_add, double weights[4][4], size_t cell_add, std::vector<WeightLinks4> &weightLinks);
 void weightLinksToRemapLinks(int lalloc, size_t gridSize, std::vector<WeightLinks> &weightLinks, RemapVars &rv);
 void weightLinks4ToRemapLinks(size_t gridSize, std::vector<WeightLinks4> &weightLinks, RemapVars &rv);
 void sort_add_and_wgts(size_t numWeights, size_t *src_add, double *wgts);

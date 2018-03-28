@@ -158,7 +158,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               // Successfully found iw,jw - compute weights
               bicubicSetWeights(iw, jw, wgts);
-              storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightLinks);
+              storeWeightLinks4(src_add, wgts, tgt_cell_add, weightLinks);
             }
           else
             {
@@ -177,7 +177,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
-              storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightLinks);
+              storeWeightLinks4(src_add, wgts, tgt_cell_add, weightLinks);
             }
         }
     }

@@ -956,7 +956,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
           tgt_grid->cell_frac[tgt_cell_add] += partial_weight;
         }
 
-      storeWeightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightLinks);
+      storeWeightLinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightLinks);
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area;
       // printf("area %d %g %g\n", tgt_cell_add,

@@ -1,5 +1,5 @@
-#ifndef NBR_WEIGHTS_H
-#define NBR_WEIGHTS_H
+#ifndef KNN_WEIGHTS_H
+#define KNN_WEIGHTS_H
 
 #include <stdio.h>
 #include <stdlib.h>

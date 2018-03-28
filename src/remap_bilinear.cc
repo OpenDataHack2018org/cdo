@@ -222,7 +222,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               // Successfully found iw,jw - compute weights
               bilinearSetWeights(iw, jw, wgts);
-              storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightLinks);
+              storeWeightLinks(0, 4, src_add, wgts, tgt_cell_add, weightLinks);
             }
           else
             {
@@ -241,7 +241,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
-              storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightLinks);
+              storeWeightLinks(0, 4, src_add, wgts, tgt_cell_add, weightLinks);
             }
         }
     }
