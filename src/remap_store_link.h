@@ -43,6 +43,7 @@ struct weightLinks4_t
   addweight4_t *addweights;
 };
 
+void weightLinksAlloc(size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks);
 void storeWeightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weights, size_t cell_add,
                       std::vector<WeightLinks> &weightLinks);
 void storeWeightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], size_t cell_add,

@@ -271,3 +271,11 @@ weightLinks2remaplinks4(size_t tgt_grid_size, std::vector<weightLinks4_t> &weigh
       Free(weightLinks[0].addweights);
     }
 }
+
+void
+weightLinksAlloc(size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks)
+{
+  weightLinks[0].addweights = (addweight_t *) Malloc(4 * tgt_grid_size * sizeof(addweight_t));
+  for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
+    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + 4 * tgt_cell_add;
+}

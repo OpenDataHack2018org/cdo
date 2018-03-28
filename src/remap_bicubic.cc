@@ -98,17 +98,16 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
   RemapGrid *src_grid = rsearch.srcGrid;
   RemapGrid *tgt_grid = rsearch.tgtGrid;
 
-  extern int timer_remap_bic;
-
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
+  if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
+
+  extern int timer_remap_bic;
   if (cdoTimer) timer_start(timer_remap_bic);
 
   progressInit();
 
   // Compute mappings from source to target grid
-
-  if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
 
   size_t tgt_grid_size = tgt_grid->size;
 
@@ -206,6 +205,8 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
+  if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
+
   extern int timer_remap_bic;
   if (cdoTimer) timer_start(timer_remap_bic);
 
@@ -214,8 +215,6 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
   size_t tgt_grid_size = tgt_grid->size;
 
   // Compute mappings from source to target grid
-
-  if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
 
   gradientsType gradients(src_grid->size);
   remapGradients(*src_grid, src_array, gradients);

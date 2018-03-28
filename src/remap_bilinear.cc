@@ -163,6 +163,8 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
+  if (src_grid->rank != 2) cdoAbort("Can't do bilinear interpolation when source grid rank != 2");
+
   extern int timer_remap_bil;
   if (cdoTimer) timer_start(timer_remap_bil);
 
@@ -170,14 +172,10 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 
   // Compute mappings from source to target grid
 
-  if (src_grid->rank != 2) cdoAbort("Can't do bilinear interpolation when source grid rank != 2");
-
   size_t tgt_grid_size = tgt_grid->size;
 
   std::vector<WeightLinks> weightLinks(tgt_grid_size);
-  weightLinks[0].addweights = (addweight_t *) Malloc(4 * tgt_grid_size * sizeof(addweight_t));
-  for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + 4 * tgt_cell_add;
+  weightLinksAlloc(tgt_grid_size, weightLinks);
 
   double findex = 0;
 
@@ -269,6 +267,8 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
+  if (src_grid->rank != 2) cdoAbort("Can't do bilinear interpolation when source grid rank != 2");
+
   extern int timer_remap_bil;
   if (cdoTimer) timer_start(timer_remap_bil);
 
@@ -277,8 +277,6 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
   size_t tgt_grid_size = tgt_grid->size;
 
   // Compute mappings from source to target grid
-
-  if (src_grid->rank != 2) cdoAbort("Can't do bilinear interpolation when source grid rank != 2");
 
   double findex = 0;
 
