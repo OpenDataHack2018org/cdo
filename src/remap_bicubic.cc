@@ -111,7 +111,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  std::vector<weightLinks4_t> weightLinks(tgt_grid_size);
+  std::vector<WeightLinks4> weightLinks(tgt_grid_size);
   weightLinks[0].addweights = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
   for (unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + 4 * tgt_cell_add;

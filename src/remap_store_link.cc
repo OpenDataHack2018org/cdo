@@ -144,7 +144,7 @@ storeWeightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weigh
 
 void
 storeWeightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], size_t cell_add,
-                  std::vector<weightLinks4_t> &weightLinks)
+                  std::vector<WeightLinks4> &weightLinks)
 {
   weightLinks[cell_add].nlinks = 0;
   weightLinks[cell_add].offset = 0;
@@ -225,7 +225,7 @@ weightLinks2remaplinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLinks
 }
 
 void
-weightLinks2remaplinks4(size_t tgt_grid_size, std::vector<weightLinks4_t> &weightLinks, RemapVars &rv)
+weightLinks2remaplinks4(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks, RemapVars &rv)
 {
   size_t nlinks = 0;
 
