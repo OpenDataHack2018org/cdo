@@ -763,7 +763,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   double src_grid_bound_box[4];
   if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D) reg2d_bound_box(src_grid, src_grid_bound_box);
 
-  std::vector<weightlinks_t> weightlinks(tgt_grid_size);
+  std::vector<WeightLinks> weightLinks(tgt_grid_size);
 
   double findex = 0;
 
@@ -779,7 +779,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(rsearch, \
     Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose, \
-    tgt_num_cell_corners, target_cell_type, weightlinks, srch_corners, src_grid, tgt_grid, tgt_grid_size,   \
+    tgt_num_cell_corners, target_cell_type, weightLinks, srch_corners, src_grid, tgt_grid, tgt_grid_size,   \
     src_grid_size, search, srch_add, tgt_grid_cell, sum_srch_cells, sum_srch_cells2)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
@@ -793,7 +793,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       findex++;
       if (ompthID == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
-      weightlinks[tgt_cell_add].nlinks = 0;
+      weightLinks[tgt_cell_add].nlinks = 0;
 
 // Get search cells
 #ifdef STIMER
@@ -956,7 +956,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
           tgt_grid->cell_frac[tgt_cell_add] += partial_weight;
         }
 
-      storeWeightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightlinks);
+      storeWeightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightLinks);
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area;
       // printf("area %d %g %g\n", tgt_cell_add,
@@ -985,7 +985,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       delete[] srch_add[ompthID];
     }
 
-  weightlinks2remaplinks(1, tgt_grid_size, weightlinks, rv);
+  weightLinks2remaplinks(1, tgt_grid_size, weightLinks, rv);
 
   // Normalize weights using destination area if requested
   remapNormalizeWeights(tgt_grid, rv);

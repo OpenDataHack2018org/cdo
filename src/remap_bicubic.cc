@@ -112,24 +112,24 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  std::vector<weightlinks4_t> weightlinks(tgt_grid_size);
-  weightlinks[0].addweights = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
+  std::vector<weightLinks4_t> weightLinks(tgt_grid_size);
+  weightLinks[0].addweights = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
   for (unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4 * tgt_cell_add;
+    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + 4 * tgt_cell_add;
 
   double findex = 0;
 
   // Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightlinks, tgt_grid_size, src_grid, tgt_grid, rv)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightLinks, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
       findex++;
       if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
-      weightlinks[tgt_cell_add].nlinks = 0;
+      weightLinks[tgt_cell_add].nlinks = 0;
 
       if (!tgt_grid->mask[tgt_cell_add]) continue;
 
@@ -161,7 +161,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               // Successfully found iw,jw - compute weights
               bicubicSetWeights(iw, jw, wgts);
-              storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightlinks);
+              storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightLinks);
             }
           else
             {
@@ -180,12 +180,12 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
-              storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightlinks);
+              storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightLinks);
             }
         }
     }
 
-  weightlinks2remaplinks4(tgt_grid_size, weightlinks, rv);
+  weightLinks2remaplinks4(tgt_grid_size, weightLinks, rv);
 
   if (cdoTimer) timer_stop(timer_remap_bic);
 }  // scrip_remap_weights_bicubic

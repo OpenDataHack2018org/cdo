@@ -27,13 +27,12 @@
 bool
 remapFindWeights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
 {
-  bool lfound = false;
   long iter;                      // iteration counters
   double deli, delj;              // corrections to iw,jw
   double dthp, dphp;              // difference between point and sw corner
   double mat1, mat2, mat3, mat4;  // matrix elements
   double determinant;             // matrix determinant
-  double converge = 1.e-10;       // Convergence criterion
+  constexpr double converge = 1.e-10;       // Convergence criterion
   extern long remap_max_iter;
 
   /* Iterate to find iw,jw for bilinear approximation  */
@@ -90,9 +89,7 @@ remapFindWeights(double plon, double plat, double *restrict src_lons, double *re
   *ig = iguess;
   *jg = jguess;
 
-  if (iter < remap_max_iter) lfound = true;
-
-  return lfound;
+  return (iter < remap_max_iter);
 }
 
 static void
@@ -177,10 +174,10 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  std::vector<weightlinks_t> weightlinks(tgt_grid_size);
-  weightlinks[0].addweights = (addweight_t *) Malloc(4 * tgt_grid_size * sizeof(addweight_t));
+  std::vector<WeightLinks> weightLinks(tgt_grid_size);
+  weightLinks[0].addweights = (addweight_t *) Malloc(4 * tgt_grid_size * sizeof(addweight_t));
   for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4 * tgt_cell_add;
+    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + 4 * tgt_cell_add;
 
   double findex = 0;
 
@@ -188,14 +185,14 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) schedule(static) \
-  reduction(+ : findex) shared(rsearch, weightlinks, tgt_grid_size, src_grid, tgt_grid, rv)
+  reduction(+ : findex) shared(rsearch, weightLinks, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
       findex++;
       if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
-      weightlinks[tgt_cell_add].nlinks = 0;
+      weightLinks[tgt_cell_add].nlinks = 0;
 
       if (!tgt_grid->mask[tgt_cell_add]) continue;
 
@@ -227,7 +224,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               // Successfully found iw,jw - compute weights
               bilinearSetWeights(iw, jw, wgts);
-              storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
+              storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightLinks);
             }
           else
             {
@@ -246,12 +243,12 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
-              storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
+              storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightLinks);
             }
         }
     }
 
-  weightlinks2remaplinks(0, tgt_grid_size, weightlinks, rv);
+  weightLinks2remaplinks(0, tgt_grid_size, weightLinks, rv);
 
   if (cdoTimer) timer_stop(timer_remap_bil);
 }  // scrip_remap_weights_bilinear

@@ -115,10 +115,10 @@ sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
 
 void
 storeWeightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weights, size_t cell_add,
-                 std::vector<weightlinks_t> &weightlinks)
+                 std::vector<WeightLinks> &weightLinks)
 {
-  weightlinks[cell_add].nlinks = 0;
-  weightlinks[cell_add].offset = 0;
+  weightLinks[cell_add].nlinks = 0;
+  weightLinks[cell_add].offset = 0;
 
   if (num_weights)
     {
@@ -126,7 +126,7 @@ storeWeightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weigh
       if (lalloc)
         addweights = (addweight_t *) Malloc(num_weights * sizeof(addweight_t));
       else
-        addweights = weightlinks[cell_add].addweights;
+        addweights = weightLinks[cell_add].addweights;
 
       for (size_t n = 0; n < num_weights; ++n)
         {
@@ -136,22 +136,22 @@ storeWeightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weigh
 
       if (num_weights > 1) sort_addweights(num_weights, addweights);
 
-      weightlinks[cell_add].nlinks = num_weights;
+      weightLinks[cell_add].nlinks = num_weights;
 
-      if (lalloc) weightlinks[cell_add].addweights = addweights;
+      if (lalloc) weightLinks[cell_add].addweights = addweights;
     }
 }
 
 void
 storeWeightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], size_t cell_add,
-                  std::vector<weightlinks4_t> &weightlinks)
+                  std::vector<weightLinks4_t> &weightLinks)
 {
-  weightlinks[cell_add].nlinks = 0;
-  weightlinks[cell_add].offset = 0;
+  weightLinks[cell_add].nlinks = 0;
+  weightLinks[cell_add].offset = 0;
 
   if (num_weights)
     {
-      addweight4_t *addweights = weightlinks[cell_add].addweights;
+      addweight4_t *addweights = weightLinks[cell_add].addweights;
 
       for (size_t n = 0; n < num_weights; ++n)
         {
@@ -161,21 +161,21 @@ storeWeightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], si
 
       sort_addweights4(num_weights, addweights);
 
-      weightlinks[cell_add].nlinks = num_weights;
+      weightLinks[cell_add].nlinks = num_weights;
     }
 }
 
 void
-weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, std::vector<weightlinks_t> &weightlinks, RemapVars &rv)
+weightLinks2remaplinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks, RemapVars &rv)
 {
   size_t nlinks = 0;
 
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
-      if (weightlinks[tgt_cell_add].nlinks)
+      if (weightLinks[tgt_cell_add].nlinks)
         {
-          weightlinks[tgt_cell_add].offset = nlinks;
-          nlinks += weightlinks[tgt_cell_add].nlinks;
+          weightLinks[tgt_cell_add].offset = nlinks;
+          nlinks += weightLinks[tgt_cell_add].nlinks;
         }
     }
 
@@ -191,15 +191,15 @@ weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, std::vector<weightlinks
       double *restrict wts = &rv.wts[0];
 
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightlinks, tgt_grid_size)
+#pragma omp parallel for schedule(static) default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightLinks, tgt_grid_size)
 #endif
       for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
         {
-          size_t num_links = weightlinks[tgt_cell_add].nlinks;
+          size_t num_links = weightLinks[tgt_cell_add].nlinks;
           if (num_links)
             {
-              size_t offset = weightlinks[tgt_cell_add].offset;
-              addweight_t *addweights = weightlinks[tgt_cell_add].addweights;
+              size_t offset = weightLinks[tgt_cell_add].offset;
+              addweight_t *addweights = weightLinks[tgt_cell_add].addweights;
               for (size_t ilink = 0; ilink < num_links; ++ilink)
                 {
                   src_cell_adds[offset + ilink] = addweights[ilink].add;
@@ -213,28 +213,28 @@ weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, std::vector<weightlinks
         {
           for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
             {
-              size_t num_links = weightlinks[tgt_cell_add].nlinks;
-              if (num_links) Free(weightlinks[tgt_cell_add].addweights);
+              size_t num_links = weightLinks[tgt_cell_add].nlinks;
+              if (num_links) Free(weightLinks[tgt_cell_add].addweights);
             }
         }
       else
         {
-          Free(weightlinks[0].addweights);
+          Free(weightLinks[0].addweights);
         }
     }
 }
 
 void
-weightlinks2remaplinks4(size_t tgt_grid_size, std::vector<weightlinks4_t> &weightlinks, RemapVars &rv)
+weightLinks2remaplinks4(size_t tgt_grid_size, std::vector<weightLinks4_t> &weightLinks, RemapVars &rv)
 {
   size_t nlinks = 0;
 
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
-      if (weightlinks[tgt_cell_add].nlinks)
+      if (weightLinks[tgt_cell_add].nlinks)
         {
-          weightlinks[tgt_cell_add].offset = nlinks;
-          nlinks += weightlinks[tgt_cell_add].nlinks;
+          weightLinks[tgt_cell_add].offset = nlinks;
+          nlinks += weightLinks[tgt_cell_add].nlinks;
         }
     }
 
@@ -250,15 +250,15 @@ weightlinks2remaplinks4(size_t tgt_grid_size, std::vector<weightlinks4_t> &weigh
       double *restrict wts = &rv.wts[0];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightlinks, tgt_grid_size)
+#pragma omp parallel for default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightLinks, tgt_grid_size)
 #endif
       for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
         {
-          size_t num_links = weightlinks[tgt_cell_add].nlinks;
+          size_t num_links = weightLinks[tgt_cell_add].nlinks;
           if (num_links)
             {
-              size_t offset = weightlinks[tgt_cell_add].offset;
-              addweight4_t *addweights = weightlinks[tgt_cell_add].addweights;
+              size_t offset = weightLinks[tgt_cell_add].offset;
+              addweight4_t *addweights = weightLinks[tgt_cell_add].addweights;
               for (size_t ilink = 0; ilink < num_links; ++ilink)
                 {
                   src_cell_adds[offset + ilink] = addweights[ilink].add;
@@ -268,6 +268,6 @@ weightlinks2remaplinks4(size_t tgt_grid_size, std::vector<weightlinks4_t> &weigh
             }
         }
 
-      Free(weightlinks[0].addweights);
+      Free(weightLinks[0].addweights);
     }
 }
