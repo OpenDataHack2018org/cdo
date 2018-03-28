@@ -175,7 +175,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
   size_t tgt_grid_size = tgt_grid->size;
 
   std::vector<WeightLinks> weightLinks(tgt_grid_size);
-  weightLinksAlloc(tgt_grid_size, weightLinks);
+  weightLinksAlloc(4, tgt_grid_size, weightLinks);
 
   double findex = 0;
 
@@ -246,7 +246,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
         }
     }
 
-  weightLinks2remaplinks(0, tgt_grid_size, weightLinks, rv);
+  weightLinksToRemapLinks(0, tgt_grid_size, weightLinks, rv);
 
   if (cdoTimer) timer_stop(timer_remap_bil);
 }  // scrip_remap_weights_bilinear

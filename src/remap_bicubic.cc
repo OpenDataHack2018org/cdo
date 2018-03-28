@@ -112,9 +112,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
   size_t tgt_grid_size = tgt_grid->size;
 
   std::vector<WeightLinks4> weightLinks(tgt_grid_size);
-  weightLinks[0].addweights = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
-  for (unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + 4 * tgt_cell_add;
+  weightLinks4Alloc(tgt_grid_size, weightLinks);
 
   double findex = 0;
 
@@ -184,7 +182,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
         }
     }
 
-  weightLinks2remaplinks4(tgt_grid_size, weightLinks, rv);
+  weightLinksToRemapLinks4(tgt_grid_size, weightLinks, rv);
 
   if (cdoTimer) timer_stop(timer_remap_bic);
 }  // scrip_remap_weights_bicubic

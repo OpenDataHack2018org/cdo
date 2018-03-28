@@ -43,13 +43,14 @@ struct WeightLinks4
   addweight4_t *addweights;
 };
 
-void weightLinksAlloc(size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks);
+void weightLinksAlloc(size_t numNeighbors, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks);
+void weightLinks4Alloc(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks);
 void storeWeightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weights, size_t cell_add,
                       std::vector<WeightLinks> &weightLinks);
 void storeWeightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], size_t cell_add,
                        std::vector<WeightLinks4> &weightLinks);
-void weightLinks2remaplinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks, RemapVars &rv);
-void weightLinks2remaplinks4(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks, RemapVars &rv);
+void weightLinksToRemapLinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks, RemapVars &rv);
+void weightLinksToRemapLinks4(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks, RemapVars &rv);
 void sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts);
 void sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4]);
 

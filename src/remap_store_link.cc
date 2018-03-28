@@ -166,7 +166,7 @@ storeWeightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], si
 }
 
 void
-weightLinks2remaplinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks, RemapVars &rv)
+weightLinksToRemapLinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks, RemapVars &rv)
 {
   size_t nlinks = 0;
 
@@ -225,7 +225,7 @@ weightLinks2remaplinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLinks
 }
 
 void
-weightLinks2remaplinks4(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks, RemapVars &rv)
+weightLinksToRemapLinks4(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks, RemapVars &rv)
 {
   size_t nlinks = 0;
 
@@ -273,9 +273,17 @@ weightLinks2remaplinks4(size_t tgt_grid_size, std::vector<WeightLinks4> &weightL
 }
 
 void
-weightLinksAlloc(size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks)
+weightLinksAlloc(size_t numNeighbors, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks)
 {
-  weightLinks[0].addweights = (addweight_t *) Malloc(4 * tgt_grid_size * sizeof(addweight_t));
+  weightLinks[0].addweights = (addweight_t *) Malloc(numNeighbors * tgt_grid_size * sizeof(addweight_t));
   for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
+    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + numNeighbors * tgt_cell_add;
+}
+
+void
+weightLinks4Alloc(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks)
+{
+  weightLinks[0].addweights = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
+  for (unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + 4 * tgt_cell_add;
 }

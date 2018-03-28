@@ -985,7 +985,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       delete[] srch_add[ompthID];
     }
 
-  weightLinks2remaplinks(1, tgt_grid_size, weightLinks, rv);
+  weightLinksToRemapLinks(1, tgt_grid_size, weightLinks, rv);
 
   // Normalize weights using destination area if requested
   remapNormalizeWeights(tgt_grid, rv);

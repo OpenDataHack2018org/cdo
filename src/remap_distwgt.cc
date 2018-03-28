@@ -41,9 +41,7 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
   size_t tgt_grid_size = tgt_grid->size;
 
   std::vector<WeightLinks> weightLinks(tgt_grid_size);
-  weightLinks[0].addweights = (addweight_t *) Malloc(numNeighbors * tgt_grid_size * sizeof(addweight_t));
-  for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + numNeighbors * tgt_cell_add;
+  weightLinksAlloc(numNeighbors, tgt_grid_size, weightLinks);
 
   std::vector<knnWeightsType> knnWeights;
   for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
@@ -92,7 +90,7 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
   if (rsearch.gs) gridsearch_delete(rsearch.gs);
   rsearch.gs = NULL;
 
-  weightLinks2remaplinks(0, tgt_grid_size, weightLinks, rv);
+  weightLinksToRemapLinks(0, tgt_grid_size, weightLinks, rv);
 
 #ifdef _OPENMP
   if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
