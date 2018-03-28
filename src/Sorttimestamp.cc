@@ -35,20 +35,11 @@ typedef struct
 } timeinfo_t;
 
 static int
-cmpdatetime(const void *s1, const void *s2)
+cmpdatetime(const void *a, const void *b)
 {
-  int cmp = 0;
-  const timeinfo_t *x = (timeinfo_t *) s1;
-  const timeinfo_t *y = (timeinfo_t *) s2;
-  /*
-  printf("%g %g  %d %d\n", x->datetime, y->datetime, x, y);
-  */
-  if (x->datetime < y->datetime)
-    cmp = -1;
-  else if (x->datetime > y->datetime)
-    cmp = 1;
-
-  return cmp;
+  const double x = ((const timeinfo_t *)a)->datetime;
+  const double y = ((const timeinfo_t *)b)->datetime;
+  return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 void *

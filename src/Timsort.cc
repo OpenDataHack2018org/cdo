@@ -30,18 +30,11 @@
 #define NALLOC_INC 1024
 
 static int
-cmpdarray(const void *s1, const void *s2)
+compareDouble(const void *a, const void *b)
 {
-  int cmp = 0;
-  const double *x = (double *) s1;
-  const double *y = (double *) s2;
-
-  if (*x < *y)
-    cmp = -1;
-  else if (*x > *y)
-    cmp = 1;
-
-  return cmp;
+  const double *x = (const double*) a;
+  const double *y = (const double*) b;
+  return ((*x > *y) - (*x < *y)) * 2 + (*x > *y) - (*x < *y);
 }
 
 void *
@@ -122,7 +115,7 @@ Timsort(void *process)
 
               for (int tsID = 0; tsID < nts; tsID++) sarray[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
-              qsort(sarray[ompthID], nts, sizeof(double), cmpdarray);
+              qsort(sarray[ompthID], nts, sizeof(double), compareDouble);
 
               for (int tsID = 0; tsID < nts; tsID++) vars[tsID][varID][levelID].ptr[i] = sarray[ompthID][tsID];
             }

@@ -40,45 +40,42 @@ typedef struct
 } xyinfoType;
 
 static int
-cmpx(const void *s1, const void *s2)
+cmpx(const void *a, const void *b)
 {
-  int cmp = 0;
-  const xyinfoType *xy1 = (const xyinfoType *) s1;
-  const xyinfoType *xy2 = (const xyinfoType *) s2;
+  const double x = ((const xyinfoType *)a)->x;
+  const double y = ((const xyinfoType *)b)->x;
+  return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
+}
 
-  if (xy1->x < xy2->x)
+static int
+cmpxy_lt(const void *a, const void *b)
+{
+  const double x1 = ((const xyinfoType *)a)->x;
+  const double x2 = ((const xyinfoType *)b)->x;
+  const double y1 = ((const xyinfoType *)a)->y;
+  const double y2 = ((const xyinfoType *)b)->y;
+
+  int cmp = 0;
+  if (y1 < y2 || (!(fabs(y1 - y2) > 0) && x1 < x2))
     cmp = -1;
-  else if (xy1->x > xy2->x)
+  else if (y1 > y2 || (!(fabs(y1 - y2) > 0) && x1 > x2))
     cmp = 1;
 
   return cmp;
 }
 
 static int
-cmpxy_lt(const void *s1, const void *s2)
+cmpxy_gt(const void *a, const void *b)
 {
+  const double x1 = ((const xyinfoType *)a)->x;
+  const double x2 = ((const xyinfoType *)b)->x;
+  const double y1 = ((const xyinfoType *)a)->y;
+  const double y2 = ((const xyinfoType *)b)->y;
+
   int cmp = 0;
-  const xyinfoType *xy1 = (const xyinfoType *) s1;
-  const xyinfoType *xy2 = (const xyinfoType *) s2;
-
-  if (xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x))
+  if (y1 > y2 || (!(fabs(y1 - y2) > 0) && x1 < x2))
     cmp = -1;
-  else if (xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x))
-    cmp = 1;
-
-  return cmp;
-}
-
-static int
-cmpxy_gt(const void *s1, const void *s2)
-{
-  int cmp = 0;
-  const xyinfoType *xy1 = (const xyinfoType *) s1;
-  const xyinfoType *xy2 = (const xyinfoType *) s2;
-
-  if (xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x))
-    cmp = -1;
-  else if (xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x))
+  else if (y1 < y2 || (!(fabs(y1 - y2) > 0) && x1 > x2))
     cmp = 1;
 
   return cmp;

@@ -44,68 +44,43 @@ typedef struct
 } varinfo_t;
 
 static int
-cmpvarcode(const void *s1, const void *s2)
+cmpvarcode(const void *a, const void *b)
 {
-  const varinfo_t *x = (const varinfo_t *) s1;
-  const varinfo_t *y = (const varinfo_t *) s2;
-  int cmp = 0;
-  /*
-  printf("%d %d  %d %d\n", x->code, y->code, x, y);
-  */
-  if (x->code < y->code)
-    cmp = -1;
-  else if (x->code > y->code)
-    cmp = 1;
-
-  return cmp;
+  const int x = ((const varinfo_t *)a)->code;
+  const int y = ((const varinfo_t *)b)->code;
+  return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static int
-cmpvarparam(const void *s1, const void *s2)
+cmpvarparam(const void *a, const void *b)
 {
-  const varinfo_t *x = (const varinfo_t *) s1;
-  const varinfo_t *y = (const varinfo_t *) s2;
-
-  return strcmp(x->param, y->param);
+  const char *x = ((const varinfo_t *)a)->param;
+  const char *y = ((const varinfo_t *)b)->param;
+  return strcmp(x, y);
 }
 
 static int
-cmpvarname(const void *s1, const void *s2)
+cmpvarname(const void *a, const void *b)
 {
-  const varinfo_t *x = (const varinfo_t *) s1;
-  const varinfo_t *y = (const varinfo_t *) s2;
-
-  return strcmp(x->name, y->name);
+  const char *x = ((const varinfo_t *)a)->name;
+  const char *y = ((const varinfo_t *)b)->name;
+  return strcmp(x, y);
 }
 
 static int
-cmpvarlevel(const void *s1, const void *s2)
+cmpvarlevel(const void *a, const void *b)
 {
-  const levinfo_t *x = (const levinfo_t *) s1;
-  const levinfo_t *y = (const levinfo_t *) s2;
-  int cmp = 0;
-
-  if (x->level < y->level)
-    cmp = -1;
-  else if (x->level > y->level)
-    cmp = 1;
-
-  return cmp;
+  const double x = ((const levinfo_t *)a)->level;
+  const double y = ((const levinfo_t *)b)->level;
+  return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static int
-cmpvarlevelrev(const void *s1, const void *s2)
+cmpvarlevelrev(const void *a, const void *b)
 {
-  const levinfo_t *x = (const levinfo_t *) s1;
-  const levinfo_t *y = (const levinfo_t *) s2;
-  int cmp = 0;
-
-  if (x->level > y->level)
-    cmp = -1;
-  else if (x->level < y->level)
-    cmp = 1;
-
-  return cmp;
+  const double x = ((const levinfo_t *)a)->level;
+  const double y = ((const levinfo_t *)b)->level;
+  return -1 * (((x > y) - (x < y)) * 2 + (x > y) - (x < y));
 }
 
 static void

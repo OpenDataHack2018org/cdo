@@ -199,18 +199,11 @@ typedef struct
 } sinfo_t;
 
 static int
-cmpsinfo(const void *s1, const void *s2)
+cmpsinfo(const void *a, const void *b)
 {
-  int cmp = 0;
-  const sinfo_t *x = (const sinfo_t *) s1;
-  const sinfo_t *y = (const sinfo_t *) s2;
-
-  if (x->p < y->p)
-    cmp = -1;
-  else if (x->p > y->p)
-    cmp = 1;
-
-  return cmp;
+  const int x = ((const sinfo_t *)a)->p;
+  const int y = ((const sinfo_t *)b)->p;
+  return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static void

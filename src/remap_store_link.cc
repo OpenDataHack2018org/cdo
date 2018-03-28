@@ -35,13 +35,17 @@ compareAdds4(const Addweight4 &a, const Addweight4 &b)
 static int
 qcompareAdds(const void *a, const void *b)
 {
-  return ((const Addweight *)a)->add < ((const Addweight *)b)->add;
+  const size_t x = ((const Addweight *)a)->add;
+  const size_t y = ((const Addweight *)b)->add;
+  return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static int
 qcompareAdds4(const void *a, const void *b)
 {
-  return ((const Addweight4 *)a)->add < ((const Addweight4 *)b)->add;
+  const size_t x = ((const Addweight4 *)a)->add;
+  const size_t y = ((const Addweight4 *)b)->add;
+  return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static void

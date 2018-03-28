@@ -25,10 +25,9 @@
       Ymonstat   ymonmean        Multi-year monthly mean
       Ymonstat   ymonavg         Multi-year monthly average
       Ymonstat   ymonvar         Multi-year monthly variance
-      Ymonstat   ymonvar1        Multi-year monthly variance [Normalize by
-   (n-1)] Ymonstat   ymonstd         Multi-year monthly standard deviation
-      Ymonstat   ymonstd1        Multi-year monthly standard deviation
-   [Normalize by (n-1)]
+      Ymonstat   ymonvar1        Multi-year monthly variance [Normalize by (n-1)]
+      Ymonstat   ymonstd         Multi-year monthly standard deviation
+      Ymonstat   ymonstd1        Multi-year monthly standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>
@@ -40,16 +39,11 @@
 
 /*
 static
-int cmpint(const void *s1, const void *s2)
+int compareInt(const void *a, const void *b)
 {
-  int cmp = 0;
-  const int *x = s1;
-  const int *y = s2;
-
-  if      ( *x < *y ) cmp = -1;
-  else if ( *x > *y ) cmp =  1;
-
-  return cmp;
+  const int *x = (const int*) a;
+  const int *y = (const int*) b;
+  return ((*x > *y) - (*x < *y)) * 2 + (*x > *y) - (*x < *y);
 }
 */
 
@@ -252,7 +246,7 @@ Ymonstat(void *process)
         nmon++;
     }
 
-  qsort(mon, nmon, sizeof(int), cmpint);
+  qsort(mon, nmon, sizeof(int), compareInt);
 
   for ( i = 0; i < nmon; i++ )
     {
