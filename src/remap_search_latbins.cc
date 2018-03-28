@@ -163,8 +163,8 @@ get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &sr
 }
 
 static int
-grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
-               const double *restrict src_center_lat, const double *restrict src_center_lon)
+gridSearchSquareCurv2dNNScrip(size_t min_add, size_t max_add, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
+                              const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
   double distance;
@@ -319,8 +319,8 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
 }
 
 int
-grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons, double plat,
-            double plon, GridSearchBins &srcBins)
+gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons, double plat,
+                            double plon, GridSearchBins &srcBins)
 {
   /*
     Output variables:
@@ -345,7 +345,6 @@ grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_
   */
   int search_result = 0;
 
-  const size_t *restrict src_grid_dims = src_grid->dims;
   const double *restrict src_center_lat = src_grid->cell_center_lat;
   const double *restrict src_center_lon = src_grid->cell_center_lon;
 
@@ -379,8 +378,8 @@ grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_
 
   /* Now perform a more detailed search */
 
-  size_t nx = src_grid_dims[0];
-  size_t ny = src_grid_dims[1];
+  size_t nx = src_grid->dims[0];
+  size_t ny = src_grid->dims[1];
 
   for (srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
@@ -418,7 +417,7 @@ grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-  search_result = grid_search_nn(min_add, max_add, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
+  search_result = gridSearchSquareCurv2dNNScrip(min_add, max_add, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
 
   return search_result;
 } /* grid_search */

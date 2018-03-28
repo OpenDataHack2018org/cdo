@@ -288,19 +288,13 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src
 int
 remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t *src_add, double *src_lats, double *src_lons)
 {
-  RemapGrid *src_grid = rsearch.srcGrid;
-  int remap_grid_type = src_grid->remap_grid_type;
-
   int search_result;
-  if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-    search_result = gridSearchSquareReg2d(src_grid, src_add, src_lats, src_lons, plat, plon);
+  if (rsearch.srcGrid->remap_grid_type == REMAP_GRID_TYPE_REG2D)
+    search_result = gridSearchSquareReg2d(rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
+  else if (rsearch.gs)
+    search_result = gridSearchSquareCurv2d(rsearch.gs, rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
   else
-    {
-      if (rsearch.gs)
-        search_result = gridSearchSquareCurv2d(rsearch.gs, src_grid, src_add, src_lats, src_lons, plat, plon);
-      else
-        search_result = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);
-    }
+    search_result = gridSearchSquareCurv2dScrip(rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);
 
   return search_result;
 }
