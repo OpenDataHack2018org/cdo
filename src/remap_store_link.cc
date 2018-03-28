@@ -15,69 +15,78 @@
   GNU General Public License for more details.
 */
 
+#include <algorithm>
 #include "cdo_int.h"
 #include "remap.h"
 #include "remap_store_link.h"
 
-static int
-cmp_adds(const void *s1, const void *s2)
+static bool
+compareAdds(const addweight_t &a, const addweight_t &b)
 {
-  const addweight_t *c1 = (const addweight_t *) s1;
-  const addweight_t *c2 = (const addweight_t *) s2;
-  return (c1->add < c2->add) ? -1 : ((c1->add > c2->add) ? 1 : 0);
+  return a.add < b.add;
+}
+
+static bool
+compareAdds4(const addweight4_t &a, const addweight4_t &b)
+{
+  return a.add < b.add;
 }
 
 static int
-cmp_adds4(const void *s1, const void *s2)
+qcompareAdds(const void *a, const void *b)
 {
-  const addweight4_t *c1 = (const addweight4_t *) s1;
-  const addweight4_t *c2 = (const addweight4_t *) s2;
-  return (c1->add < c2->add) ? -1 : ((c1->add > c2->add) ? 1 : 0);
+  return ((const addweight_t *)a)->add < ((const addweight_t *)b)->add;
+}
+
+static int
+qcompareAdds4(const void *a, const void *b)
+{
+  return ((const addweight4_t *)a)->add < ((const addweight4_t *)b)->add;
 }
 
 static void
-sort_addweights(size_t num_weights, addweight_t *addweights)
+sortAddweights(size_t numWeights, addweight_t *addweights)
 {
   size_t n;
-  for (n = 1; n < num_weights; ++n)
+  for (n = 1; n < numWeights; ++n)
     if (addweights[n].add < addweights[n - 1].add) break;
-  if (n == num_weights) return;
+  if (n == numWeights) return;
 
-  qsort(addweights, num_weights, sizeof(addweight_t), cmp_adds);
+  qsort(addweights, numWeights, sizeof(addweight_t), qcompareAdds);
 }
 
 static void
-sort_addweights4(size_t num_weights, addweight4_t *addweights)
+sortAddweights4(size_t numWeights, addweight4_t *addweights)
 {
   size_t n;
-  for (n = 1; n < num_weights; ++n)
+  for (n = 1; n < numWeights; ++n)
     if (addweights[n].add < addweights[n - 1].add) break;
-  if (n == num_weights) return;
+  if (n == numWeights) return;
 
-  qsort(addweights, num_weights, sizeof(addweight4_t), cmp_adds);
+  qsort(addweights, numWeights, sizeof(addweight4_t), qcompareAdds4);
 }
 
 void
-sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts)
+sort_add_and_wgts(size_t numWeights, size_t *src_add, double *wgts)
 {
   size_t n;
-  for (n = 1; n < num_weights; ++n)
+  for (n = 1; n < numWeights; ++n)
     if (src_add[n] < src_add[n - 1]) break;
-  if (n == num_weights) return;
+  if (n == numWeights) return;
 
-  if (num_weights > 1)
+  if (numWeights > 1)
     {
-      std::vector<addweight_t> addweights(num_weights);
+      std::vector<addweight_t> addweights(numWeights);
 
-      for (n = 0; n < num_weights; ++n)
+      for (n = 0; n < numWeights; ++n)
         {
           addweights[n].add = src_add[n];
           addweights[n].weight = wgts[n];
         }
 
-      qsort(&addweights[0], num_weights, sizeof(addweight_t), cmp_adds);
+      std::sort(addweights.begin(), addweights.end(), compareAdds);
 
-      for (n = 0; n < num_weights; ++n)
+      for (n = 0; n < numWeights; ++n)
         {
           src_add[n] = addweights[n].add;
           wgts[n] = addweights[n].weight;
@@ -86,26 +95,26 @@ sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts)
 }
 
 void
-sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
+sort_add_and_wgts4(size_t numWeights, size_t *src_add, double wgts[4][4])
 {
   size_t n;
-  for (n = 1; n < num_weights; ++n)
+  for (n = 1; n < numWeights; ++n)
     if (src_add[n] < src_add[n - 1]) break;
-  if (n == num_weights) return;
+  if (n == numWeights) return;
 
-  if (num_weights > 1)
+  if (numWeights > 1)
     {
-      std::vector<addweight4_t> addweights(num_weights);
+      std::vector<addweight4_t> addweights(numWeights);
 
-      for (n = 0; n < num_weights; ++n)
+      for (n = 0; n < numWeights; ++n)
         {
           addweights[n].add = src_add[n];
           for (unsigned k = 0; k < 4; ++k) addweights[n].weight[k] = wgts[n][k];
         }
 
-      qsort(&addweights[0], num_weights, sizeof(addweight4_t), cmp_adds4);
+      std::sort(addweights.begin(), addweights.end(), compareAdds4);
 
-      for (n = 0; n < num_weights; ++n)
+      for (n = 0; n < numWeights; ++n)
         {
           src_add[n] = addweights[n].add;
           for (unsigned k = 0; k < 4; ++k) wgts[n][k] = addweights[n].weight[k];
@@ -114,68 +123,68 @@ sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
 }
 
 void
-storeWeightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weights, size_t cell_add,
+storeWeightlinks(int lalloc, size_t numWeights, size_t *srch_add, double *weights, size_t cell_add,
                  std::vector<WeightLinks> &weightLinks)
 {
   weightLinks[cell_add].nlinks = 0;
   weightLinks[cell_add].offset = 0;
 
-  if (num_weights)
+  if (numWeights)
     {
       addweight_t *addweights = NULL;
       if (lalloc)
-        addweights = (addweight_t *) Malloc(num_weights * sizeof(addweight_t));
+        addweights = (addweight_t *) Malloc(numWeights * sizeof(addweight_t));
       else
         addweights = weightLinks[cell_add].addweights;
 
-      for (size_t n = 0; n < num_weights; ++n)
+      for (size_t n = 0; n < numWeights; ++n)
         {
           addweights[n].add = srch_add[n];
           addweights[n].weight = weights[n];
         }
 
-      if (num_weights > 1) sort_addweights(num_weights, addweights);
+      if (numWeights > 1) sortAddweights(numWeights, addweights);
 
-      weightLinks[cell_add].nlinks = num_weights;
+      weightLinks[cell_add].nlinks = numWeights;
 
       if (lalloc) weightLinks[cell_add].addweights = addweights;
     }
 }
 
 void
-storeWeightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], size_t cell_add,
+storeWeightlinks4(size_t numWeights, size_t *srch_add, double weights[4][4], size_t cell_add,
                   std::vector<WeightLinks4> &weightLinks)
 {
   weightLinks[cell_add].nlinks = 0;
   weightLinks[cell_add].offset = 0;
 
-  if (num_weights)
+  if (numWeights)
     {
       addweight4_t *addweights = weightLinks[cell_add].addweights;
 
-      for (size_t n = 0; n < num_weights; ++n)
+      for (size_t n = 0; n < numWeights; ++n)
         {
           addweights[n].add = srch_add[n];
           for (unsigned k = 0; k < 4; ++k) addweights[n].weight[k] = weights[n][k];
         }
 
-      sort_addweights4(num_weights, addweights);
+      sortAddweights4(numWeights, addweights);
 
-      weightLinks[cell_add].nlinks = num_weights;
+      weightLinks[cell_add].nlinks = numWeights;
     }
 }
 
 void
-weightLinksToRemapLinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks, RemapVars &rv)
+weightLinksToRemapLinks(int lalloc, size_t gridSize, std::vector<WeightLinks> &weightLinks, RemapVars &rv)
 {
   size_t nlinks = 0;
 
-  for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
+  for (size_t i = 0; i < gridSize; ++i)
     {
-      if (weightLinks[tgt_cell_add].nlinks)
+      if (weightLinks[i].nlinks)
         {
-          weightLinks[tgt_cell_add].offset = nlinks;
-          nlinks += weightLinks[tgt_cell_add].nlinks;
+          weightLinks[i].offset = nlinks;
+          nlinks += weightLinks[i].nlinks;
         }
     }
 
@@ -191,19 +200,19 @@ weightLinksToRemapLinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLink
       double *restrict wts = &rv.wts[0];
 
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightLinks, tgt_grid_size)
+#pragma omp parallel for schedule(static) default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightLinks, gridSize)
 #endif
-      for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
+      for (size_t i = 0; i < gridSize; ++i)
         {
-          size_t num_links = weightLinks[tgt_cell_add].nlinks;
+          size_t num_links = weightLinks[i].nlinks;
           if (num_links)
             {
-              size_t offset = weightLinks[tgt_cell_add].offset;
-              addweight_t *addweights = weightLinks[tgt_cell_add].addweights;
+              size_t offset = weightLinks[i].offset;
+              addweight_t *addweights = weightLinks[i].addweights;
               for (size_t ilink = 0; ilink < num_links; ++ilink)
                 {
                   src_cell_adds[offset + ilink] = addweights[ilink].add;
-                  tgt_cell_adds[offset + ilink] = tgt_cell_add;
+                  tgt_cell_adds[offset + ilink] = i;
                   wts[offset + ilink] = addweights[ilink].weight;
                 }
             }
@@ -211,10 +220,10 @@ weightLinksToRemapLinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLink
 
       if (lalloc)
         {
-          for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
+          for (size_t i = 0; i < gridSize; ++i)
             {
-              size_t num_links = weightLinks[tgt_cell_add].nlinks;
-              if (num_links) Free(weightLinks[tgt_cell_add].addweights);
+              size_t num_links = weightLinks[i].nlinks;
+              if (num_links) Free(weightLinks[i].addweights);
             }
         }
       else
@@ -225,16 +234,16 @@ weightLinksToRemapLinks(int lalloc, size_t tgt_grid_size, std::vector<WeightLink
 }
 
 void
-weightLinks4ToRemapLinks(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks, RemapVars &rv)
+weightLinks4ToRemapLinks(size_t gridSize, std::vector<WeightLinks4> &weightLinks, RemapVars &rv)
 {
   size_t nlinks = 0;
 
-  for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
+  for (size_t i = 0; i < gridSize; ++i)
     {
-      if (weightLinks[tgt_cell_add].nlinks)
+      if (weightLinks[i].nlinks)
         {
-          weightLinks[tgt_cell_add].offset = nlinks;
-          nlinks += weightLinks[tgt_cell_add].nlinks;
+          weightLinks[i].offset = nlinks;
+          nlinks += weightLinks[i].nlinks;
         }
     }
 
@@ -250,19 +259,19 @@ weightLinks4ToRemapLinks(size_t tgt_grid_size, std::vector<WeightLinks4> &weight
       double *restrict wts = &rv.wts[0];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightLinks, tgt_grid_size)
+#pragma omp parallel for default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightLinks, gridSize)
 #endif
-      for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
+      for (size_t i = 0; i < gridSize; ++i)
         {
-          size_t num_links = weightLinks[tgt_cell_add].nlinks;
+          size_t num_links = weightLinks[i].nlinks;
           if (num_links)
             {
-              size_t offset = weightLinks[tgt_cell_add].offset;
-              addweight4_t *addweights = weightLinks[tgt_cell_add].addweights;
+              size_t offset = weightLinks[i].offset;
+              addweight4_t *addweights = weightLinks[i].addweights;
               for (size_t ilink = 0; ilink < num_links; ++ilink)
                 {
                   src_cell_adds[offset + ilink] = addweights[ilink].add;
-                  tgt_cell_adds[offset + ilink] = tgt_cell_add;
+                  tgt_cell_adds[offset + ilink] = i;
                   for (size_t k = 0; k < 4; ++k) wts[(offset + ilink) * 4 + k] = addweights[ilink].weight[k];
                 }
             }
@@ -273,17 +282,17 @@ weightLinks4ToRemapLinks(size_t tgt_grid_size, std::vector<WeightLinks4> &weight
 }
 
 void
-weightLinksAlloc(size_t numNeighbors, size_t tgt_grid_size, std::vector<WeightLinks> &weightLinks)
+weightLinksAlloc(size_t numNeighbors, size_t gridSize, std::vector<WeightLinks> &weightLinks)
 {
-  weightLinks[0].addweights = (addweight_t *) Malloc(numNeighbors * tgt_grid_size * sizeof(addweight_t));
-  for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + numNeighbors * tgt_cell_add;
+  weightLinks[0].addweights = (addweight_t *) Malloc(numNeighbors * gridSize * sizeof(addweight_t));
+  for (size_t i = 1; i < gridSize; ++i)
+    weightLinks[i].addweights = weightLinks[0].addweights + numNeighbors * i;
 }
 
 void
-weightLinks4Alloc(size_t tgt_grid_size, std::vector<WeightLinks4> &weightLinks)
+weightLinks4Alloc(size_t gridSize, std::vector<WeightLinks4> &weightLinks)
 {
-  weightLinks[0].addweights = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
-  for (unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightLinks[tgt_cell_add].addweights = weightLinks[0].addweights + 4 * tgt_cell_add;
+  weightLinks[0].addweights = (addweight4_t *) Malloc(4 * gridSize * sizeof(addweight4_t));
+  for (size_t i = 1; i < gridSize; ++i)
+    weightLinks[i].addweights = weightLinks[0].addweights + 4 * i;
 }
