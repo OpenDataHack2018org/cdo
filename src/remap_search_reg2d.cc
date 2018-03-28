@@ -18,8 +18,8 @@
 #include "remap.h"
 
 int
-grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
-                     const double *restrict src_center_lat, const double *restrict src_center_lon)
+gridSearchSquareReg2dNN(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
+                        const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
   double coslat_dst = cos(plat);
@@ -110,8 +110,8 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *res
 }
 
 int
-grid_search_reg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-                  double plat, double plon)
+gridSearchSquareReg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                      double plat, double plon)
 {
   /*
     Input variables:
@@ -178,7 +178,7 @@ grid_search_reg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restric
   */
   if (!src_grid->lextrapolate) return search_result;
 
-  search_result = grid_search_reg2d_nn(nx, ny, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
+  search_result = gridSearchSquareReg2dNN(nx, ny, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
 
   return search_result;
 }

@@ -143,7 +143,7 @@ grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &
           size_t nbr_add4[4];
           double nbr_dist4[4];
           for (size_t n = 0; n < numNeighbors; ++n) nbr_add4[n] = SIZE_MAX;
-          search_result = grid_search_reg2d_nn(nx, ny, nbr_add4, nbr_dist4, plat, plon, src_center_lat, src_center_lon);
+          search_result = gridSearchSquareReg2dNN(nx, ny, nbr_add4, nbr_dist4, plat, plon, src_center_lat, src_center_lon);
           if (search_result < 0)
             {
               for (size_t n = 0; n < numNeighbors; ++n) nbr_add[n] = nbr_add4[n];
@@ -152,7 +152,7 @@ grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &
         }
       else
         {
-          search_result = grid_search_reg2d_nn(nx, ny, nbr_add, nbr_dist, plat, plon, src_center_lat, src_center_lon);
+          search_result = gridSearchSquareReg2dNN(nx, ny, nbr_add, nbr_dist, plat, plon, src_center_lat, src_center_lon);
         }
 
       if (search_result >= 0)
@@ -205,7 +205,7 @@ grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
   for (size_t i = 0; i < ndist; ++i) knnWeights.store_distance(adds[i], dist[i], numNeighbors);
 
   knnWeights.check_distance();
-}  // grid_search_nbr
+}
 
 void
 remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights)
@@ -283,7 +283,7 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src
     }
 
   return search_result;
-} /* grid_search_square */
+}
 
 int
 remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t *src_add, double *src_lats, double *src_lons)
@@ -293,7 +293,7 @@ remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t *src_ad
 
   int search_result;
   if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-    search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon);
+    search_result = gridSearchSquareReg2d(src_grid, src_add, src_lats, src_lons, plat, plon);
   else
     {
       if (rsearch.gs)

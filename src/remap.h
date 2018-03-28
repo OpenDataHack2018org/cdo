@@ -166,11 +166,11 @@ void calc_lat_bins(GridSearchBins &searchBins);
 size_t get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &srcBins, float *tgt_cell_bound_box,
                       size_t *srch_add);
 
-int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
-                         const double *restrict src_center_lat, const double *restrict src_center_lon);
+int gridSearchSquareReg2dNN(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
+                            const double *restrict src_center_lat, const double *restrict src_center_lon);
 
-int grid_search_reg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-                      double plat, double plon);
+int gridSearchSquareReg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                          double plat, double plon);
 
 bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
                    double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
