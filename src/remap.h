@@ -135,8 +135,7 @@ void remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_gr
 void remapSearchFree(RemapSearch &search);
 
 void remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights);
-int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4],
-                      double src_lons[4]);
+int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t *src_add, double *src_lats, double *src_lons);
 
 void remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv);
 void remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv);

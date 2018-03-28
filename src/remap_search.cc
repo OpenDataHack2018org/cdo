@@ -25,17 +25,16 @@ static void
 grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
 {
   /*
-    Output variables:
-
-    int nbr_add[numNeighbors]     ! address of each of the closest points
-    double nbr_dist[numNeighbors] ! distance to each of the closest points
-
     Input variables:
 
-    double plat,         ! latitude  of the search point
-    double plon,         ! longitude of the search point
-  */
+      double plat                   ! latitude  of the search point
+      double plon                   ! longitude of the search point
 
+    Output variables:
+
+      int knnWeights.m_addr[numNeighbors]    ! address of each of the closest points
+      double knnWeights.m_dist[numNeighbors] ! distance to each of the closest points
+  */
   size_t numNeighbors = knnWeights.maxNeighbors();
   size_t *restrict nbr_add = &knnWeights.m_addr[0];
   double *restrict nbr_dist = &knnWeights.m_dist[0];
@@ -44,8 +43,8 @@ grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &
   std::vector<size_t> src_add_tmp;
   size_t *psrc_add = src_add;
   size_t num_add = 0;
-  double *restrict src_center_lon = gs->reg2d_center_lon;
-  double *restrict src_center_lat = gs->reg2d_center_lat;
+  const double *restrict src_center_lon = gs->reg2d_center_lon;
+  const double *restrict src_center_lat = gs->reg2d_center_lat;
 
   long nx = gs->dims[0];
   long ny = gs->dims[1];
@@ -105,10 +104,10 @@ grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &
 
   if (lfound)
     {
-      double *restrict coslon = gs->coslon;
-      double *restrict sinlon = gs->sinlon;
-      double *restrict coslat = gs->coslat;
-      double *restrict sinlat = gs->sinlat;
+      const double *restrict coslon = gs->coslon;
+      const double *restrict sinlon = gs->sinlon;
+      const double *restrict coslat = gs->coslat;
+      const double *restrict sinlat = gs->sinlat;
 
       double xyz[3];
       double query_pt[3];
@@ -196,13 +195,9 @@ grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
 
   size_t nadds = 0;
   if (numNeighbors == 1)
-    {
-      nadds = gridsearch_nearest(gs, plon, plat, adds, dist);
-    }
+    nadds = gridsearch_nearest(gs, plon, plat, adds, dist);
   else
-    {
-      nadds = gridsearch_qnearest(gs, plon, plat, ndist, adds, dist);
-    }
+    nadds = gridsearch_qnearest(gs, plon, plat, ndist, adds, dist);
 
   ndist = nadds;
   if (ndist < numNeighbors) numNeighbors = ndist;
@@ -224,8 +219,8 @@ remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType
 }
 
 static int
-grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats,
-                   double *restrict src_lons, double plat, double plon)
+gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats,
+                       double *restrict src_lons, double plat, double plon)
 {
   /*
     Input variables:
@@ -239,17 +234,15 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
       src_lats[4]:  latitudes  of the four corner points
       src_lons[4]:  longitudes of the four corner points
   */
-  bool is_cyclic = true;
   int search_result = 0;
 
-  const size_t *restrict src_grid_dims = src_grid->dims;
   const double *restrict src_center_lat = src_grid->cell_center_lat;
   const double *restrict src_center_lon = src_grid->cell_center_lon;
 
   for (unsigned n = 0; n < 4; ++n) src_add[n] = 0;
 
-  size_t nx = src_grid_dims[0];
-  size_t ny = src_grid_dims[1];
+  size_t nx = src_grid->dims[0];
+  size_t ny = src_grid->dims[1];
 
   double dist;
   size_t addr;
@@ -261,9 +254,9 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
           // Determine neighbor addresses
           size_t j = addr / nx;
           size_t i = addr - j * nx;
-          if (k == 0 || k == 2) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
+          if (k == 0 || k == 2) i = (i > 0) ? i - 1 : src_grid->is_cyclic ? nx - 1 : 0;
           if (k == 0 || k == 1) j = (j > 0) ? j - 1 : 0;
-          if (point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon, src_center_lat))
+          if (point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon, src_center_lat))
             {
               search_result = 1;
               return search_result;
@@ -293,7 +286,7 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
 } /* grid_search_square */
 
 int
-remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4], double src_lons[4])
+remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t *src_add, double *src_lats, double *src_lons)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -304,7 +297,7 @@ remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add
   else
     {
       if (rsearch.gs)
-        search_result = grid_search_square(rsearch.gs, src_grid, src_add, src_lats, src_lons, plat, plon);
+        search_result = gridSearchSquareCurv2d(rsearch.gs, src_grid, src_add, src_lats, src_lons, plat, plon);
       else
         search_result = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);
     }
