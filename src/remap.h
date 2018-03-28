@@ -23,7 +23,7 @@
 #include "grid_search.h"
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846264338327950288 /* pi */
+#define M_PI 3.14159265358979323846264338327950288
 #endif
 
 constexpr double PI = M_PI;
@@ -33,7 +33,6 @@ constexpr float PI_f = PI;
 constexpr float PI2_f = PI2;
 constexpr float PIH_f = PIH;
 
-#define THREE 3.0
 #define TINY 1.e-14
 
 #define REMAP_GRID_TYPE_REG2D 1

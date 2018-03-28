@@ -252,14 +252,14 @@ quad_cross_products(double plon, double plat, double lons[4], double lats[4])
       vec2_lon = plon - lons[n];
 
       /* Check for 0,2pi crossings */
-      if (vec1_lon > THREE * PIH)
+      if (vec1_lon > 3.0 * PIH)
         vec1_lon -= PI2;
-      else if (vec1_lon < -THREE * PIH)
+      else if (vec1_lon < -3.0 * PIH)
         vec1_lon += PI2;
 
-      if (vec2_lon > THREE * PIH)
+      if (vec2_lon > 3.0 * PIH)
         vec2_lon -= PI2;
-      else if (vec2_lon < -THREE * PIH)
+      else if (vec2_lon < -3.0 * PIH)
         vec2_lon += PI2;
 
       double cross_product = vec1_lon * vec2_lat - vec2_lon * vec1_lat;

@@ -48,12 +48,12 @@ find_ij_weights(double plon, double plat, double *restrict src_lons, double *res
   double dph2 = src_lons[3] - src_lons[0];
   double dph3 = src_lons[2] - src_lons[1];
 
-  if (dph1 > THREE * PIH) dph1 -= PI2;
-  if (dph2 > THREE * PIH) dph2 -= PI2;
-  if (dph3 > THREE * PIH) dph3 -= PI2;
-  if (dph1 < -THREE * PIH) dph1 += PI2;
-  if (dph2 < -THREE * PIH) dph2 += PI2;
-  if (dph3 < -THREE * PIH) dph3 += PI2;
+  if (dph1 > 3.0 * PIH) dph1 -= PI2;
+  if (dph2 > 3.0 * PIH) dph2 -= PI2;
+  if (dph3 > 3.0 * PIH) dph3 -= PI2;
+  if (dph1 < -3.0 * PIH) dph1 += PI2;
+  if (dph2 < -3.0 * PIH) dph2 += PI2;
+  if (dph3 < -3.0 * PIH) dph3 += PI2;
 
   dph3 = dph3 - dph2;
 
@@ -66,8 +66,8 @@ find_ij_weights(double plon, double plat, double *restrict src_lons, double *res
       dthp = plat - src_lats[0] - dth1 * iguess - dth2 * jguess - dth3 * iguess * jguess;
       dphp = plon - src_lons[0];
 
-      if (dphp > THREE * PIH) dphp -= PI2;
-      if (dphp < -THREE * PIH) dphp += PI2;
+      if (dphp > 3.0 * PIH) dphp -= PI2;
+      if (dphp < -3.0 * PIH) dphp += PI2;
 
       dphp = dphp - dph1 * iguess - dph2 * jguess - dph3 * iguess * jguess;
 

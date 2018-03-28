@@ -33,16 +33,15 @@
 #define ZERO 0.0
 #define ONE 1.0
 #define TWO 2.0
+#define THREE 3.0
 #define HALF 0.5
 #define QUART 0.25
 
 /* #define  BABY_STEP  0.001 */ /* original value */
 #define BABY_STEP 0.001
 
-/* static double north_thresh =  1.45;  */ /* threshold for coord transformation
-                                            */
-/* static double south_thresh = -2.00;  */ /* threshold for coord transformation
-                                            */
+/* static double north_thresh =  1.45;  */ /* threshold for coord transformation */
+/* static double south_thresh = -2.00;  */ /* threshold for coord transformation */
 static double north_thresh = 2.00;         /* threshold for coord transformation */
 static double south_thresh = -2.00;        /* threshold for coord transformation */
 
@@ -987,8 +986,7 @@ line_integral(double *weights, double in_phi1, double in_phi2, double theta1, do
   double dphi, sinth1, sinth2, costh1, costh2;
   double f1, f2;
 
-  /*  Weights for the general case based on a trapezoidal approx to the
-   * integrals. */
+  /*  Weights for the general case based on a trapezoidal approx to the integrals. */
 
   sinth1 = sin(theta1);
   sinth2 = sin(theta2);
@@ -1488,7 +1486,6 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
     }
 
   for (i = 0; i < Threading::ompNumThreads; ++i) max_srch_cells[i] = 0;
-
   for (i = 0; i < Threading::ompNumThreads; ++i) srch_add[i] = new size_t[src_grid_size];
 
   srch_corners = src_num_cell_corners;
