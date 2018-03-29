@@ -767,8 +767,10 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
   double findex = 0;
 
-  size_t sum_srch_cells = 0;
-  size_t sum_srch_cells2 = 0;
+  size_t num_srch_cells_stat[3];
+  num_srch_cells_stat[0] = 0;
+  num_srch_cells_stat[1] = 100000;
+  num_srch_cells_stat[2] = 0;
 
 #ifdef STIMER
   double stimer = 0;
@@ -780,7 +782,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 #pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(rsearch, \
     Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose, \
     tgt_num_cell_corners, target_cell_type, weightLinks, srch_corners, src_grid, tgt_grid, tgt_grid_size,   \
-    src_grid_size, search, srch_add, tgt_grid_cell, sum_srch_cells, sum_srch_cells2)
+    src_grid_size, search, srch_add, tgt_grid_cell, num_srch_cells_stat)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -844,7 +846,12 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       stimer += ((double) (finish - start)) / CLOCKS_PER_SEC;
 #endif
 
-      if (0 && cdoVerbose) sum_srch_cells += num_srch_cells;
+      if (1 && cdoVerbose)
+        {
+          num_srch_cells_stat[0] += num_srch_cells;
+          if ( num_srch_cells < num_srch_cells_stat[1] ) num_srch_cells_stat[1] = num_srch_cells;
+          if ( num_srch_cells > num_srch_cells_stat[2] ) num_srch_cells_stat[2] = num_srch_cells;
+        }
 
       if (0 && cdoVerbose) printf("tgt_cell_add %zu  num_srch_cells %zu\n", tgt_cell_add, num_srch_cells);
 
@@ -891,8 +898,6 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
               num_weights++;
             }
         }
-
-      if (0 && cdoVerbose) sum_srch_cells2 += num_weights;
 
       for (n = 0; n < num_weights; ++n) partial_weights[n] = partial_areas[n] / tgt_area;
 
@@ -967,10 +972,12 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   printf("stime = %gs\n", stimer);
 #endif
 
-  if (0 && cdoVerbose)
+  if (1 && cdoVerbose)
     {
-      printf("sum_srch_cells : %zu\n", sum_srch_cells);
-      printf("sum_srch_cells2: %zu\n", sum_srch_cells2);
+      printf("num_srch_cells_sum  : %zu\n", num_srch_cells_stat[0]);
+      printf("num_srch_cells_min  : %zu\n", num_srch_cells_stat[1]);
+      printf("num_srch_cells_mean : %3.1f\n", num_srch_cells_stat[0]/(double)tgt_grid_size);
+      printf("num_srch_cells_max  : %zu\n", num_srch_cells_stat[2]);
     }
 
   // Finished with all cells: deallocate search arrays

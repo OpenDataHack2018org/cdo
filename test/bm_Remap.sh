@@ -4,7 +4,7 @@ export DYLD_LIBRARY_PATH=/opt/intel/lib:$DYLD_LIBRARY_PATH
 CDO=src/cdo
 #CDO=cdo-1.6.2
 #
-RMODS="bil bic nn con ycon"
+RMODS="bil bic nn ycon con"
 #
 $CDO -V
 #$CDO -setrtomiss,0,10000 -topo topo05
@@ -58,8 +58,8 @@ done
 # result on bailung: gcc 7.2 sse4_2
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   0.6    1.4   0.6   187    128
-# curv     14     14    14   187    243
+# reg2d   0.6    1.4   0.6   187    105
+# curv     14     14    14   187    212
 #
 # CDO 1.8.0 ----------------------------------------
 #
