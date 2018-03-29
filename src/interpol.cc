@@ -229,9 +229,9 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
 
   progressInit();
 
-#ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared( \
-    Threading::ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
+#ifdef _OPENMP
+#pragma omp parallel for default(none) shared(findex, \
+    field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
 #endif
   for (size_t i = 0; i < gridsize2; ++i)
     {
@@ -241,6 +241,9 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
 
       field[i] = missval;
 
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (lprogress) progressStatus(0, 1, findex / gridsize2);
 
@@ -277,7 +280,7 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
         }
     }
 
-  if (findex < gridsize2) progressStatus(0, 1, 1);
+  progressStatus(0, 1, 1);
 
   if (grid1_mask) Free(grid1_mask);
 }

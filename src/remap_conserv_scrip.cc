@@ -1293,16 +1293,19 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 
   if (cdoTimer) timer_start(timer_remap_con_l1);
 
-#ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)                                                                                         \
-    reduction(+ : findex) shared(rsearch, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, cdoVerbose, max_subseg, \
-                                 srch_corner_lat, srch_corner_lon, max_srch_cells, src_num_cell_corners, srch_corners,         \
-                                 src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
+#ifdef _OPENMP
+#pragma omp parallel for default(none)                                                                         \
+  shared(findex, rsearch, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, cdoVerbose, max_subseg, \
+         srch_corner_lat, srch_corner_lon, max_srch_cells, src_num_cell_corners, srch_corners,         \
+         src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for (long src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add)
     {
       int ompthID = cdo_omp_get_thread_num();
 
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (ompthID == 0) progressStatus(0, 0.5, findex / src_grid_size);
 
@@ -1494,16 +1497,19 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 
   findex = 0;
 
-#ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)                                                                                         \
-    reduction(+ : findex) shared(rsearch, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, cdoVerbose, max_subseg, \
-                                 srch_corner_lat, srch_corner_lon, max_srch_cells, tgt_num_cell_corners, srch_corners,         \
-                                 src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
+#ifdef _OPENMP
+#pragma omp parallel for default(none)                                                                         \
+  shared(findex, rsearch, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, cdoVerbose, max_subseg, \
+         srch_corner_lat, srch_corner_lon, max_srch_cells, tgt_num_cell_corners, srch_corners,         \
+         src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for (long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
       int ompthID = cdo_omp_get_thread_num();
 
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (ompthID == 0) progressStatus(0.5, 0.5, findex / tgt_grid_size);
 
@@ -1666,6 +1672,8 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
           /* End of segment */
         }
     }
+
+  progressStatus(0, 1, 1);
 
   if (cdoTimer) timer_stop(timer_remap_con_l2);
 

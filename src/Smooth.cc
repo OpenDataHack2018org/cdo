@@ -102,13 +102,16 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) reduction(+ : nmissx) shared( \
+#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : nmissx) shared(findex, \
     cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
       int ompthID = cdo_omp_get_thread_num();
 
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (cdoVerbose && cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / gridsize);
 
@@ -128,6 +131,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
     }
 
   *nmiss = nmissx;
+
+  progressStatus(0, 1, 1);
 
   finish = clock();
 

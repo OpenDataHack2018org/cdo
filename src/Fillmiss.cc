@@ -458,12 +458,15 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   double findex = 0;
 
-#ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(knnWeights) shared(mindex, vindex, array1, array2, xvals, \
-                                                                                       yvals, gs, nmiss, numNeighbors)
+#ifdef _OPENMP
+#pragma omp parallel for default(none) shared(knnWeights, findex, mindex, vindex, array1, array2, xvals, \
+                                              yvals, gs, nmiss, numNeighbors)
 #endif
   for (size_t i = 0; i < nmiss; ++i)
     {
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / nmiss);
 
@@ -481,6 +484,8 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
           array2[mindex[i]] = result;
         }
     }
+
+  progressStatus(0, 1, 1);
 
   finish = clock();
 

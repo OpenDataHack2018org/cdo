@@ -181,12 +181,14 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 
 // Loop over destination grid
 
-#ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(rsearch, weightLinks, tgt_grid_size, \
-                                                                                     src_grid, tgt_grid, rv)
+#ifdef _OPENMP
+#pragma omp parallel for default(none) schedule(static) shared(findex, rsearch, weightLinks, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
@@ -246,6 +248,8 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
         }
     }
 
+  progressStatus(0, 1, 1);
+
   weightLinksToRemapLinks(0, tgt_grid_size, weightLinks, rv);
 
   if (cdoTimer) timer_stop(timer_remap_bil);
@@ -282,12 +286,15 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
 
 // Loop over destination grid
 
-#ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared( \
-    rsearch, Options::silentMode, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
+#ifdef _OPENMP
+#pragma omp parallel for default(none) schedule(static) shared(findex, \
+    rsearch, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
@@ -348,6 +355,8 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
             }
         }
     }
+
+  progressStatus(0, 1, 1);
 
   if (cdoTimer) timer_stop(timer_remap_bil);
 }  // remapBilinear

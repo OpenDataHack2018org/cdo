@@ -408,26 +408,30 @@ gridGenArea(int gridID, double *area)
 
   progressInit();
 
-#ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(gridsize, area, nv, grid_corner_lon, grid_corner_lat, \
-                                                                    grid_center_lon, grid_center_lat)
+#ifdef _OPENMP
+#pragma omp parallel for default(none) shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat, \
+                                              grid_center_lon, grid_center_lat)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
       int lprogress = 1;
       if (cdo_omp_get_thread_num() != 0) lprogress = 0;
 
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (lprogress) progressStatus(0, 1, findex / gridsize);
 
-      // area[i] = mod_cell_area(nv, grid_corner_lon+i*nv,
-      // grid_corner_lat+i*nv);
+      // area[i] = mod_cell_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
       if (nv <= 4)
         area[i] = mod_huiliers_area(nv, grid_corner_lon + i * nv, grid_corner_lat + i * nv);
       else
         area[i] = mod_huiliers_area2(nv, grid_corner_lon + i * nv, grid_corner_lat + i * nv, grid_center_lon[i],
                                      grid_center_lat[i]);
     }
+
+  progressStatus(0, 1, 1);
 
   if (cdoVerbose)
     {

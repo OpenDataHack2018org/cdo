@@ -777,9 +777,9 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
 // Loop over destination grid
 
-#ifdef HAVE_OPENMP4
-#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(                                   \
-    rsearch, Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose,     \
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic) default(none) shared(findex, \
+    rsearch, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose,     \
     tgt_num_cell_corners, target_cell_type, weightLinks, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
     search, srch_add, tgt_grid_cell, num_srch_cells_stat)
 #endif
@@ -791,6 +791,9 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       size_t n, num_weights, num_weights_old;
       int ompthID = cdo_omp_get_thread_num();
 
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
       findex++;
       if (ompthID == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
@@ -966,6 +969,8 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       // printf("area %d %g %g\n", tgt_cell_add,
       // tgt_grid->cell_area[tgt_cell_add], tgt_area);
     }
+
+  progressStatus(0, 1, 1);
 
 #ifdef STIMER
   printf("stime = %gs\n", stimer);
