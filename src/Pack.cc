@@ -170,7 +170,6 @@ Pack(void *process)
       double fmin = 1.e300;
       double fmax = -1.e300;
       double sf, ao;
-      size_t ivals = 0;
       size_t nmisspv = 0;
 
       int gridID = vlistInqVarGrid(vlistID1, varID);
@@ -188,12 +187,11 @@ Pack(void *process)
               if (nmiss > 0)
                 {
                   nmisspv += nmiss;
-                  ivals = arrayMinMaxMV(gridsize, array, missval1, &fmin, &fmax);
+                  arrayMinMaxMV(gridsize, array, missval1, &fmin, &fmax);
                 }
               else
                 {
                   arrayMinMax(gridsize, array, &fmin, &fmax);
-                  ivals = gridsize;
                 }
             }
         }
