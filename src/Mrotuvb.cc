@@ -135,8 +135,7 @@ rotate_uv2(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat, d
         if (cdoVerbose)
           {
             absold = sqrt(u_i[IX2D(j, i, ix)] * u_i[IX2D(j, i, ix)] + v_j[IX2D(j, i, ix)] * v_j[IX2D(j, i, ix)]);
-            absnew
-                = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)] + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
+            absnew = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)] + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
 
             if (i % 20 == 0 && j % 20 == 0 && absold > 0)
               {
@@ -288,8 +287,7 @@ Mrotuvb(void *process)
   if (gpint == false && gridID1 != gridID2) cdoAbort("Input grids are not the same!");
   if (gridsize != gridInqSize(gridID2)) cdoAbort("Grids have different size!");
 
-  if (gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN
-      && gridInqType(gridID1) != GRID_CURVILINEAR)
+  if (gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN && gridInqType(gridID1) != GRID_CURVILINEAR)
     cdoAbort("Grid %s unsupported!", gridNamePtr(gridInqType(gridID1)));
 
   if (gridInqType(gridID1) != GRID_CURVILINEAR) gridID1 = gridToCurvilinear(gridID1, 1);
@@ -452,8 +450,7 @@ Mrotuvb(void *process)
                 for (size_t i = 0; i < nlon; i++)
                   {
                     ufield[IX2D(j, i, nlon)] = (uhelp[IX2D(j, i, nlon + 2)] + uhelp[IX2D(j, i + 1, nlon + 2)]) * 0.5;
-                    vfield[IX2D(j, i, nlon)]
-                        = (vhelp[IX2D(j - 1, i + 1, nlon + 2)] + vhelp[IX2D(j, i + 1, nlon + 2)]) * 0.5;
+                    vfield[IX2D(j, i, nlon)] = (vhelp[IX2D(j - 1, i + 1, nlon + 2)] + vhelp[IX2D(j, i + 1, nlon + 2)]) * 0.5;
                   }
             }
 

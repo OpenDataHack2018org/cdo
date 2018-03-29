@@ -474,8 +474,7 @@ CMOR_lite(void *process)
       var_t *var = &vars[varID];
       if (var->convert == false) var->changeunits = false;
       if (var->changeunits)
-        cdoConvertUnits(&var->ut_converter, &var->changeunits, (char *) &var->units, (char *) &var->units_old,
-                        var->name);
+        cdoConvertUnits(&var->ut_converter, &var->changeunits, (char *) &var->units, (char *) &var->units_old, var->name);
     }
 
   int taxisID1 = vlistInqTaxis(vlistID1);

@@ -602,8 +602,7 @@ PstreamType::defVlist(int p_vlistID)
 
 #ifdef _OPENMP
       if (Threading::ompNumThreads > 1)
-        cdiDefAttInt(p_vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", CDI_DATATYPE_INT32, 1,
-                     &Threading::ompNumThreads);
+        cdiDefAttInt(p_vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", CDI_DATATYPE_INT32, 1, &Threading::ompNumThreads);
 #endif
       defVarList(p_vlistID);
 
@@ -1042,8 +1041,7 @@ pstreamCloseAll()
     {
       if (pstream_iter.second.m_fileID != CDI_UNDEFID)
         {
-          if (CdoDebug::PSTREAM)
-            MESSAGE("Close file ", pstream_iter.second.m_name, " id ", pstream_iter.second.m_fileID);
+          if (CdoDebug::PSTREAM) MESSAGE("Close file ", pstream_iter.second.m_name, " id ", pstream_iter.second.m_fileID);
           streamClose(pstream_iter.second.m_fileID);
         }
     }
@@ -1072,9 +1070,8 @@ set_comp(int fileID, int filetype)
       streamDefCompType(fileID, Options::cdoCompType);
       streamDefCompLevel(fileID, Options::cdoCompLevel);
 
-      if (Options::cdoCompType == CDI_COMPRESS_SZIP
-          && (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2 && filetype != CDI_FILETYPE_NC4
-              && filetype != CDI_FILETYPE_NC4C))
+      if (Options::cdoCompType == CDI_COMPRESS_SZIP && (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2
+                                                        && filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C))
         cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
 
       if (Options::cdoCompType == CDI_COMPRESS_JPEG && filetype != CDI_FILETYPE_GRB2)

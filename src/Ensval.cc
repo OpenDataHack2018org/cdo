@@ -514,8 +514,7 @@ Ensval(void *process)
             }
 
           if (cdoVerbose && operfunc == CRPS)
-            cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g", crps, crps_reli, crps_pot,
-                     crps_reli + crps_pot);
+            cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g", crps, crps_reli, crps_pot, crps_reli + crps_pot);
 
           for (stream = 0; stream < nostreams; stream++)
             {

@@ -195,8 +195,8 @@ fldavgw(field_type field)
 }
 
 static void
-prevarsum(const double *restrict array, size_t len, size_t nmiss, double missval, double *rsum, double *rsumw,
-          double *rsumq, double *rsumwq)
+prevarsum(const double *restrict array, size_t len, size_t nmiss, double missval, double *rsum, double *rsumw, double *rsumq,
+          double *rsumwq)
 {
   assert(array != NULL);
 
@@ -386,8 +386,8 @@ fldskew(field_type field)
 }
 
 static void
-prevarsumw(const double *restrict array, const double *restrict w, size_t len, size_t nmiss, double missval,
-           double *rsum, double *rsumw, double *rsumq, double *rsumwq)
+prevarsumw(const double *restrict array, const double *restrict w, size_t len, size_t nmiss, double missval, double *rsum,
+           double *rsumw, double *rsumq, double *rsumwq)
 {
   assert(array != NULL);
   assert(w != NULL);

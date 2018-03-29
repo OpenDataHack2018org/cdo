@@ -63,11 +63,10 @@ void grid_check_lat_borders(int n, double *ybounds);
 void grid_gen_xbounds2D(size_t nx, size_t ny, const double *restrict xbounds, double *restrict xbounds2D);
 void grid_gen_ybounds2D(size_t nx, size_t ny, const double *restrict ybounds, double *restrict ybounds2D);
 
-void grid_cell_center_to_bounds_X2D(const char *xunitstr, size_t xsize, size_t ysize,
-                                    const double *restrict grid_center_lon, double *restrict grid_corner_lon,
-                                    double dlon);
-void grid_cell_center_to_bounds_Y2D(const char *yunitstr, size_t xsize, size_t ysize,
-                                    const double *restrict grid_center_lat, double *restrict grid_corner_lat);
+void grid_cell_center_to_bounds_X2D(const char *xunitstr, size_t xsize, size_t ysize, const double *restrict grid_center_lon,
+                                    double *restrict grid_corner_lon, double dlon);
+void grid_cell_center_to_bounds_Y2D(const char *yunitstr, size_t xsize, size_t ysize, const double *restrict grid_center_lat,
+                                    double *restrict grid_corner_lat);
 
 int gridWeights(int gridID, double *weights);
 int gridGenArea(int gridID, double *area);
@@ -99,8 +98,8 @@ void correct_sinxvals(int xsize, int ysize, double *xvals);
 struct cart gc2cc(struct geo *position);
 void factorni(int kni, int *kni2, int *kni3);
 void gme_grid_restore(double *p, int ni, int nd);
-void gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon, double *blat, int *imask, int ni,
-              int nd, int ni2, int ni3);
+void gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon, double *blat, int *imask, int ni, int nd,
+              int ni2, int ni3);
 
 /* Rotated grid */
 double lamrot_to_lam(double phis, double rlas, double polphi, double pollam, double polgam);

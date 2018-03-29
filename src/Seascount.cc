@@ -111,8 +111,7 @@ Seascount(void *process)
 
               if (nsets == 0)
                 {
-                  for (size_t i = 0; i < nwpv * gridsize; i++)
-                    vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
+                  for (size_t i = 0; i < nwpv * gridsize; i++) vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
                   vars1[varID][levelID].nmiss = gridsize;
                 }
 

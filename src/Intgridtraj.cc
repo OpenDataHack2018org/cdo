@@ -172,10 +172,10 @@ Intgridtraj(void *process)
               taxisDefVtime(taxisID2, vtime);
               pstreamDefTimestep(streamID2, tsIDo++);
 
-              double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate))
-                            / juldate_to_seconds(juldate_sub(juldate2, juldate1));
-              double fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1))
-                            / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac1
+                  = juldate_to_seconds(juldate_sub(juldate2, juldate)) / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac2
+                  = juldate_to_seconds(juldate_sub(juldate, juldate1)) / juldate_to_seconds(juldate_sub(juldate2, juldate1));
               /*
               printf("      %f %f %f %f %f\n", juldate_to_seconds(juldate),
                                                juldate_to_seconds(juldate1),

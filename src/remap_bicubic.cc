@@ -116,7 +116,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
 
   double findex = 0;
 
-  // Loop over destination grid
+// Loop over destination grid
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightLinks, tgt_grid_size, src_grid, tgt_grid, rv)
@@ -219,11 +219,11 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
 
   double findex = 0;
 
-  // Loop over destination grid
+// Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) \
-  shared(rsearch, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, gradients)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, tgt_grid_size, src_grid, tgt_grid, src_array, \
+                                                                    tgt_array, missval, gradients)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {

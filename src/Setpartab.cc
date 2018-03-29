@@ -47,8 +47,7 @@ paramToString(int param, char *paramstr, int maxlen)
   else
     len = snprintf(paramstr, umaxlen, "%d.%d.%d", num, cat, dis);
 
-  if (len >= maxlen || len < 0)
-    fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
+  if (len >= maxlen || len < 0) fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
 }
 
 typedef enum { CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME } pt_mode_t;
@@ -491,8 +490,7 @@ Setpartab(void *process)
           var_t *var = &vars[varID];
           if (var->convert == false) var->changeunits = false;
           if (var->changeunits)
-            cdoConvertUnits(&var->ut_converter, &var->changeunits, (char *) &var->units, (char *) &var->units_old,
-                            var->name);
+            cdoConvertUnits(&var->ut_converter, &var->changeunits, (char *) &var->units, (char *) &var->units_old, var->name);
         }
     }
 

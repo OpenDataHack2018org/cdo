@@ -175,8 +175,7 @@ cdoConvertUnits(void **ut_converter, bool *changeunits, char *units, char *units
         {
           if (status == -2)
             {
-              if (cdoVerbose)
-                cdoPrint("%s - not converted from  [%s] to [%s], units are equal!", name, units_old, units);
+              if (cdoVerbose) cdoPrint("%s - not converted from  [%s] to [%s], units are equal!", name, units_old, units);
             }
           else if (status == -3)
             {

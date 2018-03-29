@@ -50,9 +50,9 @@ correlation_s(const double *restrict in0, const double *restrict in1, const doub
         }
     }
 
-  double out = IS_NOT_EQUAL(wsum0, 0) ? DIVMN((sum01 * wsum0 - sum0 * sum1),
-                                              SQRTMN((sum00 * wsum0 - sum0 * sum0) * (sum11 * wsum0 - sum1 * sum1)))
-                                      : missval1;
+  double out = IS_NOT_EQUAL(wsum0, 0)
+                   ? DIVMN((sum01 * wsum0 - sum0 * sum1), SQRTMN((sum00 * wsum0 - sum0 * sum0) * (sum11 * wsum0 - sum1 * sum1)))
+                   : missval1;
 
   return out;
 }

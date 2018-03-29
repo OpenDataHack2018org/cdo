@@ -42,8 +42,8 @@ invertLonDes(int vlistID)
 
       int gridtype = gridInqType(gridID1);
 
-      if (!(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION
-            || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR))
+      if (!(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION || gridtype == GRID_LONLAT
+            || gridtype == GRID_CURVILINEAR))
         cdoAbort("Unsupported gridtype: %s!", gridNamePtr(gridtype));
 
       if (gridInqXvals(gridID1, NULL))
@@ -200,8 +200,8 @@ invertLatDes(int vlistID)
 
       int gridtype = gridInqType(gridID1);
 
-      if (!(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION
-            || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR))
+      if (!(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION || gridtype == GRID_LONLAT
+            || gridtype == GRID_CURVILINEAR))
         cdoAbort("Unsupported gridtype: %s!", gridNamePtr(gridtype));
 
       invertLatCoord(gridID2);

@@ -58,8 +58,8 @@ vert_interp_lev_kernel(double w1, double w2, double var1L1, double var1L2, doubl
 }
 
 static void
-vert_interp_lev(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1,
-                int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
+vert_interp_lev(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1, int *lev_idx2,
+                double *lev_wgt1, double *lev_wgt2)
 {
   for (int ilev = 0; ilev < nlev2; ++ilev)
     {
@@ -89,8 +89,8 @@ vert_interp_lev(size_t gridsize, double missval, double *vardata1, double *varda
  * 3d vertical interpolation routine (see vert_interp_lev() in src/Intlevel.cc)
  */
 void
-vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1,
-                  int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
+vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1, int *lev_idx2,
+                  double *lev_wgt1, double *lev_wgt2)
 {
   for (int ilev = 0; ilev < nlev2; ilev++)
     {
@@ -98,8 +98,7 @@ vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *var
       double *var2 = vardata2 + offset;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(offset, gridsize, vardata1, var2, lev_idx1, lev_idx2, lev_wgt1, \
-                                              lev_wgt2, missval)
+#pragma omp parallel for default(none) shared(offset, gridsize, vardata1, var2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2, missval)
 #endif
       for (size_t i = 0; i < gridsize; i++)
         {
@@ -123,8 +122,8 @@ vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *var
 }
 
 void
-vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2, int *lev_idx1, int *lev_idx2,
-                 double *lev_wgt1, double *lev_wgt2)
+vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1,
+                 double *lev_wgt2)
 {
   int i1;
   int idx1 = 0, idx2 = 0;
@@ -495,8 +494,7 @@ Intlevel(void *process)
                 }
 
               vert_init_level_0_and_N(nlev1, zvarGridsize, lev1);
-              vert_gen_weights3d1d(expol, nlev1 + 2, zvarGridsize, lev1, nlev2, lev2, lev_idx1, lev_idx2, lev_wgt1,
-                                   lev_wgt2);
+              vert_gen_weights3d1d(expol, nlev1 + 2, zvarGridsize, lev1, nlev2, lev2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
             }
           else
             vert_gen_weights(expol, nlev1 + 2, lev1, nlev2, lev2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
@@ -511,11 +509,11 @@ Intlevel(void *process)
               size_t gridsize = gridInqSize(gridID);
 
               if (zvarname)
-                vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2,
-                                  lev_wgt1, lev_wgt2);
+                vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2, lev_wgt1,
+                                  lev_wgt2);
               else
-                vert_interp_lev(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2,
-                                lev_wgt1, lev_wgt2);
+                vert_interp_lev(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2, lev_wgt1,
+                                lev_wgt2);
 
               for (levelID = 0; levelID < nlev2; levelID++)
                 {

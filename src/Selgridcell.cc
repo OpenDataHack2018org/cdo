@@ -44,8 +44,7 @@ genindexgrid(int gridID1, size_t gridsize2, long *cellidx)
     }
 
   int gridID2 = -1;
-  if (gridtype1 == GRID_UNSTRUCTURED || gridtype1 == GRID_CURVILINEAR)
-    gridID2 = gengridcell(gridID1, gridsize2, cellidx);
+  if (gridtype1 == GRID_UNSTRUCTURED || gridtype1 == GRID_CURVILINEAR) gridID2 = gengridcell(gridID1, gridsize2, cellidx);
 
   if (gridID0 != gridID1) gridDestroy(gridID1);
 

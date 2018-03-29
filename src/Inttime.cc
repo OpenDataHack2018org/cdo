@@ -155,8 +155,7 @@ Inttime(void *process)
       cdoPrint("juldate1  = %f", juldate_to_seconds(juldate1));
     }
 
-  if (juldate_to_seconds(juldate1) > juldate_to_seconds(juldate))
-    cdoWarning("start time %d %d out of range!", vdate, vtime);
+  if (juldate_to_seconds(juldate1) > juldate_to_seconds(juldate)) cdoWarning("start time %d %d out of range!", vdate, vtime);
 
   int tsIDo = 0;
   while (juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate))
@@ -215,10 +214,10 @@ Inttime(void *process)
               taxisDefVtime(taxisID2, vtime);
               pstreamDefTimestep(streamID2, tsIDo++);
 
-              double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate))
-                            / juldate_to_seconds(juldate_sub(juldate2, juldate1));
-              double fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1))
-                            / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac1
+                  = juldate_to_seconds(juldate_sub(juldate2, juldate)) / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac2
+                  = juldate_to_seconds(juldate_sub(juldate, juldate1)) / juldate_to_seconds(juldate_sub(juldate2, juldate1));
 
               for (int recID = 0; recID < nrecs; recID++)
                 {
@@ -240,11 +239,9 @@ Inttime(void *process)
                         {
                           if (!DBL_IS_EQUAL(single1[i], missval1) && !DBL_IS_EQUAL(single2[i], missval2))
                             array[i] = single1[i] * fac1 + single2[i] * fac2;
-                          else if (DBL_IS_EQUAL(single1[i], missval1) && !DBL_IS_EQUAL(single2[i], missval2)
-                                   && fac2 >= 0.5)
+                          else if (DBL_IS_EQUAL(single1[i], missval1) && !DBL_IS_EQUAL(single2[i], missval2) && fac2 >= 0.5)
                             array[i] = single2[i];
-                          else if (DBL_IS_EQUAL(single2[i], missval2) && !DBL_IS_EQUAL(single1[i], missval1)
-                                   && fac1 >= 0.5)
+                          else if (DBL_IS_EQUAL(single2[i], missval2) && !DBL_IS_EQUAL(single1[i], missval1) && fac1 >= 0.5)
                             array[i] = single1[i];
                           else
                             {

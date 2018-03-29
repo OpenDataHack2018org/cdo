@@ -80,7 +80,7 @@ void
 remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType submapType, int numNeighbors, int remapOrder,
                     RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv)
 {
-  // Writes remap data to a NetCDF file using SCRIP conventions
+// Writes remap data to a NetCDF file using SCRIP conventions
 
 #ifdef HAVE_LIBNETCDF
 
@@ -501,7 +501,7 @@ void
 remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMethod *mapType, SubmapType *submapType,
                    int *numNeighbors, int *remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv)
 {
-  // The routine reads a NetCDF file to extract remapping info in SCRIP format
+// The routine reads a NetCDF file to extract remapping info in SCRIP format
 
 #ifdef HAVE_LIBNETCDF
 

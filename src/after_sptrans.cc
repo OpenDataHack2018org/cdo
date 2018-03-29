@@ -243,8 +243,7 @@ phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1, double *zt
   pnm += waves;
 
   hnm[0] = 0.0;
-  for (jn = 1; jn < waves; jn++)
-    hnm[jn] = jn * (pmu * ztemp1[jn] - sqrt((jn + jn + 1.0) / (jn + jn - 1.0)) * ztemp1[jn - 1]);
+  for (jn = 1; jn < waves; jn++) hnm[jn] = jn * (pmu * ztemp1[jn] - sqrt((jn + jn + 1.0) / (jn + jn - 1.0)) * ztemp1[jn - 1]);
 
   hnm += waves;
 
@@ -289,8 +288,8 @@ phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1, double *zt
 }
 
 void
-after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
-                  double *restrict pol2, double *restrict pol3, double *restrict coslat)
+after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev, double *restrict pol2,
+                  double *restrict pol3, double *restrict coslat)
 {
   int jgl, jm, jn;
   int jsp;

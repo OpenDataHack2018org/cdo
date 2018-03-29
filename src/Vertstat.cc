@@ -266,8 +266,8 @@ Vertstat(void *process)
             vert[index].numlevel = nlev;
             vert[index].thickness = (double *) Malloc(nlev * sizeof(double));
             vert[index].weights = (double *) Malloc(nlev * sizeof(double));
-            vert[index].status = getLayerThickness(useweights, genbounds, index, zaxisID, nlev, vert[index].thickness,
-                                                   vert[index].weights);
+            vert[index].status
+                = getLayerThickness(useweights, genbounds, index, zaxisID, nlev, vert[index].thickness, vert[index].weights);
           }
           if (!useweights) vert[index].status = 3;
         }

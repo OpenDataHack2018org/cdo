@@ -293,8 +293,7 @@ after_FC2GP(double *fc, double *gp, long nlat, long nlon, long nlev, long nfc)
 /* HUMTEST */
 
 static void
-sh2rh(int AnalysisData, double *sphum, double *rhum, double *t, int lev, int dimgpout, double *level,
-      double *fullpresshybrid)
+sh2rh(int AnalysisData, double *sphum, double *rhum, double *t, int lev, int dimgpout, double *level, double *fullpresshybrid)
 {
   int lp, i;
   int lpi, lfp;
@@ -410,8 +409,8 @@ after_FCrh2FCsh(struct Control *globs, struct Variable *vars)
 
   after_FC2GP(vars[RHUMIDITY].fourier, vars[RHUMIDITY].grid, globs->Latitudes, globs->Longitudes, vars[RHUMIDITY].plev,
               globs->Fouriers);
-  after_FC2GP(vars[TEMPERATURE].fourier, vars[TEMPERATURE].grid, globs->Latitudes, globs->Longitudes,
-              vars[TEMPERATURE].plev, globs->Fouriers);
+  after_FC2GP(vars[TEMPERATURE].fourier, vars[TEMPERATURE].grid, globs->Latitudes, globs->Longitudes, vars[TEMPERATURE].plev,
+              globs->Fouriers);
 
   rh2sh(vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid, globs->NumLevelRequest, globs->DimGP,
         globs->LevelRequest);
@@ -436,10 +435,10 @@ after_SPuv2SPdv(struct Control *globs, struct Variable *vars)
   if (vars[U_WIND].fourier == NULL) vars[U_WIND].fourier = alloc_dp(fieldSize, "vars[U_WIND].fourier");
   if (vars[V_WIND].fourier == NULL) vars[V_WIND].fourier = alloc_dp(fieldSize, "vars[V_WIND].fourier");
 
-  sp2fc(vars[U_WIND].spectral, vars[U_WIND].fourier, globs->poli, globs->NumLevelRequest, globs->Latitudes,
-        globs->Fouriers, globs->Truncation);
-  sp2fc(vars[V_WIND].spectral, vars[V_WIND].fourier, globs->poli, globs->NumLevelRequest, globs->Latitudes,
-        globs->Fouriers, globs->Truncation);
+  sp2fc(vars[U_WIND].spectral, vars[U_WIND].fourier, globs->poli, globs->NumLevelRequest, globs->Latitudes, globs->Fouriers,
+        globs->Truncation);
+  sp2fc(vars[V_WIND].spectral, vars[V_WIND].fourier, globs->poli, globs->NumLevelRequest, globs->Latitudes, globs->Fouriers,
+        globs->Truncation);
   uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, Div, Vor, globs->pol2, globs->pol3, globs->NumLevelRequest,
         globs->Latitudes, globs->Truncation);
 
@@ -468,8 +467,8 @@ after_FCsh2FCrh(struct Control *globs, struct Variable *vars)
 
   after_FC2GP(vars[HUMIDITY].fourier, vars[HUMIDITY].grid, globs->Latitudes, globs->Longitudes, vars[HUMIDITY].plev,
               globs->Fouriers);
-  after_FC2GP(vars[TEMPERATURE].fourier, vars[TEMPERATURE].grid, globs->Latitudes, globs->Longitudes,
-              vars[TEMPERATURE].plev, globs->Fouriers);
+  after_FC2GP(vars[TEMPERATURE].fourier, vars[TEMPERATURE].grid, globs->Latitudes, globs->Longitudes, vars[TEMPERATURE].plev,
+              globs->Fouriers);
 
   sh2rh(globs->AnalysisData, vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid, globs->NumLevelRequest,
         globs->DimGP, globs->LevelRequest, vars[FULL_PRESS].hybrid);
@@ -487,9 +486,9 @@ static void
 CheckAnalyses(struct Variable *vars)
 {
   for (int code = 0; code < 272; code++)
-    if (vars[code].needed && code != DIVERGENCE && code != VORTICITY && code != STREAM && code != U_WIND
-        && code != HUMIDITY && code != VELOPOT && code != V_WIND && code != RHUMIDITY && code != GEOPOTHEIGHT
-        && code != PS && vars[code].spectral == NULL && vars[code].grid == NULL)
+    if (vars[code].needed && code != DIVERGENCE && code != VORTICITY && code != STREAM && code != U_WIND && code != HUMIDITY
+        && code != VELOPOT && code != V_WIND && code != RHUMIDITY && code != GEOPOTHEIGHT && code != PS
+        && vars[code].spectral == NULL && vars[code].grid == NULL)
       {
         if (labort_after)
           Error("Code  %3d not found", code);
@@ -540,8 +539,8 @@ after_processPL(struct Control *globs, struct Variable *vars)
     {
       if (vars[GEOPOTHEIGHT].spectral == NULL)
         vars[GEOPOTHEIGHT].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "GEOPOTHEIGHT.spectral");
-      MultVectorScalar(vars[GEOPOTHEIGHT].spectral, vars[GEOPOTENTIAL].spectral, C_RG,
-                       globs->DimSP * globs->NumLevelRequest, 0, 0);
+      MultVectorScalar(vars[GEOPOTHEIGHT].spectral, vars[GEOPOTENTIAL].spectral, C_RG, globs->DimSP * globs->NumLevelRequest, 0,
+                       0);
       vars[GEOPOTENTIAL].needed = vars[GEOPOTENTIAL].selected;
     }
 
@@ -578,8 +577,8 @@ after_processPL(struct Control *globs, struct Variable *vars)
         vars[U_WIND].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[U_WIND].spectral");
       if (vars[V_WIND].spectral == NULL)
         vars[V_WIND].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[V_WIND].spectral");
-      dv2uv(vars[DIVERGENCE].spectral, vars[VORTICITY].spectral, vars[U_WIND].spectral, vars[V_WIND].spectral,
-            globs->dv2uv_f1, globs->dv2uv_f2, globs->Truncation, globs->DimSP, globs->NumLevelRequest);
+      dv2uv(vars[DIVERGENCE].spectral, vars[VORTICITY].spectral, vars[U_WIND].spectral, vars[V_WIND].spectral, globs->dv2uv_f1,
+            globs->dv2uv_f2, globs->Truncation, globs->DimSP, globs->NumLevelRequest);
     }
 
   if (vars[VELOPOT].comp)
@@ -641,8 +640,8 @@ after_processPL(struct Control *globs, struct Variable *vars)
                 fieldSize = vars[code].plev * globs->DimFC;
                 vars[code].fourier = alloc_dp(fieldSize, FieldName(code, "fourier"));
               }
-            sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].plev, globs->Latitudes,
-                  globs->Fouriers, globs->Truncation);
+            sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].plev, globs->Latitudes, globs->Fouriers,
+                  globs->Truncation);
           }
       if (vars[U_WIND].needed && vars[U_WIND].fourier)
         scaluv(vars[U_WIND].fourier, globs->rcoslat, globs->Latitudes, globs->Fouriers * globs->NumLevelRequest);
@@ -764,8 +763,8 @@ after_processPL(struct Control *globs, struct Variable *vars)
       vars[RHUMIDITY].plev = globs->NumLevelRequest;
       vars[RHUMIDITY].sfit = TRUE;
       vars[RHUMIDITY].grid = alloc_dp(globs->DimGP * globs->NumLevelRequest, "vars[RHUMIDITY].grid");
-      sh2rh(globs->AnalysisData, vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid,
-            globs->NumLevelRequest, globs->DimGP, globs->LevelRequest, vars[FULL_PRESS].hybrid);
+      sh2rh(globs->AnalysisData, vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid, globs->NumLevelRequest,
+            globs->DimGP, globs->LevelRequest, vars[FULL_PRESS].hybrid);
       vars[HUMIDITY].needed = vars[HUMIDITY].selected;
       vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
     }
@@ -888,8 +887,7 @@ after_processPL(struct Control *globs, struct Variable *vars)
 }
 
 static void
-theta(double *pthetaf, double *pthetah, double *ph, double *ps, double *tf, double *ts, int levels, int dimgp,
-      int dim3gp)
+theta(double *pthetaf, double *pthetah, double *ph, double *ps, double *tf, double *ts, int levels, int dimgp, int dim3gp)
 {
   double *thetah = pthetah;
   double *thetaf = pthetaf;
@@ -919,8 +917,8 @@ windSpeed(double *uvspeed, double *u, double *v, int dim3gp)
 }
 
 static void
-Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind, double *halfpress, double *fullpress,
-      double *dpsdx, double *dpsdy, double *vct, int dimgp, int nlev)
+Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind, double *halfpress, double *fullpress, double *dpsdx,
+      double *dpsdy, double *vct, int dimgp, int nlev)
 {
   int i, j;
   double DeltaHybrid, Cterm, Pterm;
@@ -951,8 +949,8 @@ Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind, doub
 #endif
       for (i = 0; i < dimgp; i++)
         {
-          omega[i + dimgp] = omega[i] - diver[i] * (halfp[i + dimgp] - halfp[i])
-                             - DeltaHybrid * (uwind[i] * dpsdx[i] + vwind[i] * dpsdy[i]);
+          omega[i + dimgp]
+              = omega[i] - diver[i] * (halfp[i + dimgp] - halfp[i]) - DeltaHybrid * (uwind[i] * dpsdx[i] + vwind[i] * dpsdy[i]);
         }
     }
 
@@ -1133,8 +1131,7 @@ LayerCloud(double *cc, double *ll, double pmax, double pmin, int DimGP, int Half
   for (k = MaxLev + 1; k <= MinLev; k++)
     {
       for (i = 0; i < DimGP; i++)
-        ll[i] *= (1. - MAX(cc[i + (k - 1) * DimGP], cc[i + k * DimGP]))
-                 / (1. - MIN(cc[i + (k - 1) * DimGP], 1. - ZEPSEC));
+        ll[i] *= (1. - MAX(cc[i + (k - 1) * DimGP], cc[i + k * DimGP])) / (1. - MIN(cc[i + (k - 1) * DimGP], 1. - ZEPSEC));
     }
   for (i = 0; i < DimGP; i++) ll[i] = 1. - ll[i];
 }
@@ -1143,8 +1140,8 @@ LayerCloud(double *cc, double *ll, double pmax, double pmin, int DimGP, int Half
 void
 after_EchamCompGP(struct Control *globs, struct Variable *vars)
 {
-  if (vars[GEOPOTHEIGHT].comp || vars[SLP].comp || vars[THETAF].needed || vars[HALF_PRESS].needed
-      || vars[RHUMIDITY].comp || vars[OMEGA].comp || globs->Type >= 30)
+  if (vars[GEOPOTHEIGHT].comp || vars[SLP].comp || vars[THETAF].needed || vars[HALF_PRESS].needed || vars[RHUMIDITY].comp
+      || vars[OMEGA].comp || globs->Type >= 30)
     {
       if (vars[FULL_PRESS].hybrid == NULL) vars[FULL_PRESS].hybrid = alloc_dp(globs->Dim3GP, "vars[FULL_PRESS].hybrid");
 
@@ -1155,8 +1152,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       if (vars[HALF_PRESS].hybrid == NULL)
         vars[HALF_PRESS].hybrid = alloc_dp(globs->Dim3GP + globs->DimGP, "vars[HALF_PRESS].hybrid");
 
-      presh(vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vct, vars[PS_PROG].hybrid, globs->NumLevel,
-            globs->DimGP);
+      presh(vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vct, vars[PS_PROG].hybrid, globs->NumLevel, globs->DimGP);
     }
 
   if (globs->unitsel > 2) vars[FULL_PRESS].hybrid = (double *) FreeMemory(vars[FULL_PRESS].hybrid);
@@ -1168,8 +1164,8 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[THETAF].sfit = TRUE;
       if (vars[THETAF].hybrid == NULL) vars[THETAF].hybrid = alloc_dp(globs->Dim3GP, "vars[THETAF].hybrid");
       if (vars[THETAH].hybrid == NULL) vars[THETAH].hybrid = alloc_dp(globs->Dim3GP, "vars[THETAH].hybrid");
-      theta(vars[THETAF].hybrid, vars[THETAH].hybrid, vars[HALF_PRESS].hybrid, vars[PS_PROG].hybrid,
-            vars[TEMPERATURE].hybrid, vars[TS].hybrid, globs->NumLevel, globs->DimGP, globs->Dim3GP);
+      theta(vars[THETAF].hybrid, vars[THETAH].hybrid, vars[HALF_PRESS].hybrid, vars[PS_PROG].hybrid, vars[TEMPERATURE].hybrid,
+            vars[TS].hybrid, globs->NumLevel, globs->DimGP, globs->Dim3GP);
     }
 
   if (vars[GEOPOTHEIGHT].comp)
@@ -1180,8 +1176,8 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[GEOPOTHEIGHT].hybrid = alloc_dp(globs->Dim3GP + globs->DimGP, "vars[GEOPOTHEIGHT].hybrid");
 
       arrayCopy(globs->DimGP, globs->Orography, vars[GEOPOTHEIGHT].hybrid + globs->Dim3GP);
-      MakeGeopotHeight(vars[GEOPOTHEIGHT].hybrid, vars[TEMPERATURE].hybrid, vars[HUMIDITY].hybrid,
-                       vars[HALF_PRESS].hybrid, globs->DimGP, globs->NumLevel);
+      MakeGeopotHeight(vars[GEOPOTHEIGHT].hybrid, vars[TEMPERATURE].hybrid, vars[HUMIDITY].hybrid, vars[HALF_PRESS].hybrid,
+                       globs->DimGP, globs->NumLevel);
 
       vars[HUMIDITY].needed = vars[HUMIDITY].selected;
     }
@@ -1209,9 +1205,8 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[OMEGA].sfit = TRUE;
       vars[OMEGA].hybrid = alloc_dp(globs->Dim3GP + globs->DimGP, "OMEGA.hybrid");
 
-      Omega(vars[OMEGA].hybrid, vars[DIVERGENCE].hybrid, vars[U_WIND].hybrid, vars[V_WIND].hybrid,
-            vars[HALF_PRESS].hybrid, vars[FULL_PRESS].hybrid, vars[DPSDX].hybrid, vars[DPSDY].hybrid, globs->vct,
-            globs->DimGP, globs->NumLevel);
+      Omega(vars[OMEGA].hybrid, vars[DIVERGENCE].hybrid, vars[U_WIND].hybrid, vars[V_WIND].hybrid, vars[HALF_PRESS].hybrid,
+            vars[FULL_PRESS].hybrid, vars[DPSDX].hybrid, vars[DPSDY].hybrid, globs->vct, globs->DimGP, globs->NumLevel);
 
       vars[DPSDX].needed = vars[DPSDX].selected;
       vars[DPSDY].needed = vars[DPSDY].selected;
@@ -1234,8 +1229,8 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[RHUMIDITY].sfit = FALSE;
       vars[RHUMIDITY].hybrid = alloc_dp(globs->Dim3GP, "vars[RHUMIDITY].hybrid");
 
-      sh2rh(globs->AnalysisData, vars[HUMIDITY].hybrid, vars[RHUMIDITY].hybrid, vars[TEMPERATURE].hybrid,
-            globs->NumLevel, globs->DimGP, globs->LevelRequest, vars[FULL_PRESS].hybrid);
+      sh2rh(globs->AnalysisData, vars[HUMIDITY].hybrid, vars[RHUMIDITY].hybrid, vars[TEMPERATURE].hybrid, globs->NumLevel,
+            globs->DimGP, globs->LevelRequest, vars[FULL_PRESS].hybrid);
 
       vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
       vars[HUMIDITY].needed = vars[HUMIDITY].selected;
@@ -1257,9 +1252,8 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[SLP].sfit = TRUE;
       vars[SLP].hybrid = alloc_dp(globs->DimGP, "vars[SLP].hybrid");
 
-      extra_P(vars[SLP].hybrid, vars[HALF_PRESS].hybrid + globs->Dim3GP,
-              vars[FULL_PRESS].hybrid + globs->Dim3GP - globs->DimGP, globs->Orography,
-              vars[TEMPERATURE].hybrid + globs->Dim3GP - globs->DimGP, globs->DimGP);
+      extra_P(vars[SLP].hybrid, vars[HALF_PRESS].hybrid + globs->Dim3GP, vars[FULL_PRESS].hybrid + globs->Dim3GP - globs->DimGP,
+              globs->Orography, vars[TEMPERATURE].hybrid + globs->Dim3GP - globs->DimGP, globs->DimGP);
       vars[TEMPERATURE].needed = vars[TEMPERATURE].selected || vars[GEOPOTHEIGHT].selected;
     }
 
@@ -1337,8 +1331,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[LOW_WATER].hlev = vars[LOW_WATER].plev = 1;
       vars[LOW_WATER].sfit = FALSE;
       vars[LOW_WATER].hybrid = alloc_dp(globs->DimGP, "vars[LOW_WATER].hybrid");
-      LayerWater(vars[222].hybrid, vars[LOW_WATER].hybrid, 75000., 101300., globs->DimGP, globs->HalfLevels,
-                 globs->vct);
+      LayerWater(vars[222].hybrid, vars[LOW_WATER].hybrid, 75000., 101300., globs->DimGP, globs->HalfLevels, globs->vct);
     }
 
   if (vars[MID_WATER].comp)
@@ -1370,8 +1363,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[LOW_CLOUD].hlev = vars[LOW_CLOUD].plev = 1;
       vars[LOW_CLOUD].sfit = FALSE;
       vars[LOW_CLOUD].hybrid = alloc_dp(globs->DimGP, "vars[LOW_CLOUD].hybrid");
-      LayerCloud(vars[223].hybrid, vars[LOW_CLOUD].hybrid, 75000., 101300., globs->DimGP, globs->HalfLevels,
-                 globs->vct);
+      LayerCloud(vars[223].hybrid, vars[LOW_CLOUD].hybrid, 75000., 101300., globs->DimGP, globs->HalfLevels, globs->vct);
     }
 
   if (vars[MID_CLOUD].comp)
@@ -1555,8 +1547,8 @@ after_processML(struct Control *globs, struct Variable *vars)
       if (vars[DIVERGENCE].spectral == NULL) after_gp2sp(globs, vars, DIVERGENCE);
       if (vars[VORTICITY].spectral == NULL) after_gp2sp(globs, vars, VORTICITY);
 
-      dv2uv(vars[DIVERGENCE].spectral, vars[VORTICITY].spectral, vars[U_WIND].spectral, vars[V_WIND].spectral,
-            globs->dv2uv_f1, globs->dv2uv_f2, globs->Truncation, globs->DimSP, vars[DIVERGENCE].hlev);
+      dv2uv(vars[DIVERGENCE].spectral, vars[VORTICITY].spectral, vars[U_WIND].spectral, vars[V_WIND].spectral, globs->dv2uv_f1,
+            globs->dv2uv_f2, globs->Truncation, globs->DimSP, vars[DIVERGENCE].hlev);
     }
 
   if (vars[VELOPOT].comp && globs->Type < 30)
@@ -1624,8 +1616,8 @@ after_processML(struct Control *globs, struct Variable *vars)
               {
                 fieldSize = vars[code].hlev * globs->DimFC;
                 vars[code].fourier = alloc_dp(fieldSize, FieldName(code, "fourier"));
-                sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].hlev, globs->Latitudes,
-                      globs->Fouriers, globs->Truncation);
+                sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].hlev, globs->Latitudes, globs->Fouriers,
+                      globs->Truncation);
               }
             if (code != LNPS) vars[code].spectral = (double *) FreeMemory(vars[code].spectral);
           }
@@ -1655,8 +1647,8 @@ after_processML(struct Control *globs, struct Variable *vars)
           vars[DPSDY].sfit = FALSE;
           vars[DPSDY].fourier = alloc_dp(globs->DimFC, "vars[DPSDY].fourier");
           if (vars[LNPS].spectral == NULL) after_gp2sp(globs, vars, LNPS);
-          sp2fc(vars[LNPS].spectral, vars[DPSDY].fourier, globs->pdev, vars[DPSDY].hlev, globs->Latitudes,
-                globs->Fouriers, globs->Truncation);
+          sp2fc(vars[LNPS].spectral, vars[DPSDY].fourier, globs->pdev, vars[DPSDY].hlev, globs->Latitudes, globs->Fouriers,
+                globs->Truncation);
         }
     }
 
@@ -1806,11 +1798,10 @@ after_processML(struct Control *globs, struct Variable *vars)
                         MultVectorScalar(vars[code].hybrid, vars[code].mean, 1.0 / globs->MeanCount, fieldSize,
                                          vars[code].nmiss, vars[code].missval);
                       else
-                        DivVectorIvector(vars[code].hybrid, vars[code].mean, vars[code].samp, fieldSize,
-                                         &vars[code].nmiss, vars[code].missval);
+                        DivVectorIvector(vars[code].hybrid, vars[code].mean, vars[code].samp, fieldSize, &vars[code].nmiss,
+                                         vars[code].missval);
 
-                      if (globs->Mean > 1)
-                        VarQuaSum(vars[code].variance, vars[code].hybrid, fieldSize, globs->MeanCount);
+                      if (globs->Mean > 1) VarQuaSum(vars[code].variance, vars[code].hybrid, fieldSize, globs->MeanCount);
                     }
                 }
             }
@@ -1857,8 +1848,7 @@ after_processML(struct Control *globs, struct Variable *vars)
 
   if (globs->Type >= 30)
     {
-      if (globs->vert_index == NULL)
-        globs->vert_index = (int *) Malloc(globs->NumLevelRequest * globs->DimGP * sizeof(int));
+      if (globs->vert_index == NULL) globs->vert_index = (int *) Malloc(globs->NumLevelRequest * globs->DimGP * sizeof(int));
 
       if (globs->unitsel)
         {
@@ -1871,8 +1861,7 @@ after_processML(struct Control *globs, struct Variable *vars)
           pressureLevel = globs->LevelRequest;
         }
 
-      genind(globs->vert_index, pressureLevel, vars[FULL_PRESS].hybrid, globs->DimGP, globs->NumLevelRequest,
-             globs->NumLevel);
+      genind(globs->vert_index, pressureLevel, vars[FULL_PRESS].hybrid, globs->DimGP, globs->NumLevelRequest, globs->NumLevel);
 
       nmiss = 0;
       if (!globs->Extrapolate)
@@ -1903,17 +1892,16 @@ after_processML(struct Control *globs, struct Variable *vars)
 
                 if (code == TEMPERATURE)
                   {
-                    interp_T(globs->Orography, vars[TEMPERATURE].hybrid, vars[TEMPERATURE].grid,
-                             vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vert_index, pressureLevel,
-                             globs->NumLevelRequest, globs->DimGP, globs->NumLevel, vars[code].missval);
+                    interp_T(globs->Orography, vars[TEMPERATURE].hybrid, vars[TEMPERATURE].grid, vars[FULL_PRESS].hybrid,
+                             vars[HALF_PRESS].hybrid, globs->vert_index, pressureLevel, globs->NumLevelRequest, globs->DimGP,
+                             globs->NumLevel, vars[code].missval);
                   }
                 else if (code == GEOPOTHEIGHT)
                   {
                     if (vars[TEMPERATURE].hybrid == NULL) Error("Code  130 not found!");
-                    interp_Z(globs->Orography, vars[GEOPOTHEIGHT].hybrid, vars[GEOPOTHEIGHT].grid,
-                             vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vert_index,
-                             vars[TEMPERATURE].hybrid, pressureLevel, globs->NumLevelRequest, globs->DimGP,
-                             globs->NumLevel, vars[code].missval);
+                    interp_Z(globs->Orography, vars[GEOPOTHEIGHT].hybrid, vars[GEOPOTHEIGHT].grid, vars[FULL_PRESS].hybrid,
+                             vars[HALF_PRESS].hybrid, globs->vert_index, vars[TEMPERATURE].hybrid, pressureLevel,
+                             globs->NumLevelRequest, globs->DimGP, globs->NumLevel, vars[code].missval);
                   }
                 else
                   {
@@ -2087,8 +2075,7 @@ after_processML(struct Control *globs, struct Variable *vars)
     }
 
   for (code = 0; code < MaxCodes; code++)
-    if (vars[code].grid && (vars[code].sfit || globs->Type < 70))
-      vars[code].grid = (double *) FreeMemory(vars[code].grid);
+    if (vars[code].grid && (vars[code].sfit || globs->Type < 70)) vars[code].grid = (double *) FreeMemory(vars[code].grid);
 
   /* -------------------------- */
   /*  Output of fourier fields  */
@@ -2158,8 +2145,8 @@ after_processML(struct Control *globs, struct Variable *vars)
                 vars[code].spectral = alloc_dp(fieldSize, FieldName(code, "spectral"));
               }
 
-            fc2sp(vars[code].fourier, vars[code].spectral, globs->pold, vars[code].plev, globs->Latitudes,
-                  globs->Fouriers, globs->Truncation);
+            fc2sp(vars[code].fourier, vars[code].spectral, globs->pold, vars[code].plev, globs->Latitudes, globs->Fouriers,
+                  globs->Truncation);
           }
 
       if (vars[DIVERGENCE].needed || vars[VORTICITY].needed || vars[VELOPOT].needed || vars[STREAM].needed)
@@ -2170,8 +2157,8 @@ after_processML(struct Control *globs, struct Variable *vars)
             vars[VORTICITY].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[VORTICITY].spectral");
           if ((vars[U_WIND].fourier == 0 || vars[V_WIND].fourier == 0) && globs->NumLevelRequest)
             Error("uwind or vwind missing!");
-          uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, vars[DIVERGENCE].spectral, vars[VORTICITY].spectral,
-                globs->pol2, globs->pol3, globs->NumLevelRequest, globs->Latitudes, globs->Truncation);
+          uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, vars[DIVERGENCE].spectral, vars[VORTICITY].spectral, globs->pol2,
+                globs->pol3, globs->NumLevelRequest, globs->Latitudes, globs->Truncation);
         }
 
       if (vars[VELOPOT].needed)
@@ -2235,8 +2222,8 @@ after_processML(struct Control *globs, struct Variable *vars)
                 fieldSize = vars[code].plev * globs->DimFC;
                 vars[code].fourier = alloc_dp(fieldSize, FieldName(code, "fourier"));
               }
-            sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].plev, globs->Latitudes,
-                  globs->Fouriers, globs->Truncation);
+            sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].plev, globs->Latitudes, globs->Fouriers,
+                  globs->Truncation);
           }
       if (vars[U_WIND].needed && vars[U_WIND].fourier)
         scaluv(vars[U_WIND].fourier, globs->rcoslat, globs->Latitudes, globs->Fouriers * globs->NumLevelRequest);
@@ -2440,8 +2427,7 @@ after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int 
 }
 
 void
-after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID,
-                     size_t nmiss)
+after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
 {
   int gridtype = gridInqType(gridID);
   int leveltype = zaxisInqType(zaxisID);
@@ -2766,8 +2752,7 @@ after_legini_setup(struct Control *globs, struct Variable *vars)
       if (vars[DPSDY].needed) globs->pdev = (double *) Malloc(pdim * sizeof(double));
     }
 
-  if ((vars[DIVERGENCE].needed || vars[VORTICITY].needed || vars[VELOPOT].needed || vars[STREAM].needed)
-      && globs->Type > 20)
+  if ((vars[DIVERGENCE].needed || vars[VORTICITY].needed || vars[VELOPOT].needed || vars[STREAM].needed) && globs->Type > 20)
     {
       globs->pol2 = (double *) Malloc(pdim * sizeof(double));
       globs->pol3 = (double *) Malloc(pdim * sizeof(double));

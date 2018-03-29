@@ -414,8 +414,7 @@ get_no_output_operator_list()
   std::vector<std::string> names;
   for (std::pair<std::string, std::string> operator_module_names_pair : modules_map)
     {
-      if (modules[operator_module_names_pair.second].mode == 1
-          && modules[operator_module_names_pair.second].streamOutCnt == 0)
+      if (modules[operator_module_names_pair.second].mode == 1 && modules[operator_module_names_pair.second].streamOutCnt == 0)
         {
           names.push_back(operator_module_names_pair.first);
         }
@@ -594,8 +593,7 @@ get_operator_description(std::string p_current_op_name, std::vector<std::string>
 
       line = help.at(++operator_section);
       // search the operator section for current operator line
-      while (line.find(p_current_op_name + " ") == std::string::npos && !line.empty()
-             && operator_section < help.size() - 1)
+      while (line.find(p_current_op_name + " ") == std::string::npos && !line.empty() && operator_section < help.size() - 1)
         {
           line = help.at(++operator_section);
         }
@@ -604,8 +602,7 @@ get_operator_description(std::string p_current_op_name, std::vector<std::string>
         {
           auto op_name_start = line.find_first_not_of(" \t");
 
-          description
-              = line.substr(line.find_first_not_of(" \t", op_name_start + p_current_op_name.size()), line.size());
+          description = line.substr(line.find_first_not_of(" \t", op_name_start + p_current_op_name.size()), line.size());
         }
     }
   return description;
@@ -642,8 +639,7 @@ operatorPrintList(bool print_no_output)
       if (aliases.find(current_op_name) != aliases.end())
         {
 
-          output_list[out_list_idx]
-              += std::string(get_spacing_for(16, current_op_name) + "--> " + aliases[current_op_name]);
+          output_list[out_list_idx] += std::string(get_spacing_for(16, current_op_name) + "--> " + aliases[current_op_name]);
         }
       else if (!current_module->help.empty())
         {
@@ -651,8 +647,8 @@ operatorPrintList(bool print_no_output)
           std::string description = get_operator_description(current_op_name, current_module->help);
           output_list[out_list_idx] += get_spacing_for(16, current_op_name) + description;
         }
-      std::string in_out_info = "(" + std::to_string(current_module->streamInCnt) + "|"
-                                + std::to_string(current_module->streamOutCnt) + ")";
+      std::string in_out_info
+          = "(" + std::to_string(current_module->streamInCnt) + "|" + std::to_string(current_module->streamOutCnt) + ")";
       output_list[out_list_idx] += get_spacing_for(90, output_list[out_list_idx]) + in_out_info;
     }
   // print generated output list

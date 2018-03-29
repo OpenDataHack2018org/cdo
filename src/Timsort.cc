@@ -32,8 +32,8 @@
 static int
 compareDouble(const void *a, const void *b)
 {
-  const double *x = (const double*) a;
-  const double *y = (const double*) b;
+  const double *x = (const double *) a;
+  const double *y = (const double *) b;
   return ((*x > *y) - (*x < *y)) * 2 + (*x > *y) - (*x < *y);
 }
 

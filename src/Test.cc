@@ -124,9 +124,8 @@ Testdata(void *process)
               cval2[i + gridsize * 3] = cval[i * 4 + 3];
 
               if (tsID1 == 0 && recID == 0)
-                printf("%4zu %3d %3d %3d %3d %d %g\n", i, (unsigned int) cval[4 * i + 0],
-                       (unsigned int) cval[4 * i + 1], (unsigned int) cval[4 * i + 2], (unsigned int) cval[4 * i + 3],
-                       ival[i], fval[i]);
+                printf("%4zu %3d %3d %3d %3d %d %g\n", i, (unsigned int) cval[4 * i + 0], (unsigned int) cval[4 * i + 1],
+                       (unsigned int) cval[4 * i + 2], (unsigned int) cval[4 * i + 3], ival[i], fval[i]);
             }
 
           pstreamWriteRecord(streamID2, array, nmiss);

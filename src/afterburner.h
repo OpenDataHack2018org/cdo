@@ -177,8 +177,7 @@ struct Variable
 void fft_set(double *trigs, long *ifax, long n);
 void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon,
            long nlev, long nfc);
-void gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev,
-           long nfc);
+void gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev, long nfc);
 
 /* Convert Spectral Array to new resolution */
 void sp2sp(double *arrayIn, int truncIn, double *arrayOut, int truncOut);
@@ -260,8 +259,8 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars);
 void after_processPL(struct Control *globs, struct Variable *vars);
 void after_processML(struct Control *globs, struct Variable *vars);
 
-void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID,
-                             int levelID, size_t nmiss);
+void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID,
+                             size_t nmiss);
 double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int levelID);
 void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID,
                           size_t nmiss);

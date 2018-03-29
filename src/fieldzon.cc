@@ -205,8 +205,8 @@ zonavg(field_type field1, field_type *field2)
 }
 
 static void
-prevarsum_zon(const double *restrict array, size_t nx, size_t nmiss, double missval, double *rsum, double *rsumw,
-              double *rsumq, double *rsumwq)
+prevarsum_zon(const double *restrict array, size_t nx, size_t nmiss, double missval, double *rsum, double *rsumw, double *rsumq,
+              double *rsumwq)
 {
   double w = 1. / nx;
 

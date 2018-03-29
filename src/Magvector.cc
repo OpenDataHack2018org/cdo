@@ -446,8 +446,8 @@ Magvector(void *process)
           if (found == 2)
             {
               if (DBG) fprintf(stderr, "Found Both U & V VEL, Creating vector fields! \n");
-              magvector(cdoGetStreamName(1).c_str(), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat,
-                        uarray, varray, nparam, pnames, datetimestr);
+              magvector(cdoGetStreamName(1).c_str(), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, uarray,
+                        varray, nparam, pnames, datetimestr);
             }
           else if (found == 1)
             {

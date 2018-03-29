@@ -176,8 +176,7 @@ Timselstat(void *process)
                     {
                       if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
-                      for (size_t i = 0; i < gridsize; i++)
-                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                      for (size_t i = 0; i < gridsize; i++) psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
               else

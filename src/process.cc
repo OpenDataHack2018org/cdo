@@ -187,14 +187,12 @@ ProcessType::checkStreamCnt(void)
   if (m_streamCnt > streamCnt)
     CdoError::Abort(Cdo::progname, "Too many streams specified!"
                                    " Operator ",
-                    m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt,
-                    " output streams.");
+                    m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt, " output streams.");
 
   if (m_streamCnt < streamCnt && !obase)
     CdoError::Abort(Cdo::progname, "Too few streams specified!"
                                    " Operator ",
-                    m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt,
-                    " output streams.");
+                    m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt, " output streams.");
 
   if (wantedStreamInCnt == 1 && streamInCnt0 == -1) return 1;
 

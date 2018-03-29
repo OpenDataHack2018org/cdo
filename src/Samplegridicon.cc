@@ -201,8 +201,8 @@ typedef struct
 static int
 cmpsinfo(const void *a, const void *b)
 {
-  const int x = ((const sinfo_t *)a)->p;
-  const int y = ((const sinfo_t *)b)->p;
+  const int x = ((const sinfo_t *) a)->p;
+  const int y = ((const sinfo_t *) b)->p;
   return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
@@ -269,8 +269,7 @@ read_coordinates(const char *filename, long n, double *lon, double *lat, int nv,
   for (int index = 0; index < ngrids; ++index)
     {
       gridID = vlistGrid(vlistID, index);
-      if (gridInqType(gridID) == GRID_UNSTRUCTURED && (long) gridInqSize(gridID) == n && gridInqNvertex(gridID) == 3)
-        break;
+      if (gridInqType(gridID) == GRID_UNSTRUCTURED && (long) gridInqSize(gridID) == n && gridInqNvertex(gridID) == 3) break;
     }
 
   if (gridID == -1) cdoAbort("No ICON grid with %ld cells found in %s!", n, filename);
@@ -414,8 +413,8 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
                   break;
                 }
 
-              int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, ncorner + 1,
-                                                             center_point_plane_projection);
+              int winding_number
+                  = winding_numbers_algorithm(cell_corners_plane_projection, ncorner + 1, center_point_plane_projection);
               // printf("%d %g %g %g %g %d\n", cell_no2,
               // RAD2DEG*grid_center_lon2[cell_no2],
               // RAD2DEG*grid_center_lat2[cell_no2],

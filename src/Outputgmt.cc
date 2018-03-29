@@ -284,8 +284,7 @@ Outputgmt(void *process)
   */
   if (lhov)
     {
-      if (operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT)
-        cdoAbort("Bounds not available hovmoeller data!");
+      if (operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT) cdoAbort("Bounds not available hovmoeller data!");
     }
 
   int ncorner = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? gridInqNvertex(gridID) : 4;
@@ -381,8 +380,7 @@ Outputgmt(void *process)
 
           if (cdoVerbose)
             for (int i = 0; i < nlev; ++i)
-              fprintf(stderr, "level: %d %g %g %g\n", i + 1, zaxis_lower_lev[i], zaxis_center_lev[i],
-                      zaxis_upper_lev[i]);
+              fprintf(stderr, "level: %d %g %g %g\n", i + 1, zaxis_lower_lev[i], zaxis_center_lev[i], zaxis_upper_lev[i]);
         }
     }
 
@@ -497,8 +495,7 @@ Outputgmt(void *process)
                       else if (lmer)
                         fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i], level, array[i]);
                       else
-                        fprintf(stdout, " %g  %g  %g  %g\n", grid_center_lon[i], grid_center_lat[i], array[i],
-                                array[i]);
+                        fprintf(stdout, " %g  %g  %g  %g\n", grid_center_lon[i], grid_center_lat[i], array[i], array[i]);
                     }
                 }
               fprintf(stdout, "#\n");
@@ -538,8 +535,8 @@ Outputgmt(void *process)
                 for (int i = 0; i < nlon; i += ninc)
                   {
                     /* compute length of velocity vector */
-                    auv[IX2D(j, i, nlon)] = sqrt(uf[IX2D(j, i, nlon)] * uf[IX2D(j, i, nlon)]
-                                                 + vf[IX2D(j, i, nlon)] * vf[IX2D(j, i, nlon)]);
+                    auv[IX2D(j, i, nlon)]
+                        = sqrt(uf[IX2D(j, i, nlon)] * uf[IX2D(j, i, nlon)] + vf[IX2D(j, i, nlon)] * vf[IX2D(j, i, nlon)]);
 
                     alpha[IX2D(j, i, nlon)] = atan2(vf[IX2D(j, i, nlon)], uf[IX2D(j, i, nlon)]);
                     alpha[IX2D(j, i, nlon)] = 90. - alpha[IX2D(j, i, nlon)] * RAD2DEG;
@@ -548,8 +545,8 @@ Outputgmt(void *process)
                     if (alpha[IX2D(j, i, nlon)] > 360) alpha[IX2D(j, i, nlon)] -= 360;
 
                     if (fabs(auv[IX2D(j, i, nlon)]) > 0)
-                      fprintf(stdout, " %g  %g  %g  %g\n", grid_center_lon[IX2D(j, i, nlon)],
-                              grid_center_lat[IX2D(j, i, nlon)], alpha[IX2D(j, i, nlon)], auv[IX2D(j, i, nlon)]);
+                      fprintf(stdout, " %g  %g  %g  %g\n", grid_center_lon[IX2D(j, i, nlon)], grid_center_lat[IX2D(j, i, nlon)],
+                              alpha[IX2D(j, i, nlon)], auv[IX2D(j, i, nlon)]);
                   }
 
               fprintf(stdout, "#\n");
@@ -675,8 +672,7 @@ Outputgmt(void *process)
                       const double *lat_bounds = grid_corner_lat + i * ncorner;
                       int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
 
-                      for (int ic = 0; ic < ncorner_new; ic++)
-                        fprintf(stdout, "   %g  %g\n", lon_bounds[ic], lat_bounds[ic]);
+                      for (int ic = 0; ic < ncorner_new; ic++) fprintf(stdout, "   %g  %g\n", lon_bounds[ic], lat_bounds[ic]);
                       fprintf(stdout, "   %g  %g\n", lon_bounds[0], lat_bounds[0]);
                     }
                 }

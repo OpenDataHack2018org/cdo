@@ -176,8 +176,7 @@ Seasstat(void *process)
                     {
                       if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
-                      for (size_t i = 0; i < gridsize; i++)
-                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                      for (size_t i = 0; i < gridsize; i++) psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
               else
@@ -285,8 +284,8 @@ Seasstat(void *process)
           time2str(vtime0, vtimestr0, sizeof(vtimestr0));
           date2str(vdate1, vdatestr1, sizeof(vdatestr1));
           time2str(vtime1, vtimestr1, sizeof(vtimestr1));
-          cdoPrint("season: %3d %3s  start: %s %s  end: %s %s ntimesteps: %ld", nseason, seas_name[seas0], vdatestr0,
-                   vtimestr0, vdatestr1, vtimestr1, nsets);
+          cdoPrint("season: %3d %3s  start: %s %s  end: %s %s ntimesteps: %ld", nseason, seas_name[seas0], vdatestr0, vtimestr0,
+                   vdatestr1, vtimestr1, nsets);
         }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
@@ -296,8 +295,7 @@ Seasstat(void *process)
         {
           char vdatestr[32];
           date2str(vdate0, vdatestr, sizeof(vdatestr));
-          cdoWarning("Season %3d (%s) has only %d input time step%s!", otsID + 1, vdatestr, nsets,
-                     nsets == 1 ? "" : "s");
+          cdoWarning("Season %3d (%s) has only %d input time step%s!", otsID + 1, vdatestr, nsets, nsets == 1 ? "" : "s");
         }
 
       for (int recID = 0; recID < maxrecs; recID++)

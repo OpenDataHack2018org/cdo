@@ -57,8 +57,7 @@ gen_param(const char *fmt, ...)
 }
 
 static void
-verify_lcc_parameter(double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0,
-                     double y_0)
+verify_lcc_parameter(double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0, double y_0)
 {
   const char *projection = "lambert_conformal_conic";
 
@@ -79,8 +78,8 @@ verify_lcc_parameter(double lon_0, double lat_0, double lat_1, double lat_2, dou
 }
 
 int
-proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf,
-                   size_t nvals, double *xvals, double *yvals)
+proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, size_t nvals,
+                   double *xvals, double *yvals)
 {
   int status = 0;
 #ifdef HAVE_LIBPROJ
@@ -159,8 +158,8 @@ cdo_lonlat_to_lcc(int gridID, size_t nvals, double *xvals, double *yvals)
 }
 
 int
-proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf,
-                   double x_0, double y_0, size_t nvals, double *xvals, double *yvals)
+proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0,
+                   double y_0, size_t nvals, double *xvals, double *yvals)
 {
   int status = 0;
 #ifdef HAVE_LIBPROJ

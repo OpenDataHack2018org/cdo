@@ -53,8 +53,8 @@ void dvtrans_delete(DVTRANS *dvtrans);
 
 void trans_uv2dv(SPTRANS *sptrans, int nlev, int gridID1, double *gu, double *gv, int gridID2, double *sd, double *svo);
 
-void trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev, int gridID1, double *sd, double *svo, int gridID2,
-                 double *gu, double *gv);
+void trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev, int gridID1, double *sd, double *svo, int gridID2, double *gu,
+                 double *gv);
 
 void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut);
 void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut);

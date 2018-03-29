@@ -22,8 +22,7 @@
 #include "cdoOptions.h"
 #include "timer.h"
 
-extern "C"
-{
+extern "C" {
 #include "lib/yac/clipping.h"
 #include "lib/yac/area.h"
 #include "lib/yac/geometry.h"
@@ -776,13 +775,13 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   double stimer = 0;
 #endif
 
-  // Loop over destination grid
+// Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(rsearch, \
-    Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose, \
-    tgt_num_cell_corners, target_cell_type, weightLinks, srch_corners, src_grid, tgt_grid, tgt_grid_size,   \
-    src_grid_size, search, srch_add, tgt_grid_cell, num_srch_cells_stat)
+#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(                                   \
+    rsearch, Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose,     \
+    tgt_num_cell_corners, target_cell_type, weightLinks, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
+    search, srch_add, tgt_grid_cell, num_srch_cells_stat)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -849,8 +848,8 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       if (1 && cdoVerbose)
         {
           num_srch_cells_stat[0] += num_srch_cells;
-          if ( num_srch_cells < num_srch_cells_stat[1] ) num_srch_cells_stat[1] = num_srch_cells;
-          if ( num_srch_cells > num_srch_cells_stat[2] ) num_srch_cells_stat[2] = num_srch_cells;
+          if (num_srch_cells < num_srch_cells_stat[1]) num_srch_cells_stat[1] = num_srch_cells;
+          if (num_srch_cells > num_srch_cells_stat[2]) num_srch_cells_stat[2] = num_srch_cells;
         }
 
       if (0 && cdoVerbose) printf("tgt_cell_add %zu  num_srch_cells %zu\n", tgt_cell_add, num_srch_cells);
@@ -976,7 +975,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
     {
       printf("num_srch_cells_sum  : %zu\n", num_srch_cells_stat[0]);
       printf("num_srch_cells_min  : %zu\n", num_srch_cells_stat[1]);
-      printf("num_srch_cells_mean : %3.1f\n", num_srch_cells_stat[0]/(double)tgt_grid_size);
+      printf("num_srch_cells_mean : %3.1f\n", num_srch_cells_stat[0] / (double) tgt_grid_size);
       printf("num_srch_cells_max  : %zu\n", num_srch_cells_stat[2]);
     }
 

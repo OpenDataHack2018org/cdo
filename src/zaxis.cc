@@ -235,8 +235,8 @@ zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, size_t *iatt, const 
 static void
 zaxis_read_attributes(size_t iatt, size_t nkv, kvmap_t *kvmap, int zaxisID)
 {
-  const char *reserved_keys[] = { "zaxistype", "size",   "scalar",  "vctsize", "name", "units",
-                                  "longname",  "levels", "lbounds", "ubounds", "vct" };
+  const char *reserved_keys[]
+      = { "zaxistype", "size", "scalar", "vctsize", "name", "units", "longname", "levels", "lbounds", "ubounds", "vct" };
   int num_rkeys = sizeof(reserved_keys) / sizeof(char *);
   const char *attkey0 = NULL;
 

@@ -291,8 +291,7 @@ parameter2word(const char *string)
   for (size_t i = 0; i < len; ++i)
     {
       int c = string[i];
-      if (iscntrl(c) || isblank(c))
-        cdoAbort("Word parameter >%s< contains invalid character at position %zu!", string, i + 1);
+      if (iscntrl(c) || isblank(c)) cdoAbort("Word parameter >%s< contains invalid character at position %zu!", string, i + 1);
     }
 
   if (len == 0) cdoAbort("Word parameter >%s< is empty!", string);
@@ -606,8 +605,7 @@ cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, con
                       switch (firstchar)
                         {
                         case 'g':
-                          if (cdoDefaultFileType == CDI_FILETYPE_GRB || cdoDefaultFileType == CDI_FILETYPE_GRB2)
-                            lready = true;
+                          if (cdoDefaultFileType == CDI_FILETYPE_GRB || cdoDefaultFileType == CDI_FILETYPE_GRB2) lready = true;
                           break;
                         case 'n':
                           if (cdoDefaultFileType == CDI_FILETYPE_NC || cdoDefaultFileType == CDI_FILETYPE_NC2

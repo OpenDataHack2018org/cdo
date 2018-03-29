@@ -442,8 +442,8 @@ ydstatFinalize(YDAY_STATS *stats, int operfunc)
                 if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT) continue;
                 nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
                 for (levelID = 0; levelID < nlevels; levelID++)
-                  farcstd(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID],
-                          stats->nsets[dayoy], divisor);
+                  farcstd(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID], stats->nsets[dayoy],
+                          divisor);
               }
             break;
 
@@ -454,8 +454,8 @@ ydstatFinalize(YDAY_STATS *stats, int operfunc)
                 if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT) continue;
                 nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
                 for (levelID = 0; levelID < nlevels; levelID++)
-                  farcvar(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID],
-                          stats->nsets[dayoy], divisor);
+                  farcvar(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID], stats->nsets[dayoy],
+                          divisor);
               }
             break;
           }

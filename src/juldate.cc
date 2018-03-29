@@ -49,8 +49,7 @@ juldate_sub(juldate_t juldate2, juldate_t juldate1)
 {
   juldate_t juldate;
 
-  (void) julday_sub(juldate1.julday, juldate1.secofday, juldate2.julday, juldate2.secofday, &juldate.julday,
-                    &juldate.secofday);
+  (void) julday_sub(juldate1.julday, juldate1.secofday, juldate2.julday, juldate2.secofday, &juldate.julday, &juldate.secofday);
 
   return juldate;
 }

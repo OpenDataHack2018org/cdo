@@ -39,8 +39,7 @@ void julday_add_seconds(int64_t seconds, int *julday, int *secofday);
 void julday_add(int days, int secs, int *julday, int *secofday);
 double julday_sub(int julday1, int secofday1, int julday2, int secofday2, int *days, int *secs);
 
-void encode_juldaysec(int calendar, int year, int month, int day, int hour, int minute, int second, int *julday,
-                      int *secofday);
+void encode_juldaysec(int calendar, int year, int month, int day, int hour, int minute, int second, int *julday, int *secofday);
 void decode_juldaysec(int calendar, int julday, int secofday, int *year, int *month, int *day, int *hour, int *minute,
                       int *second);
 

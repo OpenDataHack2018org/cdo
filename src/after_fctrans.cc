@@ -128,8 +128,8 @@ fft_set(double *trigs, long *ifax, long n)
 }
 
 static int
-rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, long inc2, long inc3, long inc4, long lot,
-       long n, long ifac, long la)
+rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, long inc2, long inc3, long inc4, long lot, long n,
+       long ifac, long la)
 {
   /*
      rpassc' - performs one pass through data as part;
@@ -799,14 +799,10 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, lon
                   {
                     c[ja + j] = (a[ia + i] + a[id + i]) + (a[ib + i] + a[ic + i]);
                     c[jd + j] = (a[ia + i] - a[id + i]) - (a[ib + i] - a[ic + i]);
-                    c[jb + j]
-                        = ((a[ia + i] - a[id + i]) + 0.5 * (a[ib + i] - a[ic + i])) - S60 * (b[ib + i] + b[ic + i]);
-                    c[jf + j]
-                        = ((a[ia + i] - a[id + i]) + 0.5 * (a[ib + i] - a[ic + i])) + S60 * (b[ib + i] + b[ic + i]);
-                    c[jc + j]
-                        = ((a[ia + i] + a[id + i]) - 0.5 * (a[ib + i] + a[ic + i])) - S60 * (b[ib + i] - b[ic + i]);
-                    c[je + j]
-                        = ((a[ia + i] + a[id + i]) - 0.5 * (a[ib + i] + a[ic + i])) + S60 * (b[ib + i] - b[ic + i]);
+                    c[jb + j] = ((a[ia + i] - a[id + i]) + 0.5 * (a[ib + i] - a[ic + i])) - S60 * (b[ib + i] + b[ic + i]);
+                    c[jf + j] = ((a[ia + i] - a[id + i]) + 0.5 * (a[ib + i] - a[ic + i])) + S60 * (b[ib + i] + b[ic + i]);
+                    c[jc + j] = ((a[ia + i] + a[id + i]) - 0.5 * (a[ib + i] + a[ic + i])) - S60 * (b[ib + i] - b[ic + i]);
+                    c[je + j] = ((a[ia + i] + a[id + i]) - 0.5 * (a[ib + i] + a[ic + i])) + S60 * (b[ib + i] - b[ic + i]);
                     i += inc3;
                     j += inc4;
                   }
@@ -931,14 +927,10 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, lon
                   {
                     c[ja + j] = (2.0 * (a[ia + i] + a[id + i])) + (2.0 * (a[ib + i] + a[ic + i]));
                     c[jd + j] = (2.0 * (a[ia + i] - a[id + i])) - (2.0 * (a[ib + i] - a[ic + i]));
-                    c[jb + j]
-                        = (2.0 * (a[ia + i] - a[id + i]) + (a[ib + i] - a[ic + i])) - (D60 * (b[ib + i] + b[ic + i]));
-                    c[jf + j]
-                        = (2.0 * (a[ia + i] - a[id + i]) + (a[ib + i] - a[ic + i])) + (D60 * (b[ib + i] + b[ic + i]));
-                    c[jc + j]
-                        = (2.0 * (a[ia + i] + a[id + i]) - (a[ib + i] + a[ic + i])) - (D60 * (b[ib + i] - b[ic + i]));
-                    c[je + j]
-                        = (2.0 * (a[ia + i] + a[id + i]) - (a[ib + i] + a[ic + i])) + (D60 * (b[ib + i] - b[ic + i]));
+                    c[jb + j] = (2.0 * (a[ia + i] - a[id + i]) + (a[ib + i] - a[ic + i])) - (D60 * (b[ib + i] + b[ic + i]));
+                    c[jf + j] = (2.0 * (a[ia + i] - a[id + i]) + (a[ib + i] - a[ic + i])) + (D60 * (b[ib + i] + b[ic + i]));
+                    c[jc + j] = (2.0 * (a[ia + i] + a[id + i]) - (a[ib + i] + a[ic + i])) - (D60 * (b[ib + i] - b[ic + i]));
+                    c[je + j] = (2.0 * (a[ia + i] + a[id + i]) - (a[ib + i] + a[ic + i])) + (D60 * (b[ib + i] - b[ic + i]));
                     i += inc3;
                     j += inc4;
                   }
@@ -1018,8 +1010,8 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, lon
 }
 
 static int
-qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, long inc2, long inc3, long inc4, long lot,
-       long n, long ifac, long la)
+qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, long inc2, long inc3, long inc4, long lot, long n,
+       long ifac, long la)
 {
   /*
      qpassc - performs one pass through data as part
@@ -1942,8 +1934,8 @@ qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, lon
 /* Fast Fourier Transform */
 /* ====================== */
 void
-fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon,
-      long nlev, long nfc)
+fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon, long nlev,
+      long nfc)
 {
   /* fc2gp performs fourier to gridpoint transforms using           */
   /* multiple fast fourier transform of length nlon                 */
@@ -2089,8 +2081,7 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *r
 }
 
 void
-gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev,
-      long nfc)
+gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev, long nfc)
 {
   long lot, fou, ia, ifac, jump, k, la;
   long lat, lev, lon, nfax, rix, wix;

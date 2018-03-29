@@ -124,8 +124,7 @@ Tstepcount(void *process)
       for (levelID = 0; levelID < nlevel; levelID++)
         {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(gridsize, mem, vars, varID, levelID, nts, missval, \
-                                              refval) schedule(dynamic, 1)
+#pragma omp parallel for default(none) shared(gridsize, mem, vars, varID, levelID, nts, missval, refval) schedule(dynamic, 1)
 #endif
           for (size_t i = 0; i < gridsize; i++)
             {

@@ -409,8 +409,8 @@ gridGenArea(int gridID, double *area)
   progressInit();
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(gridsize, area, nv, grid_corner_lon, \
-                                                                    grid_corner_lat, grid_center_lon, grid_center_lat)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(gridsize, area, nv, grid_corner_lon, grid_corner_lat, \
+                                                                    grid_center_lon, grid_center_lat)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {

@@ -441,8 +441,8 @@ Info(void *process)
 
                   if (infostatp->nmiss > 0)
                     {
-                      size_t nvals = arrayMinMaxSumMV(gridsize, array, missval, &infostatp->min, &infostatp->max,
-                                                      &infostatp->sum);
+                      size_t nvals
+                          = arrayMinMaxSumMV(gridsize, array, missval, &infostatp->min, &infostatp->max, &infostatp->sum);
                       imiss = gridsize - nvals;
                       infostatp->nvals += nvals;
                     }

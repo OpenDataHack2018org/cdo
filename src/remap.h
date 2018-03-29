@@ -175,8 +175,8 @@ int gridSearchSquareReg2d(RemapGrid *src_grid, size_t *restrict src_add, double 
 bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
                    double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
 
-int gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-                                double plat, double plon, GridSearchBins &srcBins);
+int gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats,
+                                double *restrict src_lons, double plat, double plon, GridSearchBins &srcBins);
 
 bool remapFindWeights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg);
 int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, size_t nym, const double *restrict xm,

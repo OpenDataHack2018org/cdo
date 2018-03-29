@@ -337,8 +337,7 @@ Output(void *process)
                         if (!DBL_IS_EQUAL(array[i], missval))
                           {
                             if (array[i] < fmin) fmin = array[i];
-                            fprintf(stdout, "%g\t%g\t%g\t%g\n", grid_center_lon[i], grid_center_lat[i], array[i],
-                                    array[i]);
+                            fprintf(stdout, "%g\t%g\t%g\t%g\n", grid_center_lon[i], grid_center_lat[i], array[i], array[i]);
                           }
                       FILE *fp = fopen(fname, "w");
                       if (fp == NULL) cdoAbort("Open failed on %s", fname);

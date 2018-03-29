@@ -978,8 +978,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
 
       if (nvdims == 4)
         {
-          if (dimidsp[0] == nhgl_dimid && dimidsp[1] == nmp1_dimid && dimidsp[2] == complex_dimid
-              && dimidsp[3] == lev_dimid)
+          if (dimidsp[0] == nhgl_dimid && dimidsp[1] == nmp1_dimid && dimidsp[2] == complex_dimid && dimidsp[3] == lev_dimid)
             {
               read_fc4d(nc_file_id, name, &(*vars)[varid], gridIDfc, zaxisIDml, nhgl, nmp1);
               varid++;
@@ -1514,8 +1513,7 @@ Echam5ini(void *process)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  if (operatorID == EXPORT_E5ML && processSelf().m_ID != 0)
-    cdoAbort("This operator can't be linked with other operators!");
+  if (operatorID == EXPORT_E5ML && processSelf().m_ID != 0) cdoAbort("This operator can't be linked with other operators!");
 
   if (operfunc == func_read)
     {
@@ -1554,8 +1552,7 @@ Echam5ini(void *process)
       for (iatt = 0; iatt < atts.natxt; ++iatt)
         {
           /* printf("%s: %s\n", atts.atxtname[iatt], atts.atxtentry[iatt]); */
-          cdiDefAttTxt(vlistID2, CDI_GLOBAL, atts.atxtname[iatt], (int) strlen(atts.atxtentry[iatt]) + 1,
-                       atts.atxtentry[iatt]);
+          cdiDefAttTxt(vlistID2, CDI_GLOBAL, atts.atxtname[iatt], (int) strlen(atts.atxtentry[iatt]) + 1, atts.atxtentry[iatt]);
         }
 
       taxisID = taxisCreate(TAXIS_ABSOLUTE);

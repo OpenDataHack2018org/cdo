@@ -96,8 +96,7 @@ Merstat(void *process)
   index = 0;
   gridID1 = vlistGrid(vlistID1, index);
 
-  if (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN
-      || gridInqType(gridID1) == GRID_GENERIC)
+  if (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN || gridInqType(gridID1) == GRID_GENERIC)
     {
       gridID2 = gridToMeridional(gridID1);
     }

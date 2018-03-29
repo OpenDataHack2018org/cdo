@@ -296,8 +296,8 @@ createNewProcess(ProcessType *p_parentProces, const char *argvEntry)
   ProcessType *newProcess = processCreate(argvEntry);
   if (newProcess->m_module.streamOutCnt == 0)
     {
-      CdoError::Abort(Cdo::progname, "operator -", p_parentProces->operatorName, " can not take -",
-                      newProcess->operatorName, "  with 0 outputs as input");
+      CdoError::Abort(Cdo::progname, "operator -", p_parentProces->operatorName, " can not take -", newProcess->operatorName,
+                      "  with 0 outputs as input");
       exit(EXIT_FAILURE);
     }
 
@@ -451,8 +451,7 @@ cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
   int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
   if (outStreamIDX > process.getOutStreamCnt() || outStreamIDX < 0)
     {
-      ERROR("outstream ", outStreamIDX, " of ", process.m_ID, " not found.",
-            "Was called with streamIDX = ", p_outStreamIDX);
+      ERROR("outstream ", outStreamIDX, " of ", process.m_ID, " not found.", "Was called with streamIDX = ", p_outStreamIDX);
     }
   PstreamType *outStream = process.outputStreams[outStreamIDX];
 
@@ -728,12 +727,14 @@ runProcesses()
   getProcess(0)->m_module.func(getProcess(0));
 }
 
-void killProcesses()
+void
+killProcesses()
 {
-    for(auto threadID : threadIDs)
+  for (auto threadID : threadIDs)
     {
-        if(threadID != pthread_self()){
-         pthread_cancel(threadID);
+      if (threadID != pthread_self())
+        {
+          pthread_cancel(threadID);
         }
     }
 }

@@ -253,8 +253,8 @@ timer_report(void)
       if (rt[it].calls > 0) avg /= rt[it].calls;
 
       if (rt[it].stat != rt_stat_undef)
-        fprintf(rt_unit, "%4d %7d %12.4g %12.4g %12.4g %12.4g  %s\n", it, rt[it].calls, rt[it].min, avg, rt[it].max,
-                total, rt[it].text);
+        fprintf(rt_unit, "%4d %7d %12.4g %12.4g %12.4g %12.4g  %s\n", it, rt[it].calls, rt[it].min, avg, rt[it].max, total,
+                rt[it].text);
     }
 }
 

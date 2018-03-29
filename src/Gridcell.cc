@@ -191,8 +191,7 @@ Gridcell(void *process)
     {
       int gridtype = gridInqType(gridID);
       int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
-      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || projtype == CDI_PROJ_LCC
-          || gridtype == GRID_CURVILINEAR)
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || projtype == CDI_PROJ_LCC || gridtype == GRID_CURVILINEAR)
         {
           double len1 = 0, len2 = 0;
           char units[CDI_MAX_NAME];
@@ -221,22 +220,18 @@ Gridcell(void *process)
                   {
                     if (i == 0)
                       {
-                        len2 = orthodrome(xv[j * xsize + i], yv[j * xsize + i], xv[j * xsize + i + 1],
-                                          yv[j * xsize + i + 1]);
+                        len2 = orthodrome(xv[j * xsize + i], yv[j * xsize + i], xv[j * xsize + i + 1], yv[j * xsize + i + 1]);
                         len1 = len2;
                       }
                     else if (i == (xsize - 1))
                       {
-                        len1 = orthodrome(xv[j * xsize + i - 1], yv[j * xsize + i - 1], xv[j * xsize + i],
-                                          yv[j * xsize + i]);
+                        len1 = orthodrome(xv[j * xsize + i - 1], yv[j * xsize + i - 1], xv[j * xsize + i], yv[j * xsize + i]);
                         len2 = len1;
                       }
                     else
                       {
-                        len1 = orthodrome(xv[j * xsize + i - 1], yv[j * xsize + i - 1], xv[j * xsize + i],
-                                          yv[j * xsize + i]);
-                        len2 = orthodrome(xv[j * xsize + i], yv[j * xsize + i], xv[j * xsize + i + 1],
-                                          yv[j * xsize + i + 1]);
+                        len1 = orthodrome(xv[j * xsize + i - 1], yv[j * xsize + i - 1], xv[j * xsize + i], yv[j * xsize + i]);
+                        len2 = orthodrome(xv[j * xsize + i], yv[j * xsize + i], xv[j * xsize + i + 1], yv[j * xsize + i + 1]);
                       }
 
                     array[j * xsize + i] = 0.5 * (len1 + len2) * PlanetRadius;

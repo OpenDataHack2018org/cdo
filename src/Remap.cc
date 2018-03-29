@@ -81,13 +81,9 @@ getMaptype(int operfunc, RemapMethod &mapType, SubmapType &submapType, int &numN
   switch (operfunc)
     {
     case REMAPYCON:
-    case GENYCON:
-      mapType = RemapMethod::CONSERV_YAC;
-      break;
+    case GENYCON: mapType = RemapMethod::CONSERV_YAC; break;
     case REMAPCON:
-    case GENCON:
-      mapType = RemapMethod::CONSERV;
-      break;
+    case GENCON: mapType = RemapMethod::CONSERV; break;
     case REMAPCON2:
     case GENCON2:
       mapType = RemapMethod::CONSERV;
@@ -424,9 +420,8 @@ gridIsGlobal(int gridID)
 
   int gridtype = gridInqType(gridID);
   int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
-  if ((projtype == CDI_PROJ_RLL) || (projtype == CDI_PROJ_LAEA) || (projtype == CDI_PROJ_SINU)
-      || (projtype == CDI_PROJ_LCC) || (gridtype == GRID_LONLAT && non_global)
-      || (gridtype == GRID_CURVILINEAR && non_global))
+  if ((projtype == CDI_PROJ_RLL) || (projtype == CDI_PROJ_LAEA) || (projtype == CDI_PROJ_SINU) || (projtype == CDI_PROJ_LCC)
+      || (gridtype == GRID_LONLAT && non_global) || (gridtype == GRID_CURVILINEAR && non_global))
     global_grid = false;
 
   return global_grid;
@@ -474,7 +469,8 @@ set_remapgrids(int filetype, int vlistID, int ngrids, std::vector<bool> &remapgr
                 cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular Gaussian grid!",
                          gridNamePtr(gridtype));
               else
-                cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular Gaussian grid!",
+                cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular "
+                         "Gaussian grid!",
                          gridNamePtr(gridtype));
             }
           else if (gridtype == GRID_GENERIC && gridInqSize(gridID) <= 2)
@@ -749,8 +745,7 @@ static void
 remapSum(RemapGrid *remapGrid, size_t gridsize, double *array, const char *tag)
 {
   for (size_t i = 0; i < gridsize; i++)
-    printf("1 %zd %g %g %g %g\n", i, array[i], remapGrid->cell_frac[i], remapGrid->cell_area[i],
-           remapGrid->cell_frac[i]);
+    printf("1 %zd %g %g %g %g\n", i, array[i], remapGrid->cell_frac[i], remapGrid->cell_area[i], remapGrid->cell_frac[i]);
 
   double sum = 0;
   for (size_t i = 0; i < gridsize; i++) sum += remapGrid->cell_area[i];
@@ -907,8 +902,8 @@ Remap(void *argument)
   int remapOrder = 0;
   if (lremap)
     {
-      remapReadDataScrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remapOrder,
-                         remaps[0].src_grid, remaps[0].tgt_grid, remaps[0].vars);
+      remapReadDataScrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remapOrder, remaps[0].src_grid,
+                         remaps[0].tgt_grid, remaps[0].vars);
 
       if (remaps[0].vars.links_per_value == 0) remapLinksPerValue(remaps[0].vars);
 
@@ -1184,8 +1179,7 @@ Remap(void *argument)
 
               // calculate some statistics
               if (cdoVerbose)
-                remapStat(remapOrder, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars, &array1[0], &array2[0],
-                           missval);
+                remapStat(remapOrder, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars, &array1[0], &array2[0], missval);
 
               if (gridInqType(gridID2) == GRID_GME)
                 {

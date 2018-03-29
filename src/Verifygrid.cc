@@ -482,9 +482,8 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
               && fabs(cell_corners_xyz_open_cell[i + 2] - cell_corners_xyz_open_cell[j + 2]) < eps)
             {
               if (cdoVerbose)
-                fprintf(stdout, "The duplicate vertex %f, %f, %f was found in cell no %zu.\n",
-                        cell_corners_xyz_open_cell[j], cell_corners_xyz_open_cell[j + 1],
-                        cell_corners_xyz_open_cell[j + 2], cell_no + 1);
+                fprintf(stdout, "The duplicate vertex %f, %f, %f was found in cell no %zu.\n", cell_corners_xyz_open_cell[j],
+                        cell_corners_xyz_open_cell[j + 1], cell_corners_xyz_open_cell[j + 2], cell_no + 1);
 
               no_duplicates += 1;
               marked_duplicate_indices[j / 3] = 1;
@@ -588,8 +587,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
       /* Checking the arrangement or direction of cell vertices. */
 
-      long double polygon_area
-          = calculate_the_polygon_area(cell_corners_plane_projection, actual_number_of_corners + 1);
+      long double polygon_area = calculate_the_polygon_area(cell_corners_plane_projection, actual_number_of_corners + 1);
       bool is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
 
       /* If the direction of the vertices was flipped during the projection onto the two-dimensional plane, the previous
@@ -618,8 +616,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
           printf("cell_no %zu: ", cell_no + 1);
           printf(" lon=%g lat=%g : ", grid_center_lon[cell_no], grid_center_lat[cell_no]);
           for (int corner_no = 0; corner_no < ncorner; corner_no++)
-            printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no],
-                   grid_corner_lat[cell_no * ncorner + corner_no]);
+            printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no]);
           printf("\n");
         }
     }
@@ -645,8 +642,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
   if (no_nonconvex_cells) cdoPrintRed("%9zu cells are non-convex", no_nonconvex_cells);
 
-  if (no_clockwise_cells)
-    cdoPrintRed("%9zu cells have their vertices arranged in a clockwise order", no_clockwise_cells);
+  if (no_clockwise_cells) cdoPrintRed("%9zu cells have their vertices arranged in a clockwise order", no_clockwise_cells);
 
   if (no_of_cells_with_center_points_out_of_bounds)
     cdoPrintRed("%9zu cells have their center points located outside their boundaries",

@@ -378,15 +378,15 @@ Tinfo(void *process)
                   incperiod0 = incperiod;
                   incunit0 = incunit;
 
-                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, 1, incperiod0, incunit0, vdate_first, vdate,
-                                 vtime, calendar, day, juldate0, juldate_encode(calendar, vdate_first, vtime_first));
+                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, 1, incperiod0, incunit0, vdate_first, vdate, vtime,
+                                 calendar, day, juldate0, juldate_encode(calendar, vdate_first, vtime_first));
 
                   arrow = '^';
                 }
               else
                 {
-                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, tsID, incperiod0, incunit0, vdate, vdate0,
-                                 vtime0, calendar, day0, juldate, juldate0);
+                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, tsID, incperiod0, incunit0, vdate, vdate0, vtime0,
+                                 calendar, day0, juldate, juldate0);
 
                   arrow = '<';
 

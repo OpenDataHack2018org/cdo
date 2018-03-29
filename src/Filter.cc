@@ -195,8 +195,7 @@ Filter(void *process)
           vars[tsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
-          if (nmiss)
-            cdoAbort("Missing value support for operators in module Filter not added yet!");
+          if (nmiss) cdoAbort("Missing value support for operators in module Filter not added yet!");
         }
 
       /* get and check time increment */
@@ -228,8 +227,8 @@ Filter(void *process)
           else
             getTimeInc(jdelta, vdate0, vdate, &incperiod, &incunit);
 
-          if (calendar != CALENDAR_360DAYS && calendar != CALENDAR_365DAYS && calendar != CALENDAR_366DAYS
-              && incunit0 < 4 && month == 2 && day == 29 && (day0 != day || month0 != month || year0 != year))
+          if (calendar != CALENDAR_360DAYS && calendar != CALENDAR_365DAYS && calendar != CALENDAR_366DAYS && incunit0 < 4
+              && month == 2 && day == 29 && (day0 != day || month0 != month || year0 != year))
             {
               cdoWarning("Filtering of multi-year times series doesn't works properly with a standard calendar.");
               cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)", year);
@@ -341,15 +340,13 @@ Filter(void *process)
                 {
                   int ompthID = cdo_omp_get_thread_num();
 
-                  for (int tsID = 0; tsID < nts; tsID++)
-                    ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+                  for (int tsID = 0; tsID < nts; tsID++) ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
                   arrayFill(nts, ompmem[ompthID].array2.data(), 0.0);
 
                   filter_intrinsic(nts, fmasc, ompmem[ompthID].array1.data(), ompmem[ompthID].array2.data());
 
-                  for (int tsID = 0; tsID < nts; tsID++)
-                    vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].array1[tsID];
+                  for (int tsID = 0; tsID < nts; tsID++) vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].array1[tsID];
                 }
             }
         }

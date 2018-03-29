@@ -654,11 +654,10 @@ VerifyPlotParameters(int num_param, char **param_names, int opID)
               if (!strcmp(split_str[0], params[j]))
                 {
                   found = TRUE;
-                  if (!strcmp(split_str[0], "colour") || !strcmp(split_str[0], "style")
-                      || !strcmp(split_str[0], "colour_min") || !strcmp(split_str[0], "colour_max")
-                      || !strcmp(split_str[0], "RGB") || !strcmp(split_str[0], "colour_triad")
-                      || !strcmp(split_str[0], "device") || !strcmp(split_str[0], "file_split")
-                      || !strcmp(split_str[0], "projection"))
+                  if (!strcmp(split_str[0], "colour") || !strcmp(split_str[0], "style") || !strcmp(split_str[0], "colour_min")
+                      || !strcmp(split_str[0], "colour_max") || !strcmp(split_str[0], "RGB")
+                      || !strcmp(split_str[0], "colour_triad") || !strcmp(split_str[0], "device")
+                      || !strcmp(split_str[0], "file_split") || !strcmp(split_str[0], "projection"))
                     {
                       if (IsNumeric(split_str[1]))
                         syntax = FALSE;
@@ -772,9 +771,9 @@ VerifyPlotParameters(int num_param, char **param_names, int opID)
 
                   if (!strcmp(split_str[0], "min") || !strcmp(split_str[0], "max") || !strcmp(split_str[0], "lat_min")
                       || !strcmp(split_str[0], "lat_max") || !strcmp(split_str[0], "lon_min")
-                      || !strcmp(split_str[0], "lon_max") || !strcmp(split_str[0], "count")
-                      || !strcmp(split_str[0], "interval") || !strcmp(split_str[0], "thickness")
-                      || !strcmp(split_str[0], "resolution") || !strcmp(split_str[0], "step_freq"))
+                      || !strcmp(split_str[0], "lon_max") || !strcmp(split_str[0], "count") || !strcmp(split_str[0], "interval")
+                      || !strcmp(split_str[0], "thickness") || !strcmp(split_str[0], "resolution")
+                      || !strcmp(split_str[0], "step_freq"))
                     {
                       if (!IsNumeric(split_str[1]))
                         syntax = FALSE;
@@ -1292,8 +1291,8 @@ Magplot(void *process)
                 }
 
               if (DBG) fprintf(stderr, "Plot %d\n", varID);
-              magplot(cdoGetStreamName(1).c_str(), operatorID, varname, units, nlon, nlat, grid_center_lon,
-                      grid_center_lat, array, nparam, pnames, datetimestr, lregular);
+              magplot(cdoGetStreamName(1).c_str(), operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat,
+                      array, nparam, pnames, datetimestr, lregular);
             }
           else
             fprintf(stderr, "operator not implemented\n");

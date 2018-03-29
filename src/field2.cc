@@ -440,8 +440,7 @@ faratan2(field_type *field1, field_type field2)
   if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   for (size_t i = 0; i < len; i++)
-    array1[i] = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
-                                                                                       : atan2(array1[i], array2[i]);
+    array1[i] = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1 : atan2(array1[i], array2[i]);
 
   field1->nmiss = arrayNumMV(len, array1, missval1);
 }

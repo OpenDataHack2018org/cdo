@@ -37,8 +37,8 @@ typedef struct
 static int
 cmpdatetime(const void *a, const void *b)
 {
-  const double x = ((const timeinfo_t *)a)->datetime;
-  const double y = ((const timeinfo_t *)b)->datetime;
+  const double x = ((const timeinfo_t *) a)->datetime;
+  const double y = ((const timeinfo_t *) b)->datetime;
   return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 

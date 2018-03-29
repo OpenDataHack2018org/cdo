@@ -441,7 +441,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   add2s[1] = &add2[add_srt[1]];
   nl[0] = num_links / nsplit;
   nl[1] = num_links - nl[0];
-  // add_end[0] = nl[0];              add_end[1] = num_links;
+// add_end[0] = nl[0];              add_end[1] = num_links;
 
 #ifdef _OPENMP
   int depth = (int) (log(parent) / log(2));
@@ -458,12 +458,12 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     }
 #endif
 
-    //  printf("I am %i nl[0] %i nl[1] %i\n",parent,nl[0],nl[1]);
-    //  printf("add_srt[0] %i add_Srt[1] %i\n",add_srt[0],add_srt[1]);
-    //  if ( 1 )
-    //      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i
-    //      parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
-    //	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
+//  printf("I am %i nl[0] %i nl[1] %i\n",parent,nl[0],nl[1]);
+//  printf("add_srt[0] %i add_Srt[1] %i\n",add_srt[0],add_srt[1]);
+//  if ( 1 )
+//      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i
+//      parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
+//	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(n, m, who_am_i) shared(weights) num_threads(2)
@@ -472,7 +472,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     {
 
       who_am_i = nsplit * parent + i;
-      //    my_depth = (int) (log(parent)/log(2))+1;
+//    my_depth = (int) (log(parent)/log(2))+1;
 
 #ifdef _OPENMP
 //      if ( 1 )

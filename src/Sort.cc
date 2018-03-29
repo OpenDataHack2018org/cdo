@@ -46,40 +46,40 @@ typedef struct
 static int
 cmpvarcode(const void *a, const void *b)
 {
-  const int x = ((const varinfo_t *)a)->code;
-  const int y = ((const varinfo_t *)b)->code;
+  const int x = ((const varinfo_t *) a)->code;
+  const int y = ((const varinfo_t *) b)->code;
   return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static int
 cmpvarparam(const void *a, const void *b)
 {
-  const char *x = ((const varinfo_t *)a)->param;
-  const char *y = ((const varinfo_t *)b)->param;
+  const char *x = ((const varinfo_t *) a)->param;
+  const char *y = ((const varinfo_t *) b)->param;
   return strcmp(x, y);
 }
 
 static int
 cmpvarname(const void *a, const void *b)
 {
-  const char *x = ((const varinfo_t *)a)->name;
-  const char *y = ((const varinfo_t *)b)->name;
+  const char *x = ((const varinfo_t *) a)->name;
+  const char *y = ((const varinfo_t *) b)->name;
   return strcmp(x, y);
 }
 
 static int
 cmpvarlevel(const void *a, const void *b)
 {
-  const double x = ((const levinfo_t *)a)->level;
-  const double y = ((const levinfo_t *)b)->level;
+  const double x = ((const levinfo_t *) a)->level;
+  const double y = ((const levinfo_t *) b)->level;
   return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static int
 cmpvarlevelrev(const void *a, const void *b)
 {
-  const double x = ((const levinfo_t *)a)->level;
-  const double y = ((const levinfo_t *)b)->level;
+  const double x = ((const levinfo_t *) a)->level;
+  const double y = ((const levinfo_t *) b)->level;
   return -1 * (((x > y) - (x < y)) * 2 + (x > y) - (x < y));
 }
 
@@ -118,8 +118,7 @@ paramToStringLong(int param, char *paramstr, int maxlen)
   else
     len = snprintf(paramstr, umaxlen, "%03d.%03d.%03d", num, cat, dis);
 
-  if (len >= maxlen || len < 0)
-    fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
+  if (len >= maxlen || len < 0) fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
 }
 
 void *
@@ -230,8 +229,8 @@ Sort(void *process)
               {
                 nlevs = varInfo[vindex].nlevs;
                 for (lindex = 0; lindex < nlevs; ++lindex)
-                  printf("sort in: %d %s %d %d %g\n", vindex, varInfo[vindex].name, varInfo[vindex].code,
-                         varInfo[vindex].nlevs, varInfo[vindex].levInfo[lindex].level);
+                  printf("sort in: %d %s %d %d %g\n", vindex, varInfo[vindex].name, varInfo[vindex].code, varInfo[vindex].nlevs,
+                         varInfo[vindex].levInfo[lindex].level);
               }
 
           if (operatorID == SORTCODE)

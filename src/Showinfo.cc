@@ -188,8 +188,8 @@ Showinfo(void *process)
           int gridID = vlistInqVarGrid(vlistID, varID);
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
 
-          fprintf(stdout, "      %3d     %3d      %3d\n", vlistInqVarCode(vlistID, varID),
-                  vlistGridIndex(vlistID, gridID) + 1, vlistZaxisIndex(vlistID, zaxisID) + 1);
+          fprintf(stdout, "      %3d     %3d      %3d\n", vlistInqVarCode(vlistID, varID), vlistGridIndex(vlistID, gridID) + 1,
+                  vlistZaxisIndex(vlistID, zaxisID) + 1);
         }
     }
   else if (operatorID == SHOWUNIT)
@@ -241,8 +241,7 @@ Showinfo(void *process)
         {
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
           int nlevs = zaxisInqSize(zaxisID);
-          for (int levelID = 0; levelID < nlevs; levelID++)
-            fprintf(stdout, " %.9g", cdoZaxisInqLevel(zaxisID, levelID));
+          for (int levelID = 0; levelID < nlevs; levelID++) fprintf(stdout, " %.9g", cdoZaxisInqLevel(zaxisID, levelID));
           fprintf(stdout, "\n");
         }
     }

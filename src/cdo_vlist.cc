@@ -31,8 +31,8 @@ double
 cdoZaxisInqLevel(int zaxisID, int levelID)
 {
   int zaxistype = zaxisInqType(zaxisID);
-  double level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID)
-                                               : (zaxistype == ZAXIS_SURFACE) ? 0 : levelID + 1;
+  double level
+      = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : (zaxistype == ZAXIS_SURFACE) ? 0 : levelID + 1;
   return level;
 }
 
@@ -111,8 +111,8 @@ compare_lon_reg2d(size_t xsize, int gridID1, int gridID2)
 static void
 compare_grid_unstructured(int gridID1, int gridID2)
 {
-  if (gridInqXvals(gridID1, NULL) && gridInqXvals(gridID1, NULL) == gridInqXvals(gridID2, NULL)
-      && gridInqYvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) == gridInqYvals(gridID2, NULL))
+  if (gridInqXvals(gridID1, NULL) && gridInqXvals(gridID1, NULL) == gridInqXvals(gridID2, NULL) && gridInqYvals(gridID1, NULL)
+      && gridInqYvals(gridID1, NULL) == gridInqYvals(gridID2, NULL))
     {
       size_t gridsize = gridInqSize(gridID1);
       std::vector<double> xvals1(gridsize);
@@ -351,8 +351,7 @@ vlistInqNWPV(int vlistID, int varID)
 {
   int nwpv;  // number of words per value; real:1  complex:2
 
-  if (vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_CPX32
-      || vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_CPX64)
+  if (vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_CPX32 || vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_CPX64)
     nwpv = 2;
   else
     nwpv = 1;
@@ -413,8 +412,8 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlev
       int zaxistype = zaxisInqType(zaxisID);
 
       if (cdoVerbose)
-        cdoPrint("ZAXIS_HYBRID = %d ZAXIS_HYBRID_HALF=%d nlevel=%d mono_level=%d",
-                 zaxisInqType(zaxisID) == ZAXIS_HYBRID, zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF, nlevel, mono_level);
+        cdoPrint("ZAXIS_HYBRID = %d ZAXIS_HYBRID_HALF=%d nlevel=%d mono_level=%d", zaxisInqType(zaxisID) == ZAXIS_HYBRID,
+                 zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF, nlevel, mono_level);
 
       if ((zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF) && nlevel > 1 && !mono_level)
         {

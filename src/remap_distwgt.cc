@@ -55,8 +55,8 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) \
-  shared(rsearch, weightLinks, numNeighbors, src_grid, tgt_grid, tgt_grid_size, knnWeights)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightLinks, numNeighbors, src_grid, tgt_grid, \
+                                                                    tgt_grid_size, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -124,8 +124,8 @@ remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict s
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+ : findex) \
-  shared(rsearch, numNeighbors, src_grid, tgt_grid, tgt_grid_size, src_array, tgt_array, missval, knnWeights)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, numNeighbors, src_grid, tgt_grid, tgt_grid_size, \
+                                                                    src_array, tgt_array, missval, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {

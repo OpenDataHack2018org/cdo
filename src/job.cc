@@ -140,8 +140,7 @@ create_job_template(const char *expname, const char *jobfilename, const char *jo
 
 #if defined(HAVE_LIBDRMAA)
 static int
-drmaa_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath,
-             const char *ftppath)
+drmaa_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath)
 {
   char status[DRMAA_ERROR_STRING_BUFFER];
   char jobid[DRMAA_JOBNAME_BUFFER], jobout[DRMAA_JOBNAME_BUFFER];
@@ -244,8 +243,8 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname, 
 
   /* wait for job */
 
-  drmaa_errno = drmaa_wait(jobid, jobout, sizeof(jobout) - 1, &stat, DRMAA_TIMEOUT_WAIT_FOREVER, &rusage, status,
-                           sizeof(status) - 1);
+  drmaa_errno
+      = drmaa_wait(jobid, jobout, sizeof(jobout) - 1, &stat, DRMAA_TIMEOUT_WAIT_FOREVER, &rusage, status, sizeof(status) - 1);
 
   if (drmaa_errno != DRMAA_ERRNO_SUCCESS)
     {

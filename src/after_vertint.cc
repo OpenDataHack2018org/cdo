@@ -61,8 +61,7 @@ pressure2height(double *restrict hlev, const double *restrict plev, long nphlev)
 }
 
 void
-presh(double *restrict fullp, double *halfp, const double *restrict vct, const double *restrict ps, long nhlev,
-      long ngp)
+presh(double *restrict fullp, double *halfp, const double *restrict vct, const double *restrict ps, long nhlev, long ngp)
 {
   if (ps == NULL)
     {
@@ -111,8 +110,7 @@ genind(int *nx, const double *restrict plev, const double *restrict fullp, long 
 }
 
 void
-genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog,
-           size_t *restrict pnmiss)
+genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog, size_t *restrict pnmiss)
 {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(nx, plev, ngp, nplev, ps_prog, pnmiss)
@@ -256,8 +254,8 @@ extra_Z(double pres, double halfp, double fullp, double geop, double temp)
 } /* extra_Z */
 
 void
-interp_X(const double *restrict gt, double *pt, const double *restrict hyb_press, const int *nx,
-         const double *restrict plev, long nplev, long ngp, long nhlev, double missval)
+interp_X(const double *restrict gt, double *pt, const double *restrict hyb_press, const int *nx, const double *restrict plev,
+         long nplev, long ngp, long nhlev, double missval)
 {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(gt, pt, hyb_press, nx, plev, nplev, ngp, nhlev, missval)
@@ -333,8 +331,8 @@ interp_T(const double *restrict geop, const double *restrict gt, double *pt, con
 
 void
 interp_Z(const double *restrict geop, const double *restrict gz, double *pz, const double *restrict fullp,
-         const double *restrict halfp, const int *nx, const double *restrict gt, const double *restrict plev,
-         long nplev, long ngp, long nhlev, double missval)
+         const double *restrict halfp, const int *nx, const double *restrict gt, const double *restrict plev, long nplev,
+         long ngp, long nhlev, double missval)
 {
   assert(geop != NULL);
   assert(gz != NULL);
@@ -343,8 +341,7 @@ interp_Z(const double *restrict geop, const double *restrict gz, double *pz, con
   assert(halfp != NULL);
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(geop, gz, pz, fullp, halfp, nx, gt, plev, nplev, ngp, nhlev, missval, \
-                                              Mars)
+#pragma omp parallel for default(none) shared(geop, gz, pz, fullp, halfp, nx, gt, plev, nplev, ngp, nhlev, missval, Mars)
 #endif
   for (long lp = 0; lp < nplev; lp++)
     {

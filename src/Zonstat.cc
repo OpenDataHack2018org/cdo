@@ -107,8 +107,7 @@ Zonstat(void *process)
 
   if (gridID1 != -1)
     {
-      if (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN
-          || gridInqType(gridID1) == GRID_GENERIC)
+      if (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN || gridInqType(gridID1) == GRID_GENERIC)
         {
           if (zongridID != -1 && gridInqYsize(zongridID) == gridInqYsize(gridID1))
             gridID2 = zongridID;

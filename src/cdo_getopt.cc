@@ -135,8 +135,7 @@ cdo_getopt_internal(int nargc, char *const *nargv, const char *ostr)
 
       if (!*place) ++CDO_optind;
 
-      if (CDO_opterr && *ostr != ':')
-        (void) fprintf(stderr, "%s: illegal option -- %c\n", __progname(nargv[0]), CDO_optopt);
+      if (CDO_opterr && *ostr != ':') (void) fprintf(stderr, "%s: illegal option -- %c\n", __progname(nargv[0]), CDO_optopt);
 
       return (BADCH);
     }

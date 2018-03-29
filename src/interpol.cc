@@ -214,8 +214,8 @@ intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double 
 
 static void
 intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const double *restrict fieldm,
-           const double *restrict xm, const double *restrict ym, size_t gridsize2, double *field,
-           const double *restrict x, const double *restrict y)
+           const double *restrict xm, const double *restrict ym, size_t gridsize2, double *field, const double *restrict x,
+           const double *restrict y)
 {
   size_t nlon1 = nxm;
   double findex = 0;
@@ -230,9 +230,8 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
   progressInit();
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(Threading::ompNumThreads, field, fieldm, x, y, xm, \
-                                                                    ym, nxm, nym, gridsize2, missval, nlon1,           \
-                                                                    lon_is_circular, grid1_mask)
+#pragma omp parallel for default(none) reduction(+ : findex) shared( \
+    Threading::ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
 #endif
   for (size_t i = 0; i < gridsize2; ++i)
     {
@@ -332,8 +331,7 @@ intgridbil(field_type *field1, field_type *field2)
 
   if (lgeorefgrid)
     {
-      if (!(gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)))
-        cdoAbort("Source grid has no coordinate values!");
+      if (!(gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL))) cdoAbort("Source grid has no coordinate values!");
 
       lon_is_circular = gridIsCircular(gridID1);
 
@@ -412,8 +410,7 @@ intgridbil(field_type *field1, field_type *field2)
           if (gridInqType(gridID2) != GRID_UNSTRUCTURED && gridInqType(gridID2) != GRID_CURVILINEAR)
             gridID2 = gridToCurvilinear(gridID2, 0);
 
-          if (!(gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)))
-            cdoAbort("Target grid has no coordinate values!");
+          if (!(gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL))) cdoAbort("Target grid has no coordinate values!");
         }
 
       size_t gridsize2 = gridInqSize(gridID2);
@@ -588,12 +585,10 @@ interpolate(field_type *field1, field_type *field2)
   for (i++; i < out_nlon; i++)
     {
       lono[i] += 360;
-      if (i < out_nlon - 1 && lono[i + 1] + 360 <= lono[i])
-        cdoAbort("Longitudes of output grid are not in ascending order!");
+      if (i < out_nlon - 1 && lono[i + 1] + 360 <= lono[i]) cdoAbort("Longitudes of output grid are not in ascending order!");
     }
 
-  if (lono[out_nlon - 1] - lono[0] >= 360)
-    cdoAbort("The area covered by the longitudes of output grid must not overlap!");
+  if (lono[out_nlon - 1] - lono[0] >= 360) cdoAbort("The area covered by the longitudes of output grid must not overlap!");
 
   if (lato[0] > 90.001 || lato[out_nlat - 1] > 90.001 || lato[0] < -90.001 || lato[out_nlat - 1] < -90.001)
     {
@@ -601,8 +596,7 @@ interpolate(field_type *field1, field_type *field2)
     }
 
   for (i = 0; i < out_nlat - 1; i++)
-    if (IS_EQUAL(lato[i + 1], lato[i])
-        || (i < out_nlat - 2 && ((lato[i + 1] > lato[i]) != (lato[i + 2] > lato[i + 1]))))
+    if (IS_EQUAL(lato[i + 1], lato[i]) || (i < out_nlat - 2 && ((lato[i + 1] > lato[i]) != (lato[i + 2] > lato[i + 1]))))
       {
         cdoAbort("Latitudes of output grid must be in descending or ascending "
                  "order!");

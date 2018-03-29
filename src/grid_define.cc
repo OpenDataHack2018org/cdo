@@ -54,8 +54,8 @@ cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagG
   lon = -195  lat = 30
   */
   if (CdoDebug::cdoDebugExt)
-    cdoPrint("%s(gridID_u=%d,gridID_v=%d,destagGridOffsets(%02.1f,%02.1f)) ...\n", __func__, gridID_u_stag,
-             gridID_v_stag, destagGridOffsets[0], destagGridOffsets[1]);
+    cdoPrint("%s(gridID_u=%d,gridID_v=%d,destagGridOffsets(%02.1f,%02.1f)) ...\n", __func__, gridID_u_stag, gridID_v_stag,
+             destagGridOffsets[0], destagGridOffsets[1]);
 
   if (CdoDebug::cdoDebugExt > 1)
     {
@@ -198,8 +198,8 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
   if (CdoDebug::cdoDebugExt) cdoPrint("%s(gridSrcID=%d, sampleFactor=%d) ...", __func__, gridSrcID, sampleFactor);
 
   int gridtype = gridInqType(gridSrcID);
-  if (!(gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION
-        || gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC))
+  if (!(gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION || gridtype == GRID_CURVILINEAR
+        || gridtype == GRID_GENERIC))
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridtype));
 
   int gridXsize = gridInqXsize(gridSrcID);
@@ -335,16 +335,15 @@ cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int subJ
               latitudeOfFirstGridPointInDegrees = ...
   */
   if (CdoDebug::cdoDebugExt)
-    cdoPrint("%s(gridSrcID=%d, (subI0,subI1,subJ0,subJ1) = (%d,%d,%d,%d) ...", __func__, gridSrcID, subI0, subI1, subJ0,
-             subJ1);
+    cdoPrint("%s(gridSrcID=%d, (subI0,subI1,subJ0,subJ1) = (%d,%d,%d,%d) ...", __func__, gridSrcID, subI0, subI1, subJ0, subJ1);
 
   int gridXsize = gridInqXsize(gridSrcID);
   int gridYsize = gridInqYsize(gridSrcID);
   int maxIndexI = gridXsize - 1;
   int maxIndexJ = gridYsize - 1;
 
-  if ((subI0 < 0) || (subI0 > maxIndexI) || (subI1 <= subI0) || (subI1 > maxIndexI) || (subJ0 < 0)
-      || (subJ0 > maxIndexJ) || (subJ1 <= subJ0) || (subJ1 > maxIndexJ))
+  if ((subI0 < 0) || (subI0 > maxIndexI) || (subI1 <= subI0) || (subI1 > maxIndexI) || (subJ0 < 0) || (subJ0 > maxIndexJ)
+      || (subJ1 <= subJ0) || (subJ1 > maxIndexJ))
     cdoAbort("%s() Incorrect subgrid specified!  (subI0,subI1,subJ0,subJ1) "
              "=(%d,%d,%d,%d) Note that: gridXsize = %d, gridYsize = %d",
              __func__, subI0, subI1, subJ0, subJ1, gridXsize, gridYsize);

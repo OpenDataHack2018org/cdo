@@ -395,8 +395,7 @@ eca2(const ECA_REQUEST_2 *request)
   int nlevels;
   int *recVarID, *recLevelID;
   double missval1, missval2;
-  field_type *var14 = NULL, *samp1 = NULL, *samp2 = NULL, *samp3 = NULL, *total = NULL, *var15 = NULL, *var22 = NULL,
-             *var;
+  field_type *var14 = NULL, *samp1 = NULL, *samp2 = NULL, *samp3 = NULL, *total = NULL, *var15 = NULL, *var22 = NULL, *var;
   field_type field1, field2;
 
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
@@ -1382,13 +1381,12 @@ eca4(const ECA_REQUEST_4 *request)
        *  this is the default action if more than a year is available */
       if (yearcnt != 0)
         {
-          computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay,
-                     FALSE);
+          computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay, FALSE);
 
           /* values of the privous year */
           {
-            writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration,
-                           gslFirstDay, cdiEncodeDate(ovdate / 10000 - 1, 12, 31), ovtime, nlevels);
+            writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration, gslFirstDay,
+                           cdiEncodeDate(ovdate / 10000 - 1, 12, 31), ovtime, nlevels);
             otsID++;
           }
         }
@@ -1406,8 +1404,8 @@ eca4(const ECA_REQUEST_4 *request)
                *  previous year? */
               if (fldhvs(startDateWithHist[1], nlevels))
                 {
-                  computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration,
-                             gslFirstDay, FALSE);
+                  computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay,
+                             FALSE);
                   {
                     writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration,
                                    gslFirstDay, cdiEncodeDate(ovdate / 10000 - 1, 12, 31), ovtime, nlevels);
@@ -1430,11 +1428,10 @@ eca4(const ECA_REQUEST_4 *request)
       else /* process the current year, this only happens, if the last timestep
               is reached OR if data for only one year is present */
         {
-          computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay,
-                     TRUE);
+          computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay, TRUE);
           {
-            writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration,
-                           gslFirstDay, ovdate, ovtime, nlevels);
+            writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration, gslFirstDay,
+                           ovdate, ovtime, nlevels);
             otsID++;
           }
         }

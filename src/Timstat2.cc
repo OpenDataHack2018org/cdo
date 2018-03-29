@@ -28,8 +28,8 @@
 
 // correlation in time
 static void
-correlationInit(size_t gridsize, const double *array1, const double *array2, double missval1, double missval2,
-                size_t *nofvals, double *work0, double *work1, double *work2, double *work3, double *work4)
+correlationInit(size_t gridsize, const double *array1, const double *array2, double missval1, double missval2, size_t *nofvals,
+                double *work0, double *work1, double *work2, double *work3, double *work4)
 {
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -46,8 +46,8 @@ correlationInit(size_t gridsize, const double *array1, const double *array2, dou
 }
 
 static size_t
-correlation(size_t gridsize, double missval1, double missval2, size_t *nofvals, double *work0, double *work1,
-            double *work2, double *work3, double *work4)
+correlation(size_t gridsize, double missval1, double missval2, size_t *nofvals, double *work0, double *work1, double *work2,
+            double *work3, double *work4)
 {
   size_t nmiss = 0;
   double cor;
@@ -87,8 +87,8 @@ correlation(size_t gridsize, double missval1, double missval2, size_t *nofvals, 
 
 // covariance in time
 static void
-covarianceInit(size_t gridsize, const double *array1, const double *array2, double missval1, double missval2,
-               size_t *nofvals, double *work0, double *work1, double *work2)
+covarianceInit(size_t gridsize, const double *array1, const double *array2, double missval1, double missval2, size_t *nofvals,
+               double *work0, double *work1, double *work2)
 {
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -103,8 +103,7 @@ covarianceInit(size_t gridsize, const double *array1, const double *array2, doub
 }
 
 static size_t
-covariance(size_t gridsize, double missval1, double missval2, size_t *nofvals, double *work0, double *work1,
-           double *work2)
+covariance(size_t gridsize, double missval1, double missval2, size_t *nofvals, double *work0, double *work1, double *work2)
 {
   size_t nmiss = 0;
   double covar;

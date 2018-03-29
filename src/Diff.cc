@@ -70,7 +70,7 @@ Diff(void *process)
 
   std::vector<double> array1(gridsizemax);
   std::vector<double> array2(gridsizemax);
-  std::vector<double> work(vlistNumber(vlistID1) != CDI_REAL ? 2*gridsizemax : 0) ;
+  std::vector<double> work(vlistNumber(vlistID1) != CDI_REAL ? 2 * gridsizemax : 0);
 
   int indg = 0;
   int tsID = 0;
@@ -108,18 +108,18 @@ Diff(void *process)
 
           cdiParamToString(param, paramstr, sizeof(paramstr));
 
-          if ( vlistInqVarNumber(vlistID1, varID1) == CDI_COMP)
+          if (vlistInqVarNumber(vlistID1, varID1) == CDI_COMP)
             {
               pstreamReadRecord(streamID1, work.data(), &nmiss1);
-              for (size_t i = 0; i < gridsize; ++i) array1[i] = work[i*2];
+              for (size_t i = 0; i < gridsize; ++i) array1[i] = work[i * 2];
             }
           else
             pstreamReadRecord(streamID1, array1.data(), &nmiss1);
 
-          if ( vlistInqVarNumber(vlistID1, varID1) == CDI_COMP)
+          if (vlistInqVarNumber(vlistID1, varID1) == CDI_COMP)
             {
               pstreamReadRecord(streamID1, work.data(), &nmiss2);
-              for (size_t i = 0; i < gridsize; ++i) array2[i] = work[i*2];
+              for (size_t i = 0; i < gridsize; ++i) array2[i] = work[i * 2];
             }
           else
             pstreamReadRecord(streamID2, array2.data(), &nmiss2);
@@ -133,8 +133,7 @@ Diff(void *process)
 
           for (size_t i = 0; i < gridsize; i++)
             {
-              if ((DBL_IS_NAN(array1[i]) && !DBL_IS_NAN(array2[i]))
-                  || (!DBL_IS_NAN(array1[i]) && DBL_IS_NAN(array2[i])))
+              if ((DBL_IS_NAN(array1[i]) && !DBL_IS_NAN(array2[i])) || (!DBL_IS_NAN(array1[i]) && DBL_IS_NAN(array2[i])))
                 {
                   ndiff++;
                   relm = 1.0;
@@ -241,8 +240,7 @@ Diff(void *process)
       reset_text_color(stdout);
       fprintf(stdout, "\n");
 
-      if (ndrec != nd2rec && abslim < abslim2)
-        fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
+      if (ndrec != nd2rec && abslim < abslim2) fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
       //  fprintf(stdout, "  %d of %d records differ more then one thousandth\n", nprec, ngrec);
     }
 

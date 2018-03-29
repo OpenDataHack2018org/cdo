@@ -237,8 +237,7 @@ dtlist_midhigh(dtlist_type *dtlist, int nsteps)
 void
 dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
 {
-  if ((size_t) nsteps > dtlist->size)
-    cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps, dtlist->size);
+  if ((size_t) nsteps > dtlist->size) cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps, dtlist->size);
 
   int stat = dtlist->stat;
   if (CDO_Timestat_Date > 0) stat = CDO_Timestat_Date;

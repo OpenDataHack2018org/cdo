@@ -38,7 +38,6 @@ struct cdo_option
 #define optional_argument 3  // an argument to the option may be presented.
 
 int cdo_getopt(int argc, char *const *argv, const char *optstring);
-int cdo_getopt_long(int argc, char *const *argv, const char *optstring, const struct cdo_option *longopts,
-                    int *longindex);
+int cdo_getopt_long(int argc, char *const *argv, const char *optstring, const struct cdo_option *longopts, int *longindex);
 
 #endif /* _CDO_GETOPT_H */

@@ -35,16 +35,16 @@ compareAdds4(const Addweight4 &a, const Addweight4 &b)
 static int
 qcompareAdds(const void *a, const void *b)
 {
-  const size_t x = ((const Addweight *)a)->add;
-  const size_t y = ((const Addweight *)b)->add;
+  const size_t x = ((const Addweight *) a)->add;
+  const size_t y = ((const Addweight *) b)->add;
   return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static int
 qcompareAdds4(const void *a, const void *b)
 {
-  const size_t x = ((const Addweight4 *)a)->add;
-  const size_t y = ((const Addweight4 *)b)->add;
+  const size_t x = ((const Addweight4 *) a)->add;
+  const size_t y = ((const Addweight4 *) b)->add;
   return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
@@ -137,7 +137,7 @@ storeWeightLinks(int lalloc, size_t numWeights, size_t *srch_add, double *weight
     {
       Addweight *addweights = NULL;
       if (lalloc)
-        addweights = (Addweight*) Malloc(numWeights * sizeof(Addweight));
+        addweights = (Addweight *) Malloc(numWeights * sizeof(Addweight));
       else
         addweights = weightLinks[cell_add].addweights;
 
@@ -285,14 +285,12 @@ void
 weightLinksAlloc(size_t numNeighbors, size_t gridSize, std::vector<WeightLinks> &weightLinks)
 {
   weightLinks[0].addweights = (Addweight *) Malloc(numNeighbors * gridSize * sizeof(Addweight));
-  for (size_t i = 1; i < gridSize; ++i)
-    weightLinks[i].addweights = weightLinks[0].addweights + numNeighbors * i;
+  for (size_t i = 1; i < gridSize; ++i) weightLinks[i].addweights = weightLinks[0].addweights + numNeighbors * i;
 }
 
 void
 weightLinks4Alloc(size_t gridSize, std::vector<WeightLinks4> &weightLinks)
 {
   weightLinks[0].addweights = (Addweight4 *) Malloc(4 * gridSize * sizeof(Addweight4));
-  for (size_t i = 1; i < gridSize; ++i)
-    weightLinks[i].addweights = weightLinks[0].addweights + 4 * i;
+  for (size_t i = 1; i < gridSize; ++i) weightLinks[i].addweights = weightLinks[0].addweights + 4 * i;
 }

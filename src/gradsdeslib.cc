@@ -146,10 +146,8 @@ lowcas(char *ch)
 
 static gaint mosiz[13] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 static gaint momn[13] = { 0, 44640, 40320, 44640, 43200, 44640, 43200, 44640, 44640, 43200, 44640, 43200, 44640 };
-static gaint mnacum[13]
-    = { 0, 0, 44640, 84960, 129600, 172800, 217440, 260640, 305280, 349920, 393120, 437760, 480960 };
-static gaint mnacul[13]
-    = { 0, 0, 44640, 86400, 131040, 174240, 218880, 262080, 306720, 351360, 394560, 439200, 482400 };
+static gaint mnacum[13] = { 0, 0, 44640, 84960, 129600, 172800, 217440, 260640, 305280, 349920, 393120, 437760, 480960 };
+static gaint mnacul[13] = { 0, 0, 44640, 86400, 131040, 174240, 218880, 262080, 306720, 351360, 394560, 439200, 482400 };
 
 /* Test for leap year.  Rules are:
 
@@ -1182,8 +1180,8 @@ getvnm(struct gavar *pvar, char *mrec)
  */
 
 char *
-gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachsub *pch1st, struct gaens *ens1st,
-       gaint t, gaint e, gaint *flag)
+gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachsub *pch1st, struct gaens *ens1st, gaint t,
+       gaint e, gaint *flag)
 {
   struct gachsub *pchsub;
   struct gaens *ens;

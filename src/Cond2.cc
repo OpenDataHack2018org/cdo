@@ -92,8 +92,7 @@ Cond2(void *process)
   std::vector<double> array3(gridsize);
   std::vector<double> array4(gridsize);
 
-  if (cdoVerbose)
-    cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d", ntsteps1, ntsteps2, vlistNtsteps(vlistID3));
+  if (cdoVerbose) cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d", ntsteps1, ntsteps2, vlistNtsteps(vlistID3));
 
   if (filltype == FILL_NONE)
     {
@@ -168,8 +167,7 @@ Cond2(void *process)
           if (recID == 0 || filltype != FILL_REC) missval1 = vlistInqVarMissval(vlistID1, varID);
 
           for (size_t i = 0; i < gridsize; i++)
-            array4[i]
-                = DBL_IS_EQUAL(array1[i], missval1) ? missval2 : !DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : array3[i];
+            array4[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval2 : !DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : array3[i];
 
           nmiss = arrayNumMV(gridsize, &array4[0], missval2);
           pstreamDefRecord(streamID4, varID, levelID);

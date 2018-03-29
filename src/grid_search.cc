@@ -31,8 +31,7 @@
 #include "grid_search.h"
 #include "kdtreelib/kdtree.h"
 #include "nanoflann.hpp"
-extern "C"
-{
+extern "C" {
 #include "lib/yac/sphere_part.h"
 }
 
@@ -203,7 +202,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
   kdata_t max[3] = { -1.e9, -1.e9, -1.e9 };
 
 #ifdef HAVE_OPENMP45
-#pragma omp parallel for reduction(min : min[:3]) reduction(max : max[:3])
+#pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
 #endif
   for (size_t i = 0; i < n; i++)
     {
@@ -246,7 +245,7 @@ gs_create_nanoflann(size_t n, const double *restrict lons, const double *restric
   // Generating  Point Cloud
   pointcloud->pts.resize(n);
 #ifdef HAVE_OPENMP45
-#pragma omp parallel for reduction(min : min[:3]) reduction(max : max[:3])
+#pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
 #endif
   for (size_t i = 0; i < n; i++)
     {
@@ -297,7 +296,7 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
   double max[3] = { -1.e9, -1.e9, -1.e9 };
 
 #ifdef HAVE_OPENMP45
-#pragma omp parallel for reduction(min : min[:3]) reduction(max : max[:3])
+#pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
 #endif
   for (size_t i = 0; i < n; i++)
     {

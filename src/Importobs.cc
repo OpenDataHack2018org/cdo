@@ -156,8 +156,8 @@ Importobs(void *process)
   int tsID = 0;
   while (readline(fp, line, MAX_LINE_LEN))
     {
-      sscanf(line, "%s %s %s %g %g %g %d %g %g %g", dummy, station, datetime, &lat, &lon, &height1, &code, &pressure,
-             &height2, &value);
+      sscanf(line, "%s %s %s %g %g %g %d %g %g %g", dummy, station, datetime, &lat, &lon, &height1, &code, &pressure, &height2,
+             &value);
       sscanf(datetime, "%d_%d", &vdate, &vtime);
 
       if (vdate != vdate0 || vtime != vtime0)

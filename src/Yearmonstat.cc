@@ -168,8 +168,7 @@ Yearmonstat(void *process)
                         }
 
                       for (size_t i = 0; i < gridsize; i++)
-                        if (!DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval))
-                          samp1[varID][levelID].ptr[i] += dpm;
+                        if (!DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval)) samp1[varID][levelID].ptr[i] += dpm;
                     }
 
                   farfun(&vars1[varID][levelID], field, operfunc);

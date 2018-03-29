@@ -367,8 +367,7 @@ EOF3d(void *process)
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(eigenvec, weight, pack, npack, gridsizemax) reduction(+ : sum)
 #endif
-          for (size_t i = 0; i < npack; i++)
-            sum += weight[pack[i] % gridsizemax] * eigenvec[pack[i]] * eigenvec[pack[i]];
+          for (size_t i = 0; i < npack; i++) sum += weight[pack[i] % gridsizemax] * eigenvec[pack[i]] * eigenvec[pack[i]];
 
           if (sum > 0)
             {

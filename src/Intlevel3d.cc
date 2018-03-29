@@ -252,8 +252,7 @@ Intlevel3d(void *process)
   double *lev_wgt1 = (double *) Malloc(nlevo * gridSize * sizeof(double));
   double *lev_wgt2 = (double *) Malloc(nlevo * gridSize * sizeof(double));
 
-  vert_gen_weights3d(expol, nlevi + 2, gridSize, zlevels_in, nlevo, zlevels_out, lev_idx1, lev_idx2, lev_wgt1,
-                     lev_wgt2);
+  vert_gen_weights3d(expol, nlevi + 2, gridSize, zlevels_in, nlevo, zlevels_out, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
   /*
    * Copy z-axis information to output z-axis
@@ -377,8 +376,8 @@ Intlevel3d(void *process)
               size_t gridsize = gridInqSize(gridID);
               double missval = vlistInqVarMissval(vlistID1, varID);
 
-              vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID], nlevo, lev_idx1, lev_idx2,
-                                lev_wgt1, lev_wgt2);
+              vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID], nlevo, lev_idx1, lev_idx2, lev_wgt1,
+                                lev_wgt2);
 
               for (levelID = 0; levelID < nlevo; levelID++)
                 {

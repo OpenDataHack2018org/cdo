@@ -49,8 +49,7 @@ typedef struct
 } smoothpoint_t;
 
 static void
-smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss,
-       smoothpoint_t spoint)
+smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss, smoothpoint_t spoint)
 {
   int gridID0 = gridID;
   size_t gridsize = gridInqSize(gridID);
@@ -268,8 +267,7 @@ radius_str_to_deg(const char *string)
       else if (strncmp(endptr, "rad", 3) == 0)
         radius *= RAD2DEG;
       else
-        cdoAbort("Float parameter >%s< contains invalid character at position %d!", string,
-                 (int) (endptr - string + 1));
+        cdoAbort("Float parameter >%s< contains invalid character at position %d!", string, (int) (endptr - string + 1));
     }
 
   if (radius > 180.) radius = 180.;
@@ -391,8 +389,8 @@ Smooth(void *process)
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if (gridsizemax < spoint.maxpoints) spoint.maxpoints = gridsizemax;
   if (cdoVerbose)
-    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g", xnsmooth,
-             spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
+    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g", xnsmooth, spoint.maxpoints,
+             spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
 
   spoint.radius *= DEG2RAD;
 

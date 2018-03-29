@@ -236,8 +236,7 @@ SetMagicsParameterValue(const char *, const char *, const char *)
   /*   MAGICS++ STRINGARRAY  TYPE    PARAMETERS   */
   else if (!strcmp(param_type, "stringarray"))
     {
-      if (DBG)
-        fprintf(stderr, "Input strarr is %s  Sep char is %s Search char is %s\n", param_value, sep_char, search_char);
+      if (DBG) fprintf(stderr, "Input strarr is %s  Sep char is %s Search char is %s\n", param_value, sep_char, search_char);
       if (strstr(param_value, ";"))
         {
           sep_char = ";";
@@ -247,8 +246,7 @@ SetMagicsParameterValue(const char *, const char *, const char *)
       split_str_count = StringSplitWithSeperator(param_value, sep_char, &split_str);
 
       if (DBG)
-        fprintf(stderr, "Input strarr is %s split str count is %d Sep char is %s\n", param_value, split_str_count,
-                sep_char);
+        fprintf(stderr, "Input strarr is %s split str count is %d Sep char is %s\n", param_value, split_str_count, sep_char);
 
       mag_set1c(param_name, (const char **) split_str, split_str_count);
       Free(split_str);

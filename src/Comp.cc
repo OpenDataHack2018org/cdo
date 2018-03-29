@@ -248,9 +248,9 @@ Comp(void *process)
           if (operatorID == EQ)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2)
-                                 ? missval1
-                                 : IS_EQUAL(array1[i], array2[i]));
+                array3[i]
+                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                              : IS_EQUAL(array1[i], array2[i]));
             }
           else if (operatorID == NE)
             {
@@ -262,30 +262,26 @@ Comp(void *process)
           else if (operatorID == LE)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i]
-                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
-                                                                                              : array1[i] <= array2[i]);
+                array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                                    : array1[i] <= array2[i]);
             }
           else if (operatorID == LT)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i]
-                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
-                                                                                              : array1[i] < array2[i]);
+                array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                                    : array1[i] < array2[i]);
             }
           else if (operatorID == GE)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i]
-                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
-                                                                                              : array1[i] >= array2[i]);
+                array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                                    : array1[i] >= array2[i]);
             }
           else if (operatorID == GT)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i]
-                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
-                                                                                              : array1[i] > array2[i]);
+                array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                                    : array1[i] > array2[i]);
             }
           else
             {

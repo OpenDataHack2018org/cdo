@@ -49,8 +49,7 @@ pmlist_search_kvlist(list_t *pmlist, const char *key, const char *value)
             {
               list_t *kvlist = *(list_t **) node->data;
               keyValues_t *kv = kvlist_search(kvlist, key);
-              if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0)
-                return kvlist;
+              if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0) return kvlist;
             }
           node = node->next;
         }
@@ -190,8 +189,7 @@ pmlist_search_kvlist_ventry(list_t *pmlist, const char *key, const char *value, 
                 if (strcmp(listname, entry[i]) == 0)
                   {
                     keyValues_t *kv = kvlist_search(kvlist, key);
-                    if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0)
-                      return kvlist;
+                    if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0) return kvlist;
                   }
             }
           node = node->next;

@@ -331,8 +331,7 @@ Cloudlayer(void *process)
 
       for (varID = 0; varID < nvars2; ++varID)
         {
-          if (kmax[varID] != -1 && kmin[varID] != -1)
-            layer_cloud(aclcac, cloud[varID], kmax[varID], kmin[varID], gridsize);
+          if (kmax[varID] != -1 && kmin[varID] != -1) layer_cloud(aclcac, cloud[varID], kmax[varID], kmin[varID], gridsize);
         }
 
       for (varID = 0; varID < nvars2; ++varID)

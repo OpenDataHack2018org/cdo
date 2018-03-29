@@ -761,8 +761,7 @@ field2regular(int gridID1, int gridID2, double missval, double *array, size_t nm
   size_t nx = 0;
   if (fabs(xfirst) > 0 || (np > 0 && fabs(xlast - (360.0 - 90.0 / np)) > 90.0 / np))
     {
-      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon, ny, missval, &iret, lmiss, lperio,
-                          lnearest);
+      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon, ny, missval, &iret, lmiss, lperio, lnearest);
     }
   else
     {
@@ -1022,11 +1021,9 @@ gridToCurvilinear(int gridID1, int lbounds)
           {
             int len;
             len = (int) strlen(xunits);
-            bool lvalid_xunits
-                = (len == 1 && memcmp(xunits, "m", 1) == 0) || (len == 2 && memcmp(xunits, "km", 2) == 0);
+            bool lvalid_xunits = (len == 1 && memcmp(xunits, "m", 1) == 0) || (len == 2 && memcmp(xunits, "km", 2) == 0);
             len = (int) strlen(yunits);
-            bool lvalid_yunits
-                = (len == 1 && memcmp(yunits, "m", 1) == 0) || (len == 2 && memcmp(yunits, "km", 2) == 0);
+            bool lvalid_yunits = (len == 1 && memcmp(yunits, "m", 1) == 0) || (len == 2 && memcmp(yunits, "km", 2) == 0);
 
             if (!lvalid_xunits)
               cdoWarning("Possibly wrong result! Invalid x-coordinate units: \"%s\" (expected \"m\" or \"km\")", xunits);
@@ -1737,8 +1734,8 @@ gridWeights(int gridID, double *grid_wgts)
   else
     {
       if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || projtype == CDI_PROJ_RLL || projtype == CDI_PROJ_LAEA
-          || projtype == CDI_PROJ_LCC || projtype == CDI_PROJ_SINU || gridtype == GRID_GME
-          || gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED)
+          || projtype == CDI_PROJ_LCC || projtype == CDI_PROJ_SINU || gridtype == GRID_GME || gridtype == GRID_CURVILINEAR
+          || gridtype == GRID_UNSTRUCTURED)
         {
           a_status = gridGenArea(gridID, grid_area);
         }
@@ -1778,8 +1775,7 @@ grid_is_distance_generic(int gridID)
       char yunits[CDI_MAX_NAME];
       gridInqXunits(gridID, yunits);
 
-      if (strcmp(xunits, "m") == 0 && strcmp(yunits, "m") == 0 && gridInqXvals(gridID, NULL)
-          && gridInqYvals(gridID, NULL))
+      if (strcmp(xunits, "m") == 0 && strcmp(yunits, "m") == 0 && gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL))
         status = true;
     }
 

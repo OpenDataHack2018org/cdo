@@ -140,8 +140,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
       else
         return gridID;
 
-      if (grid.yvals[0] > 90.001 || grid.yvals[nlat - 1] > 90.001 || grid.yvals[0] < -90.001
-          || grid.yvals[nlat - 1] < -90.001)
+      if (grid.yvals[0] > 90.001 || grid.yvals[nlat - 1] > 90.001 || grid.yvals[0] < -90.001 || grid.yvals[nlat - 1] < -90.001)
         {
           cdoPrint("Latitudes must be between 90 and -90!");
           return gridID;

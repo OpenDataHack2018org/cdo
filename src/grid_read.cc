@@ -35,8 +35,7 @@ cdo_read_field(const char *name, char *pline, int size, double *field, int *line
       if (pline == endptr)
         {
           (*lineno)++;
-          if (!readline(fp, line, MAX_LINE_LEN))
-            cdoAbort("Incomplete command: >%s< (line: %d file: %s)", name, *lineno, dname);
+          if (!readline(fp, line, MAX_LINE_LEN)) cdoAbort("Incomplete command: >%s< (line: %d file: %s)", name, *lineno, dname);
           pline = line;
           fval = strtod(pline, &endptr);
         }
@@ -356,8 +355,7 @@ grid_read_mapping(size_t igmap, size_t nkv, kvmap_t *kvmap, int gridID)
           continue;
         }
 
-      if (STR_IS_EQ(key, "grid_mapping_name"))
-        cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int) strlen(value) + 1, value);
+      if (STR_IS_EQ(key, "grid_mapping_name")) cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int) strlen(value) + 1, value);
 
       int dtype = literals_find_datatype(nvalues, kv->values);
 

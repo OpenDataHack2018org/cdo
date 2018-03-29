@@ -419,9 +419,8 @@ Ensstat3(void *process)
                       roc[binID][TPR] = tpr;
                       roc[binID][FPR] = fpr;
 
-                      fprintf(stderr, "%3i %10.4g: %6i %6i %6i %6i: %10.4g %10.4g\n", binID,
-                              binID < nbins ? lThresh[binID] : 1, ctg_tab[binID][0], ctg_tab[binID][1],
-                              ctg_tab[binID][2], ctg_tab[binID][3], tpr, fpr);
+                      fprintf(stderr, "%3i %10.4g: %6i %6i %6i %6i: %10.4g %10.4g\n", binID, binID < nbins ? lThresh[binID] : 1,
+                              ctg_tab[binID][0], ctg_tab[binID][1], ctg_tab[binID][2], ctg_tab[binID][3], tpr, fpr);
                     }
                   fprintf(stderr, "nbins %10i\n", nbins);
                   fprintf(stderr, "#ROC CurveArea: %10.6f\n", roc_curve_integrate((const double **) roc, nbins));
@@ -468,8 +467,8 @@ Ensstat3(void *process)
 
           int sum = ctg_tab[i][TP] + ctg_tab[i][TN] + ctg_tab[i][FP] + ctg_tab[i][FN];
 
-          fprintf(stdout, "%3i %10.4g: %6i %6i %6i %6i (%6i): %10.4g %10.4g\n", i, i < nbins ? lThresh[i] : 1,
-                  ctg_tab[i][0], ctg_tab[i][1], ctg_tab[i][2], ctg_tab[i][3], sum, tpr, fpr);
+          fprintf(stdout, "%3i %10.4g: %6i %6i %6i %6i (%6i): %10.4g %10.4g\n", i, i < nbins ? lThresh[i] : 1, ctg_tab[i][0],
+                  ctg_tab[i][1], ctg_tab[i][2], ctg_tab[i][3], sum, tpr, fpr);
         }
 
       fprintf(stdout, "#ROC CurveArea: %10.6f\n", roc_curve_integrate((const double **) roc, nbins));

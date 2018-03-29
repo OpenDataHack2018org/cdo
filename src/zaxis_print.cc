@@ -21,8 +21,7 @@
 void cdo_print_attributes(FILE *fp, int cdiID, int varID, int nblanks);
 
 static void
-printDblsPrefixAutoBrk(FILE *fp, int dig, const char prefix[], int nbyte0, size_t n, const double vals[],
-                       size_t extbreak)
+printDblsPrefixAutoBrk(FILE *fp, int dig, const char prefix[], int nbyte0, size_t n, const double vals[], size_t extbreak)
 {
   fputs(prefix, fp);
   int nbyte = nbyte0;

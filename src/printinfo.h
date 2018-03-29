@@ -237,11 +237,11 @@ print_xyvals2D(int gridID, int dig)
                     break;
                   }
               free(xvals);
-              if ( IS_NOT_EQUAL(xinc, 0) )
+              if (IS_NOT_EQUAL(xinc, 0))
                 {
                   for (size_t i = 1; i < ysize; i++)
-                    if (IS_NOT_EQUAL(xvals2D[i*xsize], xvals2D[0]) ||
-                        IS_NOT_EQUAL(xvals2D[(i+1)*xsize-1], xvals2D[xsize-1]))
+                    if (IS_NOT_EQUAL(xvals2D[i * xsize], xvals2D[0])
+                        || IS_NOT_EQUAL(xvals2D[(i + 1) * xsize - 1], xvals2D[xsize - 1]))
                       {
                         xinc = 0;
                         break;
@@ -260,11 +260,11 @@ print_xyvals2D(int gridID, int dig)
                     break;
                   }
               free(yvals);
-              if ( IS_NOT_EQUAL(yinc, 0) )
+              if (IS_NOT_EQUAL(yinc, 0))
                 {
                   for (size_t i = 1; i < xsize; i++)
-                    if (IS_NOT_EQUAL(yvals2D[i], yvals2D[0]) ||
-                        IS_NOT_EQUAL(yvals2D[(ysize-1)*xsize+i], yvals2D[(ysize-1)*xsize]))
+                    if (IS_NOT_EQUAL(yvals2D[i], yvals2D[0])
+                        || IS_NOT_EQUAL(yvals2D[(ysize - 1) * xsize + i], yvals2D[(ysize - 1) * xsize]))
                       {
                         yinc = 0;
                         break;
@@ -337,8 +337,7 @@ printGridInfoKernel(int gridID, int index, bool lproj)
           else if (xysize)
             fprintf(stdout, " (%zux%zu)", xsize, ysize);
 
-          if (gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED)
-            fprintf(stdout, "  np=%d", gridInqNP(gridID));
+          if (gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED) fprintf(stdout, "  np=%d", gridInqNP(gridID));
           my_reset_text_color(stdout);
 
           fprintf(stdout, "\n");
@@ -413,8 +412,7 @@ printGridInfoKernel(int gridID, int index, bool lproj)
       else
         fprintf(stdout, "points=%zu", gridsize);
 
-      if (gridtype == GRID_UNSTRUCTURED && gridInqNvertex(gridID) > 0)
-        fprintf(stdout, "  nvertex=%d", gridInqNvertex(gridID));
+      if (gridtype == GRID_UNSTRUCTURED && gridInqNvertex(gridID) > 0) fprintf(stdout, "  nvertex=%d", gridInqNvertex(gridID));
       my_reset_text_color(stdout);
 
       fprintf(stdout, "\n");

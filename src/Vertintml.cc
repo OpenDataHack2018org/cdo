@@ -310,8 +310,8 @@ Vertintml(void *process)
       if (cdoVerbose)
         {
           vlistInqVarName(vlistID1, varID, varname);
-          cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s Varname = %s varID = %d",
-                   mode, instNum, tableNum, code, paramstr, varname, varID);
+          cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s Varname = %s varID = %d", mode, instNum, tableNum,
+                   code, paramstr, varname, varID);
         }
 
       if (code <= 0 || code == 255)
@@ -379,8 +379,7 @@ Vertintml(void *process)
 
       /* if ( zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && nlevel == nhlev )
        */
-      if (zaxisID == zaxisIDh
-          || (zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)))
+      if (zaxisID == zaxisIDh || (zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)))
         {
           varinterp[varID] = true;
           vardata2[varID] = (double *) Malloc(gridsize * nplev * sizeof(double));
@@ -391,8 +390,7 @@ Vertintml(void *process)
           if (zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && nlevel > 1)
             {
               vlistInqVarName(vlistID1, varID, varname);
-              cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
-                         varID + 1, varname, nlevel);
+              cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)", varID + 1, varname, nlevel);
             }
 
           varinterp[varID] = false;
@@ -404,16 +402,13 @@ Vertintml(void *process)
   if (cdoVerbose)
     {
       cdoPrint("Found:");
-      if (tempID != -1)
-        cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
-      if (psID != -1)
-        cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
+      if (tempID != -1) cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
+      if (psID != -1) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
       if (lnpsID != -1)
         cdoPrint("  LOG(%s) -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, lnpsID, varname));
       if (sgeopotID != -1)
         cdoPrint("  %s -> %s", var_stdname(surface_geopotential), cdoVlistInqVarName(vlistID1, sgeopotID, varname));
-      if (geopotID != -1)
-        cdoPrint("  %s -> %s", var_stdname(geopotential), cdoVlistInqVarName(vlistID1, geopotID, varname));
+      if (geopotID != -1) cdoPrint("  %s -> %s", var_stdname(geopotential), cdoVlistInqVarName(vlistID1, geopotID, varname));
       if (gheightID != -1)
         cdoPrint("  %s -> %s", var_stdname(geopotential_height), cdoVlistInqVarName(vlistID1, gheightID, varname));
     }
@@ -519,11 +514,10 @@ Vertintml(void *process)
                 {
                   arrayMinMaxMask(gridsize, &sgeopot[0], NULL, &minval, &maxval);
                   if (minval < MIN_FIS || maxval > MAX_FIS)
-                    cdoWarning("Surface geopotential out of range (min=%g max=%g) [timestep:%d]!",
-                               minval, maxval, tsID + 1);
-                  if (gridsize > 1 && minval >= 0 && maxval <= 9000 && IS_NOT_EQUAL(minval, maxval) )
-                    cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g) [timestep:%d]!",
-                               minval, maxval, tsID + 1);
+                    cdoWarning("Surface geopotential out of range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID + 1);
+                  if (gridsize > 1 && minval >= 0 && maxval <= 9000 && IS_NOT_EQUAL(minval, maxval))
+                    cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g) [timestep:%d]!", minval, maxval,
+                               tsID + 1);
                 }
             }
 
@@ -585,8 +579,7 @@ Vertintml(void *process)
                   else
                     {
                       vlistInqVarName(vlistID1, varID, varname);
-                      cdoAbort("Number of hybrid level differ from full/half level (param=%s)!",
-                               varname);
+                      cdoAbort("Number of hybrid level differ from full/half level (param=%s)!", varname);
                     }
 
                   for (levelID = 0; levelID < nlevel; levelID++)
@@ -600,21 +593,20 @@ Vertintml(void *process)
 
                       if (useLogType && extrapolate) cdoAbort("Log. extrapolation of temperature unsupported!");
 
-                      interp_T(&sgeopot[0], vardata1[varID], vardata2[varID], &full_press[0], &half_press[0],
-                               &vert_index[0], plev, nplev, gridsize, nlevel, missval);
+                      interp_T(&sgeopot[0], vardata1[varID], vardata2[varID], &full_press[0], &half_press[0], &vert_index[0],
+                               plev, nplev, gridsize, nlevel, missval);
                     }
                   else if (varID == gheightID)
                     {
-                      for (size_t i = 0; i < gridsize; ++i)
-                        vardata1[varID][gridsize * nlevel + i] = sgeopot[i] / PlanetGrav;
+                      for (size_t i = 0; i < gridsize; ++i) vardata1[varID][gridsize * nlevel + i] = sgeopot[i] / PlanetGrav;
 
-                      interp_Z(&sgeopot[0], vardata1[varID], vardata2[varID], &full_press[0], &half_press[0],
-                               &vert_index[0], vardata1[tempID], plev, nplev, gridsize, nlevel, missval);
+                      interp_Z(&sgeopot[0], vardata1[varID], vardata2[varID], &full_press[0], &half_press[0], &vert_index[0],
+                               vardata1[tempID], plev, nplev, gridsize, nlevel, missval);
                     }
                   else
                     {
-                      interp_X(vardata1[varID], vardata2[varID], hyb_press, &vert_index[0], plev, nplev, gridsize,
-                               nlevel, missval);
+                      interp_X(vardata1[varID], vardata2[varID], hyb_press, &vert_index[0], plev, nplev, gridsize, nlevel,
+                               missval);
                     }
 
                   if (!extrapolate) arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);

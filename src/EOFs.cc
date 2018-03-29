@@ -44,8 +44,8 @@
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 static void
-scale_eigvec_grid(double *restrict out, int tsID, size_t npack, const size_t *restrict pack,
-                  const double *restrict weight, double **covar, double sum_w)
+scale_eigvec_grid(double *restrict out, int tsID, size_t npack, const size_t *restrict pack, const double *restrict weight,
+                  double **covar, double sum_w)
 {
   for (size_t i = 0; i < npack; ++i) out[pack[i]] = covar[tsID][i] / sqrt(weight[pack[i]] / sum_w);
 }
@@ -304,8 +304,7 @@ EOFs(void *process)
     }
 
   if (cdoVerbose)
-    cdoPrint("Calculating %d eigenvectors and %zu eigenvalues in %s", n_eig, n,
-             grid_space == 1 ? "grid_space" : "time_space");
+    cdoPrint("Calculating %d eigenvectors and %zu eigenvalues in %s", n_eig, n, grid_space == 1 ? "grid_space" : "time_space");
 
   double *weight = (double *) Malloc(gridsize * sizeof(double));
   for (size_t i = 0; i < gridsize; ++i) weight[i] = 1.;
@@ -371,8 +370,7 @@ EOFs(void *process)
               npack = 0;
               for (size_t i = 0; i < gridsize; ++i)
                 {
-                  if (!DBL_IS_EQUAL(weight[i], 0.0) && !DBL_IS_EQUAL(weight[i], missval)
-                      && !DBL_IS_EQUAL(in[i], missval))
+                  if (!DBL_IS_EQUAL(weight[i], 0.0) && !DBL_IS_EQUAL(weight[i], missval) && !DBL_IS_EQUAL(in[i], missval))
                     {
                       pack[npack] = i;
                       npack++;
@@ -419,8 +417,7 @@ EOFs(void *process)
 #pragma omp parallel for default(shared)
 #endif
               for (size_t ipack = 0; ipack < npack; ++ipack)
-                for (size_t jpack = ipack; jpack < npack; ++jpack)
-                  covar[ipack][jpack] += in[pack[ipack]] * in[pack[jpack]];
+                for (size_t jpack = ipack; jpack < npack; ++jpack) covar[ipack][jpack] += in[pack[ipack]] * in[pack[jpack]];
             }
           else if (time_space)
             {

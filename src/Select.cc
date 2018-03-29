@@ -220,14 +220,14 @@ Select(void *process)
             }
 
           bool lvarsel = SELLIST_NVAL(code) || SELLIST_NVAL(ltype) || SELLIST_NVAL(zaxisnum) || SELLIST_NVAL(gridnum)
-                         || SELLIST_NVAL(name) || SELLIST_NVAL(param) || SELLIST_NVAL(zaxisname)
-                         || SELLIST_NVAL(gridname) || SELLIST_NVAL(steptype);
+                         || SELLIST_NVAL(name) || SELLIST_NVAL(param) || SELLIST_NVAL(zaxisname) || SELLIST_NVAL(gridname)
+                         || SELLIST_NVAL(steptype);
 
           bool llevsel = SELLIST_NVAL(level) || SELLIST_NVAL(levidx);
 
           ltimsel = SELLIST_NVAL(date) || SELLIST_NVAL(startdate) || SELLIST_NVAL(enddate) || SELLIST_NVAL(season)
-                    || SELLIST_NVAL(timestep_of_year) || SELLIST_NVAL(timestep) || SELLIST_NVAL(year)
-                    || SELLIST_NVAL(month) || SELLIST_NVAL(day) || SELLIST_NVAL(hour) || SELLIST_NVAL(minute);
+                    || SELLIST_NVAL(timestep_of_year) || SELLIST_NVAL(timestep) || SELLIST_NVAL(year) || SELLIST_NVAL(month)
+                    || SELLIST_NVAL(day) || SELLIST_NVAL(hour) || SELLIST_NVAL(minute);
 
           for (varID = 0; varID < nvars; ++varID)
             {

@@ -256,8 +256,7 @@ Rhopot(void *process)
   rho.missval = to.missval;
 
   int datatype = CDI_DATATYPE_FLT32;
-  if (vlistInqVarDatatype(vlistID1, toID) == CDI_DATATYPE_FLT64
-      && vlistInqVarDatatype(vlistID1, saoID) == CDI_DATATYPE_FLT64)
+  if (vlistInqVarDatatype(vlistID1, toID) == CDI_DATATYPE_FLT64 && vlistInqVarDatatype(vlistID1, saoID) == CDI_DATATYPE_FLT64)
     datatype = CDI_DATATYPE_FLT64;
 
   int vlistID2 = vlistCreate();

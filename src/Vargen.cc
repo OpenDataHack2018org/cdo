@@ -454,8 +454,7 @@ Vargen(void *process)
                     }
                   else if (operatorID == COSHILL)
                     {
-                      for (size_t i = 0; i < gridsize; i++)
-                        array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i])) / 1.2);
+                      for (size_t i = 0; i < gridsize; i++) array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i])) / 1.2);
                     }
 
                   Free(xvals);
@@ -495,8 +494,7 @@ Vargen(void *process)
                 }
               else if (operatorID == STDATM)
                 {
-                  array[0]
-                      = (varID == varID2) ? std_atm_temperatur(levels[levelID]) : std_atm_pressure(levels[levelID]);
+                  array[0] = (varID == varID2) ? std_atm_temperatur(levels[levelID]) : std_atm_pressure(levels[levelID]);
                 }
 
               if (gridID != gridIDdata && (operatorID == TOPO || operatorID == TEMP || operatorID == MASK))

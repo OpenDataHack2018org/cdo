@@ -175,10 +175,9 @@ Harmonic(void *process)
             {
               offset = gridsize * levelID;
               for (size_t i = 0; i < gridsize; i++)
-                out[j][varID][i + offset]
-                    = sqrt(work[j][varID][i + offset] * work[j][varID][i + offset]
-                           + work[n_out + j][varID][i + offset] * work[n_out + j][varID][i + offset])
-                      * 2 / nts;
+                out[j][varID][i + offset] = sqrt(work[j][varID][i + offset] * work[j][varID][i + offset]
+                                                 + work[n_out + j][varID][i + offset] * work[n_out + j][varID][i + offset])
+                                            * 2 / nts;
             }
         }
     }
@@ -234,8 +233,7 @@ Harmonic(void *process)
                 {
                   out[j][varID][i + offset]
                       = work[j][varID][i + offset] || work[n_out + j][varID][i + offset]
-                            ? atan2(work[j][varID][i + offset], work[n_out + j][varID][i + offset]) * n / (j + 1) / 2
-                                  / M_PI
+                            ? atan2(work[j][varID][i + offset], work[n_out + j][varID][i + offset]) * n / (j + 1) / 2 / M_PI
                             : missval;
 
                   if (out[j][varID][i + offset] < 0) out[j][varID][i + offset] += n / (j + 1.);

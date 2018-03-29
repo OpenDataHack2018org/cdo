@@ -105,8 +105,8 @@ extern char *DEVICE_TABLE;
 extern int DEVICE_COUNT;
 
 static void
-maggraph(const char *plotfile, const char *varname, const char *varunits, long nfiles, long *nts, int **vdate,
-         int **vtime, double **datatab, int nparam, char **params)
+maggraph(const char *plotfile, const char *varname, const char *varunits, long nfiles, long *nts, int **vdate, int **vtime,
+         double **datatab, int nparam, char **params)
 {
   char *lines[1];
   char *temp_str;

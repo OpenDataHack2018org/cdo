@@ -257,8 +257,7 @@ Pressure(void *process)
 
           /* check range of ps_prog */
           arrayMinMaxMask(gridsize, ps_prog, NULL, &minval, &maxval);
-          if (minval < MIN_PS || maxval > MAX_PS)
-            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+          if (minval < MIN_PS || maxval > MAX_PS) cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           presh(full_press, half_press, vct, ps_prog, nhlevf, gridsize);
         }

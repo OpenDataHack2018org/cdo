@@ -438,8 +438,8 @@ Selmulti(void *process)
                             cdoPrint(" Processing: (code %d, ltype %d, level %d);  "
                                      "nvars=%d, varID=%d => (selcode %d, selltype "
                                      "%d, sellevel %d) => change (%d,%d,%d)",
-                                     code, ltype, (int) level, nvars, varID, selcode, selltype, sellevel,
-                                     tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
+                                     code, ltype, (int) level, nvars, varID, selcode, selltype, sellevel, tuplerec->changedCode,
+                                     tuplerec->changedLevelType, tuplerec->changedLevel);
                           if ((tuplerec->changedCode == -1) && (tuplerec->changedLevelType == -1)
                               && (tuplerec->changedLevel == -1))
                             cdoPrint(" WARNING: Cannot CHANGE identification!");
@@ -901,8 +901,7 @@ multiSelectionParser(const char *filenameOrString)
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
@@ -927,8 +926,7 @@ multiSelectionParser(const char *filenameOrString)
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
@@ -964,8 +962,7 @@ multiSelectionParser(const char *filenameOrString)
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
@@ -994,8 +991,7 @@ multiSelectionParser(const char *filenameOrString)
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
@@ -1019,8 +1015,7 @@ multiSelectionParser(const char *filenameOrString)
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
@@ -1082,8 +1077,7 @@ multiSelectionParser(const char *filenameOrString)
                 pline = removeSpaces(pline);
                 parEnd = findParamEnd(pline);
                 if ((!parEnd) && (!pline))
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                 while ((pline != parEnd) && (strlen(pline) > 0))
                   {
                     pline = removeSpaces(pline);
@@ -1110,8 +1104,7 @@ multiSelectionParser(const char *filenameOrString)
                 pline = removeSpaces(pline);
                 parEnd = findParamEnd(pline);
                 if ((!parEnd) && (!pline))
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                 while ((pline != parEnd) && (strlen(pline) > 0))
                   {
                     pline = removeSpaces(pline);
@@ -1150,8 +1143,7 @@ multiSelectionParser(const char *filenameOrString)
                 pline = removeSpaces(pline);
                 parEnd = findParamEnd(pline);
                 if ((!parEnd) && (!pline))
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                 while ((pline != parEnd) && (strlen(pline) > 0))
                   {
                     pline = removeSpaces(pline);
@@ -1165,11 +1157,9 @@ multiSelectionParser(const char *filenameOrString)
                       }
                     if (CdoDebug::cdoDebugExt >= 100) cdoPrint("level=%d", val);
                     tuplerec->nlevels = push_backIntList(val, tuplerec->levelLST, tuplerec->nlevels);
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     strpos = goToNextSeparator(pline);
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (!strpos)
                       {
                         strpos = strContains(pline, "|");  // compact notation for  changemulti
@@ -1177,8 +1167,7 @@ multiSelectionParser(const char *filenameOrString)
                           pline = strpos - 1;  // strContains returns character after...
                         else
                           pline = parEnd;
-                        if (CdoDebug::cdoDebugExt >= 100)
-                          cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                        if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                         break;
                       }
                     else
@@ -1203,8 +1192,7 @@ multiSelectionParser(const char *filenameOrString)
                     parEnd = findParamEnd(pline);
                     if ((!parEnd) || (pline[0] == 0))
                       cdoAbort("Channot parse: strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (pline[0] == '*')
                       val = -1;
                     else
@@ -1218,8 +1206,7 @@ multiSelectionParser(const char *filenameOrString)
                     parEnd = findParamEnd(pline);
                     if ((!parEnd) || (pline[0] == 0))
                       cdoAbort("Channot parse: strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (pline[0] == '*')
                       val = -1;
                     else
@@ -1233,8 +1220,7 @@ multiSelectionParser(const char *filenameOrString)
                     parEnd = findParamEnd(pline);
                     if ((!parEnd) || (pline[0] == 0))
                       cdoAbort("Channot parse: strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (pline[0] == '*')
                       val = -1;
                     else
@@ -1245,8 +1231,7 @@ multiSelectionParser(const char *filenameOrString)
                   }  // changemulti specification
                 parEnd = findParamEnd(pline);
                 if ((!parEnd) && (!pline))
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                 while ((pline != parEnd) && (strlen(pline) > 0))
                   {
                     pline = removeSpaces(pline);
@@ -1295,8 +1280,8 @@ printSelectionTuples()
       char bff[200];
       bff[0] = '\0';
       if (CdoDebug::cdoDebugExt)
-        cdoPrint(" Selection tuple [%d]: ncodes=%d, nlevelTypes=%d, nlevels=%d", ii, tuplerec->ncodes,
-                 tuplerec->nlevelTypes, tuplerec->nlevels);
+        cdoPrint(" Selection tuple [%d]: ncodes=%d, nlevelTypes=%d, nlevels=%d", ii, tuplerec->ncodes, tuplerec->nlevelTypes,
+                 tuplerec->nlevels);
       for (ri = 0; ri < tuplerec->ncodes; ri++)
         {
           sprintf(bff, "%d", lista_get_int(tuplerec->codeLST, ri));

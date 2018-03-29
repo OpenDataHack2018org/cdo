@@ -134,8 +134,8 @@ boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const 
   float tmp_lats[4], tmp_lons[4];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box) private(idx, tmp_lats, tmp_lons)
+#pragma omp parallel for default(none) shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, \
+                                              bound_box) private(idx, tmp_lats, tmp_lons)
 #endif
   for (size_t n = 0; n < size; n++)
     {
@@ -366,7 +366,7 @@ remapDefineGrid(RemapMethod mapType, int gridID, RemapGrid &grid, const char *tx
 
   remapGridAlloc(mapType, grid);
 
-  /* Initialize logical mask */
+/* Initialize logical mask */
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(gridsize, grid)
@@ -716,11 +716,10 @@ remapInitGrids(RemapMethod mapType, bool lextrapolate, int gridID1, RemapGrid &s
     }
 
   int sgridID = src_grid.gridID;
-  if (gridInqSize(sgridID) > 1
-      && ((gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LCC)
-          || (gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_RLL)
-          || (gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LAEA)
-          || (gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_SINU)))
+  if (gridInqSize(sgridID) > 1 && ((gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LCC)
+                                   || (gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_RLL)
+                                   || (gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LAEA)
+                                   || (gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_SINU)))
     {
       int lbounds = TRUE;
       src_grid.gridID = gridID1 = gridToCurvilinear(src_grid.gridID, lbounds);

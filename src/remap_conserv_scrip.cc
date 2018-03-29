@@ -1193,8 +1193,8 @@ normalize_weights(RemapGrid *tgt_grid, RemapVars &rv, double *src_centroid_lat, 
   else if (rv.normOpt == NormOpt::NONE)
     {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon) private(src_cell_add, norm_factor)
+#pragma omp parallel for default(none) shared(num_links, rv, weights, tgt_grid, src_centroid_lat, \
+                                              src_centroid_lon) private(src_cell_add, norm_factor)
 #endif
       for (long n = 0; n < num_links; ++n)
         {
@@ -1294,10 +1294,10 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
   if (cdoTimer) timer_start(timer_remap_con_l1);
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(                                                 \
-    rsearch, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, \
-    cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells, src_num_cell_corners, srch_corners,    \
-    src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
+#pragma omp parallel for default(none)                                                                                         \
+    reduction(+ : findex) shared(rsearch, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, cdoVerbose, max_subseg, \
+                                 srch_corner_lat, srch_corner_lon, max_srch_cells, src_num_cell_corners, srch_corners,         \
+                                 src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for (long src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add)
     {
@@ -1495,10 +1495,10 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
   findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(                                                 \
-    rsearch, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, \
-    cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells, tgt_num_cell_corners, srch_corners,    \
-    src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
+#pragma omp parallel for default(none)                                                                                         \
+    reduction(+ : findex) shared(rsearch, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, cdoVerbose, max_subseg, \
+                                 srch_corner_lat, srch_corner_lon, max_srch_cells, tgt_num_cell_corners, srch_corners,         \
+                                 src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for (long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {

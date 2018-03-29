@@ -31,7 +31,7 @@ Complextorect(void *process)
   cdoInitialize(process);
 
   int COMPLEXTORECT = cdoOperatorAdd("complextorect", 0, 0, NULL);
-  int COMPLEXTOPOL  = cdoOperatorAdd("complextopol", 0, 0, NULL);
+  int COMPLEXTOPOL = cdoOperatorAdd("complextopol", 0, 0, NULL);
 
   int operatorID = cdoOperatorID();
 
@@ -93,7 +93,7 @@ Complextorect(void *process)
           double missval1 = vlistInqVarMissval(vlistID1, varID);
           double missval2 = missval1;
 
-          if ( operatorID == COMPLEXTORECT )
+          if (operatorID == COMPLEXTORECT)
             {
               for (size_t i = 0; i < gridsize; ++i)
                 {
@@ -101,12 +101,14 @@ Complextorect(void *process)
                   array3[i] = array1[2 * i + 1];
                 }
             }
-          else if ( operatorID == COMPLEXTOPOL )
+          else if (operatorID == COMPLEXTOPOL)
             {
               for (size_t i = 0; i < gridsize; ++i)
                 {
                   array2[i] = SQRTMN(ADDMN(MULMN(array1[2 * i], array1[2 * i]), MULMN(array1[2 * i + 1], array1[2 * i + 1])));
-                  array3[i] = (DBL_IS_EQUAL(array1[2 * i], missval1) || DBL_IS_EQUAL(array1[2 * i + 1], missval1)) ? missval1 : atan2 (array1[2 * i + 1], array1[2 * i]);
+                  array3[i] = (DBL_IS_EQUAL(array1[2 * i], missval1) || DBL_IS_EQUAL(array1[2 * i + 1], missval1))
+                                  ? missval1
+                                  : atan2(array1[2 * i + 1], array1[2 * i]);
                 }
             }
 

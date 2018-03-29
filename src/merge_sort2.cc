@@ -167,8 +167,7 @@ sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   tmp = (double *) Malloc(num_links * sizeof(double));
 
 #ifdef _OPENMP
-#pragma omp parallel for if (depth < par_depth /* && num_links > 4096*/) private(i) num_threads(2) schedule(static, \
-                                                                                                            1024)
+#pragma omp parallel for if (depth < par_depth /* && num_links > 4096*/) private(i) num_threads(2) schedule(static, 1024)
 #endif
   for (i = 0; i < num_links; i++) tmp[i] = add1[idx[i]];
 

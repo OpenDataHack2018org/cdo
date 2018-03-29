@@ -524,15 +524,13 @@ computeGsl(int nlevels, size_t gridsize, double *yvals, double missval, field_ty
               /* start with southern sphere */
               if (yvals[i] < 0.0)
                 {
-                  duration
-                      = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[0][levelID].ptr[i])
-                                  - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
+                  duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[0][levelID].ptr[i])
+                                       - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
                 }
               else
                 {
-                  duration
-                      = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[1][levelID].ptr[i])
-                                  - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
+                  duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[1][levelID].ptr[i])
+                                       - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
                 }
 
               if (DBL_IS_EQUAL(startDateWithHist[1][levelID].ptr[i], missval))
@@ -560,9 +558,8 @@ computeGsl(int nlevels, size_t gridsize, double *yvals, double missval, field_ty
                 }
               else
                 {
-                  duration
-                      = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[0][levelID].ptr[i])
-                                  - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[0][levelID].ptr[i]));
+                  duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[0][levelID].ptr[i])
+                                       - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[0][levelID].ptr[i]));
 
                   if (DBL_IS_EQUAL(startDateWithHist[0][levelID].ptr[i], missval))
                     firstDay = missval;

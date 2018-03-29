@@ -223,8 +223,7 @@ writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   if (gridfile[len - 2] == 'n' && gridfile[len - 1] == 'c') len -= 3;
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "title", len, gridfile));
 
-  if (CDO_Version_Info)
-    nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO", (int) strlen(cdoComment()) + 1, cdoComment()));
+  if (CDO_Version_Info) nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO", (int) strlen(cdoComment()) + 1, cdoComment()));
 
   /* define grid size dimension */
 

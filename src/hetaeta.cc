@@ -90,17 +90,16 @@ esat(double temperature)
 
 static void
 hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long nvars, const double *restrict af1,
-           const double *restrict bf1, const double *restrict etah2, const double *restrict af2,
-           const double *restrict bf2, const double *restrict w1, const double *restrict w2, const long *restrict jl1,
-           const long *restrict jl2, const double *restrict ah1, const double *restrict bh1, const double *restrict ps1,
-           double epsm1i, const double *restrict q1, const double *restrict t1, const double *restrict fis1,
-           const double *restrict fis2, double *restrict ps2, const double *restrict ah2, const double *restrict bh2,
-           double *restrict *restrict vars1, double *restrict *restrict vars2, double *restrict t2, double *restrict q2,
-           double *restrict tscor, double *restrict pscor, double *restrict secor, long jblt, double *restrict ph1,
-           double *restrict lnph1, double *restrict fi1, double *restrict pf1, double *restrict lnpf1,
-           double *restrict tv1, double *restrict theta1, double *restrict rh1, double *restrict zvar,
-           double *restrict ph2, double *restrict lnph2, double *restrict fi2, double *restrict pf2,
-           double *restrict rh2, double *restrict wgt, long *restrict idx, double *restrict rh_pbl,
+           const double *restrict bf1, const double *restrict etah2, const double *restrict af2, const double *restrict bf2,
+           const double *restrict w1, const double *restrict w2, const long *restrict jl1, const long *restrict jl2,
+           const double *restrict ah1, const double *restrict bh1, const double *restrict ps1, double epsm1i,
+           const double *restrict q1, const double *restrict t1, const double *restrict fis1, const double *restrict fis2,
+           double *restrict ps2, const double *restrict ah2, const double *restrict bh2, double *restrict *restrict vars1,
+           double *restrict *restrict vars2, double *restrict t2, double *restrict q2, double *restrict tscor,
+           double *restrict pscor, double *restrict secor, long jblt, double *restrict ph1, double *restrict lnph1,
+           double *restrict fi1, double *restrict pf1, double *restrict lnpf1, double *restrict tv1, double *restrict theta1,
+           double *restrict rh1, double *restrict zvar, double *restrict ph2, double *restrict lnph2, double *restrict fi2,
+           double *restrict pf2, double *restrict rh2, double *restrict wgt, long *restrict idx, double *restrict rh_pbl,
            double *restrict theta_pbl, double *restrict *restrict vars_pbl, double *restrict zt2, double *restrict zq2)
 {
   long ijk, ijk1, ijk2;
@@ -415,8 +414,8 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
         }
 
       /* correct surface pressure */
-      dfi = fiadj - (fi2[jlev + 1]
-                     + (fi2[jlev] - fi2[jlev + 1]) * log(ph2[jlev + 1] / p_firef) / log(ph2[jlev + 1] / ph2[jlev]));
+      dfi = fiadj
+            - (fi2[jlev + 1] + (fi2[jlev] - fi2[jlev + 1]) * log(ph2[jlev + 1] / p_firef) / log(ph2[jlev + 1] / ph2[jlev]));
       double ztv = (1.0 + epsm1i * zq2[nlev2 - 1]) * zt2[nlev2 - 1];
       ps2[ij] = ps2[ij] * exp(dfi / (rair * ztv));
     }
@@ -459,9 +458,8 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
       pscor[ij] = pow(ps2[ij] / ps1[ij], rair_d_cpair);
 
       /* correction term of static energy of lowest layer */
-      secor[ij]
-          = tv1[nlev1 - 1]
-            * (cpair + rair * (1.0 - ph1[nlev1 - 1] / (ps1[ij] - ph1[nlev1 - 1]) * log(ps1[ij] / ph1[nlev1 - 1])));
+      secor[ij] = tv1[nlev1 - 1]
+                  * (cpair + rair * (1.0 - ph1[nlev1 - 1] / (ps1[ij] - ph1[nlev1 - 1]) * log(ps1[ij] / ph1[nlev1 - 1])));
     }
 
   if (ltq)
@@ -476,8 +474,8 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
 void
 hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const double *bh1, const double *fis1,
         const double *ps1, const double *t1, const double *q1, int nlev2, const double *ah2, const double *bh2,
-        const double *fis2, double *ps2, double *t2, double *q2, int nvars, double **vars1, double **vars2,
-        double *tscor, double *pscor, double *secor)
+        const double *fis2, double *ps2, double *t2, double *q2, int nvars, double **vars1, double **vars2, double *tscor,
+        double *pscor, double *secor)
 {
   long jblt;
   long jlev = 0;
@@ -621,10 +619,10 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
   double epsm1i = 1.0 / epsilon - 1.0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) firstprivate(lpsmod) private(vars_pbl) schedule(dynamic, 1) shared(            \
-    ngp, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, zt2, zq2, theta_pbl, rh2, \
-    wgt, idx, vars_pbl_2, af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2, ltq, nvars, imiss, ah1, bh1, ps1, nlev1,       \
-    epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt)
+#pragma omp parallel for default(none) firstprivate(lpsmod) private(vars_pbl) schedule(dynamic, 1) shared(                 \
+    ngp, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, zt2, zq2, theta_pbl, rh2, wgt, \
+    idx, vars_pbl_2, af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2, ltq, nvars, imiss, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, \
+    fis1, fis2, ps2, ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt)
 #endif
   for (int ij = 0; ij < ngp; ++ij)
     {
@@ -634,13 +632,12 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
 
       if (imiss && imiss[ij]) continue;
 
-      hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars, &af1[0], &bf1[0], &etah2[0], &af2[0], &bf2[0], &w1[0],
-                 &w2[0], &jl1[0], &jl2[0], ah1, bh1, ps1, epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, vars1, vars2, t2,
-                 q2, tscor, pscor, secor, jblt, &ph1[ompthID][0], &lnph1[ompthID][0], &fi1[ompthID][0],
-                 &pf1[ompthID][0], &lnpf1[ompthID][0], &tv1[ompthID][0], &theta1[ompthID][0], &rh1[ompthID][0],
-                 &zvar[ompthID][0], &ph2[ompthID][0], &lnph2[ompthID][0], &fi2[ompthID][0], &pf2[ompthID][0],
-                 &rh2[ompthID][0], &wgt[ompthID][0], &idx[ompthID][0], &rh_pbl[ompthID][0], &theta_pbl[ompthID][0],
-                 vars_pbl, &zt2[ompthID][0], &zq2[ompthID][0]);
+      hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars, &af1[0], &bf1[0], &etah2[0], &af2[0], &bf2[0], &w1[0], &w2[0],
+                 &jl1[0], &jl2[0], ah1, bh1, ps1, epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, vars1, vars2, t2, q2, tscor, pscor,
+                 secor, jblt, &ph1[ompthID][0], &lnph1[ompthID][0], &fi1[ompthID][0], &pf1[ompthID][0], &lnpf1[ompthID][0],
+                 &tv1[ompthID][0], &theta1[ompthID][0], &rh1[ompthID][0], &zvar[ompthID][0], &ph2[ompthID][0],
+                 &lnph2[ompthID][0], &fi2[ompthID][0], &pf2[ompthID][0], &rh2[ompthID][0], &wgt[ompthID][0], &idx[ompthID][0],
+                 &rh_pbl[ompthID][0], &theta_pbl[ompthID][0], vars_pbl, &zt2[ompthID][0], &zq2[ompthID][0]);
 
     } /* end for ij */
 
@@ -673,16 +670,15 @@ main(int argc, char *argv[])
                     210.39390563964843750,   65.88919067382812500,    7.36769962310791016,     0.00000000000000000,
                     0.00000000000000000 };
 
-  double b2[41]
-      = { 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000,
-          0.00039085815660655, 0.00182679994031787, 0.00513499975204468, 0.01114289835095406, 0.02067789807915688,
-          0.03412120044231415, 0.05169039964675903, 0.07353377342224121, 0.09967470169067383, 0.13002246618270874,
-          0.16438430547714233, 0.20247590541839600, 0.24393308162689209, 0.28832298517227173, 0.33515489101409912,
-          0.38389205932617188, 0.43396288156509399, 0.48477149009704590, 0.53570991754531860, 0.58616840839385986,
-          0.63554751873016357, 0.68326860666275024, 0.72878581285476685, 0.77159661054611206, 0.81125342845916748,
-          0.84737491607666016, 0.87965691089630127, 0.90788388252258301, 0.93194031715393066, 0.95182150602340698,
-          0.96764522790908813, 0.97966271638870239, 0.98827010393142700, 0.99401938915252686, 0.99763011932373047,
-          1.00000000000000000 };
+  double b2[41] = { 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000,
+                    0.00039085815660655, 0.00182679994031787, 0.00513499975204468, 0.01114289835095406, 0.02067789807915688,
+                    0.03412120044231415, 0.05169039964675903, 0.07353377342224121, 0.09967470169067383, 0.13002246618270874,
+                    0.16438430547714233, 0.20247590541839600, 0.24393308162689209, 0.28832298517227173, 0.33515489101409912,
+                    0.38389205932617188, 0.43396288156509399, 0.48477149009704590, 0.53570991754531860, 0.58616840839385986,
+                    0.63554751873016357, 0.68326860666275024, 0.72878581285476685, 0.77159661054611206, 0.81125342845916748,
+                    0.84737491607666016, 0.87965691089630127, 0.90788388252258301, 0.93194031715393066, 0.95182150602340698,
+                    0.96764522790908813, 0.97966271638870239, 0.98827010393142700, 0.99401938915252686, 0.99763011932373047,
+                    1.00000000000000000 };
 
   double a1[20] = { 0.00000000000000000,     2000.00000000000000000,  4000.00000000000000000,  6046.10937500000000000,
                     8267.92968750000000000,  10609.51171875000000000, 12851.10156250000000000, 14698.50000000000000000,
@@ -690,11 +686,10 @@ main(int argc, char *argv[])
                     11101.55859375000000000, 8127.14453125000000000,  5125.14062500000000000,  2549.96899414062500000,
                     783.19506835937500000,   0.00000000000000000,     0.00000000000000000,     0.00000000000000000 };
 
-  double b1[20]
-      = { 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00033899326808751, 0.00335718691349030,
-          0.01307003945112228, 0.03407714888453484, 0.07064980268478394, 0.12591671943664551, 0.20119541883468628,
-          0.29551959037780762, 0.40540921688079834, 0.52493220567703247, 0.64610791206359863, 0.75969839096069336,
-          0.85643762350082397, 0.92874687910079956, 0.97298520803451538, 0.99228149652481079, 1.00000000000000000 };
+  double b1[20] = { 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00033899326808751, 0.00335718691349030,
+                    0.01307003945112228, 0.03407714888453484, 0.07064980268478394, 0.12591671943664551, 0.20119541883468628,
+                    0.29551959037780762, 0.40540921688079834, 0.52493220567703247, 0.64610791206359863, 0.75969839096069336,
+                    0.85643762350082397, 0.92874687910079956, 0.97298520803451538, 0.99228149652481079, 1.00000000000000000 };
 
   double iu1[19] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
@@ -707,15 +702,13 @@ main(int argc, char *argv[])
                      8.901303e-06, 3.285719e-05, 0.0001270178, 0.0003347051, 0.0007223329, 0.001228461,  0.001733165,
                      0.002967748,  0.004558741,  0.004706143,  0.004668835,  0.004677606 };
 
-  double icl1[19]
-      = { 0.0,           0.0,           0.0,           0.0,           0.0,           0.0,           -4.987459e-40,
-          -4.791847e-39, -3.970467e-23, -1.902515e-23, -1.694066e-21, -3.705769e-22, -1.799945e-21, -4.632211e-22,
-          2.072752e-05,  0.000149563,   -1.482308e-20, -2.541099e-21, 5.033612e-05 };
+  double icl1[19] = { 0.0,           0.0,           0.0,           0.0,           0.0,           0.0,           -4.987459e-40,
+                      -4.791847e-39, -3.970467e-23, -1.902515e-23, -1.694066e-21, -3.705769e-22, -1.799945e-21, -4.632211e-22,
+                      2.072752e-05,  0.000149563,   -1.482308e-20, -2.541099e-21, 5.033612e-05 };
 
-  double ici1[19]
-      = { -4.408104e-37, 0.0,           0.0,           -2.003328e-25, -9.305782e-24, -2.15067e-23,  -9.926167e-23,
-          -1.958764e-21, -8.735027e-22, -2.779327e-22, -2.117582e-21, -1.323489e-21, -8.470329e-22, -4.102816e-22,
-          -1.429368e-21, -2.646978e-21, -5.029258e-22, -8.205632e-22, -1.588187e-21 };
+  double ici1[19] = { -4.408104e-37, 0.0,           0.0,           -2.003328e-25, -9.305782e-24, -2.15067e-23,  -9.926167e-23,
+                      -1.958764e-21, -8.735027e-22, -2.779327e-22, -2.117582e-21, -1.323489e-21, -8.470329e-22, -4.102816e-22,
+                      -1.429368e-21, -2.646978e-21, -5.029258e-22, -8.205632e-22, -1.588187e-21 };
 
   double icc1[19]
       = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4445496, 0.0, 0.0, 0.001098633 };
@@ -786,11 +779,10 @@ main(int argc, char *argv[])
   for (ij = 0; ij < NGP; ++ij) fis2[ij] = fis1[ij];
 
   if (ltq)
-    hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, t1, q1, 40, a2, b2, fis2, ps2, t2, q2, 5, vars1, vars2, tscor, pscor,
-            secor);
+    hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, t1, q1, 40, a2, b2, fis2, ps2, t2, q2, 5, vars1, vars2, tscor, pscor, secor);
   else
-    hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, NULL, NULL, 40, a2, b2, fis2, ps2, NULL, NULL, 5, vars1, vars2, NULL,
-            NULL, NULL);
+    hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, NULL, NULL, 40, a2, b2, fis2, ps2, NULL, NULL, 5, vars1, vars2, NULL, NULL,
+            NULL);
 
   double ot2[40] = { 224.226, 212.75,  209.616, 208.895, 210.468, 213.454, 218.091, 220.49,  220.977, 221.114,
                      220.731, 220.803, 223.595, 226.547, 230.566, 234.99,  239.411, 243.722, 248.125, 252.164,

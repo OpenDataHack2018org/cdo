@@ -245,8 +245,8 @@ defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double 
 }
 
 static int
-defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, double dx, double dy, double a,
-            double lon0, double lat0)
+defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, double dx, double dy, double a, double lon0,
+            double lat0)
 {
   UNUSED(xmax);
   UNUSED(ymin);
@@ -446,8 +446,8 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
     }
 
   if (cdoVerbose)
-    cdoPrint("  Region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g", region.xmin, region.xmax, region.ymin,
-             region.ymax, region.dx, region.dy);
+    cdoPrint("  Region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g", region.xmin, region.xmax, region.ymin, region.ymax,
+             region.dx, region.dy);
 
   H5Gclose(grp_id);
 
@@ -468,17 +468,16 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
       region.xmax = 8887500.0;
       region.ymin = -8887500.0;
       if (cdoVerbose)
-        cdoPrint("  Corrected region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g", region.xmin, region.xmax,
-                 region.ymin, region.ymax, region.dx, region.dy);
+        cdoPrint("  Corrected region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g", region.xmin, region.xmax, region.ymin,
+                 region.ymax, region.dx, region.dy);
 
       xsize = (int) lround((region.xmax - region.xmin) / region.dx);
       ysize = (int) lround((region.ymax - region.ymin) / region.dy);
       if (cdoVerbose) cdoPrint("  Corrected size: xsize=%d  ysize=%d", xsize, ysize);
     }
 
-  if (nx == 298 && ny == 371 && (int) region.xmin == -6709222 && (int) region.xmax == 6709222
-      && (int) region.ymin == -6664078 && (int) region.ymax == 9984898 && (int) region.dx == 45000
-      && (int) region.dy == 45000)
+  if (nx == 298 && ny == 371 && (int) region.xmin == -6709222 && (int) region.xmax == 6709222 && (int) region.ymin == -6664078
+      && (int) region.ymax == 9984898 && (int) region.dx == 45000 && (int) region.dy == 45000)
     {
       region.xmin = -6705000;
       region.xmax = 6705000;
@@ -524,8 +523,8 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
       proj.parameter[4] = -99.99;
       proj.parameter[5] = -99.99;
       if (cdoVerbose)
-        cdoPrint("proj1 = %g, proj2 = %g, proj3 = %g, proj4 = %g,", proj.parameter[0], proj.parameter[1],
-                 proj.parameter[2], proj.parameter[3]);
+        cdoPrint("proj1 = %g, proj2 = %g, proj3 = %g, proj4 = %g,", proj.parameter[0], proj.parameter[1], proj.parameter[2],
+                 proj.parameter[3]);
     }
 
   if (nx == xsize && ny == ysize && strcmp(proj.name, "sinusoidal") == 0 && strcmp(proj.ellipsoid, "WGS-84") == 0)
@@ -1097,12 +1096,10 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
       arrayMinMax(gridsize * nt, array, &minval, &maxval);
 
       if (cdoVerbose)
-        cdoPrint("Dataset %s: missval = %g  addoffset = %g  scalefactor = %g", varname, missval, addoffset,
-                 scalefactor);
+        cdoPrint("Dataset %s: missval = %g  addoffset = %g  scalefactor = %g", varname, missval, addoffset, scalefactor);
 
       if (cdoVerbose)
-        cdoPrint("Dataset %s: dtype = %d  minval = %g  maxval = %g  missval = %g", varname, dtype, minval, maxval,
-                 missval);
+        cdoPrint("Dataset %s: dtype = %d  minval = %g  maxval = %g  missval = %g", varname, dtype, minval, maxval, missval);
 
       if (dtype == CDI_DATATYPE_UINT8)
         {
@@ -1143,8 +1140,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
           }
 
       if (cdoVerbose)
-        cdoPrint("Dataset %s: dtype = %d  minval = %g  maxval = %g  missval = %g", varname, dtype, minval, maxval,
-                 missval);
+        cdoPrint("Dataset %s: dtype = %d  minval = %g  maxval = %g  missval = %g", varname, dtype, minval, maxval, missval);
 
       if (nmiss > 0)
         {

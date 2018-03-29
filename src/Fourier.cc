@@ -122,8 +122,7 @@ Fourier(void *process)
                 {
                   ompmem[ompthID].real[tsID] = vars[tsID][varID][levelID].ptr[2 * i];
                   ompmem[ompthID].imag[tsID] = vars[tsID][varID][levelID].ptr[2 * i + 1];
-                  if (DBL_IS_EQUAL(ompmem[ompthID].real[tsID], missval)
-                      || DBL_IS_EQUAL(ompmem[ompthID].imag[tsID], missval))
+                  if (DBL_IS_EQUAL(ompmem[ompthID].real[tsID], missval) || DBL_IS_EQUAL(ompmem[ompthID].imag[tsID], missval))
                     lmiss = 1;
                 }
 
@@ -132,8 +131,8 @@ Fourier(void *process)
                   if (lpower2) /* nts is a power of 2 */
                     fft(ompmem[ompthID].real.data(), ompmem[ompthID].imag.data(), nts, sign);
                   else
-                    ft_r(ompmem[ompthID].real.data(), ompmem[ompthID].imag.data(), nts, sign,
-                         ompmem[ompthID].work_r.data(), ompmem[ompthID].work_i.data());
+                    ft_r(ompmem[ompthID].real.data(), ompmem[ompthID].imag.data(), nts, sign, ompmem[ompthID].work_r.data(),
+                         ompmem[ompthID].work_i.data());
 
                   for (tsID = 0; tsID < nts; tsID++)
                     {

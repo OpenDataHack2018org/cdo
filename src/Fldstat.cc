@@ -39,8 +39,8 @@
 #include "percentiles.h"
 
 static void
-print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr,
-                  int vdate, int vtime)
+print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr, int vdate,
+                  int vtime)
 {
   static bool showHeader = true;
   int code = vlistInqVarCode(vlistID, varID);

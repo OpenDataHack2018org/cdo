@@ -88,8 +88,7 @@ Gengrid(void *process)
   arrayMinMax(gridsize, array1, &xminval, &xmaxval);
   arrayMinMax(gridsize, array2, &yminval, &ymaxval);
 
-  if (cdoVerbose)
-    cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g", xminval, xmaxval, yminval, ymaxval);
+  if (cdoVerbose) cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g", xminval, xmaxval, yminval, ymaxval);
 
   /* check units */
   if (xminval > -4 && xmaxval < 8 && yminval > -2 && ymaxval < 2)

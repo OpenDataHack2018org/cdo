@@ -599,13 +599,11 @@ Remapeta(void *process)
         {
           /* check range of ps_prog */
           arrayMinMaxMask(gridsize, ps1, imiss, &minval, &maxval);
-          if (minval < MIN_PS || maxval > MAX_PS)
-            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+          if (minval < MIN_PS || maxval > MAX_PS) cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           /* check range of geop */
           arrayMinMaxMask(gridsize, fis1, imiss, &minval, &maxval);
-          if (minval < MIN_FIS || maxval > MAX_FIS)
-            cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
+          if (minval < MIN_FIS || maxval > MAX_FIS) cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
         }
 
       if (lfis2 == false)
@@ -645,8 +643,8 @@ Remapeta(void *process)
       if (nvars3D || ltq)
         {
           if (cdoTimer) timer_start(timer_hetaeta);
-          hetaeta(ltq, gridsize, imiss, nhlevf1, a1, b1, fis1, ps1, t1, q1, nhlevf2, a2, b2, fis2, ps2, t2, q2, nvars3D,
-                  vars1, vars2, tscor, pscor, secor);
+          hetaeta(ltq, gridsize, imiss, nhlevf1, a1, b1, fis1, ps1, t1, q1, nhlevf2, a2, b2, fis2, ps2, t2, q2, nvars3D, vars1,
+                  vars2, tscor, pscor, secor);
           if (cdoTimer) timer_stop(timer_hetaeta);
         }
 

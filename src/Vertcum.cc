@@ -31,8 +31,7 @@
 #define IS_SURFACE_LEVEL(zaxisID) (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
 
 static void
-add_vars_mv(size_t gridsize, double missval, const double *restrict var1, const double *restrict var2,
-            double *restrict var3)
+add_vars_mv(size_t gridsize, double missval, const double *restrict var1, const double *restrict var2, double *restrict var3)
 {
   double missval1 = missval;
   double missval2 = missval;
@@ -133,10 +132,8 @@ Vertcum(void *process)
       varnmiss[varID] = (size_t *) Malloc(nlevs * sizeof(size_t));
       vardata1[varID] = (double **) Malloc(nlevs * sizeof(double *));
       vardata2[varID] = (double **) Malloc(nlevs2 * sizeof(double *));
-      for (levelID = 0; levelID < nlevs; ++levelID)
-        vardata1[varID][levelID] = (double *) Malloc(gridsize * sizeof(double));
-      for (levelID = 0; levelID < nlevs2; ++levelID)
-        vardata2[varID][levelID] = (double *) Malloc(gridsize * sizeof(double));
+      for (levelID = 0; levelID < nlevs; ++levelID) vardata1[varID][levelID] = (double *) Malloc(gridsize * sizeof(double));
+      for (levelID = 0; levelID < nlevs2; ++levelID) vardata2[varID][levelID] = (double *) Malloc(gridsize * sizeof(double));
     }
 
   int taxisID1 = vlistInqTaxis(vlistID1);

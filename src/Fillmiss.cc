@@ -29,7 +29,6 @@
 #include "grid_search.h"
 #include "cdoOptions.h"
 
-
 void
 fillmiss(field_type *field1, field_type *field2, int nfill)
 {
@@ -54,8 +53,7 @@ fillmiss(field_type *field1, field_type *field2, int nfill)
   globgrid = gridIsCircular(gridID);
 
   gridtype = gridInqType(gridID);
-  if (!(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN))
-    cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
+  if (!(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN)) cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
   matrix1 = (double **) Malloc(ny * sizeof(double *));
   matrix2 = (double **) Malloc(ny * sizeof(double *));
@@ -461,8 +459,8 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(knnWeights) shared( \
-    mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(knnWeights) shared(mindex, vindex, array1, array2, xvals, \
+                                                                                       yvals, gs, nmiss, numNeighbors)
 #endif
   for (size_t i = 0; i < nmiss; ++i)
     {

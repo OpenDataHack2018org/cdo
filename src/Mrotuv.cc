@@ -125,8 +125,7 @@ rotate_uv(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat, do
         if (cdoVerbose)
           {
             absold = sqrt(u_i[IX2D(j, i, ix)] * u_i[IX2D(j, i, ix)] + v_j[IX2D(j, i, ix)] * v_j[IX2D(j, i, ix)]);
-            absnew
-                = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)] + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
+            absnew = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)] + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
 
             if (i % 20 == 0 && j % 20 == 0 && absold > 0)
               {
@@ -142,8 +141,7 @@ rotate_uv(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat, do
 }
 
 void
-p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y, double *gridux, double *griduy, double *gridvx,
-             double *gridvy)
+p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y, double *gridux, double *griduy, double *gridvx, double *gridvy)
 {
   int i, j, jp1, ip1;
 
@@ -230,8 +228,7 @@ Mrotuv(void *process)
   size_t gridsize = gridInqSize(gridID1);
   if (gridID1 != gridID2) cdoAbort("Input grids differ!");
 
-  if (gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN
-      && gridInqType(gridID1) != GRID_CURVILINEAR)
+  if (gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN && gridInqType(gridID1) != GRID_CURVILINEAR)
     cdoAbort("Grid %s unsupported!", gridNamePtr(gridInqType(gridID1)));
 
   if (gridInqType(gridID1) != GRID_CURVILINEAR) gridID1 = gridToCurvilinear(gridID1, 0);
@@ -384,8 +381,7 @@ Mrotuv(void *process)
           for (size_t j = 0; j < nlat - 1; j++)
             for (size_t i = 0; i < nlon; i++)
               {
-                vfield[IX2D(j, i, nlon)]
-                    = (vhelp[IX2D(j, i + 1, nlon + 2)] + vhelp[IX2D(j + 1, i + 1, nlon + 2)]) * 0.5;
+                vfield[IX2D(j, i, nlon)] = (vhelp[IX2D(j, i + 1, nlon + 2)] + vhelp[IX2D(j + 1, i + 1, nlon + 2)]) * 0.5;
               }
 
           for (size_t i = 0; i < nlon; i++)

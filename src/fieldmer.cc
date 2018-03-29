@@ -233,9 +233,8 @@ meravgw(field_type field1, field_type *field2)
 }
 
 static void
-prevarsum_merw(const double *restrict array, const double *restrict w, size_t nx, size_t ny, size_t nmiss,
-               double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq,
-               double *restrict rsumwq)
+prevarsum_merw(const double *restrict array, const double *restrict w, size_t nx, size_t ny, size_t nmiss, double missval,
+               double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
 {
   *rsum = 0;
   *rsumq = 0;

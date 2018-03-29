@@ -117,8 +117,7 @@ Mergetime(void *process)
       for (int fileID = 0; fileID < nfiles; fileID++)
         {
           if (sf[fileID].streamID != -1)
-            if (next_fileID == -1 || sf[fileID].vdate < vdate
-                || (sf[fileID].vdate == vdate && sf[fileID].vtime < vtime))
+            if (next_fileID == -1 || sf[fileID].vdate < vdate || (sf[fileID].vdate == vdate && sf[fileID].vtime < vtime))
               {
                 next_fileID = fileID;
                 vdate = sf[fileID].vdate;
@@ -138,8 +137,8 @@ Mergetime(void *process)
             char vdatestr[32], vtimestr[32];
             date2str(vdate, vdatestr, sizeof(vdatestr));
             time2str(vtime, vtimestr, sizeof(vtimestr));
-            cdoPrint("Timestep %4d in stream %d (%s %s) already exists, skipped!", sf[fileID].tsID + 1,
-                     sf[fileID].streamID, vdatestr, vtimestr);
+            cdoPrint("Timestep %4d in stream %d (%s %s) already exists, skipped!", sf[fileID].tsID + 1, sf[fileID].streamID,
+                     vdatestr, vtimestr);
             process_timestep = false;
           }
 

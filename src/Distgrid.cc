@@ -288,8 +288,7 @@ Distgrid(void *process)
   for (int i = 0; i < ngrids; i++)
     {
       gridID1 = vlistGrid(vlistID1, i);
-      genGrids(gridID1, &grids[i].gridIDs[0], xinc, yinc, nxblocks, nyblocks, grids[i].gridindex, grids[i].gridsize,
-               nsplit);
+      genGrids(gridID1, &grids[i].gridIDs[0], xinc, yinc, nxblocks, nyblocks, grids[i].gridindex, grids[i].gridsize, nsplit);
       /*
       if ( cdoVerbose )
         for ( size_t index = 0; index < nsplit; index++ )

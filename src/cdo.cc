@@ -265,7 +265,8 @@ cdo_usage(void)
   fprintf(stderr, "    -f, --format <format>\n");
   fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
-  fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
+  fprintf(stderr,
+          "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h, --help     Help information for the operators\n");
   fprintf(stderr, "    --history      Do not append to NetCDF \"history\" global attribute\n");
   fprintf(stderr, "    --netcdf_hdr_pad, --hdr_pad, --header_pad <nbr>\n");
@@ -320,7 +321,8 @@ cdo_usage(void)
   fprintf(stderr, "        zip[_1-9]  Deflate compression of NetCDF4 variables\n");
 #ifdef HIRLAM_EXTENSIONS
   fprintf(stderr, "    --Dkext <debLev>   Setting debugLevel for extensions\n");
-  fprintf(stderr, "    --outputGribDataScanningMode <mode>   Setting grib scanning mode for data in output file <0, 64, 96>; Default is 64\n");
+  fprintf(stderr, "    --outputGribDataScanningMode <mode>   Setting grib scanning mode for data in output file <0, 64, 96>; "
+                  "Default is 64\n");
 #endif  // HIRLAM_EXTENSIONS
   reset_text_color(stderr);
   fprintf(stderr, "\n");
@@ -1240,8 +1242,7 @@ parse_options_long(int argc, char *argv[])
           else if (luse_fftw)
             {
               int intarg = parameter2int(CDO_optarg);
-              if (intarg != 0 && intarg != 1)
-                cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", intarg);
+              if (intarg != 0 && intarg != 1) cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", intarg);
               CDO_Use_FFTW = intarg;
             }
           else if (lpointsearchmethod)
@@ -1258,8 +1259,7 @@ parse_options_long(int argc, char *argv[])
           else if (lremap_genweights)
             {
               int intarg = parameter2int(CDO_optarg);
-              if (intarg != 0 && intarg != 1)
-                cdoAbort("Unsupported value for option --remap_genweights %d [0/1]", intarg);
+              if (intarg != 0 && intarg != 1) cdoAbort("Unsupported value for option --remap_genweights %d [0/1]", intarg);
               REMAP_genweights = intarg;
             }
           else if (lsortname)

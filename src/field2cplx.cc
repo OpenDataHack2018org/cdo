@@ -39,8 +39,8 @@ faraddcplx(field_type *field1, field_type field2)
 
   for (size_t i = 0; i < gridsize; i++)
     {
-      array1[2*i] = ADDMN(array1[2*i], array2[2*i]);
-      array1[2*i+1] = ADDMN(array1[2*i+1], array2[2*i+1]);
+      array1[2 * i] = ADDMN(array1[2 * i], array2[2 * i]);
+      array1[2 * i + 1] = ADDMN(array1[2 * i + 1], array2[2 * i + 1]);
     }
 }
 
@@ -63,8 +63,8 @@ farsubcplx(field_type *field1, field_type field2)
 
   for (size_t i = 0; i < gridsize; i++)
     {
-      array1[2*i] = SUBMN(array1[2*i], array2[2*i]);
-      array1[2*i+1] = SUBMN(array1[2*i+1], array2[2*i+1]);
+      array1[2 * i] = SUBMN(array1[2 * i], array2[2 * i]);
+      array1[2 * i + 1] = SUBMN(array1[2 * i + 1], array2[2 * i + 1]);
     }
 }
 
@@ -88,13 +88,12 @@ farmulcplx(field_type *field1, field_type field2)
   // z1 · z2 = (x1x2 - y1y2) + i(x1y2 + x2y1)
   for (size_t i = 0; i < gridsize; i++)
     {
-      double a1r = array1[2*i];
-      double a1i = array1[2*i+1];
-      array1[2*i] = SUBMN(MULMN(a1r, array2[2*i]), MULMN(a1i, array2[2*i+1]));
-      array1[2*i+1] = ADDMN(MULMN(a1r, array2[2*i+1]), MULMN(a1i, array2[2*i]));
+      double a1r = array1[2 * i];
+      double a1i = array1[2 * i + 1];
+      array1[2 * i] = SUBMN(MULMN(a1r, array2[2 * i]), MULMN(a1i, array2[2 * i + 1]));
+      array1[2 * i + 1] = ADDMN(MULMN(a1r, array2[2 * i + 1]), MULMN(a1i, array2[2 * i]));
     }
 }
-
 
 static void
 fardivcplx(field_type *field1, field_type field2)
@@ -116,11 +115,11 @@ fardivcplx(field_type *field1, field_type field2)
   // z1 / z2 = (x1x2 + y1y2) / (x2x2 + y2y2) + i (y1x2 - x1y2) / (x2x2 + y2y2)
   for (size_t i = 0; i < gridsize; i++)
     {
-      double a1r = array1[2*i];
-      double a1i = array1[2*i+1];
-      double denominator = ADDMN(MULMN(array2[2*i], array2[2*i]), MULMN(array2[2*i+1], array2[2*i+1]));
-      array1[2*i] = DIVMN(ADDMN(MULMN(a1r, array2[2*i]), MULMN(a1i, array2[2*i+1])), denominator);
-      array1[2*i+1] = DIVMN(SUBMN(MULMN(a1i, array2[2*i]), MULMN(a1r, array2[2*i+1])), denominator);
+      double a1r = array1[2 * i];
+      double a1i = array1[2 * i + 1];
+      double denominator = ADDMN(MULMN(array2[2 * i], array2[2 * i]), MULMN(array2[2 * i + 1], array2[2 * i + 1]));
+      array1[2 * i] = DIVMN(ADDMN(MULMN(a1r, array2[2 * i]), MULMN(a1i, array2[2 * i + 1])), denominator);
+      array1[2 * i + 1] = DIVMN(SUBMN(MULMN(a1i, array2[2 * i]), MULMN(a1r, array2[2 * i + 1])), denominator);
     }
 }
 

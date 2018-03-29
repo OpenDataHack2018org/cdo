@@ -269,8 +269,7 @@ DestaggerUV()
       for (int i = 2; i < (2 + 2); i++) destagGridOffsets[i - 2] = parameter2double(operatorArgv()[i]);
     }
 
-  if (CdoDebug::cdoDebugExt)
-    cdoPrint("destagGridOffsets = (%01.1f,%01.1f)", destagGridOffsets[0], destagGridOffsets[1]);
+  if (CdoDebug::cdoDebugExt) cdoPrint("destagGridOffsets = (%01.1f,%01.1f)", destagGridOffsets[0], destagGridOffsets[1]);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -796,11 +795,10 @@ rot_uv_north(int gridID, double *us, double *vs)
     }
 
   if (CdoDebug::cdoDebugExt)
-    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%zu * %zu)", __func__,
-             gridNamePtr(gridInqType(gridID)), nx, ny);
+    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%zu * %zu)", __func__, gridNamePtr(gridInqType(gridID)), nx,
+             ny);
 
-  if (gridInqSize(gridID) != (nx * ny))
-    cdoAbort("Incorrect gridsize (%zu) != nx*ny (%zu * %zu)", gridInqSize(gridID), nx, ny);
+  if (gridInqSize(gridID) != (nx * ny)) cdoAbort("Incorrect gridsize (%zu) != nx*ny (%zu * %zu)", gridInqSize(gridID), nx, ny);
 // this should never happen
 
 #define OPTrotuvNorth 1  // ACTIVATE SPEED - OPTIMIZATION
@@ -920,8 +918,7 @@ rot_uv_north(int gridID, double *us, double *vs)
             zpntEastSph -= zpnt0Sph;                            // make vectors from points
             NormVector(xpntEastSph, ypntEastSph, zpntEastSph);  // vecx
             // vecz = CrossProd(vecx,vecy)
-            CrossProd(xpntEastSph, ypntEastSph, zpntEastSph, xpntNorthSph, ypntNorthSph, zpntNorthSph, xnormSph,
-                      ynormSph,
+            CrossProd(xpntEastSph, ypntEastSph, zpntEastSph, xpntNorthSph, ypntNorthSph, zpntNorthSph, xnormSph, ynormSph,
                       znormSph);  // vec z
 #else
             xnormSph = xpnt0Sph;
@@ -956,11 +953,10 @@ rot_uv_north(int gridID, double *us, double *vs)
             //            xpntEastSph,  ypntEastSphRot,  zpntEastSphRot );
             //            //vecxRot = CrossProd(vecy,vecz)
 
-            vecAngle = acos(
-                (xpntNorthSph * xpntNorthSphRot + ypntNorthSph * ypntNorthSphRot + zpntNorthSph * zpntNorthSphRot));
+            vecAngle = acos((xpntNorthSph * xpntNorthSphRot + ypntNorthSph * ypntNorthSphRot + zpntNorthSph * zpntNorthSphRot));
             // Determine the sign of the angle
-            CrossProd(xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot, xpntNorthSph, ypntNorthSph, zpntNorthSph,
-                      xncross, yncross, zncross);
+            CrossProd(xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot, xpntNorthSph, ypntNorthSph, zpntNorthSph, xncross,
+                      yncross, zncross);
             if ((xncross * xnormSph + yncross * ynormSph + zncross * znormSph) > 0.0)  // dotProduct
               vecAngle *= -1.0;
 
@@ -996,8 +992,7 @@ rot_uv_north(int gridID, double *us, double *vs)
                            "(lon_pntNorth, lat_pntNorth) = [%3.6f,%3.6f]; "
                            "dLonNorth=%3.6f; dLatNorth=%3.6f (Northing grid "
                            "relative) ",
-                           i, j, lon_pnt0, lat_pnt0, lon_pntNorth, lat_pntNorth, RAD2DEG * dLonNorth,
-                           RAD2DEG * dLatNorth);
+                           i, j, lon_pnt0, lat_pnt0, lon_pntNorth, lat_pntNorth, RAD2DEG * dLonNorth, RAD2DEG * dLatNorth);
                   cdoPrint("grid point [%zu,%zu] with latlon[%3.6f,%3.6f]; "
                            "(lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; "
                            "dLonEast =%3.6f; dLatEast =%3.6f (Easting grid "
@@ -1141,8 +1136,7 @@ project_uv_latlon(int gridID, double *us, double *vs)
   // vectors. This function expectes scaning-mode 64.
 
   if (gridInqType(gridID) != GRID_CURVILINEAR)
-    cdoAbort("%s(gridname=%s) transformation grid must be GRID_CURVILINEAR!", __func__,
-             gridNamePtr(gridInqType(gridID)));
+    cdoAbort("%s(gridname=%s) transformation grid must be GRID_CURVILINEAR!", __func__, gridNamePtr(gridInqType(gridID)));
   // this should never happen
 
   double xpnt0, ypnt0;
@@ -1170,11 +1164,10 @@ project_uv_latlon(int gridID, double *us, double *vs)
   int signLat = ((yvals[1] - yvals[0]) < 0) ? -1 : 1;
 
   if (CdoDebug::cdoDebugExt)
-    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%zu * %zu)", __func__,
-             gridNamePtr(gridInqType(gridID)), nx, ny);
+    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%zu * %zu)", __func__, gridNamePtr(gridInqType(gridID)), nx,
+             ny);
 
-  if (gridInqSize(gridID) != (nx * ny))
-    cdoAbort("Incorrect gridsize (%zu) != nx*ny (%zu * %zu)", gridInqSize(gridID), nx, ny);
+  if (gridInqSize(gridID) != (nx * ny)) cdoAbort("Incorrect gridsize (%zu) != nx*ny (%zu * %zu)", gridInqSize(gridID), nx, ny);
   // this should never happen
 
   for (j = 0; j < ny; j++)
@@ -1580,12 +1573,10 @@ TransformUV(int operatorID)
                                 gridInqParamRLL(gridID, &xpole, &ypole, &angle);
 
                               cdoPrint("GRID_PROJECTION(id: %d) && CDI_PROJ_RLL:", gridID);
-                              cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridID),
-                                       gridInqYsize(gridID));
+                              cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridID), gridInqYsize(gridID));
                               cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridID, 0),
                                        gridInqYval(gridID, 0));
-                              cdoPrint("grid Xinc   %4.3f, grid Yinc   %4.3f", gridInqXinc(gridID),
-                                       gridInqYinc(gridID));
+                              cdoPrint("grid Xinc   %4.3f, grid Yinc   %4.3f", gridInqXinc(gridID), gridInqYinc(gridID));
                               cdoPrint("grid Xpole   %4.3f, grid Ypole   %4.3f", xpole, ypole);
                               cdoPrint("GRID_CURVILINEAR (id: %d):", gridIDcurvl);
                               cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridIDcurvl),

@@ -26,8 +26,8 @@
 #include "libncl.h"
 
 static void
-uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev,
-            int boundOpt, double *div)
+uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev, int boundOpt,
+            double *div)
 {
   int ierror;
 
@@ -56,8 +56,8 @@ uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size
 }
 
 static void
-uv2vr_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev,
-            int boundOpt, double *vort)
+uv2vr_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev, int boundOpt,
+            double *vort)
 {
   int ierror;
 

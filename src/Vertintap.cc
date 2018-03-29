@@ -182,14 +182,11 @@ Vertintap(void *process)
   if (cdoVerbose)
     {
       cdoPrint("Found:");
-      if (psID != -1)
-        cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
-      if (apressID != -1)
-        cdoPrint("  %s -> %s", var_stdname(air_pressure), cdoVlistInqVarName(vlistID1, apressID, varname));
+      if (psID != -1) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
+      if (apressID != -1) cdoPrint("  %s -> %s", var_stdname(air_pressure), cdoVlistInqVarName(vlistID1, apressID, varname));
       if (dpressID != -1)
         cdoPrint("  %s -> %s", var_stdname(pressure_thickness), cdoVlistInqVarName(vlistID1, dpressID, varname));
-      if (tempID != -1)
-        cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
+      if (tempID != -1) cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
     }
 
   if (apressID == -1) cdoAbort("%s not found!", var_stdname(air_pressure));
@@ -294,8 +291,7 @@ Vertintap(void *process)
 
       vardata1[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
 
-      if (zaxisID == zaxisIDh
-          || (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)))
+      if (zaxisID == zaxisIDh || (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)))
         {
           varinterp[varID] = true;
           vardata2[varID] = (double *) Malloc(gridsize * nplev * sizeof(double));
@@ -392,8 +388,7 @@ Vertintap(void *process)
           /* check range of ps_prog */
           double minval, maxval;
           arrayMinMaxMask(gridsize, &ps_prog[0], NULL, &minval, &maxval);
-          if (minval < MIN_PS || maxval > MAX_PS)
-            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+          if (minval < MIN_PS || maxval > MAX_PS) cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           arrayCopy(gridsize * nhlevf, vardata1[apressID], &full_press[0]);
 
@@ -443,8 +438,7 @@ Vertintap(void *process)
                       if (varnmiss[varID][levelID]) cdoAbort("Missing values unsupported for this operator!");
                     }
 
-                  interp_X(vardata1[varID], vardata2[varID], hyb_press, &vert_index[0], plev, nplev, gridsize, nlevel,
-                           missval);
+                  interp_X(vardata1[varID], vardata2[varID], hyb_press, &vert_index[0], plev, nplev, gridsize, nlevel, missval);
 
                   if (!extrapolate) arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);
                 }

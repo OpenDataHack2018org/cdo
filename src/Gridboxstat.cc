@@ -279,8 +279,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                 if (!c_flag[corner]) break;
                               on_up = grid1_corner_lon[4 * g1_add + corner];
                               ax_le = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3)
-                                cdoWarning("found two matching corners!");
+                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
                             }
 
                           /* upper right cell */
@@ -314,8 +313,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                 if (!c_flag[corner]) break;
                               ox_up = grid1_corner_lon[4 * g1_add + corner];
                               ax_ri = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3)
-                                cdoWarning("found two matching corners!");
+                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
                             }
 
                           /* lower right cell */
@@ -350,8 +348,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                 if (!c_flag[corner]) break;
                               ox_lo = grid1_corner_lon[4 * g1_add + corner];
                               an_ri = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3)
-                                cdoWarning("found two matching corners!");
+                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
                             }
 
                           /* lower left cell */
@@ -386,8 +383,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                 if (!c_flag[corner]) break;
                               on_lo = grid1_corner_lon[4 * g1_add + corner];
                               an_le = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3)
-                                cdoWarning("found two matching corners!");
+                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
                             }
                         } /* if ( gridHasBounds) */
                     }     /* for ( x1 = x2*xinc; x1 < xinc*(x2+1) ; x1++ ) */

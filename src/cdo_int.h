@@ -91,9 +91,10 @@ enum T_EIGEN_MODE
 #endif
 
 template <typename T>
-inline void vectorFree(std::vector<T> &v)
+inline void
+vectorFree(std::vector<T> &v)
 {
-  if ( v.size() )
+  if (v.size())
     {
       v.clear();
       v.shrink_to_fit();

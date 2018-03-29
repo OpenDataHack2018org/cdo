@@ -73,8 +73,7 @@ mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, d
         for (n = ilev; n < nlev - 1; n++)
           for (ilat = 0; ilat < nlat; ilat++)
             {
-              field2[ilev][ilat]
-                  += fact * (field1[n][ilat] + field1[n + 1][ilat]) * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
+              field2[ilev][ilat] += fact * (field1[n][ilat] + field1[n + 1][ilat]) * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
             }
     }
   else

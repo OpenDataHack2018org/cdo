@@ -138,12 +138,8 @@ namelistbuf_to_pmlist(listbuf_t *listbuf)
         case NAMELIST_ERROR_INTYP:
           fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", name, p->lineno);
           break;
-        case NAMELIST_ERROR_INOBJ:
-          fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", name, p->lineno);
-          break;
-        case NAMELIST_ERROR_EMKEY:
-          fprintf(stderr, "Namelist error: Emtry key name in %s (line=%d)!\n", name, p->lineno);
-          break;
+        case NAMELIST_ERROR_INOBJ: fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", name, p->lineno); break;
+        case NAMELIST_ERROR_EMKEY: fprintf(stderr, "Namelist error: Emtry key name in %s (line=%d)!\n", name, p->lineno); break;
         default: fprintf(stderr, "Namelist error in %s (line=%d)!\n", name, p->lineno); break;
         }
       cdoAbort("Namelist error!");

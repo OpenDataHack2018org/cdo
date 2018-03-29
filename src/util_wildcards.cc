@@ -117,15 +117,17 @@ expandWildCards(std::vector<std::string> argv)
       if (argv[idx][0] != '-' && argv[idx].find_first_of("*?") != std::string::npos)
         {
           int status = wordexp(argv[idx].c_str(), &glob_results, flags);
-          if ( status != 0 )
+          if (status != 0)
             {
               fprintf(stderr, "%s: ", __func__);
-              if ( status == WRDE_BADCHAR )
-                fprintf(stderr, "Argument '%s' contains one of the following unsupported unquoted characters: <newline>, `|', `&', `;', `<', `>', `(', `)', `{', `}'.\n", argv[idx].c_str());
-              else if ( status == WRDE_NOSPACE )
-                fprintf(stderr, "Not enough memory to store the result.\n");               
-              else if ( status == WRDE_SYNTAX )
-                fprintf(stderr, "Shell syntax error in '%s'\n", argv[idx].c_str());               
+              if (status == WRDE_BADCHAR)
+                fprintf(stderr, "Argument '%s' contains one of the following unsupported unquoted characters: <newline>, `|', "
+                                "`&', `;', `<', `>', `(', `)', `{', `}'.\n",
+                        argv[idx].c_str());
+              else if (status == WRDE_NOSPACE)
+                fprintf(stderr, "Not enough memory to store the result.\n");
+              else if (status == WRDE_SYNTAX)
+                fprintf(stderr, "Shell syntax error in '%s'\n", argv[idx].c_str());
               else
                 fprintf(stderr, "wordexp() returns an error.\n");
               exit(EXIT_FAILURE);

@@ -42,18 +42,18 @@ typedef struct
 static int
 cmpx(const void *a, const void *b)
 {
-  const double x = ((const xyinfoType *)a)->x;
-  const double y = ((const xyinfoType *)b)->x;
+  const double x = ((const xyinfoType *) a)->x;
+  const double y = ((const xyinfoType *) b)->x;
   return ((x > y) - (x < y)) * 2 + (x > y) - (x < y);
 }
 
 static int
 cmpxy_lt(const void *a, const void *b)
 {
-  const double x1 = ((const xyinfoType *)a)->x;
-  const double x2 = ((const xyinfoType *)b)->x;
-  const double y1 = ((const xyinfoType *)a)->y;
-  const double y2 = ((const xyinfoType *)b)->y;
+  const double x1 = ((const xyinfoType *) a)->x;
+  const double x2 = ((const xyinfoType *) b)->x;
+  const double y1 = ((const xyinfoType *) a)->y;
+  const double y2 = ((const xyinfoType *) b)->y;
 
   int cmp = 0;
   if (y1 < y2 || (!(fabs(y1 - y2) > 0) && x1 < x2))
@@ -67,10 +67,10 @@ cmpxy_lt(const void *a, const void *b)
 static int
 cmpxy_gt(const void *a, const void *b)
 {
-  const double x1 = ((const xyinfoType *)a)->x;
-  const double x2 = ((const xyinfoType *)b)->x;
-  const double y1 = ((const xyinfoType *)a)->y;
-  const double y2 = ((const xyinfoType *)b)->y;
+  const double x1 = ((const xyinfoType *) a)->x;
+  const double x2 = ((const xyinfoType *) b)->x;
+  const double y1 = ((const xyinfoType *) a)->y;
+  const double y2 = ((const xyinfoType *) b)->y;
 
   int cmp = 0;
   if (y1 > y2 || (!(fabs(y1 - y2) > 0) && x1 < x2))
@@ -474,8 +474,7 @@ Collgrid(void *process)
       for (int recID = 0; recID < nrecs0; recID++)
         {
           pstreamInqRecord(ef[0].streamID, &varID, &levelID);
-          if (cdoVerbose && tsID == 0)
-            printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
+          if (cdoVerbose && tsID == 0) printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
 
           for (int fileID = 1; fileID < nfiles; fileID++)
             {

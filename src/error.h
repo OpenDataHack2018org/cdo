@@ -64,8 +64,8 @@ void Message_(const char *caller, const char *fmt, ...);
 #define __attribute__(x) /*NOTHING*/
 #endif
 
-void cdiAbortC(const char *caller, const char *filename, const char *functionname, int line, const char *errorString,
-               ...) __attribute__((noreturn));
+void cdiAbortC(const char *caller, const char *filename, const char *functionname, int line, const char *errorString, ...)
+    __attribute__((noreturn));
 #define xabortC(caller, ...) cdiAbortC(caller, __FILE__, __func__, __LINE__, __VA_ARGS__)
 #define xabort(...) cdiAbortC(NULL, __FILE__, __func__, __LINE__, __VA_ARGS__)
 #define cdiAbort(file, func, line, ...) cdiAbortC(NULL, (file), (func), (line), __VA_ARGS__)
@@ -83,8 +83,8 @@ void cdiAbortC(const char *caller, const char *filename, const char *functionnam
     }                                            \
   while (0)
 
-void cdiAbortC_serial(const char *caller, const char *filename, const char *functionname, int line,
-                      const char *errorString, va_list ap) __attribute__((noreturn));
+void cdiAbortC_serial(const char *caller, const char *filename, const char *functionname, int line, const char *errorString,
+                      va_list ap) __attribute__((noreturn));
 
 #if defined(__cplusplus)
 }

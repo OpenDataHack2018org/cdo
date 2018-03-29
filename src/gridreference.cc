@@ -272,8 +272,7 @@ referenceToGrid(int gridID1)
           int number1 = gridInqNumber(gridID1);
           int number2 = gridInqNumber(gridID2);
 
-          if (number1 > 0 && number2 > 0 && number1 != number2)
-            cdoWarning("Number of grid used of horizontal grids differ!");
+          if (number1 > 0 && number2 > 0 && number1 != number2) cdoWarning("Number of grid used of horizontal grids differ!");
         }
     }
 

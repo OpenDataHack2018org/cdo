@@ -21,8 +21,7 @@
 #include "griddes.h"
 #include "util_string.h"
 
-size_t genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yvals, double **xbounds,
-                          double **ybounds);
+size_t genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yvals, double **xbounds, double **ybounds);
 
 static void
 gen_grid_icosphere(griddes_t *grid, const char *pline)
@@ -154,8 +153,7 @@ gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, dou
 
   grid->type = gridtype;
 
-  if (lon1 >= lon2 || lat1 >= lat2)
-    cdoAbort("Invalid grid box: lon1=%g lon2=%g lat1=%g lat2=%g", lon1, lon2, lat1, lat2);
+  if (lon1 >= lon2 || lat1 >= lat2) cdoAbort("Invalid grid box: lon1=%g lon2=%g lat1=%g lat2=%g", lon1, lon2, lat1, lat2);
 
   size_t nlon = (size_t)((lon2 - lon1) / inc + 0.5);
   size_t nlat = (size_t)((lat2 - lat1) / inc + 0.5);

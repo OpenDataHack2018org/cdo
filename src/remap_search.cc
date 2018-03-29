@@ -256,7 +256,8 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src
           size_t i = addr - j * nx;
           if (k == 0 || k == 2) i = (i > 0) ? i - 1 : src_grid->is_cyclic ? nx - 1 : 0;
           if (k == 0 || k == 1) j = (j > 0) ? j - 1 : 0;
-          if (point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon, src_center_lat))
+          if (point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon,
+                            src_center_lat))
             {
               search_result = 1;
               return search_result;

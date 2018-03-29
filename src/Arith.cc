@@ -123,8 +123,7 @@ Arith(void *process)
       else
         {
           filltype = FILL_VARTS;
-          cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.",
-                   cdoGetStreamName(1).c_str());
+          cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.", cdoGetStreamName(1).c_str());
         }
     }
   else if (lfill1)
@@ -139,8 +138,7 @@ Arith(void *process)
       else
         {
           filltype = FILL_VARTS;
-          cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.",
-                   cdoGetStreamName(0).c_str());
+          cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.", cdoGetStreamName(0).c_str());
         }
       streamIDx1 = streamID2;
       streamIDx2 = streamID1;
@@ -154,8 +152,8 @@ Arith(void *process)
   if (filltype == FILL_NONE) vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
   size_t nwpv = (vlistNumber(vlistIDx1) == CDI_COMP && vlistNumber(vlistIDx2) == CDI_COMP) ? 2 : 1;
-  if ( nwpv == 2 && opercplx == false ) cdoAbort("Fields with complex numbers are not supported by this operator!");
-  size_t gridsizemax = nwpv*vlistGridsizeMax(vlistIDx1);
+  if (nwpv == 2 && opercplx == false) cdoAbort("Fields with complex numbers are not supported by this operator!");
+  size_t gridsizemax = nwpv * vlistGridsizeMax(vlistIDx1);
 
   field_init(&field1);
   field_init(&field2);
@@ -196,7 +194,7 @@ Arith(void *process)
           varnmiss.resize(nvars);
           for (varID = 0; varID < nvars; varID++)
             {
-              size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+              size_t gridsize = nwpv * gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
               int nlev = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
               vardata[varID].resize(nlev * gridsize);
               varnmiss[varID].resize(nlev);
@@ -276,14 +274,14 @@ Arith(void *process)
 
               if (filltype == FILL_TS)
                 {
-                  size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+                  size_t gridsize = nwpv * gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
                   size_t offset = gridsize * levelID;
                   arrayCopy(gridsize, fieldx2->ptr, &vardata[varID][offset]);
                   varnmiss[varID][levelID] = fieldx2->nmiss;
                 }
               else if (lstatus && (filltype == FILL_VAR || filltype == FILL_VARTS))
                 {
-                  size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
+                  size_t gridsize = nwpv * gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
                   size_t offset = gridsize * levelID2;
                   arrayCopy(gridsize, fieldx2->ptr, &vardata2[offset]);
                   varnmiss2[levelID2] = fieldx2->nmiss;
@@ -291,7 +289,7 @@ Arith(void *process)
             }
           else if (filltype == FILL_TS)
             {
-              size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, varID2));
+              size_t gridsize = nwpv * gridInqSize(vlistInqVarGrid(vlistIDx2, varID2));
               size_t offset = gridsize * levelID;
               arrayCopy(gridsize, &vardata[varID][offset], fieldx2->ptr);
               fieldx2->nmiss = varnmiss[varID][levelID];
@@ -303,7 +301,7 @@ Arith(void *process)
           if (filltype == FILL_VAR || filltype == FILL_VARTS)
             {
               levelID2 = (nlevels2 > 1) ? levelID : 0;
-              size_t gridsize = nwpv*gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
+              size_t gridsize = nwpv * gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
               size_t offset = gridsize * levelID2;
               arrayCopy(gridsize, &vardata2[offset], fieldx2->ptr);
               fieldx2->nmiss = varnmiss2[levelID2];
@@ -316,7 +314,7 @@ Arith(void *process)
               fieldx2->missval = vlistInqVarMissval(vlistIDx2, varID2);
             }
 
-          if ( nwpv == 2 )
+          if (nwpv == 2)
             farfuncplx(&field1, field2, operfunc);
           else
             farfun(&field1, field2, operfunc);

@@ -144,8 +144,8 @@ util_diff_real_time(void *it1, void *it2, double *t)
   tb1 = (struct timebasestruct *) it1;
   tb2 = (struct timebasestruct *) it2;
 
-  *t = aix_rt_tconv * (aix_rt_fhigh * ((double) (tb2->tb_high - tb1->tb_high))
-                       + 1.0e-9 * ((double) tb2->tb_low - (double) tb1->tb_low));
+  *t = aix_rt_tconv
+       * (aix_rt_fhigh * ((double) (tb2->tb_high - tb1->tb_high)) + 1.0e-9 * ((double) tb2->tb_low - (double) tb1->tb_low));
 }
 
 #elif defined(_HIGH_RESOLUTION_TIMER) && (defined(SX) || defined(ES))

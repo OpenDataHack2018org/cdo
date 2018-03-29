@@ -253,8 +253,7 @@ Derivepar(void *process)
       if (geopotID == -1)
         cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
       else
-        cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential),
-                 var_stdname(geopotential));
+        cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
 
       arrayFill(gridsize, sgeopot, 0.0);
     }
@@ -348,13 +347,11 @@ Derivepar(void *process)
         {
           /* check range of ps_prog */
           arrayMinMaxMask(gridsize, ps, NULL, &minval, &maxval);
-          if (minval < MIN_PS || maxval > MAX_PS)
-            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+          if (minval < MIN_PS || maxval > MAX_PS) cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           /* check range of surface geopot */
           arrayMinMaxMask(gridsize, sgeopot, NULL, &minval, &maxval);
-          if (minval < MIN_FIS || maxval > MAX_FIS)
-            cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
+          if (minval < MIN_FIS || maxval > MAX_FIS) cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
         }
 
       varID = tempID;

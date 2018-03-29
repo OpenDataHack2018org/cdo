@@ -170,8 +170,8 @@ cellsearch_new(grid_type *src_grid, grid_type *tgt_grid)
 
   float *src_cell_bound_box = (float *) Malloc(4 * src_grid->size * sizeof(double));
 
-  boundbox_from_corners(src_grid->size, src_grid->num_cell_corners, src_grid->cell_corner_lon,
-                        src_grid->cell_corner_lat, src_cell_bound_box);
+  boundbox_from_corners(src_grid->size, src_grid->num_cell_corners, src_grid->cell_corner_lon, src_grid->cell_corner_lat,
+                        src_cell_bound_box);
 
   cellsearch->src_cell_bound_box = src_cell_bound_box;
 
@@ -192,8 +192,8 @@ search_cells(cellsearch_type *cellsearch, long tgt_cell_add, long *srch_add)
   float *src_cell_bound_box = cellsearch->src_cell_bound_box;
   float tgt_cell_bound_box[4];
 
-  boundbox_from_corners1r(tgt_cell_add, tgt_grid->num_cell_corners, tgt_grid->cell_corner_lon,
-                          tgt_grid->cell_corner_lat, tgt_cell_bound_box);
+  boundbox_from_corners1r(tgt_cell_add, tgt_grid->num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
+                          tgt_cell_bound_box);
 
   long src_cell_addm4;
 

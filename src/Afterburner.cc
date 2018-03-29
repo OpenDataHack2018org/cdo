@@ -825,8 +825,8 @@ after_setLevel(struct Control *globs)
   double level;
   bool checkLevel = true;
   int numplevelDefault; /* default pressure level */
-  long plevelDefault[] = { 100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000,
-                           20000,  15000, 10000, 7000,  5000,  3000,  2000,  1000 };
+  long plevelDefault[]
+      = { 100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000, 10000, 7000, 5000, 3000, 2000, 1000 };
   int numhlevelDefault; /* default height level */
   long hlevelDefault[] = { 0, 1000, 2000, 5000, 10000, 15000, 20000, 25000, 30000 };
 
@@ -919,8 +919,7 @@ after_setLevel(struct Control *globs)
     }
 
   if (globs->Verbose && iVertID != -1)
-    for (l = 0; l < globs->NumLevelRequest; l++)
-      fprintf(stdout, "  Level %2d = %13.4f\n", l + 1, globs->LevelRequest[l]);
+    for (l = 0; l < globs->NumLevelRequest; l++) fprintf(stdout, "  Level %2d = %13.4f\n", l + 1, globs->LevelRequest[l]);
 
   if (checkLevel)
     {
@@ -931,8 +930,7 @@ after_setLevel(struct Control *globs)
           for (l = k + 1; l < globs->NumLevelRequest; l++)
             if (removeLevel[l] == FALSE && IS_EQUAL(level, globs->LevelRequest[l]))
               {
-                if (globs->Verbose)
-                  fprintf(stdout, "  Level %2d = %13.4f double request\n", l + 1, globs->LevelRequest[l]);
+                if (globs->Verbose) fprintf(stdout, "  Level %2d = %13.4f double request\n", l + 1, globs->LevelRequest[l]);
                 removeLevel[l] = TRUE;
               }
         }
@@ -1586,8 +1584,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
                     }
 
                   if (numlevel != (globs->nvct / 2 - 1))
-                    Error("Number of hybrid levels %d does not match VCT levels %d",
-                          numlevel, globs->nvct / 2 - 1);
+                    Error("Number of hybrid levels %d does not match VCT levels %d", numlevel, globs->nvct / 2 - 1);
 
                   if (globs->Debug)
                     for (i = 0; i < globs->nvct / 2; i++)
@@ -1664,8 +1661,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
       vars[code].detected = TRUE;
 
       if (globs->Debug)
-        fprintf(stderr, "Code %3d  Levels = %3d  LevelType = %3d  GridType = %3d\n", code, numlevel, leveltype,
-                gridtype);
+        fprintf(stderr, "Code %3d  Levels = %3d  LevelType = %3d  GridType = %3d\n", code, numlevel, leveltype, gridtype);
     }
 
   if (globs->Debug) Message("FieldDim = %d", FieldDim);
@@ -1713,8 +1709,8 @@ after_postcntl(struct Control *globs, struct Variable *vars)
           gridID = vars[code].igridID;
           zaxisID = vars[code].izaxisID;
           zaxisName(zaxisInqType(zaxisID), zaxistypename);
-          fprintf(stderr, " Detected Code %3d  grid %-8s size %5zu  level %2d %-8s\n", code,
-                  gridNamePtr(gridInqType(gridID)), gridInqSize(gridID), zaxisInqSize(zaxisID), zaxistypename);
+          fprintf(stderr, " Detected Code %3d  grid %-8s size %5zu  level %2d %-8s\n", code, gridNamePtr(gridInqType(gridID)),
+                  gridInqSize(gridID), zaxisInqSize(zaxisID), zaxistypename);
         }
 
   if (globs->Debug) lprintf(stdout);
@@ -1816,8 +1812,8 @@ after_postcntl(struct Control *globs, struct Variable *vars)
           gridID = vars[code].ogridID;
           zaxisID = vars[code].ozaxisID;
           zaxisName(zaxisInqType(zaxisID), zaxistypename);
-          fprintf(stderr, " Selected Code %3d  grid %-8s size %5zu  level %2d %-8s\n", code,
-                  gridNamePtr(gridInqType(gridID)), gridInqSize(gridID), zaxisInqSize(zaxisID), zaxistypename);
+          fprintf(stderr, " Selected Code %3d  grid %-8s size %5zu  level %2d %-8s\n", code, gridNamePtr(gridInqType(gridID)),
+                  gridInqSize(gridID), zaxisInqSize(zaxisID), zaxistypename);
         }
 }
 
@@ -1925,8 +1921,7 @@ static void
 after_printCodes(void)
 {
   int tableID = tableInq(-1, 128, "echam4");
-  int codes[]
-      = { 34, 35, 36, 131, 132, 135, 148, 149, 151, 156, 157, 259, 260, 261, 262, 263, 264, 268, 269, 270, 271, 275 };
+  int codes[] = { 34, 35, 36, 131, 132, 135, 148, 149, 151, 156, 157, 259, 260, 261, 262, 263, 264, 268, 269, 270, 271, 275 };
 
   int ncodes = sizeof(codes) / sizeof(codes[0]);
 
@@ -2145,9 +2140,8 @@ after_processing(struct Control *globs, struct Variable *vars)
   else
     filename++;
 
-  if (globs->Type >= 30 && globs->Type < 50
-      && (vars[DIVERGENCE].selected || vars[VELOPOT].selected || vars[VORTICITY].selected || vars[STREAM].selected
-          || globs->AnalysisData))
+  if (globs->Type >= 30 && globs->Type < 50 && (vars[DIVERGENCE].selected || vars[VELOPOT].selected || vars[VORTICITY].selected
+                                                || vars[STREAM].selected || globs->AnalysisData))
     {
       /*
       int newtype = 0;
@@ -2159,8 +2153,8 @@ after_processing(struct Control *globs, struct Variable *vars)
       if (globs->AnalysisData)
         fprintf(stderr, "\n TYPE changed to %d (for analysis data)\n", globs->Type);
       else
-        fprintf(stderr, "\n TYPE changed to %d (with code %d, %d, %d or %d)\n", globs->Type, DIVERGENCE, VELOPOT,
-                VORTICITY, STREAM);
+        fprintf(stderr, "\n TYPE changed to %d (with code %d, %d, %d or %d)\n", globs->Type, DIVERGENCE, VELOPOT, VORTICITY,
+                STREAM);
       /*
       if ( globs->Type == 30 ) newtype = 70;
       if ( globs->Type == 40 ) newtype = 60;

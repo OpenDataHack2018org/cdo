@@ -384,16 +384,15 @@ dumpmap()
     {
       printf("num: %d\n", indx.intnum);
       for (i = 0; i < indx.intnum / 3; i++)
-        printf("%3d %8d %6d %4d %8g %10g %8g\n", i + 1, indx.intpnt[i * 3], indx.intpnt[i * 3 + 1],
-               indx.intpnt[i * 3 + 2], indx.fltpnt[i * 3], indx.fltpnt[i * 3 + 1], indx.fltpnt[i * 3 + 2]);
+        printf("%3d %8d %6d %4d %8g %10g %8g\n", i + 1, indx.intpnt[i * 3], indx.intpnt[i * 3 + 1], indx.intpnt[i * 3 + 2],
+               indx.fltpnt[i * 3], indx.fltpnt[i * 3 + 1], indx.fltpnt[i * 3 + 2]);
     }
   else if (indx.intnum == nrecords && indx.fltnum == nrecords * 3 && indxb.bignum == nrecords * 2)
     {
       printf("nrecords: %d\n", nrecords);
       for (i = 0; i < nrecords; i++)
-        printf("%3d %8zd %6zd %4d %8g %10g %8g\n", i + 1, (size_t) indxb.bigpnt[i * 2],
-               (size_t) indxb.bigpnt[i * 2 + 1], indx.intpnt[i], indx.fltpnt[i * 3], indx.fltpnt[i * 3 + 1],
-               indx.fltpnt[i * 3 + 2]);
+        printf("%3d %8zd %6zd %4d %8g %10g %8g\n", i + 1, (size_t) indxb.bigpnt[i * 2], (size_t) indxb.bigpnt[i * 2 + 1],
+               indx.intpnt[i], indx.fltpnt[i * 3], indx.fltpnt[i * 3 + 1], indx.fltpnt[i * 3 + 2]);
     }
   else
     {
@@ -439,8 +438,7 @@ ctl_xydef(FILE *gdp, int gridID, bool *yrev)
       double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
 
       gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
-      fprintf(gdp, "PDEF %d %d LCCR %g %g 1 1 %g %g %g %g %g\n", xsize, ysize, xval_0, yval_0, lat_1, lat_2, lon_0,
-              xinc, yinc);
+      fprintf(gdp, "PDEF %d %d LCCR %g %g 1 1 %g %g %g %g %g\n", xsize, ysize, xval_0, yval_0, lat_1, lat_2, lon_0, xinc, yinc);
 
       gridID = gridToCurvilinear(gridID, 0);
       double *xvals = (double *) Malloc(xsize * ysize * sizeof(double));
@@ -665,8 +663,7 @@ ctl_zdef(FILE *gdp, int vlistID, bool *zrev)
 }
 
 static void
-ctl_options(FILE *gdp, bool yrev, bool zrev, bool sequential, bool bigendian, bool littleendian, bool flt64,
-            bool cal365day)
+ctl_options(FILE *gdp, bool yrev, bool zrev, bool sequential, bool bigendian, bool littleendian, bool flt64, bool cal365day)
 {
   /* if ( filetype == CDI_FILETYPE_GRB ) zrev = false; */
 
@@ -842,8 +839,7 @@ write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum,
       /* calculate the size of the ver==1 index file */
 
       nb = 2 + (indx.hinum * 4) + /* version in byte 2, then 4 ints with number of each data type */
-           indx.hinum * sizeof(int) + indx.hfnum * sizeof(int) + indx.intnum * sizeof(int)
-           + indx.fltnum * sizeof(float);
+           indx.hinum * sizeof(int) + indx.hfnum * sizeof(int) + indx.intnum * sizeof(int) + indx.fltnum * sizeof(float);
 
       /* add additional info */
 
@@ -1010,8 +1006,7 @@ Gradsdes(void *process)
   if (operatorArgc() == 1)
     {
       map_version = parameter2int(operatorArgv()[0]);
-      if (map_version != 1 && map_version != 2 && map_version != 4)
-        cdoAbort("map_version=%d unsupported!", map_version);
+      if (map_version != 1 && map_version != 2 && map_version != 4) cdoAbort("map_version=%d unsupported!", map_version);
     }
   else
     {
@@ -1059,13 +1054,11 @@ Gradsdes(void *process)
       gridID = vlistGrid(vlistID, index);
       gridtype = gridInqType(gridID);
       int projtype = gridInqProjType(gridID);
-      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN
-          || (gridtype == GRID_PROJECTION && projtype == CDI_PROJ_LCC))
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || (gridtype == GRID_PROJECTION && projtype == CDI_PROJ_LCC))
         break;
     }
 
-  if (index == ngrids)
-    cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!", gridNamePtr(gridtype));
+  if (index == ngrids) cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!", gridNamePtr(gridtype));
 
   /* select all variables with used gridID */
   int *vars = (int *) Malloc(nvars * sizeof(int));
@@ -1282,8 +1275,7 @@ Gradsdes(void *process)
           if (iddd < 0) iddd *= -1;
           if (idyy > 0) idmm += idyy * 12;
 
-          if (/*idmn == 0 && idhh == 0 &&*/ (iddd == 0 || iddd == 1 || idd > 27) && idmm > 0
-              && (mdt == 0 || idmm == mdt))
+          if (/*idmn == 0 && idhh == 0 &&*/ (iddd == 0 || iddd == 1 || idd > 27) && idmm > 0 && (mdt == 0 || idmm == mdt))
             {
               mdt = idmm;
               monavg = TRUE;

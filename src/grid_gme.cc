@@ -359,8 +359,8 @@ boundary(struct polygon *poly, int kip1s, int kip1e, int kip2s, int kip2e, int k
 /*****************************************************************************/
 
 static void
-neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s, int kipx2e, int kndx, struct polygon *poly,
-           int kip1s, int kip1e, int kip2s, int kip2e, int knd)
+neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s, int kipx2e, int kndx, struct polygon *poly, int kip1s,
+           int kip1e, int kip2s, int kip2e, int knd)
 {
   struct polygon *ptmp1;
 
@@ -554,8 +554,8 @@ neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s, int kip
 /*****************************************************************************/
 
 static void
-xd(double *p, int kip1s, int kip1e, int kip2s, int kip2e, int knd, double *px, int kipx1s, int kipx1e, int kipx2s,
-   int kipx2e, int kndx)
+xd(double *p, int kip1s, int kip1e, int kip2s, int kip2e, int knd, double *px, int kipx1s, int kipx1e, int kipx2s, int kipx2e,
+   int kndx)
 {
   int mi1sm1, mi1ep1, mi2sm1, mi2ep1;
   int mns, mpe, mpw, maw, mae, mpp;
@@ -687,18 +687,15 @@ tricntr(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kj
     {
       mi1 = j * kni / 3;
       mi2 = (j - 1) * kni + 1;
-      pxn[mi1 + id1 * (mi1 + 1) + id2 * 1 + id3 * kjd + ioffset]
-          = pxn[mi2 - 1 + id1 * (mi2) + id2 * 1 + id3 * kjd + ioffset]
-            + pxn[kni + id1 * 1 + id2 * 1 + id3 * kjd + ioffset]
-            + pxn[0 + id1 * (kni + 1) + id2 * 1 + id3 * kjd + ioffset];
-      pxn[mi1 + id1 * (mi1 + 1) + id2 * 2 + id3 * kjd + ioffset]
-          = pxn[mi2 - 1 + id1 * (mi2) + id2 * 2 + id3 * kjd + ioffset]
-            + pxn[kni + id1 * 1 + id2 * 2 + id3 * kjd + ioffset]
-            + pxn[0 + id1 * (kni + 1) + id2 * 2 + id3 * kjd + ioffset];
-      pxn[mi1 + id1 * (mi1 + 1) + id2 * 3 + id3 * kjd + ioffset]
-          = pxn[mi2 - 1 + id1 * (mi2) + id2 * 3 + id3 * kjd + ioffset]
-            + pxn[kni + id1 * 1 + id2 * 3 + id3 * kjd + ioffset]
-            + pxn[0 + id1 * (kni + 1) + id2 * 3 + id3 * kjd + ioffset];
+      pxn[mi1 + id1 * (mi1 + 1) + id2 * 1 + id3 * kjd + ioffset] = pxn[mi2 - 1 + id1 * (mi2) + id2 * 1 + id3 * kjd + ioffset]
+                                                                   + pxn[kni + id1 * 1 + id2 * 1 + id3 * kjd + ioffset]
+                                                                   + pxn[0 + id1 * (kni + 1) + id2 * 1 + id3 * kjd + ioffset];
+      pxn[mi1 + id1 * (mi1 + 1) + id2 * 2 + id3 * kjd + ioffset] = pxn[mi2 - 1 + id1 * (mi2) + id2 * 2 + id3 * kjd + ioffset]
+                                                                   + pxn[kni + id1 * 1 + id2 * 2 + id3 * kjd + ioffset]
+                                                                   + pxn[0 + id1 * (kni + 1) + id2 * 2 + id3 * kjd + ioffset];
+      pxn[mi1 + id1 * (mi1 + 1) + id2 * 3 + id3 * kjd + ioffset] = pxn[mi2 - 1 + id1 * (mi2) + id2 * 3 + id3 * kjd + ioffset]
+                                                                   + pxn[kni + id1 * 1 + id2 * 3 + id3 * kjd + ioffset]
+                                                                   + pxn[0 + id1 * (kni + 1) + id2 * 3 + id3 * kjd + ioffset];
       /* Normalize to unit-sphere */
 
       r1 = pxn[mi1 + id1 * (mi1 + 1) + id2 * 1 + id3 * kjd + ioffset];
@@ -720,8 +717,8 @@ tricntr(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kj
 /****************************************************************************/
 
 static void
-gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd, double pgamma, int ki1, int kj1,
-     int ki2, int kj2, int ki, int kj)
+gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd, double pgamma, int ki1, int kj1, int ki2,
+     int kj2, int ki, int kj)
 {
   (void) knd;
 
@@ -732,12 +729,9 @@ gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd, 
   int id3 = id2 * 3;
   int ioffset = -(id1 + id2 + id3);
 
-  double r1
-      = (pxn[ki2 + id1 * kj2 + id2 * 1 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 1 + id3 * kjd + ioffset]);
-  double r2
-      = (pxn[ki2 + id1 * kj2 + id2 * 2 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 2 + id3 * kjd + ioffset]);
-  double r3
-      = (pxn[ki2 + id1 * kj2 + id2 * 3 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 3 + id3 * kjd + ioffset]);
+  double r1 = (pxn[ki2 + id1 * kj2 + id2 * 1 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 1 + id3 * kjd + ioffset]);
+  double r2 = (pxn[ki2 + id1 * kj2 + id2 * 2 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 2 + id3 * kjd + ioffset]);
+  double r3 = (pxn[ki2 + id1 * kj2 + id2 * 3 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 3 + id3 * kjd + ioffset]);
 
   double zchord = sqrt((r1 * r1) + (r2 * r2) + (r3 * r3));
 
@@ -763,8 +757,7 @@ gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd, 
 /****************************************************************************/
 
 static void
-glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kni2,
-         int kni3)
+glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kni2, int kni3)
 {
   double zsgn;
   int j1, j2;
@@ -950,8 +943,7 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e, int ki
                 {
                   mi1 = (j1 - 1) * ml + ml2;
                   mi2 = (j2 - 1) * ml + ml2 + 1;
-                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, 0.5, mi1 - ml2, mi2 + ml2, mi1 + ml2, mi2 - ml2, mi1,
-                       mi2);
+                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, 0.5, mi1 - ml2, mi2 + ml2, mi1 + ml2, mi2 - ml2, mi1, mi2);
                 }
             }
         }
@@ -989,9 +981,8 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e, int ki
         {
           for (j1 = kig1s; j1 <= kig1e; ++j1)
             {
-              prlon[j1 + id1 * j2 + id2 * jd + joffset]
-                  = atan2(pxn[j1 + id1 * j2 + id2 * 2 + id3 * jd + ioffset],
-                          pxn[j1 + id1 * j2 + id2 * 1 + id3 * jd + ioffset] + 1.0e-20);
+              prlon[j1 + id1 * j2 + id2 * jd + joffset] = atan2(pxn[j1 + id1 * j2 + id2 * 2 + id3 * jd + ioffset],
+                                                                pxn[j1 + id1 * j2 + id2 * 1 + id3 * jd + ioffset] + 1.0e-20);
               prlat[j1 + id1 * j2 + id2 * jd + joffset] = asin(pxn[j1 + id1 * j2 + id2 * 3 + id3 * jd + ioffset]);
             }
         }
@@ -1289,10 +1280,8 @@ gme_grid_restore(double *p, int ni, int nd)
           for (j = 0; j <= ni; j++) p[tmp4 * (j + 1) + tmp5 * 5 + tmp3] = p[j + tmp4 + tmp5 + tmp3];
           break;
         case 6:
-          for (j = 0; j <= ni; j++)
-            p[j + tmp4 * (ni + 1) + tmp5 * 6 + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 * 2 + tmp3];
-          for (j = 0; j <= ni; j++)
-            p[ni + tmp4 * (j + 1) + tmp5 * 6 + tmp3] = p[ni - j + tmp4 * (ni + 1) + tmp5 + tmp3];
+          for (j = 0; j <= ni; j++) p[j + tmp4 * (ni + 1) + tmp5 * 6 + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 * 2 + tmp3];
+          for (j = 0; j <= ni; j++) p[ni + tmp4 * (j + 1) + tmp5 * 6 + tmp3] = p[ni - j + tmp4 * (ni + 1) + tmp5 + tmp3];
           break;
         case 7:
         case 8:
@@ -1306,10 +1295,8 @@ gme_grid_restore(double *p, int ni, int nd)
         case 10:
           for (j = 0; j <= ni; j++) p[j + tmp4 + tmp5 * 10 + tmp3] = p[tmp4 * (j + 1) + tmp5 * 9 + tmp3];
           for (j = 0; j <= ni; j++) p[tmp4 * (j + 1) + tmp5 * 10 + tmp3] = p[j + tmp4 + tmp5 * 6 + tmp3];
-          for (j = 0; j <= ni; j++)
-            p[j + tmp4 * (ni + 1) + tmp5 * 10 + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 + tmp3];
-          for (j = 0; j <= ni; j++)
-            p[ni + tmp4 * (j + 1) + tmp5 * 10 + tmp3] = p[ni - j + tmp4 * (ni + 1) + tmp5 * 5 + tmp3];
+          for (j = 0; j <= ni; j++) p[j + tmp4 * (ni + 1) + tmp5 * 10 + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 + tmp3];
+          for (j = 0; j <= ni; j++) p[ni + tmp4 * (j + 1) + tmp5 * 10 + tmp3] = p[ni - j + tmp4 * (ni + 1) + tmp5 * 5 + tmp3];
           break;
         }
     }
@@ -1320,8 +1307,8 @@ gme_grid_restore(double *p, int ni, int nd)
 /*****************************************************************************/
 
 void
-gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon, double *blat, int *imask, int ni,
-         int nd, int ni2, int ni3)
+gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon, double *blat, int *imask, int ni, int nd,
+         int ni2, int ni3)
 {
   /* check gridsize */
   if ((size_t)(ni + 1) * (ni + 1) * nd != gridsize)

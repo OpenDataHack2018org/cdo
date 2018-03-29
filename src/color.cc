@@ -325,8 +325,7 @@ cptRead(FILE *fp, CPT *cpt)
             }
           cpt->lut[n].z_high = atof(T2);
           cpt->lut[n].skip = TRUE; /* Don't paint this slice if possible*/
-          for (i = 0; i < 3; i++)
-            cpt->lut[n].rgb_low[i] = cpt->lut[n].rgb_high[i] = 255; /* If you must, use page color */
+          for (i = 0; i < 3; i++) cpt->lut[n].rgb_low[i] = cpt->lut[n].rgb_high[i] = 255; /* If you must, use page color */
         }
       else if (T1[0] == 'p' || T1[0] == 'P')
         { /* Gave pattern fill */
@@ -431,8 +430,7 @@ cptWrite(FILE *fp, CPT cpt)
   for (n = 0; n < cpt.ncolors; n++)
     {
       fprintf(fp, "%g\t%d\t%d\t%d\t%g\t%d\t%d\t%d\n", cpt.lut[n].z_low, cpt.lut[n].rgb_low[0], cpt.lut[n].rgb_low[1],
-              cpt.lut[n].rgb_low[2], cpt.lut[n].z_high, cpt.lut[n].rgb_high[0], cpt.lut[n].rgb_high[1],
-              cpt.lut[n].rgb_high[2]);
+              cpt.lut[n].rgb_low[2], cpt.lut[n].z_high, cpt.lut[n].rgb_high[0], cpt.lut[n].rgb_high[1], cpt.lut[n].rgb_high[2]);
     }
 
   for (k = 0; k < 3; k++)
@@ -466,8 +464,7 @@ cptWriteC(FILE *fp, CPT cpt, const char *name)
                   "%3d}, %d, %d},\n",
               cpt.lut[n].z_low, cpt.lut[n].z_high, cpt.lut[n].i_dz, cpt.lut[n].rgb_low[0], cpt.lut[n].rgb_low[1],
               cpt.lut[n].rgb_low[2], cpt.lut[n].rgb_high[0], cpt.lut[n].rgb_high[1], cpt.lut[n].rgb_high[2],
-              cpt.lut[n].rgb_diff[0], cpt.lut[n].rgb_diff[1], cpt.lut[n].rgb_diff[2], cpt.lut[n].annot,
-              cpt.lut[n].skip);
+              cpt.lut[n].rgb_diff[0], cpt.lut[n].rgb_diff[1], cpt.lut[n].rgb_diff[2], cpt.lut[n].annot, cpt.lut[n].skip);
     }
   fprintf(fp, "};\n");
 
@@ -477,8 +474,7 @@ cptWriteC(FILE *fp, CPT cpt, const char *name)
   fprintf(fp, "  {\n");
   for (k = 0; k < 3; k++)
     {
-      fprintf(fp, "    {{%3d, %3d, %3d}, %d},\n", cpt.bfn[k].rgb[0], cpt.bfn[k].rgb[1], cpt.bfn[k].rgb[2],
-              cpt.bfn[k].skip);
+      fprintf(fp, "    {{%3d, %3d, %3d}, %d},\n", cpt.bfn[k].rgb[0], cpt.bfn[k].rgb[1], cpt.bfn[k].rgb[2], cpt.bfn[k].skip);
     }
   fprintf(fp, "  }\n");
   fprintf(fp, "};\n");

@@ -26,8 +26,8 @@ const char *filetypestr(int filetype);
 const char *datatypestr(int datatype);
 
 static void
-print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size,
-           double file_size, double tw)
+print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size,
+           double tw)
 {
   nvalues /= 1000000;
   data_size /= 1024. * 1024. * 1024.;

@@ -27,12 +27,12 @@
 bool
 remapFindWeights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
 {
-  long iter;                      // iteration counters
-  double deli, delj;              // corrections to iw,jw
-  double dthp, dphp;              // difference between point and sw corner
-  double mat1, mat2, mat3, mat4;  // matrix elements
-  double determinant;             // matrix determinant
-  constexpr double converge = 1.e-10;       // Convergence criterion
+  long iter;                           // iteration counters
+  double deli, delj;                   // corrections to iw,jw
+  double dthp, dphp;                   // difference between point and sw corner
+  double mat1, mat2, mat3, mat4;       // matrix elements
+  double determinant;                  // matrix determinant
+  constexpr double converge = 1.e-10;  // Convergence criterion
   extern long remap_max_iter;
 
   /* Iterate to find iw,jw for bilinear approximation  */
@@ -179,11 +179,11 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 
   double findex = 0;
 
-  // Loop over destination grid
+// Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) schedule(static) \
-  reduction(+ : findex) shared(rsearch, weightLinks, tgt_grid_size, src_grid, tgt_grid, rv)
+#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(rsearch, weightLinks, tgt_grid_size, \
+                                                                                     src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -280,11 +280,11 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
 
   double findex = 0;
 
-  // Loop over destination grid
+// Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(rsearch,  \
-    Options::silentMode, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
+#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared( \
+    rsearch, Options::silentMode, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
