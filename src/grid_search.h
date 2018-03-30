@@ -79,7 +79,7 @@ struct GridSearch
   double *coordinates_xyz;
 };
 
-void grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights);
+void gridSearchPoint(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights);
 
 GridSearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats);
 GridSearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,

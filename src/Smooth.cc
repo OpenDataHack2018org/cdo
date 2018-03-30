@@ -115,7 +115,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
       findex++;
       if (cdoVerbose && cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / gridsize);
 
-      grid_search_nbr(gs, xvals[i], yvals[i], knnWeights[ompthID]);
+      gridSearchPoint(gs, xvals[i], yvals[i], knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights(mask, spoint.radius, spoint.weight0, spoint.weightR);

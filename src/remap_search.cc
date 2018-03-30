@@ -22,7 +22,7 @@
 // This routine finds the closest num_neighbor points to a search point and computes a distance to each of the neighbors
 #define MAX_SEARCH_CELLS 25
 static void
-grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
+gridSearchPointReg2d(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
 {
   /*
     Input variables:
@@ -158,10 +158,10 @@ grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &
       if (search_result >= 0)
         for (size_t n = 0; n < numNeighbors; ++n) nbr_add[n] = SIZE_MAX;
     }
-}  // grid_search_nbr_reg2d
+}
 
 void
-grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
+gridSearchPoint(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
 {
   /*
     Input variables:
@@ -210,12 +210,10 @@ grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
 void
 remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights)
 {
-  int remap_grid_type = rsearch.srcGrid->remap_grid_type;
-
-  if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-    grid_search_nbr_reg2d(rsearch.gs, plon, plat, knnWeights);
+  if (rsearch.srcGrid->remap_grid_type == REMAP_GRID_TYPE_REG2D)
+    gridSearchPointReg2d(rsearch.gs, plon, plat, knnWeights);
   else
-    grid_search_nbr(rsearch.gs, plon, plat, knnWeights);
+    gridSearchPoint(rsearch.gs, plon, plat, knnWeights);
 }
 
 static int

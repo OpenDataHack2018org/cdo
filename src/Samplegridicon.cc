@@ -387,7 +387,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
       if (invert_result) is_clockwise = !is_clockwise;
       if (is_clockwise) continue;
 
-      grid_search_nbr(gs, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2], knnWeights);
+      gridSearchPoint(gs, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2], knnWeights);
       int k = 0;
 
       for (int i = 0; i < MAX_SEARCH; ++i)
