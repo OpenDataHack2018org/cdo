@@ -575,8 +575,8 @@ gs_nearest_full(void *search_container, double lon, double lat, double searchRad
   return 0;
 }
 
-bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
-                   double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
+bool pointInQuad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+                 double plon, double plat, const double *restrict centerLon, const double *restrict centerLat);
 
 static size_t
 llindex_in_quad(GridSearch *gs, size_t index, double lon, double lat)
@@ -588,16 +588,16 @@ llindex_in_quad(GridSearch *gs, size_t index, double lon, double lat)
       size_t adds[4];
       double lons[4];
       double lats[4];
-      bool is_cyclic = gs->is_cyclic;
+      bool isCyclic = gs->is_cyclic;
       for (unsigned k = 0; k < 4; ++k)
         {
           // Determine neighbor addresses
           size_t j = index / nx;
           size_t i = index - j * nx;
-          if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
+          if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (isCyclic) ? nx - 1 : 0;
           if (k == 2 || k == 3) j = (j > 0) ? j - 1 : 0;
 
-          if (point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats, lon, lat, gs->plons, gs->plats)) return index;
+          if (pointInQuad(isCyclic, nx, ny, i, j, adds, lons, lats, lon, lat, gs->plons, gs->plats)) return index;
         }
     }
 

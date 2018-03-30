@@ -219,7 +219,7 @@ remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType
 }
 
 static int
-gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats,
+gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *rgrid, size_t *restrict src_add, double *restrict src_lats,
                        double *restrict src_lons, double plat, double plon)
 {
   /*
@@ -236,13 +236,10 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src
   */
   int search_result = 0;
 
-  const double *restrict src_center_lat = src_grid->cell_center_lat;
-  const double *restrict src_center_lon = src_grid->cell_center_lon;
-
   for (unsigned n = 0; n < 4; ++n) src_add[n] = 0;
 
-  size_t nx = src_grid->dims[0];
-  size_t ny = src_grid->dims[1];
+  size_t nx = rgrid->dims[0];
+  size_t ny = rgrid->dims[1];
 
   double dist;
   size_t addr;
@@ -254,10 +251,10 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src
           // Determine neighbor addresses
           size_t j = addr / nx;
           size_t i = addr - j * nx;
-          if (k == 0 || k == 2) i = (i > 0) ? i - 1 : src_grid->is_cyclic ? nx - 1 : 0;
+          if (k == 0 || k == 2) i = (i > 0) ? i - 1 : rgrid->is_cyclic ? nx - 1 : 0;
           if (k == 0 || k == 1) j = (j > 0) ? j - 1 : 0;
-          if (point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon,
-                            src_center_lat))
+          if (pointInQuad(rgrid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat,
+                          rgrid->cell_center_lon, rgrid->cell_center_lat))
             {
               search_result = 1;
               return search_result;
@@ -270,7 +267,7 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src
     Fall back to a distance-weighted average of the four closest points. Go ahead and compute weights here,
     but store in src_lats and return -add to prevent the parent routine from computing bilinear weights.
   */
-  if (!src_grid->lextrapolate) return search_result;
+  if (!rgrid->lextrapolate) return search_result;
 
   size_t ndist = 4;
   nadds = gridsearch_qnearest(gs, plon, plat, ndist, src_add, src_lats);
@@ -289,13 +286,13 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src
 int
 remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t *src_add, double *src_lats, double *src_lons)
 {
-  int search_result;
+  int searchResult;
   if (rsearch.srcGrid->remap_grid_type == REMAP_GRID_TYPE_REG2D)
-    search_result = gridSearchSquareReg2d(rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
+    searchResult = gridSearchSquareReg2d(rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
   else if (rsearch.gs)
-    search_result = gridSearchSquareCurv2d(rsearch.gs, rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
+    searchResult = gridSearchSquareCurv2d(rsearch.gs, rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
   else
-    search_result = gridSearchSquareCurv2dScrip(rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);
+    searchResult = gridSearchSquareCurv2dScrip(rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);
 
-  return search_result;
+  return searchResult;
 }

@@ -212,7 +212,7 @@ gridSearchSquareCurv2dNNScrip(size_t min_add, size_t max_add, size_t *restrict n
 }
 
 static unsigned
-quad_cross_products(double plon, double plat, double lons[4], double lats[4])
+quadCrossProducts(double plon, double plat, double *restrict lons, double *restrict lats)
 {
   unsigned n;
   int scross[4], scross_last = 0;
@@ -220,7 +220,7 @@ quad_cross_products(double plon, double plat, double lons[4], double lats[4])
   double vec1_lat, vec1_lon;
   double vec2_lat, vec2_lon;
 
-  /* For consistency, we must make sure all lons are in same 2pi interval */
+  // For consistency, we must make sure all lons are in same 2pi interval
   vec1_lon = lons[0] - plon;
   if (vec1_lon > PI)
     lons[0] -= PI2;
@@ -243,15 +243,14 @@ quad_cross_products(double plon, double plat, double lons[4], double lats[4])
       /*
         Here we take the cross product of the vector making up each box side
         with the vector formed by the vertex and search point.
-        If all the cross products are positive, the point is contained in the
-        box.
+        If all the cross products are positive, the point is contained in the box.
       */
       vec1_lat = lats[next_n] - lats[n];
       vec1_lon = lons[next_n] - lons[n];
       vec2_lat = plat - lats[n];
       vec2_lon = plon - lons[n];
 
-      /* Check for 0,2pi crossings */
+      // Check for 0,2pi crossings
       if (vec1_lon > 3.0 * PIH)
         vec1_lon -= PI2;
       else if (vec1_lon < -3.0 * PIH)
@@ -267,11 +266,8 @@ quad_cross_products(double plon, double plat, double lons[4], double lats[4])
       /* If cross product is less than ZERO, this cell doesn't work    */
       /* 2008-10-16 Uwe Schulzweida: bug fix for cross_product eq zero */
       scross[n] = cross_product < 0 ? -1 : cross_product > 0 ? 1 : 0;
-
       if (n == 0) scross_last = scross[n];
-
       if ((scross[n] < 0 && scross_last > 0) || (scross[n] > 0 && scross_last < 0)) break;
-
       scross_last = scross[n];
     }
 
@@ -288,11 +284,11 @@ quad_cross_products(double plon, double plat, double lons[4], double lats[4])
 }
 
 bool
-point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
-              double plon, double plat, const double *restrict center_lon, const double *restrict center_lat)
+pointInQuad(bool isCyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+            double plon, double plat, const double *restrict centerLon, const double *restrict centerLat)
 {
   bool search_result = false;
-  size_t ip1 = (i < (nx - 1)) ? i + 1 : is_cyclic ? 0 : i;
+  size_t ip1 = (i < (nx - 1)) ? i + 1 : isCyclic ? 0 : i;
   size_t jp1 = (j < (ny - 1)) ? j + 1 : j;
 
   if (i == ip1 || j == jp1) return search_result;
@@ -303,10 +299,10 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
   idx[2] = jp1 * nx + ip1;  // north-east
   idx[3] = jp1 * nx + i;    // north
 
-  for (unsigned j = 0; j < 4; ++j) lons[j] = center_lon[idx[j]];
-  for (unsigned j = 0; j < 4; ++j) lats[j] = center_lat[idx[j]];
+  for (unsigned j = 0; j < 4; ++j) lons[j] = centerLon[idx[j]];
+  for (unsigned j = 0; j < 4; ++j) lats[j] = centerLat[idx[j]];
 
-  unsigned n = quad_cross_products(plon, plat, lons, lats);
+  unsigned n = quadCrossProducts(plon, plat, lons, lats);
 
   // If cross products all same sign, we found the location
   if (n >= 4)
@@ -344,9 +340,6 @@ gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, doubl
     int src_bin_addr[][2]           ! latitude bins for restricting
   */
   int search_result = 0;
-
-  const double *restrict src_center_lat = src_grid->cell_center_lat;
-  const double *restrict src_center_lon = src_grid->cell_center_lon;
 
   size_t nbins = srcBins.nbins;
   const size_t *restrict src_bin_addr = &srcBins.bin_addr[0];
@@ -394,8 +387,8 @@ gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, doubl
           size_t j = srch_add / nx;
           size_t i = srch_add - j * nx;
 
-          if (point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon,
-                            src_center_lat))
+          if (pointInQuad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat,
+                          src_grid->cell_center_lon, src_grid->cell_center_lat))
             {
               search_result = 1;
               return search_result;
@@ -417,8 +410,8 @@ gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, doubl
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-  search_result
-      = gridSearchSquareCurv2dNNScrip(min_add, max_add, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
+  search_result = gridSearchSquareCurv2dNNScrip(min_add, max_add, src_add, src_lats, plat, plon,
+                                                src_grid->cell_center_lat, src_grid->cell_center_lon);
 
   return search_result;
-} /* grid_search */
+}
