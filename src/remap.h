@@ -162,7 +162,7 @@ void remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapTyp
 void remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMethod *mapType, SubmapType *submapType,
                         int *numNeighbors, int *remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv);
 
-void calc_lat_bins(GridSearchBins &searchBins);
+void calcLatBins(GridSearchBins &searchBins);
 size_t get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &srcBins, float *tgt_cell_bound_box,
                       size_t *srch_add);
 

@@ -19,10 +19,10 @@
 #include "remap.h"
 
 static void
-calc_bin_addr(GridSearchBins &searchBins)
+calcBinAddr(GridSearchBins &searchBins)
 {
-  size_t ncells = searchBins.ncells;
-  size_t nbins = searchBins.nbins;
+  const size_t ncells = searchBins.ncells;
+  const size_t nbins = searchBins.nbins;
   size_t *restrict bin_addr = &searchBins.bin_addr[0];
   const float *restrict bin_lats = &searchBins.bin_lats[0];
   const float *restrict cell_bound_box = &searchBins.cell_bound_box[0];
@@ -35,13 +35,12 @@ calc_bin_addr(GridSearchBins &searchBins)
 
   for (size_t nele = 0; nele < ncells; ++nele)
     {
-      size_t n2;
-      size_t nele4 = nele << 2;
-      float cell_bound_box_lat1 = cell_bound_box[nele4];
-      float cell_bound_box_lat2 = cell_bound_box[nele4 + 1];
+      const size_t nele4 = nele << 2;
+      const float cell_bound_box_lat1 = cell_bound_box[nele4];
+      const float cell_bound_box_lat2 = cell_bound_box[nele4 + 1];
       for (size_t n = 0; n < nbins; ++n)
         {
-          n2 = n << 1;
+          const size_t n2 = n << 1;
           if (cell_bound_box_lat1 <= bin_lats[n2 + 1] && cell_bound_box_lat2 >= bin_lats[n2])
             {
               bin_addr[n2] = MIN(nele, bin_addr[n2]);
@@ -52,10 +51,10 @@ calc_bin_addr(GridSearchBins &searchBins)
 }
 
 void
-calc_lat_bins(GridSearchBins &searchBins)
+calcLatBins(GridSearchBins &searchBins)
 {
-  size_t nbins = searchBins.nbins;
-  double dlat = PI / nbins;  // lat interval for search bins
+  const size_t nbins = searchBins.nbins;
+  const double dlat = PI / nbins;  // lat interval for search bins
 
   if (cdoVerbose) cdoPrint("Using %zu latitude bins to restrict search.", nbins);
 
@@ -69,7 +68,7 @@ calc_lat_bins(GridSearchBins &searchBins)
         }
 
       searchBins.bin_addr.resize(2 * nbins);
-      calc_bin_addr(searchBins);
+      calcBinAddr(searchBins);
     }
 }
 
@@ -179,7 +178,7 @@ gridSearchSquareCurv2dNNScrip(size_t min_add, size_t max_add, size_t *restrict n
   for (size_t srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
       distance = acos(coslat_dst * cos(src_center_lat[srch_add])
-                          * (coslon_dst * cos(src_center_lon[srch_add]) + sinlon_dst * sin(src_center_lon[srch_add]))
+                      * (coslon_dst * cos(src_center_lon[srch_add]) + sinlon_dst * sin(src_center_lon[srch_add]))
                       + sinlat_dst * sin(src_center_lat[srch_add]));
 
       if (distance < dist_min)

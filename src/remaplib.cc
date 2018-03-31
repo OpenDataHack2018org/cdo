@@ -612,10 +612,10 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
           cell_bounding_boxes(src_grid, &search.srcBins.cell_bound_box[0], REMAP_GRID_BASIS_SRC);
           cell_bounding_boxes(tgt_grid, &search.tgtBins.cell_bound_box[0], REMAP_GRID_BASIS_TGT);
           // Set up and assign address ranges to search bins in order to further restrict later searches
-          calc_lat_bins(search.srcBins);
+          calcLatBins(search.srcBins);
           if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
             {
-              calc_lat_bins(search.tgtBins);
+              calcLatBins(search.tgtBins);
               vectorFree(search.tgtBins.bin_lats);
               vectorFree(search.srcBins.bin_lats);
               if (mapType == RemapMethod::CONSERV_YAC) vectorFree(search.tgtBins.cell_bound_box);
