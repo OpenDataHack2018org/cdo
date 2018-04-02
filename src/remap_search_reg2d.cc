@@ -22,10 +22,11 @@ gridSearchSquareReg2dNN(size_t nx, size_t ny, size_t *restrict nbr_add, double *
                         const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
-  double coslat_dst = cos(plat);
-  double sinlat_dst = sin(plat);
-  double coslon_dst = cos(plon);
-  double sinlon_dst = sin(plon);
+
+  const double coslat_dst = cos(plat);
+  const double sinlat_dst = sin(plat);
+  const double coslon_dst = cos(plon);
+  const double sinlon_dst = sin(plon);
 
   double dist_min = DBL_MAX;
   for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = DBL_MAX;
@@ -68,8 +69,8 @@ gridSearchSquareReg2dNN(size_t nx, size_t ny, size_t *restrict nbr_add, double *
 
   for (size_t jj = jjf; jj <= jjl; ++jj)
     {
-      double coslat = coslat_dst * cos(src_center_lat[jj]);
-      double sinlat = sinlat_dst * sin(src_center_lat[jj]);
+      const double coslat = coslat_dst * cos(src_center_lat[jj]);
+      const double sinlat = sinlat_dst * sin(src_center_lat[jj]);
 
       size_t jjskip = jj > 1 && jj < (ny - 2);
 
@@ -131,10 +132,10 @@ gridSearchSquareReg2d(RemapGrid *src_grid, size_t *restrict src_add, double *res
 
   for (unsigned n = 0; n < 4; ++n) src_add[n] = 0;
 
-  size_t nx = src_grid->dims[0];
-  size_t ny = src_grid->dims[1];
+  const size_t nx = src_grid->dims[0];
+  const size_t ny = src_grid->dims[1];
 
-  size_t nxm = src_grid->is_cyclic ? nx + 1 : nx;
+  const size_t nxm = src_grid->is_cyclic ? nx + 1 : nx;
 
   if (plon < src_center_lon[0]) plon += PI2;
   if (plon > src_center_lon[nxm - 1]) plon -= PI2;

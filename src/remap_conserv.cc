@@ -681,7 +681,6 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   bool lcheck = true;
-  size_t srch_corners;  // num of corners of srch cells
 
   // Variables necessary if segment manages to hit pole
   int src_remap_grid_type = src_grid->remap_grid_type;
@@ -757,7 +756,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   std::vector<size_t *> srch_add(Threading::ompNumThreads);
   for (int i = 0; i < Threading::ompNumThreads; ++i) srch_add[i] = new size_t[src_grid_size];
 
-  srch_corners = src_num_cell_corners;
+  size_t srch_corners = src_num_cell_corners; // num of corners of srch cells
 
   double src_grid_bound_box[4];
   if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D) reg2d_bound_box(src_grid, src_grid_bound_box);
@@ -871,9 +870,8 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
       for (n = 0; n < num_srch_cells; ++n)
         {
-          size_t srch_corners_new = srch_corners;
           src_cell_add = srch_add[ompthID][n];
-          set_yac_coordinates(src_remap_grid_type, src_cell_add, srch_corners_new, src_grid, &src_grid_cells[n]);
+          set_yac_coordinates(src_remap_grid_type, src_cell_add, srch_corners, src_grid, &src_grid_cells[n]);
         }
 
       if (tgt_num_cell_corners < 4 || target_cell_type == LON_LAT_CELL)
@@ -978,10 +976,10 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
   if (1 && cdoVerbose)
     {
-      printf("num_srch_cells_sum  : %zu\n", num_srch_cells_stat[0]);
-      printf("num_srch_cells_min  : %zu\n", num_srch_cells_stat[1]);
-      printf("num_srch_cells_mean : %3.1f\n", num_srch_cells_stat[0] / (double) tgt_grid_size);
-      printf("num_srch_cells_max  : %zu\n", num_srch_cells_stat[2]);
+      cdoPrint("num_srch_cells_sum  : %zu", num_srch_cells_stat[0]);
+      cdoPrint("num_srch_cells_min  : %zu", num_srch_cells_stat[1]);
+      cdoPrint("num_srch_cells_mean : %3.1f", num_srch_cells_stat[0] / (double) tgt_grid_size);
+      cdoPrint("num_srch_cells_max  : %zu", num_srch_cells_stat[2]);
     }
 
   // Finished with all cells: deallocate search arrays

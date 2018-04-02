@@ -76,13 +76,10 @@ size_t
 get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &srcBins, float *tgt_cell_bound_box,
                size_t *srch_add)
 {
-  size_t nbins = srcBins.nbins;
-  size_t src_grid_size = srcBins.ncells;
+  const size_t nbins = srcBins.nbins;
+  const size_t src_grid_size = srcBins.ncells;
   const size_t *restrict bin_addr1 = &tgtBins.bin_addr[0];
   const size_t *restrict bin_addr2 = &srcBins.bin_addr[0];
-  const float *restrict src_cell_bound_box = &srcBins.cell_bound_box[0];
-
-  size_t src_cell_addm4;
 
   // Restrict searches first using search bins
 
@@ -106,6 +103,8 @@ get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &sr
   float bound_box_lon1 = tgt_cell_bound_box[2];
   float bound_box_lon2 = tgt_cell_bound_box[3];
 
+  const float *restrict src_cell_bound_box = &srcBins.cell_bound_box[0];
+  size_t src_cell_addm4;
   size_t num_srch_cells = 0;
   for (size_t src_cell_add = min_add; src_cell_add <= max_add; ++src_cell_add)
     {
@@ -166,15 +165,16 @@ gridSearchSquareCurv2dNNScrip(size_t min_add, size_t max_add, size_t *restrict n
                               double plon, const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
-  double distance;
-  double coslat_dst = cos(plat);
-  double sinlat_dst = sin(plat);
-  double coslon_dst = cos(plon);
-  double sinlon_dst = sin(plon);
+
+  const double coslat_dst = cos(plat);
+  const double sinlat_dst = sin(plat);
+  const double coslon_dst = cos(plon);
+  const double sinlon_dst = sin(plon);
 
   double dist_min = DBL_MAX;
   for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = DBL_MAX;
 
+  double distance;
   for (size_t srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
       distance = acos(coslat_dst * cos(src_center_lat[srch_add])
@@ -238,7 +238,7 @@ quadCrossProducts(double plon, double plat, double *restrict lons, double *restr
   /* corner_loop */
   for (n = 0; n < 4; ++n)
     {
-      unsigned next_n = (n + 1) % 4;
+      const unsigned next_n = (n + 1) % 4;
       /*
         Here we take the cross product of the vector making up each box side
         with the vector formed by the vertex and search point.
@@ -340,15 +340,13 @@ gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, doubl
   */
   int search_result = 0;
 
-  size_t nbins = srcBins.nbins;
+  const size_t nbins = srcBins.nbins;
   const size_t *restrict src_bin_addr = &srcBins.bin_addr[0];
   const float *restrict bin_lats = &srcBins.bin_lats[0];
   const float *restrict src_grid_bound_box = &srcBins.cell_bound_box[0];
 
-  size_t n2, srch_add, srch_add4;
-
-  float rlat = plat;
-  float rlon = plon;
+  const float rlat = plat;
+  const float rlon = plon;
 
   // restrict search first using bins
 
@@ -360,7 +358,7 @@ gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, doubl
 
   for (size_t n = 0; n < nbins; ++n)
     {
-      n2 = n << 1;
+      const size_t n2 = n << 1;
       if (rlat >= bin_lats[n2] && rlat <= bin_lats[n2 + 1])
         {
           if (src_bin_addr[n2] < min_add) min_add = src_bin_addr[n2];
@@ -370,12 +368,12 @@ gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, doubl
 
   /* Now perform a more detailed search */
 
-  size_t nx = src_grid->dims[0];
-  size_t ny = src_grid->dims[1];
+  const size_t nx = src_grid->dims[0];
+  const size_t ny = src_grid->dims[1];
 
-  for (srch_add = min_add; srch_add <= max_add; ++srch_add)
+  for (size_t srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
-      srch_add4 = srch_add << 2;
+      const size_t srch_add4 = srch_add << 2;
       /* First check bounding box */
       if (rlon >= src_grid_bound_box[srch_add4 + 2] && rlon <= src_grid_bound_box[srch_add4 + 3]
           && rlat >= src_grid_bound_box[srch_add4] && rlat <= src_grid_bound_box[srch_add4 + 1])
