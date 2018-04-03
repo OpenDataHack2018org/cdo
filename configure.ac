@@ -289,7 +289,7 @@ AC_CONFIG_FILES([test/EOF.test test/Select.test test/Spectral.test test/Vertint.
 AC_CONFIG_FILES([test/Timstat.test test/Timstat2.test test/Timselstat.test test/Seasstat.test test/Timpctl.test test/Runstat.test test/Runpctl.test test/Multiyearstat.test test/Ydrunstat.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gridboxstat.test test/Vertstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Merstat.test test/Zonstat.test test/Mergetime.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Ymonarith.test test/Expr.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Setmiss.test test/Smooth.test test/MapReduce.test test/Ninfo.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Filter.test ],[chmod a+x "$ac_file"])

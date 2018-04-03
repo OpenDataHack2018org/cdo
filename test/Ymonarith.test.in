@@ -1,0 +1,49 @@
+#! @BASH@
+echo 1..4 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO=cdo
+test -n "$DATAPATH" || DATAPATH=./data
+#
+IFILE1=$DATAPATH/ts_mm_5years
+IFILE2=$DATAPATH/ts_mm_1year
+CDOOUT=cout$$
+CDOERR=cerr$$
+FORMAT="-f srv -b 32"
+STATS="ymonadd ymonsub ymonmul ymondiv"
+#
+NTEST=1
+#
+for STAT in $STATS; do
+  RSTAT=0
+
+  RFILE=$DATAPATH/${STAT}_ref
+
+  CDOTEST="$STAT"
+  echo "Running test: $NTEST - $CDOTEST"
+
+  OFILE=${STAT}_res
+
+  rm -f Ymonarith_${STAT}.debug
+  DEBUG_OUT="--seperateDebugFromLog Ymonarith_${STAT}.debug"
+  CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT ${STAT} $IFILE1 $IFILE2 $OFILE"
+  echo $CDOCOMMAND
+
+  $CDOCOMMAND
+  test $? -eq 0 || let RSTAT+=1
+
+  $CDO $DEBUG_OUT diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+  test $? -eq 0 || let RSTAT+=1
+  test -s $CDOOUT && let RSTAT+=1
+  cat $CDOOUT $CDOERR
+
+  rm -f $OFILE
+
+  test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+  test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+
+  let NTEST+=1
+done
+#
+rm -f $CDOOUT $CDOERR
+#
+exit 0

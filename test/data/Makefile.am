@@ -1,4 +1,4 @@
-INPUTDATA = ts_mm_5years ts_6h_1mon ts_1d_1year hl_l19.grb t21_geosp_tsurf.grb t21_geosp_tsurf_sea.grb bathy4.grb pl_data pl_data.grb detrend_data \
+INPUTDATA = ts_mm_5years ts_mm_year ts_6h_1mon ts_1d_1year hl_l19.grb t21_geosp_tsurf.grb t21_geosp_tsurf_sea.grb bathy4.grb pl_data pl_data.grb detrend_data \
             grib_testfile01.grb grib_testfile02.grb grib_testfile03.grb netcdf_testfile01.nc netcdf_testfile02.nc testfile01c.nc \
             datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.grb tsurf_spain.grb spain.grid \
             topo_eu5.grb
@@ -52,6 +52,7 @@ EXPR         = expr1_ref aexpr1_ref expr2_ref aexpr2_ref
 THREAD       = thread1_ref tsformat1_ref
 GRADSDES     = pl_data.ctl pl_data.gmp
 ARITH        = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
+YMONARITH    = ymonadd_ref ymonsub_ref ymonmul_ref ymondiv_ref
 MAPREDUCE    = r18x9_grid icon_cell_grid griddes.r18x9 griddes.icon_cell
 MERGETIME    = mergetime_ref mergetime_y1 mergetime_y2 mergetime_y12
 REMAPETA     = remapeta1.nc remapeta2.nc remapeta_ref VCT.L62
@@ -62,4 +63,4 @@ FILTER       = lowpass_ref highpass_ref bandpass_ref
 EXTRA_DIST = $(INPUTDATA) $(FILE) $(GRIB) $(NETCDF) $(EOF) $(COMP) $(YDRUNSTAT) $(YMONSTAT) $(YSEASSTAT) $(SEASSTAT) $(TIMPCTL) \
              $(RUNSTAT) $(RUNPCTL) $(TIMSTAT2) $(TIMSTAT) $(YEARSTAT) $(MONSTAT) $(DAYSTAT) $(VERTSTAT) $(FLDSTAT) $(FLDPSTAT) \
              $(MERSTAT) $(ZONSTAT) $(ENSPSTAT) $(SPECTRAL) $(VERTINT) $(REMAP) $(REMAP2) $(REMAP3) $(SELECT) $(DETREND) \
-             $(THREAD) $(EXPR) $(GRADSDES) $(ARITH) $(MAPREDUCE) $(MERGETIME) $(REMAPETA) $(SMOOTH) $(SETMISS) $(FILTER)
+             $(THREAD) $(EXPR) $(GRADSDES) $(ARITH) $(YMONARITH) $(MAPREDUCE) $(MERGETIME) $(REMAPETA) $(SMOOTH) $(SETMISS) $(FILTER)

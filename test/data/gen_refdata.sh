@@ -5,6 +5,17 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Ymonarith
+#
+IFILE1=ts_mm_5years
+IFILE2=ts_mm_1year
+OPS="add sub mul div"
+for OP in $OPS; do
+  $CDO $FORMAT ymon$OP $IFILE1 $IFILE2 ymon${OP}_ref
+done
+exit
+########################################################################
+#
 # Remap regional grid
 #
 GRID=spain.grid
