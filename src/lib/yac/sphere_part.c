@@ -253,7 +253,7 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
       // get the angle between between the plane of the great circle and base
       // point of the bounding circle
       struct sin_cos_angle diff_angle_gc =
-        (struct sin_cos_angle){.sin = fabs(angle.cos), .cos = angle.sin};
+        sin_cos_angle_new(fabs(angle.cos), angle.sin);
 
       // if the point intersects with the great circle
       if (compare_angles(diff_angle_gc, bnd_circle.inc_angle) <= 0) {
@@ -322,10 +322,8 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
                          &corrected_inc_angle);
 
             // if the angle is bigger then PI
-            if ((big_sum) || (corrected_inc_angle.sin < 0.0)) {
-              corrected_inc_angle.sin = 0.0;
-              corrected_inc_angle.cos = -1.0;
-            }
+            if ((big_sum) || (corrected_inc_angle.sin < 0.0))
+              corrected_inc_angle = SIN_COS_M_PI;
 
             struct sin_cos_angle left, right;
             // base_angle - corrected_inc_angle
@@ -567,10 +565,8 @@ static void search_bnd_circle_I_node(
           &corrected_inc_angle);
 
      // if the angle is bigger then PI
-     if ((big_sum) || (corrected_inc_angle.sin < 0.0)) {
-       corrected_inc_angle.sin = 0.0;
-       corrected_inc_angle.cos = -1.0;
-     }
+     if ((big_sum) || (corrected_inc_angle.sin < 0.0))
+       corrected_inc_angle = SIN_COS_M_PI;
 
      struct sin_cos_angle left, right;
      // base_angle - corrected_inc_angle
@@ -891,10 +887,9 @@ static inline struct sin_cos_angle get_min_angle(
     crossproduct_ld(
       points[min_angle_idx].coordinates_xyz, coordinate_xyz, cross_ab);
 
-    return (struct sin_cos_angle){.sin = sqrt(cross_ab[0]*cross_ab[0] +
-                                              cross_ab[1]*cross_ab[1] +
-                                              cross_ab[2]*cross_ab[2]),
-                                  .cos = max_cos};
+    return sin_cos_angle_new(sqrt(cross_ab[0]*cross_ab[0] +
+                                  cross_ab[1]*cross_ab[1] +
+                                  cross_ab[2]*cross_ab[2]), max_cos);
   } else {
     return SIN_COS_M_PI;
   }
@@ -1214,9 +1209,9 @@ void yac_point_sphere_part_search_NNN(struct point_sphere_part_search * search,
     bnd_circle.base_vector[0] = curr_coordinates_xyz[0];
     bnd_circle.base_vector[1] = curr_coordinates_xyz[1];
     bnd_circle.base_vector[2] = curr_coordinates_xyz[2];
-    bnd_circle.inc_angle.sin =
-      sqrt(1.0 - MIN(max_cos_distance * max_cos_distance, 1.0));
-    bnd_circle.inc_angle.cos = max_cos_distance;
+    bnd_circle.inc_angle = sin_cos_angle_new(
+      sqrt(1.0 - MIN(max_cos_distance * max_cos_distance, 1.0)),
+      max_cos_distance);
 
     point_search_bnd_circle(
       search, bnd_circle, &overlap_leaf_points,

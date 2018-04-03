@@ -698,20 +698,31 @@ static inline double get_vector_angle(double a[3], double b[3]) {
    */
 }
 
+static inline struct sin_cos_angle sin_cos_angle_new(double sin, double cos) {
+
+  struct sin_cos_angle angle;
+
+  if (fabs(sin) <= 1.0) angle.sin = sin;
+  else if (sin < 0.0) angle.sin = -1.0;
+  else angle.sin = 1.0;
+
+  if (fabs(cos) <= 1.0) angle.cos = cos;
+  else if (cos < 0.0) angle.cos = -1.0;
+  else angle.cos = 1.0;
+
+  return angle;
+}
+
 static inline struct sin_cos_angle get_vector_angle_2(
   double a[3], double b[3]) {
 
   double cross_ab[3];
   crossproduct_ld(a, b, cross_ab);
 
-  struct sin_cos_angle angle = {
-    .sin = sqrt(cross_ab[0]*cross_ab[0] +
-                cross_ab[1]*cross_ab[1] +
-                cross_ab[2]*cross_ab[2]),
-    .cos = a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
-  };
-
-  return angle;
+  return sin_cos_angle_new(sqrt(cross_ab[0]*cross_ab[0] +
+                                cross_ab[1]*cross_ab[1] +
+                                cross_ab[2]*cross_ab[2]),
+                           a[0]*b[0] + a[1]*b[1] + a[2]*b[2]);
 }
 
 // works for angles in the range [0;2*PI[
@@ -731,15 +742,21 @@ static inline int compare_angles(
 
 //! computes (a+b), if (a+b) >= 2*PI, the result is (a+b-2*PI)
 //! a and be have to be in the range [0;2*PI[
+static inline struct sin_cos_angle sum_angles_no_check(
+  struct sin_cos_angle a, struct sin_cos_angle b) {
+
+  return sin_cos_angle_new(a.sin * b.cos + a.cos * b.sin,
+                           a.cos * b.cos - a.sin * b.sin);
+}
+
+//! computes (a+b), if (a+b) >= 2*PI, the result is (a+b-2*PI)
+//! a and be have to be in the range [0;2*PI[
 //! \returns 1 if (a+b) is >= 2*PI
 static inline int sum_angles(
   struct sin_cos_angle a, struct sin_cos_angle b,
   struct sin_cos_angle * restrict sum) {
 
-  struct sin_cos_angle sum_;
-
-  sum_.sin = a.sin * b.cos + a.cos * b.sin;
-  sum_.cos = a.cos * b.cos - a.sin * b.sin;
+  struct sin_cos_angle sum_ = sum_angles_no_check(a, b);
 
   *sum = sum_;
 
@@ -747,13 +764,13 @@ static inline int sum_angles(
   return (compare_angles(sum_, a) < 0) || (compare_angles(sum_, b) < 0);
 }
 
-//! computes (a+b), if (a+b) >= 2*PI, the result is (a+b-2*PI)
+//! computes (a-b), if (a-b) < 0, the result is (a+b+2*PI)
 //! a and be have to be in the range [0;2*PI[
-static inline struct sin_cos_angle sum_angles_no_check(
+static inline struct sin_cos_angle sub_angles_no_check(
   struct sin_cos_angle a, struct sin_cos_angle b) {
 
-  return (struct sin_cos_angle){.sin = a.sin * b.cos + a.cos * b.sin,
-                                .cos = a.cos * b.cos - a.sin * b.sin};
+  return sin_cos_angle_new(a.sin * b.cos - a.cos * b.sin,
+                           a.cos * b.cos + a.sin * b.sin);
 }
 
 //! computes (a-b), if (a-b) < 0, the result is (a+b+2*PI)
@@ -763,19 +780,9 @@ static inline int sub_angles(
   struct sin_cos_angle a, struct sin_cos_angle b,
   struct sin_cos_angle * restrict sub) {
 
-  sub->sin = a.sin * b.cos - a.cos * b.sin;
-  sub->cos = a.cos * b.cos + a.sin * b.sin;
+  *sub = sub_angles_no_check(a, b);
 
   return compare_angles(a, b) < 0;
-}
-
-//! computes (a-b), if (a-b) < 0, the result is (a+b+2*PI)
-//! a and be have to be in the range [0;2*PI[
-static inline struct sin_cos_angle sub_angles_no_check(
-  struct sin_cos_angle a, struct sin_cos_angle b) {
-
-  return (struct sin_cos_angle){.sin = a.sin * b.cos - a.cos * b.sin,
-                                .cos = a.cos * b.cos + a.sin * b.sin};
 }
 
 //! return angles in the range of [0;2PI[
@@ -815,11 +822,11 @@ static inline struct sin_cos_angle half_angle(struct sin_cos_angle angle) {
 
     if (angle.cos >= 0) {
       // first quadrant
-      if (angle.sin >= 0) return (struct sin_cos_angle){.sin = x, .cos = y};
+      if (angle.sin >= 0) return sin_cos_angle_new(x, y);
       // fourth quadrant
-      else return (struct sin_cos_angle){.sin = -x, .cos = -y};
+      else return sin_cos_angle_new(-x, -y);
       // second and third quadrant
-    } else return (struct sin_cos_angle){.sin = y, .cos = x};
+    } else return sin_cos_angle_new(y, x);
   }
 }
 
@@ -901,8 +908,7 @@ static inline void rotate_vector(
   double axis[], double angle, double v_in[], double v_out[]) {
 
   rotate_vector2(
-    axis, (struct sin_cos_angle){.sin = sin(angle), .cos = cos(angle)},
-    v_in, v_out);
+    axis, sin_cos_angle_new(sin(angle), cos(angle)), v_in, v_out);
 }
 
 /**
