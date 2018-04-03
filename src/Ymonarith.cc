@@ -48,8 +48,6 @@ Ymonarith(void *process)
   int offset;
   size_t nmiss;
   int vdate, year, mon, day;
-  size_t **varnmiss2[MAX_MON];
-  double **vardata2[MAX_MON];
   const char *seas_name[4];
 
   cdoInitialize(process);
@@ -98,7 +96,8 @@ Ymonarith(void *process)
 
   if (opertype == SEASONAL) get_season_name(seas_name);
 
-  for (mon = 0; mon < MAX_MON; mon++) vardata2[mon] = NULL;
+  std::vector<std::vector<std::vector<double>>> vardata2(MAX_MON);
+  std::vector<std::vector<std::vector<size_t>>> varnmiss2(MAX_MON);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
@@ -111,7 +110,7 @@ Ymonarith(void *process)
 
       if (opertype == SEASONAL) mon = month_to_season(mon + 1);
 
-      if (vardata2[mon] != NULL)
+      if (vardata2[mon].size())
         {
           if (opertype == SEASONAL)
             cdoAbort("Season %s already allocatd!", seas_name[mon]);
@@ -119,15 +118,15 @@ Ymonarith(void *process)
             cdoAbort("Month %d already allocatd!", mon);
         }
 
-      vardata2[mon] = (double **) Malloc(nvars * sizeof(double *));
-      varnmiss2[mon] = (size_t **) Malloc(nvars * sizeof(size_t *));
+      vardata2[mon].resize(nvars);
+      varnmiss2[mon].resize(nvars);;
 
       for (varID = 0; varID < nvars; varID++)
         {
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-          vardata2[mon][varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
-          varnmiss2[mon][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+          vardata2[mon][varID].resize(nlev*gridsize);
+          varnmiss2[mon][varID].resize(nlev);
         }
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -137,7 +136,7 @@ Ymonarith(void *process)
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           offset = gridsize * levelID;
 
-          pstreamReadRecord(streamID2, vardata2[mon][varID] + offset, &nmiss);
+          pstreamReadRecord(streamID2, &vardata2[mon][varID][offset], &nmiss);
           varnmiss2[mon][varID][levelID] = nmiss;
         }
 
@@ -155,7 +154,7 @@ Ymonarith(void *process)
 
       if (opertype == SEASONAL) mon = month_to_season(mon + 1);
 
-      if (vardata2[mon] == NULL)
+      if (vardata2[mon].size() == 0)
         {
           if (opertype == SEASONAL)
             cdoAbort("Season %s not found!", seas_name[mon]);
@@ -177,7 +176,7 @@ Ymonarith(void *process)
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           offset = gridsize * levelID;
 
-          arrayCopy(gridsize, vardata2[mon][varID] + offset, field2.ptr);
+          arrayCopy(gridsize, &vardata2[mon][varID][offset], field2.ptr);
           field2.nmiss = varnmiss2[mon][varID][levelID];
           field2.grid = vlistInqVarGrid(vlistID2, varID);
           field2.missval = vlistInqVarMissval(vlistID2, varID);
@@ -193,19 +192,6 @@ Ymonarith(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  for (mon = 0; mon < MAX_MON; mon++)
-    if (vardata2[mon])
-      {
-        for (varID = 0; varID < nvars; varID++)
-          {
-            Free(vardata2[mon][varID]);
-            Free(varnmiss2[mon][varID]);
-          }
-
-        Free(vardata2[mon]);
-        Free(varnmiss2[mon]);
-      }
 
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);
