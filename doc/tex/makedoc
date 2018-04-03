@@ -150,7 +150,9 @@ print TRCARD "\\vspace*{2mm}\n";
 print TRCARD "\\subsection*{Operators}\n";
 print TRCARD "\n";
 #
-print HELPFILE "/* Automatically created with makedoc, don't edit! */\n";
+print HELPFILE "// Automatically created with makedoc, don't edit!\n";
+print HELPFILE "\n";
+print HELPFILE "// clang-format off\n";
 #
 $help_print = 1;
 $oldchap = "oldchap";
@@ -1075,6 +1077,8 @@ foreach my $line (sort(@oplist)){
 }
 print ABCLIST "\\end{longtable}\n";
 print ABCLIST "\n";
+
+print HELPFILE "// clang-format on\n";
 
 close(HELPFILE);
 close(TRFILE);
