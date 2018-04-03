@@ -1,6 +1,18 @@
 CDO NEWS
 --------
 
+Version 1.9.4 (26 April 2018):
+
+   New features:
+     * Large data support: changed type of gridsize from 32 to 64-bit integer
+     * remapbil, remapbic, remapnn, remapdis: optimized by changing point search method
+     * Fldstat, Vertstat: added option weight=false to disable weighting
+   Fixed bugs:
+     * option -r doesn't work [Bug #8334]
+     * enspctl: changed parameter type from int to float [Bug #8386]
+     * segfault with chained operators on timeseries data [Bug #8230]
+     * expr: removed character [LlDd] from definition of float constants
+     
 Version 1.9.3 (29 January 2018):
 
    New features:
