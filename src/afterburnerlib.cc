@@ -504,7 +504,7 @@ after_processPL(struct Control *globs, struct Variable *vars)
   int code, l;
   long fieldSize;
   int lindex, nlevel;
-  int offset;
+  long offset;
 
   globs->MeanCount++;
   globs->TermCount++;
@@ -1516,7 +1516,7 @@ after_processML(struct Control *globs, struct Variable *vars)
   int code, l, i;
   long fieldSize = 0;
   int lindex, nlevel;
-  int offset;
+  long offset;
   int leveltype;
   size_t nmiss;
   double *pressureLevel = NULL;

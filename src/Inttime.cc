@@ -36,7 +36,7 @@ Inttime(void *process)
   int nlevel;
   int varID, levelID;
   int vdate, vtime;
-  int offset;
+  size_t offset;
   int incperiod = 0, incunit = 3600, tunit = TUNIT_HOUR;
   int year, month, day, hour, minute, second;
   char *rstr;

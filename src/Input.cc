@@ -121,9 +121,7 @@ Input(void *process)
           output_filetype = cdoDefaultFileType;
           if (output_filetype == CDI_UNDEFID) output_filetype = CDI_FILETYPE_EXT;
 
-          cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
-                   " of record %d (or EOF(=^D))!",
-                   nrecs + 1);
+          cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2) of record %d (or EOF(=^D))!", nrecs + 1);
 
           int rval = input_iarray(4, ihead);
           if (feof(stdin) && nrecs == 0) cdoAbort("Too few header elements (%d of %d)!", rval, 4);
@@ -161,9 +159,7 @@ Input(void *process)
           output_filetype = cdoDefaultFileType;
           if (output_filetype == CDI_UNDEFID) output_filetype = CDI_FILETYPE_SRV;
 
-          cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
-                   " of record %d (or EOF(=^D))!",
-                   nrecs + 1);
+          cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2) of record %d (or EOF(=^D))!", nrecs + 1);
 
           int rval = input_iarray(8, ihead);
           if (feof(stdin) && nrecs == 0) cdoAbort("Too few header elements (%d of %d)!", rval, 8);
@@ -231,7 +227,7 @@ Input(void *process)
 
       for (int levelID = 0; levelID < nlevs; levelID++)
         {
-          int offset = gridsize * levelID;
+          size_t offset = gridsize * levelID;
           size_t nmiss = arrayNumMV(gridsize, array + offset, missval);
           pstreamDefRecord(streamID, varID, levelID);
           pstreamWriteRecord(streamID, array + offset, nmiss);

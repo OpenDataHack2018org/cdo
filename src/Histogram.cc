@@ -31,7 +31,7 @@ Histogram(void *process)
 {
   int nrecs, varID, levelID;
   size_t nmiss;
-  int offset;
+  size_t offset;
   int nlevel, zaxisID;
   double missval;
 

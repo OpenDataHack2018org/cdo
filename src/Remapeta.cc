@@ -554,7 +554,7 @@ Remapeta(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           int zaxisID = vlistInqVarZaxis(vlistID1, varID);
           int nlevel = zaxisInqSize(zaxisID);
-          int offset = gridsize * levelID;
+          size_t offset = gridsize * levelID;
           pstreamReadRecord(streamID1, array, &nmiss);
 
           if (zaxisIDh != -1)
@@ -615,7 +615,7 @@ Remapeta(void *process)
           int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           for (levelID = 0; levelID < nlevel; levelID++)
             {
-              int offset = gridsize * levelID;
+              size_t offset = gridsize * levelID;
               single2 = t1 + offset;
 
               arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
@@ -629,7 +629,7 @@ Remapeta(void *process)
           nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           for (levelID = 0; levelID < nlevel; levelID++)
             {
-              int offset = gridsize * levelID;
+              size_t offset = gridsize * levelID;
               single2 = q1 + offset;
 
               corr_hum(gridsize, single2, MIN_Q);
@@ -677,7 +677,7 @@ Remapeta(void *process)
           int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
           for (levelID = 0; levelID < nlevel; levelID++)
             {
-              int offset = gridsize * levelID;
+              size_t offset = gridsize * levelID;
               single2 = t2 + offset;
 
               arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
@@ -695,7 +695,7 @@ Remapeta(void *process)
           nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
           for (levelID = 0; levelID < nlevel; levelID++)
             {
-              int offset = gridsize * levelID;
+              size_t offset = gridsize * levelID;
               single2 = q2 + offset;
 
               corr_hum(gridsize, single2, MIN_Q);
@@ -749,7 +749,7 @@ Remapeta(void *process)
 
           for (levelID = 0; levelID < nlevel; levelID++)
             {
-              int offset = gridsize * levelID;
+              size_t offset = gridsize * levelID;
               single2 = vars2[iv] + offset;
 
               if (operatorID == REMAPETAS || operatorID == REMAPETAZ)

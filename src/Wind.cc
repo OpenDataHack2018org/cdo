@@ -48,7 +48,7 @@ Wind(void *process)
   int code, param;
   int pnum, pcat, pdis;
   int varID1 = -1, varID2 = -1;
-  int offset;
+  size_t offset;
   SPTRANS *sptrans = NULL;
   DVTRANS *dvtrans = NULL;
   char varname[CDI_MAX_NAME];
@@ -288,8 +288,7 @@ Wind(void *process)
           if (gridInqType(gridID1) != GRID_SPECTRAL) cdoAbort("Vorticity is not on spectral grid!");
 
           if (gridID1 != vlistInqVarGrid(vlistID1, varID1))
-            cdoAbort("Divergence and vorticity must have the same grid "
-                     "represention!");
+            cdoAbort("Divergence and vorticity must have the same grid represention!");
 
           vlistDefVarParam(vlistID2, varID1, cdiEncodeParam(149, 128, 255));
           vlistDefVarParam(vlistID2, varID2, cdiEncodeParam(148, 128, 255));

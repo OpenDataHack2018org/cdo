@@ -33,7 +33,7 @@ Harmonic(void *process)
   int nrecs;
   int varID, levelID;
   size_t nmiss;
-  int offset;
+  size_t offset;
   int nlevel;
   int vdate = 0, vtime = 0;
   char filesuffix[32];
@@ -53,9 +53,7 @@ Harmonic(void *process)
   if (n_out > 9) cdoAbort("Maximum number of wave numbers is 9!");
 
   if (n < 1 || n < 2 * n_out)
-    cdoAbort("The wave length must be positive and smaller than "
-             "2 times the number of requested harmonics (=%d)!",
-             n_out);
+    cdoAbort("The wave length must be positive and smaller than 2 times the number of requested harmonics (=%d)!", n_out);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -81,10 +79,8 @@ Harmonic(void *process)
       if (filesuffix[0]) sprintf(filename + nchars + 1, "%s", filesuffix);
 
       int streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
-
-      streamIDs[j] = streamID2;
-
       pstreamDefVlist(streamID2, vlistID2);
+      streamIDs[j] = streamID2;
     }
 
   int nvars = vlistNvars(vlistID1);
@@ -160,9 +156,7 @@ Harmonic(void *process)
 
   if (nts % n)
     {
-      cdoAbort("The length of first harmonic (=%d)"
-               " does not divide the number of timesteps (=%d)!",
-               n, nts);
+      cdoAbort("The length of first harmonic (=%d) does not divide the number of timesteps (=%d)!", n, nts);
     }
 
   for (int j = 0; j < n_out && 2 * (j + 1) < n; j++)

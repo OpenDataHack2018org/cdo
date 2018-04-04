@@ -149,7 +149,7 @@ Adisit(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int offset;
+  size_t offset;
   int i;
   size_t nmiss;
   int thoID = -1, saoID = -1;
@@ -301,17 +301,10 @@ Adisit(void *process)
       for (int recID = 0; recID < nrecs; ++recID)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-
           offset = gridsize * levelID;
 
-          if (varID == thoID)
-            {
-              pstreamReadRecord(streamID1, tho.ptr + offset, &tho.nmiss);
-            }
-          if (varID == saoID)
-            {
-              pstreamReadRecord(streamID1, sao.ptr + offset, &sao.nmiss);
-            }
+          if (varID == thoID) pstreamReadRecord(streamID1, tho.ptr + offset, &tho.nmiss);
+          if (varID == saoID) pstreamReadRecord(streamID1, sao.ptr + offset, &sao.nmiss);
         }
 
       if (operatorID == ADISIT)

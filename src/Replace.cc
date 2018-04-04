@@ -174,7 +174,7 @@ Replace(void *process)
                 if (varlist2[idx] == varID)
                   {
                     size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-                    int offset = gridsize * levelID;
+                    size_t offset = gridsize * levelID;
                     parray = vardata2[idx] + offset;
                     pstreamReadRecord(streamID2, parray, &nmiss);
                     varnmiss2[idx][levelID] = nmiss;
@@ -198,7 +198,7 @@ Replace(void *process)
                 if (levelID2 != -1)
                   {
                     size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-                    int offset = gridsize * levelID2;
+                    size_t offset = gridsize * levelID2;
                     parray = vardata2[idx] + offset;
                     nmiss = varnmiss2[idx][levelID2];
                     break;

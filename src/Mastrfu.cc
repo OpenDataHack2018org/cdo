@@ -106,7 +106,7 @@ Mastrfu(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int offset;
+  size_t offset;
   size_t nmiss, nmiss1;
 
   cdoInitialize(process);
@@ -159,7 +159,6 @@ Mastrfu(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       nmiss = 0;

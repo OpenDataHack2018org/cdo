@@ -155,7 +155,7 @@ Rhopot(void *process)
   int nrecs;
   int varID, levelID;
   int zaxisID;
-  int offset;
+  size_t offset;
   size_t nmiss;
   int toID = -1, saoID = -1, thoID = -1;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
@@ -288,14 +288,8 @@ Rhopot(void *process)
 
           offset = gridsize * levelID;
 
-          if (varID == toID)
-            {
-              pstreamReadRecord(streamID1, to.ptr + offset, &to.nmiss);
-            }
-          if (varID == saoID)
-            {
-              pstreamReadRecord(streamID1, sao.ptr + offset, &sao.nmiss);
-            }
+          if (varID == toID) pstreamReadRecord(streamID1, to.ptr + offset, &to.nmiss);
+          if (varID == saoID) pstreamReadRecord(streamID1, sao.ptr + offset, &sao.nmiss);
         }
 
       calc_rhopot(gridsize, nlevel, pressure, to, sao, rho);

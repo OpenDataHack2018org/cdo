@@ -34,7 +34,7 @@ Monarith(void *process)
 {
   int nrecs, nrecs2, nlev;
   int varID, levelID;
-  int offset;
+  size_t offset;
   size_t nmiss;
   int yearmon2 = -1;
 
@@ -95,10 +95,8 @@ Monarith(void *process)
 
       if (yearmon1 != yearmon2)
         {
-          int year1, mon1;
-
-          year1 = yearmon1 / 100;
-          mon1 = yearmon1 - (yearmon1 / 100) * 100;
+          int year1 = yearmon1 / 100;
+          int mon1 = yearmon1 - (yearmon1 / 100) * 100;
 
           if (cdoVerbose) cdoPrint("Process: Year = %4d  Month = %2d", year1, mon1);
 

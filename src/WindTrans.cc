@@ -121,8 +121,7 @@ destaggerUorV(double *fu, double *fuOut, int klev, long nlat, long nlon, long Uo
     }
 
   if (CdoDebug::cdoDebugExt >= 20)
-    cdoPrint("destaggerUorV(): (nlon=%d, nlat=%d);               [lat0=%ld, "
-             "lon0=%ld, next=%ld];    (default order destaggering)",
+    cdoPrint("destaggerUorV(): (nlon=%d, nlat=%d);               [lat0=%ld, lon0=%ld, next=%ld];  (default order destaggering)",
              nlon, nlat, lat0, lon0, next);
 
   for (int lev = 0; lev < klev; lev++)
@@ -178,8 +177,7 @@ destaggerUorV_positiveOrder(double *fu, double *fuOut, int klev, long nlat, long
     }
 
   if (CdoDebug::cdoDebugExt >= 20)
-    cdoPrint("destaggerUorV(): (nlon=%ld, nlat=%ld);               [latE=%d, "
-             "lonE=%d, next=%d];    (positive order destaggering)",
+    cdoPrint("destaggerUorV(): (nlon=%ld, nlat=%ld);               [latE=%d, lonE=%d, next=%d];  (positive order destaggering)",
              nlon, nlat, latE, lonE, next);
 
   for (int lev = 0; lev < klev; lev++)
@@ -245,8 +243,7 @@ DestaggerUV()
 
   int nch = operatorArgc();
   if (nch < 2)
-    cdoAbort("Number of input arguments < 2; At least 2 arguments needed: "
-             "uvDestag,33,34<,-0.5,-0.5> optional");
+    cdoAbort("Number of input arguments < 2; At least 2 arguments needed: uvDestag,33,34<,-0.5,-0.5> optional");
   if (nch >= MAXARG) cdoAbort("Number of input arguments >= %d", MAXARG);
 
   bool lvar = false;
@@ -359,8 +356,7 @@ DestaggerUV()
               gridID1 = vlistInqVarGrid(vlistID1, varID1);
               gridID2 = vlistInqVarGrid(vlistID1, varID2);
               if (CdoDebug::cdoDebugExt)
-                cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), "
-                         "varID2=%d (gridID2=%d)",
+                cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), varID2=%d (gridID2=%d)",
                          varID1, gridID2, varID2, gridID1);
               varID1stg = varID1;
               varID2stg = varID2;
@@ -394,8 +390,7 @@ DestaggerUV()
 
   if ((varID1stg == -1) && (varID2stg == -1))
     {
-      cdoPrint("NOTE: We did not find any staggered U,V wind components. "
-               "Performing file-copy.");
+      cdoPrint("NOTE: We did not find any staggered U,V wind components. Performing file-copy.");
       lcopy = true;
       gridID0 = gridID1;
     }
@@ -429,8 +424,7 @@ DestaggerUV()
       if (gridID0 == -1)
         {
           if (CdoDebug::cdoDebugExt)
-            cdoPrint("Calling define_destagered_grid( destagGridOffsets = "
-                     "(%01.1f,%01.1f) )",
+            cdoPrint("Calling define_destagered_grid( destagGridOffsets = (%01.1f,%01.1f) )",
                      destagGridOffsets[0], destagGridOffsets[1]);
           gridID0 = cdo_define_destagered_grid(gridID1, gridID2, destagGridOffsets);
         }
@@ -456,36 +450,26 @@ DestaggerUV()
       if (CdoDebug::cdoDebugExt)
         {
           cdoPrint("Grid info: (xfirst_R = %3.2f; yfirst_R = %3.2f); (xfirst_U "
-                   "= %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = "
-                   "%3.2f);",
+                   "= %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f);",
                    xfirst_R, yfirst_R, xfirst_U, yfirst_U, xfirst_V, yfirst_V);
-          cdoPrint("Grid info: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = "
-                   "(%3.2f; %3.2f) ",
+          cdoPrint("Grid info: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) ",
                    dxU, dyU, dxV, dyV);
           cdoPrint("Grid info: nlon=%zu, nlat=%zu ", nlon, nlat);
         }
       if (CdoDebug::cdoDebugExt)
         {
           if (dxU < 0)
-            cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - "
-                     "default order ",
-                     dxU, dyV);
+            cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - default order ", dxU, dyV);
           else
-            cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - "
-                     "positive order ",
-                     dxU, dyV);
+            cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - positive order ", dxU, dyV);
         }
 
       if (CdoDebug::cdoDebugExt)
         {
           if (dyV < 0)
-            cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - "
-                     "default order ",
-                     dxU, dyV);
+            cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - default order ", dxU, dyV);
           else
-            cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - "
-                     "positive order ",
-                     dxU, dyV);
+            cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - positive order ", dxU, dyV);
         }
 
       for (int index = 0; index < ngrids; index++)
@@ -514,19 +498,16 @@ DestaggerUV()
       gridsize = vlistGridsizeMax(vlistID1);
 
       if (gridInqSize(gridID2) != gridInqSize(gridID1))
-        cdoAbort("gridSize of U-wind != gridSize of V-wind!  This should not "
-                 "happen!");
+        cdoAbort("gridSize of U-wind != gridSize of V-wind!  This should not happen!");
 
       if (CdoDebug::cdoDebugExt)
-        cdoPrint("Allocating memory for maximum gridsize (for input) = %ld "
-                 "[%4.3f MB]",
+        cdoPrint("Allocating memory for maximum gridsize (for input) = %ld [%4.3f MB]",
                  gridsize, gridsize * sizeof(double) / (1024.0 * 1024));
       ivar = (double *) Malloc(gridsize * sizeof(double));  // storage for other fields than
 
       gridsize = gridInqSize(gridID1);  // actual size of U-wind should be same as V-wind
       if (CdoDebug::cdoDebugExt)
-        cdoPrint("Allocating memory for gridsize (destaggered output)= %ld; "
-                 "nlon=%zu, nlat=%zu",
+        cdoPrint("Allocating memory for gridsize (destaggered output)= %ld; nlon=%zu, nlat=%zu",
                  gridsize, nlon, nlat);
       ovar = (double *) Malloc(gridsize * sizeof(double));
     }  // end of  if (!lcopy)
@@ -592,10 +573,8 @@ DestaggerUV()
                       if (gridID == gridID1)  // Has this variable the staggered grid?
                         {
                           if (CdoDebug::cdoDebugExt >= 10)
-                            cdoPrint("Destaggering U-wind record: %05d "
-                                     "(timestep:%d); Var.id [%4d]; (code=%3d; "
-                                     "ltype=%3d; level=%4d; levelID=%3d); "
-                                     "GridID %d => %d  *** <===",
+                            cdoPrint("Destaggering U-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; "
+                                     "ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",
                                      recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID),
                                      vlistInqVarGrid(vlistID2, varID));
                         }
@@ -608,10 +587,8 @@ DestaggerUV()
                       if (gridID == gridID2)  // Has this variable the staggered grid?
                         {
                           if (CdoDebug::cdoDebugExt >= 10)
-                            cdoPrint("Destaggering V-wind record: %05d "
-                                     "(timestep:%d); Var.id [%4d]; (code=%3d; "
-                                     "ltype=%3d; level=%4d; levelID=%3d); "
-                                     "GridID %d => %d  *** <===",
+                            cdoPrint("Destaggering V-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; "
+                                     "ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",
                                      recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID),
                                      vlistInqVarGrid(vlistID2, varID));
                         }
@@ -640,10 +617,8 @@ DestaggerUV()
                     // UorV = 0: U-wind; 1: V-wind
                     destaggerUorV_positiveOrder(ivar, ovar, 1, nlat, nlon, UorV, 0);
                   else
-                    cdoAbort("Unsupported destaggering grid offset: (dxU; dyU) "
-                             "= (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) "
-                             "where: xincU=%3.2f, yincU=%3.2f, xincV=%3.2f, "
-                             "yincV=%3.2f",
+                    cdoAbort("Unsupported destaggering grid offset: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) "
+                             "where: xincU=%3.2f, yincU=%3.2f, xincV=%3.2f, yincV=%3.2f",
                              dxU, dyU, dxV, dyV, xincU, yincU, xincV, yincV);
 
                   // Typical Hirlam LAMH_D11 situation with destaggering on
@@ -670,8 +645,7 @@ DestaggerUV()
                   pstreamDefRecord(streamID2, varID, levelID);
                   if (CdoDebug::cdoDebugExt >= 20)
                     cdoPrint("Stream-copy data record:    %05d (timestep:%d); "
-                             "Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; "
-                             "levelID=%3d)",
+                             "Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
                              recID, tsID, varID, code, ltype, level, levelID);
                   pstreamCopyRecord(streamID2, streamID1);
                 }
@@ -681,8 +655,7 @@ DestaggerUV()
               pstreamDefRecord(streamID2, varID, levelID);
               if (CdoDebug::cdoDebugExt >= 20)
                 cdoPrint("Stream-copy data record:    %05d (timestep:%d); "
-                         "Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; "
-                         "levelID=%3d)",
+                         "Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
                          recID, tsID, varID, code, ltype, level, levelID);
               pstreamCopyRecord(streamID2, streamID1);
             }
@@ -788,10 +761,8 @@ rot_uv_north(int gridID, double *us, double *vs)
     }
   else
     {
-      cdoAbort("\n***\n***\n WARNING! Unsupported data scanning mode(%d); "
-               "gridID=%d; For this operation we support only: 64,00 \n"
-               "RESULT will be probably incorrect!\n***\n***",
-               scanningMode, gridID);
+      cdoAbort("\n***\n***\n WARNING! Unsupported data scanning mode(%d); gridID=%d; For this operation we support only: 64,00 \n"
+               "RESULT will be probably incorrect!\n***\n***", scanningMode, gridID);
     }
 
   if (CdoDebug::cdoDebugExt)
@@ -822,9 +793,7 @@ rot_uv_north(int gridID, double *us, double *vs)
   if (rotationMatrixArray == NULL)
     {
       if (CdoDebug::cdoDebugExt > 0)
-        cdoPrint("About to compute rotationMatrixArray for the whole grid [%zu "
-                 "x %zu]",
-                 nx, ny);
+        cdoPrint("About to compute rotationMatrixArray for the whole grid [%zu x %zu]", nx, ny);
 
       rotationMatrixArray = (double *) Malloc(4 * nx * ny * sizeof(double));
       for (j = 0; j < ny; j++)
@@ -988,15 +957,11 @@ rot_uv_north(int gridID, double *us, double *vs)
             if (CdoDebug::cdoDebugExt >= 20)
               if (((i < 3) && (j < 3)) || ((i > (nx - 3)) && (j > (ny - 3))))
                 {
-                  cdoPrint("grid point [%zu,%zu] with latlon[%3.6f,%3.6f]; "
-                           "(lon_pntNorth, lat_pntNorth) = [%3.6f,%3.6f]; "
-                           "dLonNorth=%3.6f; dLatNorth=%3.6f (Northing grid "
-                           "relative) ",
+                  cdoPrint("grid point [%zu,%zu] with latlon[%3.6f,%3.6f]; (lon_pntNorth, lat_pntNorth) = [%3.6f,%3.6f]; "
+                           "dLonNorth=%3.6f; dLatNorth=%3.6f (Northing grid relative) ",
                            i, j, lon_pnt0, lat_pnt0, lon_pntNorth, lat_pntNorth, RAD2DEG * dLonNorth, RAD2DEG * dLatNorth);
-                  cdoPrint("grid point [%zu,%zu] with latlon[%3.6f,%3.6f]; "
-                           "(lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; "
-                           "dLonEast =%3.6f; dLatEast =%3.6f (Easting grid "
-                           "relative ) ",
+                  cdoPrint("grid point [%zu,%zu] with latlon[%3.6f,%3.6f]; (lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; "
+                           "dLonEast =%3.6f; dLatEast =%3.6f (Easting grid relative ) ",
                            i, j, lon_pnt0, lat_pnt0, lon_pntEast, lat_pntEast, RAD2DEG * dLonEast, RAD2DEG * dLatEast);
                   // cdoPrint("(xpntNorthSph, ypntNorthSph)= [%3.6f,%3.6f];
                   // (xpntEastSph,ypntEastSph) = [%3.6f,%3.6f];",
@@ -1006,15 +971,11 @@ rot_uv_north(int gridID, double *us, double *vs)
                   // ypntEastSph*ypntNorthSph + zpntEastSph*zpntNorthSph) );
                   // vecAngle = RAD2DEG * acos( (xpntEastSph*xpntNorthSph +
                   // ypntEastSph*ypntNorthSph) );
-                  cdoPrint("(xpntNorthSph, ypntNorthSph, zpntNorthSph)= "
-                           "[%3.6f,%3.6f,%3.6f]; (xpntEastSph,ypntEastSph, "
-                           "zpntEastSph) = [%3.6f,%3.6f,%3.6f]; vecAngle= "
-                           "%3.6f",
+                  cdoPrint("(xpntNorthSph, ypntNorthSph, zpntNorthSph)= [%3.6f,%3.6f,%3.6f]; (xpntEastSph,ypntEastSph, "
+                           "zpntEastSph) = [%3.6f,%3.6f,%3.6f]; vecAngle= %3.6f",
                            xpntNorthSph, ypntNorthSph, zpntNorthSph, xpntEastSph, ypntEastSph, zpntEastSph, vecAngle);
-                  cdoPrint("rotation matrix for grid point [%zu,%zu] with "
-                           "latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = "
-                           "(%3.6f,%3.6f,%3.6f,%3.6f)",
-                           i, j, lon_pnt0, lat_pnt0, VJaa, VJab, VJba, VJbb);
+                  cdoPrint("rotation matrix for grid point [%zu,%zu] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = "
+                           "(%3.6f,%3.6f,%3.6f,%3.6f)", i, j, lon_pnt0, lat_pnt0, VJaa, VJab, VJba, VJbb);
                 }
 
           }  // end of for ( i = 0; i < nx; i++ )
@@ -1074,10 +1035,8 @@ rot_uv_back_mode64(int gridID, double *us, double *vs)
     }
   else
     {
-      cdoPrint("\n***\n***\n WARNING! Unsupported data scanning mode(%d); "
-               "gridID=%d; For this operation we support only: 64\n"
-               "RESULT will be probably incorrect!\n***\n***",
-               scanningMode, gridID);
+      cdoPrint("\n***\n***\n WARNING! Unsupported data scanning mode(%d); gridID=%d; For this operation we support only: 64\n"
+               "RESULT will be probably incorrect!\n***\n***", scanningMode, gridID);
     }
 
   double xpole = 0, ypole = 0, angle = 0;
@@ -1235,10 +1194,8 @@ project_uv_latlon(int gridID, double *us, double *vs)
         VJbb = signLat * (ypntNorth - ypnt0) / distLat;
         if (CdoDebug::cdoDebugExt >= 20)
           if (((i < 3) && (j < 3)) || ((i > (nx - 3)) && (j > (ny - 3))))
-            cdoPrint("Jacobian for grid point [%zu,%zu] with "
-                     "latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = "
-                     "(%3.6f,%3.6f,%3.6f,%3.6f)",
-                     i, j, xpnt0, ypnt0, VJaa, VJab, VJba, VJbb);
+            cdoPrint("Jacobian for grid point [%zu,%zu] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = "
+                     "(%3.6f,%3.6f,%3.6f,%3.6f)", i, j, xpnt0, ypnt0, VJaa, VJab, VJba, VJbb);
         // 2) Transform the UV vector with jacobian matrix
         u = us[idx];
         v = vs[idx];
@@ -1369,8 +1326,7 @@ TransformUV(int operatorID)
 
       gridID = vlistInqVarGrid(vlistID1, varID);
       if (CdoDebug::cdoDebugExt >= 20)
-        cdoPrint("Var.id [%4d] with grib code:%3d and has name: %6s; level "
-                 "type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",
+        cdoPrint("Var.id [%4d] with grib code:%3d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",
                  varID, code, varname, ltype, nlevs, gridID, zaxisID);
 
       if (!(gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL))
@@ -1382,8 +1338,7 @@ TransformUV(int operatorID)
         {
           gridsize = gridInqSize(gridID);
           if (CdoDebug::cdoDebugExt)
-            cdoPrint("Allocating memory for variableID %4d (code=%3d): "
-                     "gridsize(%zu)*nlevels(%d) = %zu [%4.3f MB]",
+            cdoPrint("Allocating memory for variableID %4d (code=%3d): gridsize(%zu)*nlevels(%d) = %zu [%4.3f MB]",
                      varID, vlistInqVarCode(vlistID2, varID), gridsize, nlevs, gridsize * nlevs,
                      gridsize * nlevs * sizeof(double) / (1024.0 * 1024));
           varnmiss[varID] = (size_t *) Malloc(nlevs * sizeof(size_t));
@@ -1410,8 +1365,7 @@ TransformUV(int operatorID)
       pstreamDefTimestep(streamID2, tsID);
 
       if (CdoDebug::cdoDebugExt)
-        cdoPrint("About to read U & V data to memory. Other data will be "
-                 "stream-copied to the output file.");
+        cdoPrint("About to read U & V data to memory. Other data will be stream-copied to the output file.");
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -1430,10 +1384,8 @@ TransformUV(int operatorID)
               // if ( CdoDebug::cdoDebugExt>10 ) cdoPrint("Copying data record..
               // %05d (timestep:%05d)", recID, tsID);
               if (CdoDebug::cdoDebugExt >= 20)
-                cdoPrint("Stream-copy data record:    %05d (timestep:%d); "
-                         "Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; "
-                         "levelID=%3d)",
-                         recID, tsID, varID, code, ltype, level, levelID);
+                cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; "
+                         "levelID=%3d)", recID, tsID, varID, code, ltype, level, levelID);
               pstreamCopyRecord(streamID2, streamID1);  // cannot do this ! We
                                                         // have to set the flag
                                                         // uvGridRelative = 0
@@ -1446,18 +1398,15 @@ TransformUV(int operatorID)
               offset = gridsize * levelID;
               single = vardata[varID] + offset;
               if (CdoDebug::cdoDebugExt >= 10)
-                cdoPrint("Memmory-read data record:   %05d (timestep:%d); "
-                         "Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; "
-                         "levelID=%3d)",
-                         recID, tsID, varID, code, ltype, level, levelID);
+                cdoPrint("Memmory-read data record:   %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; "
+                         "levelID=%3d)", recID, tsID, varID, code, ltype, level, levelID);
               pstreamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
               if (varnmiss[varID][levelID]) cdoAbort("Missing values unsupported for this operator!");
             }
         }  // end of for ( recID = 0; recID < nrecs; ..
 
       if (CdoDebug::cdoDebugExt)
-        cdoPrint("All neccessary U & V data are in memory. About to transform "
-                 "the windvectors...");
+        cdoPrint("All neccessary U & V data are in memory. About to transform the windvectors...");
 
       int code1, zaxisID1, ltype1;
       int code2, zaxisID2, ltype2;
@@ -1480,24 +1429,19 @@ TransformUV(int operatorID)
             CheckVarIsV(varID1, varname, code1);
             if (VarIsV) continue;
             if (CdoDebug::cdoDebugExt >= 20)
-              cdoPrint("Checking U-wind: Var.id [%4d] with grib code:%3d; "
-                       "name: %6s; level type: %3d; number of levels: %3d; "
-                       "zaxisID: %d",
-                       varID1, code1, varname, ltype1, nlevel1, zaxisID1);
+              cdoPrint("Checking U-wind: Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; "
+                       "zaxisID: %d", varID1, code1, varname, ltype1, nlevel1, zaxisID1);
             CheckVarIsU(varID1, varname, code1);
             if (!VarIsU) continue;
             if (CdoDebug::cdoDebugExt >= 10)
-              cdoPrint("** FOUND U-wind; Var.id [%4d] with grib code:%3d; "
-                       "name: %6s; level type: %3d; number of levels: %3d; "
-                       "zaxisID: %d",
-                       varID1, code1, varname, ltype1, nlevel1, zaxisID1);
+              cdoPrint("** FOUND U-wind; Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; "
+                       "zaxisID: %d", varID1, code1, varname, ltype1, nlevel1, zaxisID1);
             usvar = vardata[varID1];
             // find corresponding v-variable to u-variable:
             for (varID2 = 0; varID2 < nvars; varID2++)
               if (vardata[varID2] == NULL)
                 {
-                  // if ( CdoDebug::cdoDebugExt ) cdoPrint("Checking V-wind:
-                  // vardata[%d]== NULL ",varID1);
+                  // if ( CdoDebug::cdoDebugExt ) cdoPrint("Checking V-wind: vardata[%d]== NULL ",varID1);
                 }
               else  // This means that it is U or V.
                 {
@@ -1509,18 +1453,14 @@ TransformUV(int operatorID)
                   CheckVarIsU(varID2, varname, code2);
                   if (VarIsU) continue;
                   if (CdoDebug::cdoDebugExt >= 20)
-                    cdoPrint("Checking V-wind: Var.id [%4d] with grib "
-                             "code:%3d; name: %6s; level type: %3d; number of "
-                             "levels: %3d; zaxisID: %d",
-                             varID2, code2, varname, ltype2, nlevel2, zaxisID2);
+                    cdoPrint("Checking V-wind: Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of "
+                             "levels: %3d; zaxisID: %d", varID2, code2, varname, ltype2, nlevel2, zaxisID2);
                   CheckVarIsV(varID2, varname, code2);
                   if (!VarIsV) continue;
                   if (!((ltype1 == ltype2) && (nlevel1 == nlevel2) && (zaxisID1 == zaxisID2))) continue;
                   if (CdoDebug::cdoDebugExt >= 10)
-                    cdoPrint("** FOUND V-wind; Var.id [%4d] with grib "
-                             "code:%3d; name: %6s; level type: %3d; number of "
-                             "levels: %3d; zaxisID: %d",
-                             varID2, code2, varname, ltype1, nlevel2, zaxisID2);
+                    cdoPrint("** FOUND V-wind; Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of "
+                             "levels: %3d; zaxisID: %d", varID2, code2, varname, ltype1, nlevel2, zaxisID2);
                   vsvar = vardata[varID2];
                   if (CdoDebug::cdoDebugExt >= 20)
                     cdoPrint("Using code %d [%d](u) and code %d [%d](v)", vlistInqVarCode(vlistID1, varID1), code1,
@@ -1531,40 +1471,32 @@ TransformUV(int operatorID)
                                              // creation of gridIDcurvl ...
                     {
                       if ((gridIDcurvl != -1) && (gridIDlastused != gridID))
-                        cdoAbort("The gridID (%d) used just previously for "
-                                 "uv-wind tranformation is not same this "
-                                 "time(%d)!",
-                                 gridIDlastused, gridID);
+                        cdoAbort("The gridID (%d) used just previously for uv-wind tranformation is not same this "
+                                 "time(%d)!", gridIDlastused, gridID);
 
                       if (gridIDcurvl == -1)
                         {
                           if (CdoDebug::cdoDebugExt)
-                            cdoPrint("Building LAT-LON grid for the direction "
-                                     "to the North. (First time only).");
+                            cdoPrint("Building LAT-LON grid for the direction to the North. (First time only).");
                           gridIDlastused = gridID;
                           // Compute 2D array with latlons only once. We expect
                           // that all horizontal grids for UV are same. NOTE: At
                           // this stage U and V cannot be staggered!
                           gridIDcurvl = gridToCurvilinear(gridID, 1);
                           if (CdoDebug::cdoDebugExt)
-                            cdoPrint("Transformed rotated-latLon grid (id:%d) "
-                                     "to curvilinear (id:%d) with true lat-lon "
-                                     "coordinates.",
-                                     gridID, gridIDcurvl);
+                            cdoPrint("Transformed rotated-latLon grid (id:%d) to curvilinear (id:%d) with true lat-lon "
+                                     "coordinates.", gridID, gridIDcurvl);
                           // Grid definition with id: "gridIDcurvl" contains
                           // latlons of every gridpoint.. For details see:
                           // ./libcdi/src/cdi.h; Setgridtype to GRID_CURVILINEAR
 
                           if (gridIDcurvl == -1)
-                            cdoAbort("Creation of curvilinear grid definition "
-                                     "failed!");
+                            cdoAbort("Creation of curvilinear grid definition failed!");
 
                           if (gridInqType(gridIDcurvl) != GRID_CURVILINEAR)
                             {
                               gridDestroy(gridIDcurvl);
-                              cdoAbort("Creation of curvilinear grid "
-                                       "definition failed: type != "
-                                       "GRID_CURVILINEAR");
+                              cdoAbort("Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
                             }
                           if (CdoDebug::cdoDebugExt)
                             {
@@ -1618,8 +1550,7 @@ TransformUV(int operatorID)
                       for (levelID = 0; levelID < nlevel1; levelID++)
                         {
                           if (CdoDebug::cdoDebugExt)
-                            cdoPrint("RotuvNorth(): processing  level type: "
-                                     "%d; level %d (out of [0:%d])",
+                            cdoPrint("RotuvNorth(): processing  level type: %d; level %d (out of [0:%d])",
                                      ltype1, levelID, nlevel1 - 1);
                           offset = gridsize * levelID;
                           if (operatorID == ROTUVNORTH)
@@ -1653,10 +1584,8 @@ TransformUV(int operatorID)
               ltype = zaxis2ltype(zaxisID);
               level = zaxisInqLevel(zaxisID, levelID);
               if (CdoDebug::cdoDebugExt >= 10)
-                cdoPrint("Write modified data record: %05d (timestep:%d); "
-                         "Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; "
-                         "levelID=%3d)",
-                         recID, tsID, varID, code, ltype, level, levelID);
+                cdoPrint("Write modified data record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; "
+                         "levelID=%3d)", recID, tsID, varID, code, ltype, level, levelID);
               gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
               offset = gridsize * levelID;
               single = vardata[varID] + offset;

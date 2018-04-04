@@ -33,7 +33,7 @@ Intntime(void *process)
   int nlevel;
   int varID, levelID;
   int vdate, vtime;
-  int offset;
+  size_t offset;
   double *single1, *single2;
   double *vardatap;
 
