@@ -326,10 +326,10 @@ Intgrid(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
 
   gridsize = gridInqSize(gridID2);
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array2(gridsize);
 
   field_type field1, field2;
   field_init(&field1);
@@ -344,17 +344,17 @@ Intgrid(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           gridID1 = vlistInqVarGrid(vlistID1, varID);
           missval = vlistInqVarMissval(vlistID1, varID);
 
           field1.grid = gridID1;
-          field1.ptr = array1;
+          field1.ptr = array1.data();
           field1.nmiss = nmiss;
           field1.missval = missval;
           field2.grid = gridID2;
-          field2.ptr = array2;
+          field2.ptr = array2.data();
           field2.missval = missval;
           field2.nmiss = 0;
 
@@ -368,16 +368,13 @@ Intgrid(void *process)
           // clang-format on
 
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, array2, field2.nmiss);
+          pstreamWriteRecord(streamID2, array2.data(), field2.nmiss);
         }
       tsID++;
     }
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   cdoFinish();
 

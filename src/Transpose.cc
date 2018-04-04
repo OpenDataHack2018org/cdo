@@ -30,7 +30,7 @@ void
 transxy(int gridID, double *array1, double *array2)
 {
   size_t nx = gridInqXsize(gridID);
-  int ny = gridInqYsize(gridID);
+  size_t ny = gridInqYsize(gridID);
   size_t gridsize = nx * ny;
 
   if (gridsize > 0)
@@ -38,10 +38,10 @@ transxy(int gridID, double *array1, double *array2)
       double **a2D1 = (double **) Malloc(ny * sizeof(double *));
       double **a2D2 = (double **) Malloc(nx * sizeof(double *));
 
-      for (int j = 0; j < ny; ++j) a2D1[j] = array1 + j * nx;
+      for (size_t j = 0; j < ny; ++j) a2D1[j] = array1 + j * nx;
       for (size_t i = 0; i < nx; ++i) a2D2[i] = array2 + i * ny;
 
-      for (int j = 0; j < ny; ++j)
+      for (size_t j = 0; j < ny; ++j)
         for (size_t i = 0; i < nx; ++i) a2D2[i][j] = a2D1[j][i];
 
       Free(a2D1);
@@ -93,8 +93,8 @@ Transpose(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
+  std::vector<double> array2(gridsize);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -105,13 +105,13 @@ Transpose(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           int gridID = vlistInqVarGrid(vlistID1, varID);
-          transxy(gridID, array1, array2);
+          transxy(gridID, array1.data(), array2.data());
 
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, array2, nmiss);
+          pstreamWriteRecord(streamID2, array2.data(), nmiss);
         }
 
       tsID++;
@@ -119,9 +119,6 @@ Transpose(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  Free(array1);
-  Free(array2);
 
   cdoFinish();
 

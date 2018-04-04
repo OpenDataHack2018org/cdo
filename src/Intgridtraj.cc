@@ -83,7 +83,7 @@ Intgridtraj(void *process)
   std::vector<recinfo_type> recinfo(maxrecs);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
-  double *array = (double *) Malloc(gridsizemax * sizeof(double));
+  std::vector<double> array(gridsizemax);
 
   double **vardata1 = (double **) Malloc(nvars * sizeof(double *));
   double **vardata2 = (double **) Malloc(nvars * sizeof(double *));
@@ -198,7 +198,7 @@ Intgridtraj(void *process)
                   field1.grid = gridID1;
                   field1.nmiss = nmiss;
                   field1.missval = missval;
-                  field1.ptr = array;
+                  field1.ptr = array.data();
                   field2.grid = gridID2;
                   field2.ptr = &point;
                   field2.nmiss = 0;
@@ -243,7 +243,6 @@ Intgridtraj(void *process)
     }
   Free(vardata1);
   Free(vardata2);
-  if (array) Free(array);
 
   cdoFinish();
 

@@ -45,7 +45,7 @@ Intyear(void *process)
 
   int *iyears = (int *) lista_dataptr(ilist);
 
-  int *streamIDs = (int *) Malloc(nyears * sizeof(int));
+  std::vector<int> streamIDs(nyears);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
@@ -57,9 +57,9 @@ Intyear(void *process)
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
-  double *array3 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
+  std::vector<double> array2(gridsize);
+  std::vector<double> array3(gridsize);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -80,7 +80,6 @@ Intyear(void *process)
       if (filesuffix[0]) sprintf(filename + nchars + 4, "%s", filesuffix);
 
       streamIDs[iy] = cdoStreamOpenWrite(filename, cdoFiletype());
-
       pstreamDefVlist(streamIDs[iy], vlistID3);
     }
 
@@ -113,8 +112,8 @@ Intyear(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           pstreamInqRecord(streamID2, &varID, &levelID);
 
-          pstreamReadRecord(streamID1, array1, &nmiss1);
-          pstreamReadRecord(streamID2, array2, &nmiss2);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss1);
+          pstreamReadRecord(streamID2, array2.data(), &nmiss2);
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
@@ -155,7 +154,7 @@ Intyear(void *process)
                 }
 
               pstreamDefRecord(streamIDs[iy], varID, levelID);
-              pstreamWriteRecord(streamIDs[iy], array3, nmiss3);
+              pstreamWriteRecord(streamIDs[iy], array3.data(), nmiss3);
             }
         }
 
@@ -166,12 +165,6 @@ Intyear(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array3) Free(array3);
-  if (array2) Free(array2);
-  if (array1) Free(array1);
-
-  Free(streamIDs);
 
   lista_destroy(ilist);
 

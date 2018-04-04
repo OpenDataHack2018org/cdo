@@ -33,6 +33,7 @@ Intntime(void *process)
   int nlevel;
   int varID, levelID;
   int vdate, vtime;
+  size_t gridsize;
   size_t offset;
   double *single1, *single2;
   double *vardatap;
@@ -55,11 +56,11 @@ Intntime(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<recinfo_type> recinfo(maxrecs);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double *) Malloc(gridsize * sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  std::vector<double> array(gridsizemax);
 
-  size_t **nmiss1 = (size_t **) Malloc(nvars * sizeof(size_t *));
-  size_t **nmiss2 = (size_t **) Malloc(nvars * sizeof(size_t *));
+  std::vector<std::vector<size_t>> nmiss1(nvars);
+  std::vector<std::vector<size_t>> nmiss2(nvars);
   double **vardata1 = (double **) Malloc(nvars * sizeof(double *));
   double **vardata2 = (double **) Malloc(nvars * sizeof(double *));
 
@@ -67,8 +68,8 @@ Intntime(void *process)
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      nmiss1[varID] = (size_t *) Malloc(nlevel * sizeof(size_t));
-      nmiss2[varID] = (size_t *) Malloc(nlevel * sizeof(size_t));
+      nmiss1[varID].resize(nlevel);
+      nmiss2[varID].resize(nlevel);
       vardata1[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
       vardata2[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
     }
@@ -190,7 +191,7 @@ Intntime(void *process)
                 }
 
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2, array, nmiss3);
+              pstreamWriteRecord(streamID2, array.data(), nmiss3);
             }
         }
 
@@ -224,18 +225,12 @@ Intntime(void *process)
 
   for (varID = 0; varID < nvars; varID++)
     {
-      Free(nmiss1[varID]);
-      Free(nmiss2[varID]);
       Free(vardata1[varID]);
       Free(vardata2[varID]);
     }
 
-  Free(nmiss1);
-  Free(nmiss2);
   Free(vardata1);
   Free(vardata2);
-
-  if (array) Free(array);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

@@ -48,11 +48,11 @@ Wind(void *process)
   int code, param;
   int pnum, pcat, pdis;
   int varID1 = -1, varID2 = -1;
+  size_t gridsize;
   size_t offset;
   SPTRANS *sptrans = NULL;
   DVTRANS *dvtrans = NULL;
   char varname[CDI_MAX_NAME];
-  double *ivar1 = NULL, *ivar2 = NULL, *ovar1 = NULL, *ovar2 = NULL;
 
   cdoInitialize(process);
 
@@ -308,20 +308,21 @@ Wind(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  std::vector<double> array1(gridsizemax);
 
+  std::vector<double> ivar1, ivar2, ovar1, ovar2;
   if (varID1 != -1 && varID2 != -1)
     {
       nlev = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 
       gridsize = gridInqSize(gridID1);
-      ivar1 = (double *) Malloc(nlev * gridsize * sizeof(double));
-      ivar2 = (double *) Malloc(nlev * gridsize * sizeof(double));
+      ivar1.resize(nlev * gridsize);
+      ivar2.resize(nlev * gridsize);
 
       gridsize = gridInqSize(gridID2);
-      ovar1 = (double *) Malloc(nlev * gridsize * sizeof(double));
-      ovar2 = (double *) Malloc(nlev * gridsize * sizeof(double));
+      ovar1.resize(nlev * gridsize);
+      ovar2.resize(nlev * gridsize);
     }
 
   int tsID = 0;
@@ -336,16 +337,16 @@ Wind(void *process)
 
           if ((varID1 != -1 && varID2 != -1) && (varID == varID1 || varID == varID2))
             {
-              pstreamReadRecord(streamID1, array1, &nmiss);
+              pstreamReadRecord(streamID1, array1.data(), &nmiss);
               if (nmiss) cdoAbort("Missing values unsupported for spectral data!");
 
               gridsize = gridInqSize(gridID1);
               offset = gridsize * levelID;
 
               if (varID == varID1)
-                arrayCopy(gridsize, array1, ivar1 + offset);
+                arrayCopy(gridsize, array1.data(), &ivar1[offset]);
               else if (varID == varID2)
-                arrayCopy(gridsize, array1, ivar2 + offset);
+                arrayCopy(gridsize, array1.data(), &ivar2[offset]);
             }
           else
             {
@@ -356,8 +357,8 @@ Wind(void *process)
                 }
               else
                 {
-                  pstreamReadRecord(streamID1, array1, &nmiss);
-                  pstreamWriteRecord(streamID2, array1, nmiss);
+                  pstreamReadRecord(streamID1, array1.data(), &nmiss);
+                  pstreamWriteRecord(streamID2, array1.data(), nmiss);
                 }
             }
         }
@@ -365,13 +366,13 @@ Wind(void *process)
       if (varID1 != -1 && varID2 != -1)
         {
           if (operatorID == UV2DV || operatorID == UV2DVL)
-            trans_uv2dv(sptrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
+            trans_uv2dv(sptrans, nlev, gridID1, ivar1.data(), ivar2.data(), gridID2, ovar1.data(), ovar2.data());
           else if (operatorID == DV2UV || operatorID == DV2UVL)
-            trans_dv2uv(sptrans, dvtrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
+            trans_dv2uv(sptrans, dvtrans, nlev, gridID1, ivar1.data(), ivar2.data(), gridID2, ovar1.data(), ovar2.data());
           else if (operatorID == DV2PS)
             {
-              dv2ps(ivar1, ovar1, nlev, ntr);
-              dv2ps(ivar2, ovar2, nlev, ntr);
+              dv2ps(ivar1.data(), ovar1.data(), nlev, ntr);
+              dv2ps(ivar2.data(), ovar2.data(), nlev, ntr);
             }
 
           gridsize = gridInqSize(gridID2);
@@ -381,13 +382,13 @@ Wind(void *process)
                 {
                   offset = gridsize * levelID;
                   pstreamDefRecord(streamID2, varID2, levelID);
-                  pstreamWriteRecord(streamID2, ovar2 + offset, 0);
+                  pstreamWriteRecord(streamID2, &ovar2[offset], 0);
                 }
               for (levelID = 0; levelID < nlev; levelID++)
                 {
                   offset = gridsize * levelID;
                   pstreamDefRecord(streamID2, varID1, levelID);
-                  pstreamWriteRecord(streamID2, ovar1 + offset, 0);
+                  pstreamWriteRecord(streamID2, &ovar1[offset], 0);
                 }
             }
           else if (operatorID == DV2UV || operatorID == DV2UVL)
@@ -396,13 +397,13 @@ Wind(void *process)
                 {
                   offset = gridsize * levelID;
                   pstreamDefRecord(streamID2, varID1, levelID);
-                  pstreamWriteRecord(streamID2, ovar1 + offset, 0);
+                  pstreamWriteRecord(streamID2, &ovar1[offset], 0);
                 }
               for (levelID = 0; levelID < nlev; levelID++)
                 {
                   offset = gridsize * levelID;
                   pstreamDefRecord(streamID2, varID2, levelID);
-                  pstreamWriteRecord(streamID2, ovar2 + offset, 0);
+                  pstreamWriteRecord(streamID2, &ovar2[offset], 0);
                 }
             }
         }
@@ -412,13 +413,6 @@ Wind(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array1) Free(array1);
-
-  if (ivar1) Free(ivar1);
-  if (ivar2) Free(ivar2);
-  if (ovar1) Free(ovar1);
-  if (ovar2) Free(ovar2);
 
   sptrans_delete(sptrans);
   if (dvtrans) dvtrans_delete(dvtrans);
