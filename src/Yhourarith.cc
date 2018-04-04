@@ -59,14 +59,9 @@ hour_of_year(int vdate, int vtime)
 void *
 Yhourarith(void *process)
 {
-  int nrecs, nlev;
+  int nrecs;
   int varID, levelID;
-  int offset;
-  int vdate, vtime;
   size_t nmiss;
-  int houroy;
-  size_t **varnmiss2[MAX_HOUR];
-  double **vardata2[MAX_HOUR];
 
   cdoInitialize(process);
 
@@ -105,36 +100,35 @@ Yhourarith(void *process)
 
   int nvars = vlistNvars(vlistID2);
 
-  for (houroy = 0; houroy < MAX_HOUR; ++houroy) vardata2[houroy] = NULL;
+  std::vector<std::vector<std::vector<double>>> vardata2(MAX_HOUR);
+  std::vector<std::vector<std::vector<size_t>>> varnmiss2(MAX_HOUR);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
-      vdate = taxisInqVdate(taxisID2);
-      vtime = taxisInqVtime(taxisID2);
+      int vdate = taxisInqVdate(taxisID2);
+      int vtime = taxisInqVtime(taxisID2);
 
-      houroy = hour_of_year(vdate, vtime);
-      if (vardata2[houroy] != NULL) cdoAbort("Hour of year %d already allocatd!", houroy);
+      int houroy = hour_of_year(vdate, vtime);
+      if (vardata2[houroy].size() > 0) cdoAbort("Hour of year %d already allocatd!", houroy);
 
-      vardata2[houroy] = (double **) Malloc(nvars * sizeof(double *));
-      varnmiss2[houroy] = (size_t **) Malloc(nvars * sizeof(size_t *));
+      vardata2[houroy].resize(nvars);
+      varnmiss2[houroy].resize(nvars);
 
       for (varID = 0; varID < nvars; varID++)
         {
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-          vardata2[houroy][varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
-          varnmiss2[houroy][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          size_t nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          vardata2[houroy][varID].resize(nlev * gridsize);
+          varnmiss2[houroy][varID].resize(nlev);
         }
 
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          offset = gridsize * levelID;
-
-          pstreamReadRecord(streamID2, vardata2[houroy][varID] + offset, &nmiss);
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          size_t offset = gridsize * levelID;
+          pstreamReadRecord(streamID2, &vardata2[houroy][varID][offset], &nmiss);
           varnmiss2[houroy][varID][levelID] = nmiss;
         }
 
@@ -144,11 +138,11 @@ Yhourarith(void *process)
   tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
 
-      houroy = hour_of_year(vdate, vtime);
-      if (vardata2[houroy] == NULL) cdoAbort("Hour of year %d not found!", houroy);
+      int houroy = hour_of_year(vdate, vtime);
+      if (vardata2[houroy].size() == 0) cdoAbort("Hour of year %d not found!", houroy);
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);
@@ -161,9 +155,9 @@ Yhourarith(void *process)
           field1.grid = vlistInqVarGrid(vlistID1, varID);
           field1.missval = vlistInqVarMissval(vlistID1, varID);
 
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          offset = gridsize * levelID;
-          arrayCopy(gridsize, vardata2[houroy][varID] + offset, field2.ptr);
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          size_t offset = gridsize * levelID;
+          arrayCopy(gridsize, &vardata2[houroy][varID][offset], field2.ptr);
           field2.nmiss = varnmiss2[houroy][varID][levelID];
           field2.grid = vlistInqVarGrid(vlistID2, varID);
           field2.missval = vlistInqVarMissval(vlistID2, varID);
@@ -180,19 +174,6 @@ Yhourarith(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  for (houroy = 0; houroy < MAX_HOUR; ++houroy)
-    if (vardata2[houroy])
-      {
-        for (varID = 0; varID < nvars; varID++)
-          {
-            Free(vardata2[houroy][varID]);
-            Free(varnmiss2[houroy][varID]);
-          }
-
-        Free(vardata2[houroy]);
-        Free(varnmiss2[houroy]);
-      }
 
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);

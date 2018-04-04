@@ -43,11 +43,10 @@ Ymonarith(void *process)
     MONTHLY,
     SEASONAL
   };
-  int nrecs, nlev;
+  int nrecs;
   int varID, levelID;
-  int offset;
   size_t nmiss;
-  int vdate, year, mon, day;
+  int year, mon, day;
   const char *seas_name[4];
 
   cdoInitialize(process);
@@ -102,7 +101,7 @@ Ymonarith(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
-      vdate = taxisInqVdate(taxisID2);
+      int vdate = taxisInqVdate(taxisID2);
 
       cdiDecodeDate(vdate, &year, &mon, &day);
       if (mon < 1 || mon > MAX_MON) cdoAbort("Month %d out of range!", mon);
@@ -123,8 +122,8 @@ Ymonarith(void *process)
 
       for (varID = 0; varID < nvars; varID++)
         {
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          size_t nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
           vardata2[mon][varID].resize(nlev*gridsize);
           varnmiss2[mon][varID].resize(nlev);
         }
@@ -132,10 +131,8 @@ Ymonarith(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          offset = gridsize * levelID;
-
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          size_t offset = gridsize * levelID;
           pstreamReadRecord(streamID2, &vardata2[mon][varID][offset], &nmiss);
           varnmiss2[mon][varID][levelID] = nmiss;
         }
@@ -146,7 +143,7 @@ Ymonarith(void *process)
   tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      vdate = taxisInqVdate(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
 
       cdiDecodeDate(vdate, &year, &mon, &day);
       if (mon < 1 || mon > MAX_MON) cdoAbort("Month %d out of range!", mon);
@@ -173,8 +170,8 @@ Ymonarith(void *process)
           field1.grid = vlistInqVarGrid(vlistID1, varID);
           field1.missval = vlistInqVarMissval(vlistID1, varID);
 
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          offset = gridsize * levelID;
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          size_t offset = gridsize * levelID;
 
           arrayCopy(gridsize, &vardata2[mon][varID][offset], field2.ptr);
           field2.nmiss = varnmiss2[mon][varID][levelID];
