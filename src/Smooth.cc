@@ -368,7 +368,7 @@ Smooth(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  int *varIDs = (int *) Malloc(nvars * sizeof(int));
+  std::vector<bool> varIDs(nvars);
 
   for (int varID = 0; varID < nvars; ++varID)
     {
@@ -376,17 +376,17 @@ Smooth(void *process)
       int gridtype = gridInqType(gridID);
       if (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR)
         {
-          varIDs[varID] = 1;
+          varIDs[varID] = true;
         }
       else if (gridtype == GRID_UNSTRUCTURED && operatorID == SMOOTH)
         {
-          varIDs[varID] = 1;
+          varIDs[varID] = true;
         }
       else
         {
           char varname[CDI_MAX_NAME];
           vlistInqVarName(vlistID1, varID, varname);
-          varIDs[varID] = 0;
+          varIDs[varID] = false;
           cdoWarning("Unsupported grid for variable %s", varname);
         }
     }
@@ -399,8 +399,8 @@ Smooth(void *process)
 
   spoint.radius *= DEG2RAD;
 
-  double *array1 = (double *) Malloc(gridsizemax * sizeof(double));
-  double *array2 = (double *) Malloc(gridsizemax * sizeof(double));
+  std::vector<double> array1(gridsizemax);
+  std::vector<double> array2(gridsizemax);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -417,7 +417,7 @@ Smooth(void *process)
           size_t nmiss;
 
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           if (varIDs[varID])
             {
@@ -427,20 +427,20 @@ Smooth(void *process)
               for (int i = 0; i < xnsmooth; ++i)
                 {
                   if (operatorID == SMOOTH)
-                    smooth(gridID, missval, array1, array2, &nmiss, spoint);
+                    smooth(gridID, missval, array1.data(), array2.data(), &nmiss, spoint);
                   else if (operatorID == SMOOTH9)
-                    smooth9(gridID, missval, array1, array2, &nmiss);
+                    smooth9(gridID, missval, array1.data(), array2.data(), &nmiss);
 
-                  arrayCopy(gridsizemax, array2, array1);
+                  arrayCopy(gridsizemax, array2.data(), array1.data());
                 }
 
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2, array2, nmiss);
+              pstreamWriteRecord(streamID2, array2.data(), nmiss);
             }
           else
             {
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2, array1, nmiss);
+              pstreamWriteRecord(streamID2, array1.data(), nmiss);
             }
         }
 
@@ -449,10 +449,6 @@ Smooth(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  Free(varIDs);
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   cdoFinish();
 

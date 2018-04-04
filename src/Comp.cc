@@ -108,12 +108,12 @@ Comp(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistIDx1);
 
-  double *array1 = (double *) Malloc(gridsizemax * sizeof(double));
-  double *array2 = (double *) Malloc(gridsizemax * sizeof(double));
-  double *array3 = (double *) Malloc(gridsizemax * sizeof(double));
+  std::vector<double> array1(gridsizemax);
+  std::vector<double> array2(gridsizemax);
+  std::vector<double> array3(gridsizemax);
 
-  double *arrayx1 = array1;
-  double *arrayx2 = array2;
+  double *arrayx1 = array1.data();
+  double *arrayx2 = array2.data();
 
   if (cdoVerbose) cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
 
@@ -151,8 +151,8 @@ Comp(void *process)
 
   if (fillstream1)
     {
-      arrayx1 = array2;
-      arrayx2 = array1;
+      arrayx1 = array2.data();
+      arrayx2 = array1.data();
       missvalx1 = &missval2;
       missvalx2 = &missval1;
     }
@@ -175,7 +175,6 @@ Comp(void *process)
         }
 
       taxisCopyTimestep(taxisID3, taxisIDx1);
-
       pstreamDefTimestep(streamID3, tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -288,9 +287,9 @@ Comp(void *process)
               cdoAbort("Operator not implemented!");
             }
 
-          size_t nmiss3 = arrayNumMV(gridsize, array3, missval1);
+          size_t nmiss3 = arrayNumMV(gridsize, array3.data(), missval1);
           pstreamDefRecord(streamID3, varID, levelID);
-          pstreamWriteRecord(streamID3, array3, nmiss3);
+          pstreamWriteRecord(streamID3, array3.data(), nmiss3);
         }
 
       tsID++;
@@ -299,10 +298,6 @@ Comp(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array3) Free(array3);
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   cdoFinish();
 

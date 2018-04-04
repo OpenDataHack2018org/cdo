@@ -65,8 +65,8 @@ Compc(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double *) Malloc(gridsizemax * sizeof(double));
-  double *array2 = (double *) Malloc(gridsizemax * sizeof(double));
+  std::vector<double> array1(gridsizemax);
+  std::vector<double> array2(gridsizemax);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -75,13 +75,12 @@ Compc(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           double missval = vlistInqVarMissval(vlistID1, varID);
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -126,9 +125,9 @@ Compc(void *process)
               cdoAbort("Operator not implemented!");
             }
 
-          nmiss = arrayNumMV(gridsize, array2, missval);
+          nmiss = arrayNumMV(gridsize, array2.data(), missval);
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, array2, nmiss);
+          pstreamWriteRecord(streamID2, array2.data(), nmiss);
         }
 
       tsID++;
@@ -136,9 +135,6 @@ Compc(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   cdoFinish();
 
