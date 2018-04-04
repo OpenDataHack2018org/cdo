@@ -38,8 +38,6 @@ Ydayarith(void *process)
   int varID, levelID;
   size_t nmiss;
   int year, month, day;
-  size_t **varnmiss2[MAX_DOY];
-  double **vardata2[MAX_DOY];
 
   cdoInitialize(process);
 
@@ -78,7 +76,8 @@ Ydayarith(void *process)
 
   int nvars = vlistNvars(vlistID2);
 
-  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++) vardata2[dayoy] = NULL;
+  std::vector<std::vector<std::vector<double>>> vardata2(MAX_DOY);
+  std::vector<std::vector<std::vector<size_t>>> varnmiss2(MAX_DOY);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
@@ -92,27 +91,25 @@ Ydayarith(void *process)
 
       if (dayoy < 0 || dayoy >= MAX_DOY) cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
-      if (vardata2[dayoy] != NULL) cdoAbort("Day of year %d already allocatd (date=%d)!", dayoy, vdate);
+      if (vardata2[dayoy].size() > 0) cdoAbort("Day of year %d already allocatd (date=%d)!", dayoy, vdate);
 
-      vardata2[dayoy] = (double **) Malloc(nvars * sizeof(double *));
-      varnmiss2[dayoy] = (size_t **) Malloc(nvars * sizeof(size_t *));
+      vardata2[dayoy].resize(nvars);
+      varnmiss2[dayoy].resize(nvars);
 
       for (varID = 0; varID < nvars; varID++)
         {
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           size_t nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-          vardata2[dayoy][varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
-          varnmiss2[dayoy][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+          vardata2[dayoy][varID].resize(nlev * gridsize);
+          varnmiss2[dayoy][varID].resize(nlev);
         }
 
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           size_t offset = gridsize * levelID;
-
-          pstreamReadRecord(streamID2, vardata2[dayoy][varID] + offset, &nmiss);
+          pstreamReadRecord(streamID2, &vardata2[dayoy][varID][offset], &nmiss);
           varnmiss2[dayoy][varID][levelID] = nmiss;
         }
 
@@ -132,7 +129,6 @@ Ydayarith(void *process)
       if (dayoy < 0 || dayoy >= MAX_DOY) cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
       taxisCopyTimestep(taxisID3, taxisID1);
-
       pstreamDefTimestep(streamID3, tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -143,8 +139,8 @@ Ydayarith(void *process)
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           size_t offset = gridsize * levelID;
-          if (vardata2[dayoy] == NULL) cdoAbort("Day of year %d not found (date=%d)!", dayoy, vdate);
-          arrayCopy(gridsize, vardata2[dayoy][varID] + offset, field2.ptr);
+          if (vardata2[dayoy].size() == 0) cdoAbort("Day of year %d not found (date=%d)!", dayoy, vdate);
+          arrayCopy(gridsize, &vardata2[dayoy][varID][offset], field2.ptr);
           field2.nmiss = varnmiss2[dayoy][varID][levelID];
 
           field1.grid = vlistInqVarGrid(vlistID1, varID);
@@ -165,19 +161,6 @@ Ydayarith(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
-    if (vardata2[dayoy])
-      {
-        for (varID = 0; varID < nvars; varID++)
-          {
-            Free(vardata2[dayoy][varID]);
-            Free(varnmiss2[dayoy][varID]);
-          }
-
-        Free(vardata2[dayoy]);
-        Free(varnmiss2[dayoy]);
-      }
 
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);
