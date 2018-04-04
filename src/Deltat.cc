@@ -49,8 +49,8 @@ Deltat(void *process)
   field_type **vars = field_malloc(vlistID1, FIELD_PTR);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
-  double *array1 = (double *) Malloc(gridsizemax * sizeof(double));
-  double *array2 = (double *) Malloc(gridsizemax * sizeof(double));
+  std::vector<double> array1(gridsizemax);
+  std::vector<double> array2(gridsizemax);
 
   int tsID = 0;
   int nrecs = cdoStreamInqTimestep(streamID1, tsID);
@@ -71,7 +71,7 @@ Deltat(void *process)
       for (int recID = 0; recID < nrecs; ++recID)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           double missval = vars[varID][levelID].missval;
           double *array0 = vars[varID][levelID].ptr;
@@ -86,25 +86,23 @@ Deltat(void *process)
                     array2[i] = array1[i] - array0[i];
                 }
 
-              nmiss = arrayNumMV(gridsize, array2, missval);
+              nmiss = arrayNumMV(gridsize, array2.data(), missval);
             }
           else
             {
               for (size_t i = 0; i < gridsize; ++i) array2[i] = array1[i] - array0[i];
             }
 
-          arrayCopy(gridsize, array1, array0);
+          arrayCopy(gridsize, array1.data(), array0);
 
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, array2, nmiss);
+          pstreamWriteRecord(streamID2, array2.data(), nmiss);
         }
 
       tsID++;
       tsID2++;
     }
 
-  Free(array1);
-  Free(array2);
   field_free(vars, vlistID1);
 
   pstreamClose(streamID2);

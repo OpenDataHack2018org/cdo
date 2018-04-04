@@ -110,7 +110,7 @@ boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon,
       size_t inc = i * nc;
       float clat = corner_lat[inc];
       float clon = corner_lon[inc];
-      bound_box[i4] = clat;
+      bound_box[i4 + 0] = clat;
       bound_box[i4 + 1] = clat;
       bound_box[i4 + 2] = clon;
       bound_box[i4 + 3] = clon;
@@ -118,7 +118,7 @@ boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon,
         {
           clat = corner_lat[inc + j];
           clon = corner_lon[inc + j];
-          if (clat < bound_box[i4]) bound_box[i4] = clat;
+          if (clat < bound_box[i4 + 0]) bound_box[i4 + 0] = clat;
           if (clat > bound_box[i4 + 1]) bound_box[i4 + 1] = clat;
           if (clon < bound_box[i4 + 2]) bound_box[i4 + 2] = clon;
           if (clon > bound_box[i4 + 3]) bound_box[i4 + 3] = clon;
@@ -159,14 +159,14 @@ boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const 
       for (unsigned j = 0; j < 4; ++j) tmp_lons[j] = center_lon[idx[j]];
       for (unsigned j = 0; j < 4; ++j) tmp_lats[j] = center_lat[idx[j]];
 
-      bound_box[n4] = tmp_lats[0];
+      bound_box[n4 + 0] = tmp_lats[0];
       bound_box[n4 + 1] = tmp_lats[0];
       bound_box[n4 + 2] = tmp_lons[0];
       bound_box[n4 + 3] = tmp_lons[0];
 
       for (unsigned k = 1; k < 4; k++)
         {
-          if (tmp_lats[k] < bound_box[n4]) bound_box[n4] = tmp_lats[k];
+          if (tmp_lats[k] < bound_box[n4 + 0]) bound_box[n4 + 0] = tmp_lats[k];
           if (tmp_lats[k] > bound_box[n4 + 1]) bound_box[n4 + 1] = tmp_lats[k];
           if (tmp_lons[k] < bound_box[n4 + 2]) bound_box[n4 + 2] = tmp_lons[k];
           if (tmp_lons[k] > bound_box[n4 + 3]) bound_box[n4 + 3] = tmp_lons[k];

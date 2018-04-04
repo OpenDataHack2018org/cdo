@@ -96,32 +96,28 @@ shiftx_coord(bool lcyclic, int nshift, int gridID1)
   int ny = gridInqYsize(gridID1);
   if (gridInqType(gridID1) != GRID_CURVILINEAR) ny = 1;
 
-  double *array1 = (double *) Malloc(nx * ny * sizeof(double));
-  double *array2 = (double *) Malloc(nx * ny * sizeof(double));
+  std::vector<double> array1(nx * ny);
+  std::vector<double> array2(nx * ny);
 
-  gridInqXvals(gridID1, array1);
-  shiftx(lcyclic, nshift, nx, ny, array1, array2, 0);
-  gridDefXvals(gridID2, array2);
+  gridInqXvals(gridID1, array1.data());
+  shiftx(lcyclic, nshift, nx, ny, array1.data(), array2.data(), 0);
+  gridDefXvals(gridID2, array2.data());
 
   if (gridInqXbounds(gridID1, NULL))
     {
       int nv = 4;
       if (gridInqType(gridID1) != GRID_CURVILINEAR) nv = 2;
 
-      double *bounds = (double *) Malloc(nx * ny * nv * sizeof(double));
-      gridInqXbounds(gridID1, bounds);
+      std::vector<double> bounds(nx * ny * nv);
+      gridInqXbounds(gridID1, bounds.data());
       for (int k = 0; k < nv; ++k)
         {
           for (size_t i = 0; i < nx * ny; ++i) array1[i] = bounds[i * nv + k];
-          shiftx(lcyclic, nshift, nx, ny, array1, array2, 0);
+          shiftx(lcyclic, nshift, nx, ny, array1.data(), array2.data(), 0);
           for (size_t i = 0; i < nx * ny; ++i) bounds[i * nv + k] = array2[i];
         }
-      gridDefXbounds(gridID2, bounds);
-      Free(bounds);
+      gridDefXbounds(gridID2, bounds.data());
     }
-
-  Free(array2);
-  Free(array1);
 
   return gridID2;
 }
@@ -135,32 +131,28 @@ shifty_coord(bool lcyclic, int nshift, int gridID1)
   int ny = gridInqYsize(gridID1);
   if (gridInqType(gridID1) != GRID_CURVILINEAR) nx = 1;
 
-  double *array1 = (double *) Malloc(nx * ny * sizeof(double));
-  double *array2 = (double *) Malloc(nx * ny * sizeof(double));
+  std::vector<double> array1(nx * ny);
+  std::vector<double> array2(nx * ny);
 
-  gridInqYvals(gridID1, array1);
-  shifty(lcyclic, nshift, nx, ny, array1, array2, 0);
-  gridDefYvals(gridID2, array2);
+  gridInqYvals(gridID1, array1.data());
+  shifty(lcyclic, nshift, nx, ny, array1.data(), array2.data(), 0);
+  gridDefYvals(gridID2, array2.data());
 
   if (gridInqYbounds(gridID1, NULL))
     {
       int nv = 4;
       if (gridInqType(gridID1) != GRID_CURVILINEAR) nv = 2;
 
-      double *bounds = (double *) Malloc(nx * ny * nv * sizeof(double));
-      gridInqYbounds(gridID1, bounds);
+      std::vector<double> bounds(nx * ny * nv);
+      gridInqYbounds(gridID1, bounds.data());
       for (int k = 0; k < nv; ++k)
         {
           for (size_t i = 0; i < nx * ny; ++i) array1[i] = bounds[i * nv + k];
-          shifty(lcyclic, nshift, nx, ny, array1, array2, 0);
+          shifty(lcyclic, nshift, nx, ny, array1.data(), array2.data(), 0);
           for (size_t i = 0; i < nx * ny; ++i) bounds[i * nv + k] = array2[i];
         }
-      gridDefYbounds(gridID2, bounds);
-      Free(bounds);
+      gridDefYbounds(gridID2, bounds.data());
     }
-
-  Free(array2);
-  Free(array1);
 
   return gridID2;
 }
@@ -206,7 +198,7 @@ Shiftxy(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars = (bool *) Malloc(nvars * sizeof(bool));
+  std::vector<bool> vars(nvars);
   for (varID = 0; varID < nvars; varID++) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
@@ -254,9 +246,9 @@ Shiftxy(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  std::vector<double> array1(gridsizemax);
+  std::vector<double> array2(gridsizemax);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -267,7 +259,7 @@ Shiftxy(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           pstreamDefRecord(streamID2, varID, levelID);
 
@@ -281,16 +273,16 @@ Shiftxy(void *process)
               size_t ny = gridInqYsize(gridID1);
 
               if (operatorID == SHIFTX)
-                shiftx(lcyclic, nshift, nx, ny, array1, array2, missval);
+                shiftx(lcyclic, nshift, nx, ny, array1.data(), array2.data(), missval);
               else if (operatorID == SHIFTY)
-                shifty(lcyclic, nshift, nx, ny, array1, array2, missval);
+                shifty(lcyclic, nshift, nx, ny, array1.data(), array2.data(), missval);
 
-              nmiss = arrayNumMV(gridsize, array2, missval);
-              pstreamWriteRecord(streamID2, array2, nmiss);
+              nmiss = arrayNumMV(gridsize, array2.data(), missval);
+              pstreamWriteRecord(streamID2, array2.data(), nmiss);
             }
           else
             {
-              pstreamWriteRecord(streamID2, array1, nmiss);
+              pstreamWriteRecord(streamID2, array1.data(), nmiss);
             }
         }
       tsID++;
@@ -300,10 +292,6 @@ Shiftxy(void *process)
   pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  if (vars) Free(vars);
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   cdoFinish();
 

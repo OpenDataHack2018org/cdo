@@ -28,10 +28,9 @@ Seloperator(void *process)
   int nlevs, code, zaxisID, selfound = FALSE;
   int levID, ltype = 0;
   int varID2, levelID2;
-  int sellevel, selcode, selltype;
-  size_t gridsize, nmiss;
+  bool sellevel, selcode, selltype;
+  size_t nmiss;
   double slevel = 0, level;
-  double *array = NULL;
 
   cdoInitialize(process);
 
@@ -64,22 +63,22 @@ Seloperator(void *process)
           if (operatorArgc() == 3)
             sellevel = IS_EQUAL(level, slevel);
           else
-            sellevel = TRUE;
+            sellevel = true;
 
           if (scode == -1 || scode == code)
-            selcode = TRUE;
+            selcode = true;
           else
-            selcode = FALSE;
+            selcode = false;
 
           if (sltype == -1 || sltype == ltype)
-            selltype = TRUE;
+            selltype = true;
           else
-            selltype = FALSE;
+            selltype = false;
 
           if (selcode && selltype && sellevel)
             {
-              vlistDefFlag(vlistID1, varID, levID, TRUE);
-              selfound = TRUE;
+              vlistDefFlag(vlistID1, varID, levID, true);
+              selfound = true;
             }
         }
     }
@@ -96,10 +95,11 @@ Seloperator(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
+  std::vector<double> array;
   if (!lcopy)
     {
-      gridsize = vlistGridsizeMax(vlistID1);
-      array = (double *) Malloc(gridsize * sizeof(double));
+      size_t gridsizemax = vlistGridsizeMax(vlistID1);
+      array.resize(gridsizemax);
     }
 
   int tsID = 0;
@@ -124,8 +124,8 @@ Seloperator(void *process)
                 }
               else
                 {
-                  pstreamReadRecord(streamID1, array, &nmiss);
-                  pstreamWriteRecord(streamID2, array, nmiss);
+                  pstreamReadRecord(streamID1, array.data(), &nmiss);
+                  pstreamWriteRecord(streamID2, array.data(), nmiss);
                 }
             }
         }
@@ -137,9 +137,6 @@ Seloperator(void *process)
   pstreamClose(streamID2);
 
   vlistDestroy(vlistID2);
-
-  if (!lcopy)
-    if (array) Free(array);
 
   cdoFinish();
 

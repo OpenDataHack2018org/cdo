@@ -34,7 +34,6 @@ Splitrec(void *process)
   char filesuffix[32];
   char filename[8192];
   size_t nmiss;
-  double *array = NULL;
 
   cdoInitialize(process);
 
@@ -54,11 +53,12 @@ Splitrec(void *process)
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
+  std::vector<double> array;
   if (!lcopy)
     {
       size_t gridsizemax = vlistGridsizeMax(vlistID1);
       if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
-      array = (double *) Malloc(gridsizemax * sizeof(double));
+      array.resize(gridsizemax);
     }
 
   int index = 0;
@@ -96,8 +96,8 @@ Splitrec(void *process)
             }
           else
             {
-              pstreamReadRecord(streamID1, array, &nmiss);
-              pstreamWriteRecord(streamID2, array, nmiss);
+              pstreamReadRecord(streamID1, array.data(), &nmiss);
+              pstreamWriteRecord(streamID2, array.data(), nmiss);
             }
 
           pstreamClose(streamID2);
@@ -108,9 +108,6 @@ Splitrec(void *process)
     }
 
   pstreamClose(streamID1);
-
-  if (!lcopy)
-    if (array) Free(array);
 
   cdoFinish();
 

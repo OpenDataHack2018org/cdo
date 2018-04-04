@@ -97,7 +97,7 @@ Select(void *process)
   bool lconstvars = true;
   int streamID2 = CDI_UNDEFID;
   int nrecs;
-  int nvars, nvars2;
+  int nvars, nvars2 = 0;
   int varID, levelID;
   int last_year = -999999999;
   char paramstr[32];
@@ -109,9 +109,9 @@ Select(void *process)
   int taxisID2 = CDI_UNDEFID;
   int ntsteps2 = 0;
   bool ltimsel = false;
-  bool *vars = NULL;
+  std::vector<bool> vars;
   double **vardata2 = NULL;
-  double *array = NULL;
+  std::vector<double> array;
   double fstartdate = -99999999999.;
   double fenddate = -99999999999.;
 
@@ -206,7 +206,7 @@ Select(void *process)
 
           vlistClearFlag(vlistID1);
           nvars = vlistNvars(vlistID1);
-          vars = (bool *) Malloc(nvars * sizeof(bool));
+          vars.resize(nvars);
 
           if (operatorID == DELETE)
             {
@@ -488,9 +488,9 @@ Select(void *process)
 
           if (!lcopy)
             {
-              size_t gridsize = vlistGridsizeMax(vlistID1);
-              if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-              array = (double *) Malloc(gridsize * sizeof(double));
+              size_t gridsizemax = vlistGridsizeMax(vlistID1);
+              if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
+              array.resize(gridsizemax);
             }
 
           SELLIST_GET_VAL(startdate, 0, &startdate);
@@ -642,8 +642,8 @@ Select(void *process)
                       else
                         {
                           size_t nmiss;
-                          pstreamReadRecord(streamID1, array, &nmiss);
-                          pstreamWriteRecord(streamID2, array, nmiss);
+                          pstreamReadRecord(streamID1, array.data(), &nmiss);
+                          pstreamWriteRecord(streamID2, array.data(), nmiss);
                         }
                     }
                 }
@@ -710,8 +710,6 @@ END_LABEL:
   sellist_destroy(sellist);
   kvlist_destroy(kvlist);
 
-  if (array) Free(array);
-  if (vars) Free(vars);
   if (vardata2)
     {
       for (varID = 0; varID < nvars2; ++varID)

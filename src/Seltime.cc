@@ -194,13 +194,11 @@ Seltime(void *process)
   int nts1 = 0, nts2 = 0;
   int its1 = 0, its2 = 0;
   double selfval = 0;
-  double *array = NULL;
   lista_t *ilista = lista_new(INT_LISTA);
   lista_t *flista = lista_new(FLT_LISTA);
   bool lconstout = false;
   bool process_nts1 = false, process_nts2 = false;
-  bool *selfound = NULL;
-  int *vdate_list = NULL, *vtime_list = NULL;
+  std::vector<int> vdate_list, vtime_list;
   field_type ***vars = NULL;
 
   cdoInitialize(process);
@@ -275,9 +273,10 @@ Seltime(void *process)
       nsel = 1;
     }
 
+  std::vector<bool> selfound;
   if (nsel)
     {
-      selfound = (bool *) Malloc(nsel * sizeof(bool));
+      selfound.resize(nsel);
       for (i = 0; i < nsel; i++) selfound[i] = false;
     }
 
@@ -292,11 +291,12 @@ Seltime(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
+  std::vector<double> array;
   if (!lcopy)
     {
-      size_t gridsize = vlistGridsizeMax(vlistID1);
-      if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-      array = (double *) Malloc(gridsize * sizeof(double));
+      size_t gridsizemax = vlistGridsizeMax(vlistID1);
+      if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
+      array.resize(gridsizemax);
     }
 
   int ntsteps = vlistNtsteps(vlistID1);
@@ -334,8 +334,8 @@ Seltime(void *process)
     {
       if (lnts1)
         {
-          vdate_list = (int *) Malloc(nts1 * sizeof(int));
-          vtime_list = (int *) Malloc(nts1 * sizeof(int));
+          vdate_list.resize(nts1);
+          vtime_list.resize(nts1);
         }
       else
         {
@@ -530,8 +530,8 @@ Seltime(void *process)
                 }
               else
                 {
-                  pstreamReadRecord(streamID1, array, &nmiss);
-                  pstreamWriteRecord(streamID2, array, nmiss);
+                  pstreamReadRecord(streamID1, array.data(), &nmiss);
+                  pstreamWriteRecord(streamID2, array.data(), nmiss);
                 }
             }
         }
@@ -596,8 +596,6 @@ Seltime(void *process)
   if (operatorID == SELSMON)
     if (its2 < nts2) cdoWarning("%d timesteps missing after the last month!", nts2 - its2);
 
-  if (array) Free(array);
-
   for (int isel = 0; isel < nsel; isel++)
     {
       if (selfound[isel] == false)
@@ -658,18 +656,13 @@ Seltime(void *process)
         }
     }
 
-  if (selfound) Free(selfound);
-
   lista_destroy(ilista);
   lista_destroy(flista);
 
   if (lnts1 || nconst)
     {
       for (tsID = 0; tsID < nts1; tsID++) field_free(vars[tsID], vlistID2);
-
       if (vars) Free(vars);
-      if (vdate_list) Free(vdate_list);
-      if (vtime_list) Free(vtime_list);
     }
 
   vlistDestroy(vlistID2);

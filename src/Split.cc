@@ -48,7 +48,6 @@ Split(void *process)
   int levelID, levID;
   int varID2, levelID2;
   int vlistID2;
-  int *vlistIDs = NULL, *streamIDs = NULL;
   int itmp[999];
   double ftmp[999];
   char filesuffix[32];
@@ -57,6 +56,7 @@ Split(void *process)
   size_t nmiss;
   bool swap_obase = false;
   const char *uuid_attribute = NULL;
+  std::vector<int> vlistIDs, streamIDs;
 
   cdoInitialize(process);
 
@@ -119,8 +119,8 @@ Split(void *process)
             }
         }
 
-      vlistIDs = (int *) Malloc(nsplit * sizeof(int));
-      streamIDs = (int *) Malloc(nsplit * sizeof(int));
+      vlistIDs.resize(nsplit);
+      streamIDs.resize(nsplit);
       std::vector<int> codes(nsplit);
       for (int index = 0; index < nsplit; ++index) codes[index] = itmp[index];
 
@@ -182,8 +182,8 @@ Split(void *process)
             }
         }
 
-      vlistIDs = (int *) Malloc(nsplit * sizeof(int));
-      streamIDs = (int *) Malloc(nsplit * sizeof(int));
+      vlistIDs.resize(nsplit);
+      streamIDs.resize(nsplit);
       std::vector<int> params(nsplit);
       for (int index = 0; index < nsplit; ++index) params[index] = itmp[index];
 
@@ -234,8 +234,8 @@ Split(void *process)
             }
         }
 
-      vlistIDs = (int *) Malloc(nsplit * sizeof(int));
-      streamIDs = (int *) Malloc(nsplit * sizeof(int));
+      vlistIDs.resize(nsplit);
+      streamIDs.resize(nsplit);
       std::vector<int> tabnums(nsplit);
       for (int index = 0; index < nsplit; ++index) tabnums[index] = itmp[index];
 
@@ -270,8 +270,8 @@ Split(void *process)
       char varname[CDI_MAX_NAME];
       nsplit = nvars;
 
-      vlistIDs = (int *) Malloc(nsplit * sizeof(int));
-      streamIDs = (int *) Malloc(nsplit * sizeof(int));
+      vlistIDs.resize(nsplit);
+      streamIDs.resize(nsplit);
 
       for (int index = 0; index < nsplit; index++)
         {
@@ -315,8 +315,8 @@ Split(void *process)
             }
         }
 
-      vlistIDs = (int *) Malloc(nsplit * sizeof(int));
-      streamIDs = (int *) Malloc(nsplit * sizeof(int));
+      vlistIDs.resize(nsplit);
+      streamIDs.resize(nsplit);
       std::vector<double> levels(nsplit);
       for (int index = 0; index < nsplit; ++index) levels[index] = ftmp[index];
 
@@ -353,8 +353,8 @@ Split(void *process)
 
       nsplit = vlistNgrids(vlistID1);
 
-      vlistIDs = (int *) Malloc(nsplit * sizeof(int));
-      streamIDs = (int *) Malloc(nsplit * sizeof(int));
+      vlistIDs.resize(nsplit);
+      streamIDs.resize(nsplit);
       std::vector<int> gridIDs(nsplit);
       for (int index = 0; index < nsplit; ++index) gridIDs[index] = vlistGrid(vlistID1, index);
 
@@ -388,8 +388,8 @@ Split(void *process)
     {
       nsplit = vlistNzaxis(vlistID1);
 
-      vlistIDs = (int *) Malloc(nsplit * sizeof(int));
-      streamIDs = (int *) Malloc(nsplit * sizeof(int));
+      vlistIDs.resize(nsplit);
+      streamIDs.resize(nsplit);
       std::vector<int> zaxisIDs(nsplit);
       for (int index = 0; index < nsplit; ++index) zaxisIDs[index] = vlistZaxis(vlistID1, index);
 
@@ -431,12 +431,12 @@ Split(void *process)
       pstreamDefVlist(streamIDs[index], vlistIDs[index]);
     }
 
-  double *array = NULL;
+  std::vector<double> array;
   if (!lcopy)
     {
-      size_t gridsize = vlistGridsizeMax(vlistID1);
-      if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-      array = (double *) Malloc(gridsize * sizeof(double));
+      size_t gridsizemax = vlistGridsizeMax(vlistID1);
+      if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
+      array.resize(gridsizemax);
     }
 
   int nrecs;
@@ -464,8 +464,8 @@ Split(void *process)
             }
           else
             {
-              pstreamReadRecord(streamID1, array, &nmiss);
-              pstreamWriteRecord(streamIDs[index], array, nmiss);
+              pstreamReadRecord(streamID1, array.data(), &nmiss);
+              pstreamWriteRecord(streamIDs[index], array.data(), nmiss);
             }
         }
 
@@ -479,12 +479,6 @@ Split(void *process)
       pstreamClose(streamIDs[index]);
       vlistDestroy(vlistIDs[index]);
     }
-
-  if (!lcopy)
-    if (array) Free(array);
-
-  if (vlistIDs) Free(vlistIDs);
-  if (streamIDs) Free(streamIDs);
 
   cdoFinish();
 

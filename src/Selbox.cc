@@ -888,7 +888,7 @@ Selbox(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars = (bool *) Malloc(nvars * sizeof(bool));
+  std::vector<bool> vars(nvars);
   for (varID = 0; varID < nvars; varID++) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
@@ -962,11 +962,11 @@ Selbox(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
 
   size_t gridsize2 = vlistGridsizeMax(vlistID2);
   if (vlistNumber(vlistID2) != CDI_REAL) gridsize2 *= 2;
-  double *array2 = (double *) Malloc(gridsize2 * sizeof(double));
+  std::vector<double> array2(gridsize2);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -977,7 +977,7 @@ Selbox(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           pstreamDefRecord(streamID2, varID, levelID);
 
@@ -996,22 +996,22 @@ Selbox(void *process)
               gridsize2 = gridInqSize(sbox[index].gridID2);
 
               if (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED)
-                window_cell(nwpv, array1, gridID1, array2, gridsize2, sbox[index].cellidx);
+                window_cell(nwpv, array1.data(), gridID1, array2.data(), gridsize2, sbox[index].cellidx);
               else
-                window(nwpv, array1, gridID1, array2, sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, sbox[index].lon12,
+                window(nwpv, array1.data(), gridID1, array2.data(), sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, sbox[index].lon12,
                        sbox[index].lon21, sbox[index].lon22);
 
               if (nmiss)
                 {
                   missval = vlistInqVarMissval(vlistID2, varID);
-                  nmiss = arrayNumMV(gridsize2, array2, missval);
+                  nmiss = arrayNumMV(gridsize2, array2.data(), missval);
                 }
 
-              pstreamWriteRecord(streamID2, array2, nmiss);
+              pstreamWriteRecord(streamID2, array2.data(), nmiss);
             }
           else
             {
-              pstreamWriteRecord(streamID2, array1, nmiss);
+              pstreamWriteRecord(streamID2, array1.data(), nmiss);
             }
         }
 
@@ -1022,10 +1022,6 @@ Selbox(void *process)
   pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  if (vars) Free(vars);
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   if (sbox)
     {

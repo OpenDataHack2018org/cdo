@@ -25,7 +25,6 @@ Complextorect(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int datatype;
   size_t nmiss;
 
   cdoInitialize(process);
@@ -44,7 +43,7 @@ Complextorect(void *process)
   int nvars = vlistNvars(vlistID2);
   for (varID = 0; varID < nvars; ++varID)
     {
-      datatype = vlistInqVarDatatype(vlistID2, varID);
+      int datatype = vlistInqVarDatatype(vlistID2, varID);
       if (datatype == CDI_DATATYPE_CPX64)
         datatype = CDI_DATATYPE_FLT64;
       else
@@ -66,10 +65,10 @@ Complextorect(void *process)
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID3);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double *) Malloc(2 * gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
-  double *array3 = (double *) Malloc(gridsize * sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  std::vector<double> array1(2 * gridsizemax);
+  std::vector<double> array2(gridsizemax);
+  std::vector<double> array3(gridsizemax);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -86,9 +85,9 @@ Complextorect(void *process)
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamDefRecord(streamID3, varID, levelID);
 
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           double missval1 = vlistInqVarMissval(vlistID1, varID);
           double missval2 = missval1;
@@ -112,8 +111,8 @@ Complextorect(void *process)
                 }
             }
 
-          pstreamWriteRecord(streamID2, array2, nmiss);
-          pstreamWriteRecord(streamID3, array3, nmiss);
+          pstreamWriteRecord(streamID2, array2.data(), nmiss);
+          pstreamWriteRecord(streamID3, array3.data(), nmiss);
         }
 
       tsID++;
@@ -122,10 +121,6 @@ Complextorect(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array1) Free(array1);
-  if (array2) Free(array2);
-  if (array3) Free(array3);
 
   vlistDestroy(vlistID2);
   vlistDestroy(vlistID3);

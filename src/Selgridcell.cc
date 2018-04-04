@@ -134,19 +134,19 @@ Selgridcell(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars = (bool *) Malloc(nvars * sizeof(bool));
+  std::vector<bool> vars(nvars);
   for (varID = 0; varID < nvars; varID++) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
-  sindex_t *sindex = (sindex_t *) Malloc(ngrids * sizeof(sindex_t));
+  std::vector<sindex_t> sindex(ngrids);
 
   long ncells = nind;
-  long *cellidx = NULL;
+  std::vector<long> cellidx;
   if (operatorID == DELGRIDCELL)
     {
       size_t gridsize = vlistGridsizeMax(vlistID1);
       ncells = gridsize - nind;
-      cellidx = (long *) Malloc(gridsize * sizeof(long));
+      cellidx.resize(gridsize);
       for (size_t i = 0; i < gridsize; ++i) cellidx[i] = 1;
       for (long i = 0; i < nind; ++i) cellidx[indarr[i]] = 0;
       long j = 0;
@@ -156,7 +156,7 @@ Selgridcell(void *process)
     }
   else
     {
-      cellidx = (long *) Malloc(nind * sizeof(long));
+      cellidx.resize(nind);
       for (int i = 0; i < nind; ++i) cellidx[i] = indarr[i];
     }
 
@@ -175,7 +175,7 @@ Selgridcell(void *process)
           continue;
         }
 
-      gridID2 = genindexgrid(gridID1, ncells, cellidx);
+      gridID2 = genindexgrid(gridID1, ncells, cellidx.data());
 
       if (gridID2 == -1)
         {
@@ -202,11 +202,11 @@ Selgridcell(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
 
   size_t gridsize2 = vlistGridsizeMax(vlistID2);
   if (vlistNumber(vlistID2) != CDI_REAL) gridsize2 *= 2;
-  double *array2 = (double *) Malloc(gridsize2 * sizeof(double));
+  std::vector<double> array2(gridsize2);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -219,7 +219,7 @@ Selgridcell(void *process)
           size_t nmiss;
           int varID, levelID;
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           pstreamDefRecord(streamID2, varID, levelID);
 
@@ -234,19 +234,19 @@ Selgridcell(void *process)
 
               gridsize2 = gridInqSize(sindex[index].gridID2);
 
-              sel_index(array1, array2, ncells, cellidx);
+              sel_index(array1.data(), array2.data(), ncells, cellidx.data());
 
               if (nmiss)
                 {
                   double missval = vlistInqVarMissval(vlistID2, varID);
-                  nmiss = arrayNumMV(gridsize2, array2, missval);
+                  nmiss = arrayNumMV(gridsize2, array2.data(), missval);
                 }
 
-              pstreamWriteRecord(streamID2, array2, nmiss);
+              pstreamWriteRecord(streamID2, array2.data(), nmiss);
             }
           else
             {
-              pstreamWriteRecord(streamID2, array1, nmiss);
+              pstreamWriteRecord(streamID2, array1.data(), nmiss);
             }
         }
 
@@ -258,14 +258,7 @@ Selgridcell(void *process)
 
   vlistDestroy(vlistID2);
 
-  if (vars) Free(vars);
-  if (array2) Free(array2);
-  if (array1) Free(array1);
-  if (sindex) Free(sindex);
-
   lista_destroy(ilista);
-
-  if (operatorID == DELGRIDCELL) Free(cellidx);
 
   cdoFinish();
 

@@ -18,13 +18,14 @@
 /*
    This module contains the following operators:
 
-      Selvar     selparam        Select parameters by identifier (format:
-   code.tabnum  or  pnum.cat.dis) Selvar     delparam        Delete parameters
-   by identifier (format: code.tabnum  or  pnum.cat.dis) Selvar     selcode
-   Select parameters by code number Selvar     delcode         Delete parameters
-   by code number Selvar     selname         Select parameters by name Selvar
-   delname         Delete parameters by name Selvar     selstdname      Select
-   parameters by CF standard name Selvar     sellevel        Select levels
+      Selvar     selparam        Select parameters by identifier (format: code.tabnum  or  pnum.cat.dis)
+      Selvar     delparam        Delete parameters by identifier (format: code.tabnum  or  pnum.cat.dis)
+      Selvar     selcode         Select parameters by code number
+      Selvar     delcode         Delete parameters by code number
+      Selvar     selname         Select parameters by name
+      Selvar     delname         Delete parameters by name
+      Selvar     selstdname      Select parameters by CF standard name
+      Selvar     sellevel        Select levels
       Selvar     sellevidx       Select levels by index
       Selvar     selgrid         Select grids
       Selvar     selzaxis        Select zaxis
@@ -116,10 +117,10 @@ Selvar(void *process)
         for (int i = 0; i < nsel; i++) cdoPrint("int %d = %d", i + 1, intarr[i]);
     }
 
-  bool *selfound = NULL;
+  std::vector<bool> selfound;
   if (nsel)
     {
-      selfound = (bool *) Malloc(nsel * sizeof(bool));
+      selfound.resize(nsel);
       for (int i = 0; i < nsel; i++) selfound[i] = false;
     }
 
@@ -131,7 +132,7 @@ Selvar(void *process)
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int nvars = vlistNvars(vlistID1);
-  bool *vars = (bool *) Malloc(nvars * sizeof(bool));
+  std::vector<bool> vars(nvars);
 
   if (operatorID == SELGRID && !args_are_numeric && nsel == 1 && strncmp(argnames[0], "var=", 4) == 0)
     {
@@ -300,12 +301,12 @@ Selvar(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  double *array = NULL;
+  std::vector<double> array;
   if (!lcopy)
     {
-      size_t gridsize = vlistGridsizeMax(vlistID1);
-      if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-      array = (double *) Malloc(gridsize * sizeof(double));
+      size_t gridsizemax = vlistGridsizeMax(vlistID1);
+      if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
+      array.resize(gridsizemax);
     }
 
   int tsID = 0;
@@ -329,8 +330,8 @@ Selvar(void *process)
                 }
               else
                 {
-                  pstreamReadRecord(streamID1, array, &nmiss);
-                  pstreamWriteRecord(streamID2, array, nmiss);
+                  pstreamReadRecord(streamID1, array.data(), &nmiss);
+                  pstreamWriteRecord(streamID2, array.data(), nmiss);
                 }
             }
         }
@@ -342,13 +343,6 @@ Selvar(void *process)
   pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  if (!lcopy)
-    if (array) Free(array);
-
-  if (vars) Free(vars);
-
-  if (selfound) Free(selfound);
 
   lista_destroy(ilista);
   lista_destroy(flista);

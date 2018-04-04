@@ -44,8 +44,6 @@ Splityear(void *process)
   size_t nmiss;
   char filesuffix[32];
   char filename[8192];
-  double *array = NULL;
-  field_type **vars = NULL;
 
   cdoInitialize(process);
 
@@ -79,11 +77,12 @@ Splityear(void *process)
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
+  std::vector<double> array;
   // if ( ! lcopy )
   {
     int gridsizemax = vlistGridsizeMax(vlistID1);
     if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
-    array = (double *) Malloc(gridsizemax * sizeof(double));
+    array.resize(gridsizemax);
   }
 
   int nvars = vlistNvars(vlistID1);
@@ -91,9 +90,10 @@ Splityear(void *process)
   for (varID = 0; varID < nvars; varID++)
     if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) nconst++;
 
+  std::vector<std::vector<field_type>> vars;
   if (nconst)
     {
-      vars = (field_type **) Malloc(nvars * sizeof(field_type *));
+      vars.resize(nvars);
 
       for (varID = 0; varID < nvars; varID++)
         {
@@ -103,7 +103,7 @@ Splityear(void *process)
               int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
               size_t gridsize = gridInqSize(gridID);
 
-              vars[varID] = (field_type *) Malloc(nlevel * sizeof(field_type));
+              vars[varID].resize(nlevel);
 
               for (levelID = 0; levelID < nlevel; levelID++)
                 {
@@ -209,8 +209,8 @@ Splityear(void *process)
             }
           else
             {
-              pstreamReadRecord(streamID1, array, &nmiss);
-              pstreamWriteRecord(streamID2, array, nmiss);
+              pstreamReadRecord(streamID1, array.data(), &nmiss);
+              pstreamWriteRecord(streamID2, array.data(), nmiss);
 
               if (tsID == 0 && nconst)
                 {
@@ -218,7 +218,7 @@ Splityear(void *process)
                     {
                       int gridID = vlistInqVarGrid(vlistID1, varID);
                       size_t gridsize = gridInqSize(gridID);
-                      arrayCopy(gridsize, array, vars[varID][levelID].ptr);
+                      arrayCopy(gridsize, array.data(), vars[varID][levelID].ptr);
                       vars[varID][levelID].nmiss = nmiss;
                     }
                 }
@@ -232,8 +232,6 @@ Splityear(void *process)
   pstreamClose(streamID1);
   pstreamClose(streamID2);
 
-  if (array) Free(array);
-
   if (nconst)
     {
       for (varID = 0; varID < nvars; varID++)
@@ -243,12 +241,8 @@ Splityear(void *process)
               int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
               for (levelID = 0; levelID < nlevel; levelID++)
                 if (vars[varID][levelID].ptr) Free(vars[varID][levelID].ptr);
-
-              Free(vars[varID]);
             }
         }
-
-      if (vars) Free(vars);
     }
 
   cdoFinish();

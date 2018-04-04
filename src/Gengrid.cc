@@ -49,17 +49,17 @@ Gengrid(void *process)
   size_t xsize = gridInqXsize(gridID1);
   size_t ysize = gridInqYsize(gridID1);
 
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
-  double *array3 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
+  std::vector<double> array2(gridsize);
+  std::vector<double> array3(gridsize);
 
   cdoStreamInqTimestep(streamID1, 0);
   cdoStreamInqTimestep(streamID2, 0);
 
   pstreamInqRecord(streamID1, &varID, &levelID);
-  pstreamReadRecord(streamID1, array1, &nmiss1);
+  pstreamReadRecord(streamID1, array1.data(), &nmiss1);
   pstreamInqRecord(streamID2, &varID, &levelID);
-  pstreamReadRecord(streamID2, array2, &nmiss2);
+  pstreamReadRecord(streamID2, array2.data(), &nmiss2);
 
   int datatype = vlistInqVarDatatype(vlistID1, 0);
 
@@ -75,8 +75,8 @@ Gengrid(void *process)
 
   gridDefXsize(gridID3, xsize);
   gridDefYsize(gridID3, ysize);
-  gridDefXvals(gridID3, array1);
-  gridDefYvals(gridID3, array2);
+  gridDefXvals(gridID3, array1.data());
+  gridDefYvals(gridID3, array2.data());
 
   if (datatype == CDI_DATATYPE_FLT64)
     gridDefDatatype(gridID3, CDI_DATATYPE_FLT64);
@@ -85,8 +85,8 @@ Gengrid(void *process)
 
   double xminval, xmaxval;
   double yminval, ymaxval;
-  arrayMinMax(gridsize, array1, &xminval, &xmaxval);
-  arrayMinMax(gridsize, array2, &yminval, &ymaxval);
+  arrayMinMax(gridsize, array1.data(), &xminval, &xmaxval);
+  arrayMinMax(gridsize, array2.data(), &yminval, &ymaxval);
 
   if (cdoVerbose) cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g", xminval, xmaxval, yminval, ymaxval);
 
@@ -127,13 +127,9 @@ Gengrid(void *process)
   for (size_t i = 0; i < gridsize; ++i) array3[i] = missval;
 
   pstreamDefRecord(streamID3, 0, 0);
-  pstreamWriteRecord(streamID3, array3, gridsize);
+  pstreamWriteRecord(streamID3, array3.data(), gridsize);
 
   pstreamClose(streamID3);
-
-  if (array1) Free(array1);
-  if (array2) Free(array2);
-  if (array3) Free(array3);
 
   cdoFinish();
 

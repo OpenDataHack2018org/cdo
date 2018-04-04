@@ -51,8 +51,8 @@ Tee(void *process)
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID3);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double *) Malloc(gridsize * sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  std::vector<double> array(gridsizemax);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -78,13 +78,13 @@ Tee(void *process)
           else
             {
               pstreamInqRecord(streamID1, &varID, &levelID);
-              pstreamReadRecord(streamID1, array, &nmiss);
+              pstreamReadRecord(streamID1, array.data(), &nmiss);
 
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2, array, nmiss);
+              pstreamWriteRecord(streamID2, array.data(), nmiss);
 
               pstreamDefRecord(streamID3, varID, levelID);
-              pstreamWriteRecord(streamID3, array, nmiss);
+              pstreamWriteRecord(streamID3, array.data(), nmiss);
             }
         }
 
@@ -94,8 +94,6 @@ Tee(void *process)
   pstreamClose(streamID1);
   pstreamClose(streamID2);
   pstreamClose(streamID3);
-
-  if (array) Free(array);
 
   cdoFinish();
 
