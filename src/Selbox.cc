@@ -52,8 +52,7 @@ static void
 gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat, long nlon2, long nlat2, long lat1, long lat2,
               long lon11, long lon12, long lon21, long lon22, const char *xunits)
 {
-  double *xvals1 = NULL, *yvals1 = NULL;
-  double *xvals2 = NULL, *yvals2 = NULL;
+  std::vector<double> xvals1, yvals1, xvals2, yvals2;
 
   bool lxvals = gridInqXvals(gridID1, NULL) > 0;
   bool lyvals = gridInqYvals(gridID1, NULL) > 0;
@@ -62,25 +61,25 @@ gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat, long
     {
       if (lxvals && lyvals)
         {
-          xvals1 = (double *) Malloc(nlon * nlat * sizeof(double));
-          yvals1 = (double *) Malloc(nlon * nlat * sizeof(double));
-          xvals2 = (double *) Malloc(nlon2 * nlat2 * sizeof(double));
-          yvals2 = (double *) Malloc(nlon2 * nlat2 * sizeof(double));
+          xvals1.resize(nlon * nlat);
+          yvals1.resize(nlon * nlat);
+          xvals2.resize(nlon2 * nlat2);
+          yvals2.resize(nlon2 * nlat2);
         }
     }
   else
     {
-      if (lxvals) xvals1 = (double *) Malloc(nlon * sizeof(double));
-      if (lyvals) yvals1 = (double *) Malloc(nlat * sizeof(double));
-      if (lxvals) xvals2 = (double *) Malloc(nlon2 * sizeof(double));
-      if (lyvals) yvals2 = (double *) Malloc(nlat2 * sizeof(double));
+      if (lxvals) xvals1.resize(nlon);
+      if (lyvals) yvals1.resize(nlat);
+      if (lxvals) xvals2.resize(nlon2);
+      if (lyvals) yvals2.resize(nlat2);
     }
 
-  double *pxvals2 = xvals2;
-  double *pyvals2 = yvals2;
+  double *pxvals2 = xvals2.data();
+  double *pyvals2 = yvals2.data();
 
-  if (xvals1) gridInqXvals(gridID1, xvals1);
-  if (yvals1) gridInqYvals(gridID1, yvals1);
+  if (lxvals) gridInqXvals(gridID1, xvals1.data());
+  if (lyvals) gridInqYvals(gridID1, yvals1.data());
 
   if (gridtype == GRID_CURVILINEAR)
     {
@@ -105,7 +104,7 @@ gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat, long
         {
           for (long i = lon21; i <= lon22; i++) *pxvals2++ = xvals1[i];
           for (long i = lon11; i <= lon12; i++) *pxvals2++ = xvals1[i];
-          if (xunits && strncmp(xunits, "degree", 6) == 0) correct_xvals(nlon2, 1, xvals2);
+          if (xunits && strncmp(xunits, "degree", 6) == 0) correct_xvals(nlon2, 1, xvals2.data());
         }
 
       if (lyvals)
@@ -115,13 +114,8 @@ gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat, long
     for ( int i = 0; i < nlat2; i++ ) printf("lat : %d %g\n", i+1, yvals2[i]);
     for ( int i = 0; i < nlon2; i++ ) printf("lon : %d %g\n", i+1, xvals2[i]);
   */
-  if (xvals2) gridDefXvals(gridID2, xvals2);
-  if (yvals2) gridDefYvals(gridID2, yvals2);
-
-  if (xvals1) Free(xvals1);
-  if (yvals1) Free(yvals1);
-  if (xvals2) Free(xvals2);
-  if (yvals2) Free(yvals2);
+  if (lxvals) gridDefXvals(gridID2, xvals2.data());
+  if (lyvals) gridDefYvals(gridID2, yvals2.data());
 }
 
 static int
@@ -161,29 +155,28 @@ gengrid(int gridID1, long lat1, long lat2, long lon11, long lon12, long lon21, l
 
   if (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL))
     {
-      double *xbounds1 = NULL, *ybounds1 = NULL;
-      double *xbounds2 = NULL, *ybounds2 = NULL;
+      std::vector<double> xbounds1, ybounds1, xbounds2, ybounds2;
 
       if (gridtype == GRID_CURVILINEAR)
         {
-          xbounds1 = (double *) Malloc(4 * nlon * nlat * sizeof(double));
-          ybounds1 = (double *) Malloc(4 * nlon * nlat * sizeof(double));
-          xbounds2 = (double *) Malloc(4 * nlon2 * nlat2 * sizeof(double));
-          ybounds2 = (double *) Malloc(4 * nlon2 * nlat2 * sizeof(double));
+          xbounds1.resize(4 * nlon * nlat);
+          ybounds1.resize(4 * nlon * nlat);
+          xbounds2.resize(4 * nlon2 * nlat2);
+          ybounds2.resize(4 * nlon2 * nlat2);
         }
       else
         {
-          xbounds1 = (double *) Malloc(2 * nlon * sizeof(double));
-          ybounds1 = (double *) Malloc(2 * nlat * sizeof(double));
-          xbounds2 = (double *) Malloc(2 * nlon2 * sizeof(double));
-          ybounds2 = (double *) Malloc(2 * nlat2 * sizeof(double));
+          xbounds1.resize(2 * nlon);
+          ybounds1.resize(2 * nlat);
+          xbounds2.resize(2 * nlon2);
+          ybounds2.resize(2 * nlat2);
         }
 
-      double *pxbounds2 = xbounds2;
-      double *pybounds2 = ybounds2;
+      double *pxbounds2 = xbounds2.data();
+      double *pybounds2 = ybounds2.data();
 
-      gridInqXbounds(gridID1, xbounds1);
-      gridInqYbounds(gridID1, ybounds1);
+      gridInqXbounds(gridID1, xbounds1.data());
+      gridInqYbounds(gridID1, ybounds1.data());
 
       if (gridtype == GRID_CURVILINEAR)
         {
@@ -211,18 +204,13 @@ gengrid(int gridID1, long lat1, long lat2, long lon11, long lon12, long lon21, l
 
           if (strncmp(xunits, "degree", 6) == 0)
             {
-              correct_xvals(nlon2, 2, xbounds2);
-              correct_xvals(nlon2, 2, xbounds2 + 1);
+              correct_xvals(nlon2, 2, xbounds2.data());
+              correct_xvals(nlon2, 2, xbounds2.data() + 1);
             }
         }
 
-      gridDefXbounds(gridID2, xbounds2);
-      gridDefYbounds(gridID2, ybounds2);
-
-      Free(xbounds1);
-      Free(ybounds1);
-      Free(xbounds2);
-      Free(ybounds2);
+      gridDefXbounds(gridID2, xbounds2.data());
+      gridDefYbounds(gridID2, ybounds2.data());
     }
 
   int projID1 = gridInqProj(gridID1);
@@ -264,13 +252,11 @@ gengridcell(int gridID1, size_t gridsize2, long *cellidx)
 
   if (gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL))
     {
-      double *xvals1 = (double *) Malloc(gridsize1 * sizeof(double));
-      double *yvals1 = (double *) Malloc(gridsize1 * sizeof(double));
-      double *xvals2 = (double *) Malloc(gridsize2 * sizeof(double));
-      double *yvals2 = (double *) Malloc(gridsize2 * sizeof(double));
+      std::vector<double> xvals1(gridsize1), yvals1(gridsize1);
+      std::vector<double> xvals2(gridsize2), yvals2(gridsize2);
 
-      gridInqXvals(gridID1, xvals1);
-      gridInqYvals(gridID1, yvals1);
+      gridInqXvals(gridID1, xvals1.data());
+      gridInqYvals(gridID1, yvals1.data());
 
       for (size_t i = 0; i < gridsize2; ++i)
         {
@@ -278,26 +264,19 @@ gengridcell(int gridID1, size_t gridsize2, long *cellidx)
           yvals2[i] = yvals1[cellidx[i]];
         }
 
-      gridDefXvals(gridID2, xvals2);
-      gridDefYvals(gridID2, yvals2);
-
-      Free(xvals1);
-      Free(yvals1);
-      Free(xvals2);
-      Free(yvals2);
+      gridDefXvals(gridID2, xvals2.data());
+      gridDefYvals(gridID2, yvals2.data());
     }
 
   if (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL))
     {
       int nv = gridInqNvertex(gridID1);
 
-      double *xbounds1 = (double *) Malloc(nv * gridsize1 * sizeof(double));
-      double *ybounds1 = (double *) Malloc(nv * gridsize1 * sizeof(double));
-      double *xbounds2 = (double *) Malloc(nv * gridsize2 * sizeof(double));
-      double *ybounds2 = (double *) Malloc(nv * gridsize2 * sizeof(double));
+      std::vector<double> xbounds1(nv * gridsize1), ybounds1(nv * gridsize1);
+      std::vector<double> xbounds2(nv * gridsize2), ybounds2(nv * gridsize2);
 
-      gridInqXbounds(gridID1, xbounds1);
-      gridInqYbounds(gridID1, ybounds1);
+      gridInqXbounds(gridID1, xbounds1.data());
+      gridInqYbounds(gridID1, ybounds1.data());
 
       gridDefNvertex(gridID2, nv);
 
@@ -310,13 +289,8 @@ gengridcell(int gridID1, size_t gridsize2, long *cellidx)
             }
         }
 
-      gridDefXbounds(gridID2, xbounds2);
-      gridDefYbounds(gridID2, ybounds2);
-
-      Free(xbounds1);
-      Free(ybounds1);
-      Free(xbounds2);
-      Free(ybounds2);
+      gridDefXbounds(gridID2, xbounds2.data());
+      gridDefYbounds(gridID2, ybounds2.data());
     }
 
   return gridID2;
@@ -329,11 +303,11 @@ genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, double xl
   long nlon = gridInqXsize(gridID);
   long nlat = gridInqYsize(gridID);
 
-  double *xvals = (double *) Malloc(nlon * sizeof(double));
-  double *yvals = (double *) Malloc(nlat * sizeof(double));
+  std::vector<double> xvals(nlon);
+  std::vector<double> yvals(nlat);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  gridInqXvals(gridID, xvals.data());
+  gridInqYvals(gridID, yvals.data());
 
   char xunits[CDI_MAX_NAME];
   char yunits[CDI_MAX_NAME];
@@ -418,9 +392,6 @@ genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, double xl
         }
     }
 
-  Free(xvals);
-  Free(yvals);
-
   if (*lat2 - *lat1 + 1 <= 0) cdoAbort("Latitudinal dimension is too small!");
 }
 
@@ -434,11 +405,11 @@ genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, double x
 
   int grid_is_circular = gridIsCircular(gridID);
 
-  double *xvals = (double *) Malloc(gridsize * sizeof(double));
-  double *yvals = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> xvals(gridsize);
+  std::vector<double> yvals(gridsize);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  gridInqXvals(gridID, xvals.data());
+  gridInqYvals(gridID, yvals.data());
 
   char xunits[CDI_MAX_NAME];
   char yunits[CDI_MAX_NAME];
@@ -561,9 +532,6 @@ genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, double x
   if (*lon12 == 0 && *lon11 > 0) *lon11 = -1;
 
   if (*lat2 - *lat1 + 1 <= 0) cdoAbort("Latitudinal dimension is too small!");
-
-  Free(xvals);
-  Free(yvals);
 }
 
 void
@@ -619,7 +587,7 @@ genlonlatgrid(int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, lon
 }
 
 static int
-gencellgrid(int gridID1, long *gridsize2, long **cellidx)
+gencellgrid(int gridID1, long *gridsize2, std::vector<long> &cellidx)
 {
   long cellinc = 4096;
 
@@ -650,10 +618,10 @@ gencellgrid(int gridID1, long *gridsize2, long **cellidx)
 
   if (gridtype != GRID_UNSTRUCTURED) cdoAbort("Internal problem, wrong grid type!");
 
-  double *xvals = (double *) Malloc(gridsize1 * sizeof(double));
-  double *yvals = (double *) Malloc(gridsize1 * sizeof(double));
-  gridInqXvals(gridID1, xvals);
-  gridInqYvals(gridID1, yvals);
+  std::vector<double> xvals(gridsize1);
+  std::vector<double> yvals(gridsize1);
+  gridInqXvals(gridID1, xvals.data());
+  gridInqYvals(gridID1, yvals.data());
 
   char xunits[CDI_MAX_NAME];
   char yunits[CDI_MAX_NAME];
@@ -665,7 +633,6 @@ gencellgrid(int gridID1, long *gridsize2, long **cellidx)
   if (strncmp(yunits, "radian", 6) == 0) yfact = RAD2DEG;
 
   /* find gridsize2 */
-  *cellidx = NULL;
   long maxcell = 0;
   long nvals = 0;
   for (size_t i = 0; i < gridsize1; ++i)
@@ -680,9 +647,9 @@ gencellgrid(int gridID1, long *gridsize2, long **cellidx)
             if (nvals > maxcell)
               {
                 maxcell += cellinc;
-                *cellidx = (long *) Realloc(*cellidx, maxcell * sizeof(long));
+                cellidx.resize(maxcell);
               }
-            (*cellidx)[nvals - 1] = i;
+            cellidx[nvals - 1] = i;
           }
     }
 
@@ -690,10 +657,7 @@ gencellgrid(int gridID1, long *gridsize2, long **cellidx)
 
   *gridsize2 = nvals;
 
-  Free(xvals);
-  Free(yvals);
-
-  int gridID2 = gengridcell(gridID1, *gridsize2, *cellidx);
+  int gridID2 = gengridcell(gridID1, *gridsize2, cellidx.data());
 
   return gridID2;
 }
@@ -835,7 +799,7 @@ window(int nwpv, double *array1, int gridID1, double *array2, long lat1, long la
 }
 
 static void
-window_cell(int nwpv, double *array1, int gridID1, double *array2, long gridsize2, long *cellidx)
+window_cell(int nwpv, double *array1, int gridID1, double *array2, long gridsize2, const long *restrict cellidx)
 {
   if (nwpv == 2)
     {
@@ -863,7 +827,8 @@ Selbox(void *process)
   typedef struct
   {
     int gridID1, gridID2;
-    long *cellidx, nvals;
+    std::vector<long> cellidx;
+    long nvals;
     long lat1, lat2, lon11, lon12, lon21, lon22;
   } sbox_t;
 
@@ -892,7 +857,7 @@ Selbox(void *process)
   for (varID = 0; varID < nvars; varID++) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
-  sbox_t *sbox = (sbox_t *) Malloc(ngrids * sizeof(sbox_t));
+  std::vector<sbox_t> sbox(ngrids);
 
   for (index = 0; index < ngrids; index++)
     {
@@ -911,7 +876,7 @@ Selbox(void *process)
               if (gridsize == 1) continue;
 
               if (gridtype == GRID_UNSTRUCTURED)
-                gridID2 = gencellgrid(gridID1, &sbox[index].nvals, &sbox[index].cellidx);
+                gridID2 = gencellgrid(gridID1, &sbox[index].nvals, sbox[index].cellidx);
               else
                 gridID2 = genlonlatgrid(gridID1, &sbox[index].lat1, &sbox[index].lat2, &sbox[index].lon11, &sbox[index].lon12,
                                         &sbox[index].lon21, &sbox[index].lon22);
@@ -996,7 +961,7 @@ Selbox(void *process)
               gridsize2 = gridInqSize(sbox[index].gridID2);
 
               if (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED)
-                window_cell(nwpv, array1.data(), gridID1, array2.data(), gridsize2, sbox[index].cellidx);
+                window_cell(nwpv, array1.data(), gridID1, array2.data(), gridsize2, sbox[index].cellidx.data());
               else
                 window(nwpv, array1.data(), gridID1, array2.data(), sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, sbox[index].lon12,
                        sbox[index].lon21, sbox[index].lon22);
@@ -1022,16 +987,6 @@ Selbox(void *process)
   pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  if (sbox)
-    {
-      if (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED)
-        {
-          for (index = 0; index < ngrids; index++)
-            if (sbox[index].cellidx) Free(sbox[index].cellidx);
-        }
-      Free(sbox);
-    }
 
   cdoFinish();
 
