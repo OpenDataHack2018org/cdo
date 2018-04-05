@@ -22,10 +22,10 @@
       Ymonarith  ymonsub         Subtract multi-year monthly time series
       Ymonarith  ymonmul         Multiply multi-year monthly time series
       Ymonarith  ymondiv         Divide multi-year monthly time series
-      Ymonarith  ymonadd         Add multi-year monthly time series
-      Ymonarith  ymonsub         Subtract multi-year monthly time series
-      Ymonarith  ymonmul         Multiply multi-year monthly time series
-      Ymonarith  ymondiv         Divide multi-year monthly time series
+      Ymonarith  yseasadd        Add multi-year seasonal time series
+      Ymonarith  yseassub        Subtract multi-year seasonal time series
+      Ymonarith  yseasmul        Multiply multi-year seasonal time series
+      Ymonarith  yseasdiv        Divide multi-year seasonal time series
 */
 
 #include <cdi.h>
