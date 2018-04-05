@@ -523,8 +523,6 @@ gs_nearest_spherepart(void *search_container, double lon, double lat, double sea
   size_t nadd = 0;
   if (num_local_point_ids > 0)
     {
-      if (cos_angle < -1) cos_angle = -1;
-      if (cos_angle > 1) cos_angle = 1;
       *dist = acos(cos_angle);
       if (*dist <= searchRadius)
         {
@@ -732,8 +730,6 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadi
           nadds = 0;
           for (size_t i = 0; i < maxadds; ++i)
             {
-              if (cos_angles[i] < -1) cos_angles[i] = -1;
-              if (cos_angles[i] > 1) cos_angles[i] = 1;
               double angle = acos(cos_angles[i]);
               if (angle < searchRadius)
                 {
