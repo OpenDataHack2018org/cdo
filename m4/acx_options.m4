@@ -233,6 +233,11 @@ AC_ARG_WITH([udunits2],
                                 [AC_MSG_ERROR([$UDUNITS_ROOT is not a directory! UDUNITS2 suppressed])])])],
             [AC_MSG_CHECKING([for the UDUNITS2 library])
              AC_MSG_RESULT([suppressed])])
+
+# -----------------------------------------------------------------------
+# test for UUID libraries needed by CMOR
+# (util-linux libuuid in 3.1.1 and before, OSSP UUID in 3.1.2 and after)
+ACX_UUID
 #  ----------------------------------------------------------------------
 #  Link application with CMOR library
 CMOR_LIBS=''
@@ -242,18 +247,20 @@ AC_ARG_WITH([cmor],
                      [no],[AC_MSG_CHECKING([for cmor library])
                            AC_MSG_RESULT([suppressed])],
                      [yes],[AC_CHECK_HEADERS([cmor.h])
+                                 LIBS="${LIBS+${LIBS} }$UUID_C_LIB"
                             AC_SEARCH_LIBS([cmor_load_table],[cmor],[AC_DEFINE([HAVE_LIBCMOR],[1],[Define to 1 for CMOR support])],
                                            [AC_MSG_ERROR([Could not link to cmor library!])])
                             AC_SUBST([CMOR_LIBS],[" -lcmor"])],
                      [*],[CMOR_ROOT=$with_cmor
                           AS_IF([test -d "$CMOR_ROOT"],
                                 [LDFLAGS="$LDFLAGS -L$CMOR_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$CMOR_ROOT/include -I$CMOR_ROOT/include/cdTime"
+                                 LIBS="${LIBS+${LIBS} }$UUID_C_LIB"
+                                 CPPFLAGS="$CPPFLAGS -I$CMOR_ROOT/include -I$CMOR_ROOT/include/cdTime -I$CMOR_ROOT/include/json-c"
                                  AC_SEARCH_LIBS([cmor_load_table],
                                                 [cmor],
                                                 [AC_DEFINE([HAVE_LIBCMOR],[1],[Define to 1 for CMOR support])],
                                                 [AC_MSG_ERROR([Could not link to cmor library!])])
-                                 CMOR_LIBS=" -L$CMOR_ROOT/lib -lcmor"],
+                                 CMOR_LIBS=" -L$CMOR_ROOT/lib -lcmor $UUID_C_LIB"],
                                 [AC_MSG_ERROR([$CMOR_ROOT is not a directory! CMOR suppressed])])])],
             [AC_MSG_CHECKING([for the CMOR library])
              AC_MSG_RESULT([suppressed])])
