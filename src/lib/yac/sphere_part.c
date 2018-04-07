@@ -174,6 +174,7 @@ struct point_sphere_part_search {
    struct point_id_xyz * points;
 };
 
+#ifdef YAC
 static void init_sphere_part_node(struct sphere_part_node * node) {
 
    node->flags = 0;
@@ -379,6 +380,7 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
       free(T);
    }
 }
+#endif
 
 static int compare_point_idx_xyz(void const * a, void const * b) {
   return (((struct point_id_xyz *)a)->idx > ((struct point_id_xyz *)b)->idx) -
@@ -543,6 +545,7 @@ struct point_sphere_part_search * yac_point_sphere_part_search_new (
   return search;
 }
 
+#ifdef YAC
 static void search_bnd_circle_I_node(
   struct sphere_part_node * node, struct bounding_circle bnd_circle,
   unsigned ** restrict overlap_cells, size_t * overlap_cells_array_size,
@@ -742,6 +745,7 @@ static void search_bnd_circle(struct sphere_part_node * node,
       node, bnd_circle, overlap_cells, overlap_cells_array_size,
       num_overlap_cells, search_interval_tree_buffer, prev_gc_norm_vector);
 }
+#endif
 
 static void point_search_small_bnd_circle(
    struct point_sphere_part_node * node, struct bounding_circle bnd_circle,
@@ -1284,6 +1288,7 @@ int yac_point_sphere_part_search_bnd_circle_contains_points(
   return point_check_bnd_circle(&(search->base_node), circle);
 }
 
+#ifdef YAC
 static void search_point(struct sphere_part_node * node,
                          double point[],
                          unsigned ** overlap_cells,
@@ -1375,7 +1380,6 @@ static void search_point(struct sphere_part_node * node,
    }
 }
 
-#ifdef YAC
 static void sphere_part_do_cell_search(struct grid_search * search,
                                        struct grid * grid_data,
                                        struct dep_list * tgt_to_src_cells) {
@@ -1765,7 +1769,6 @@ static void sphere_part_do_bnd_circle_search (struct grid_search * search,
    yac_set_dependencies(bnd_to_cells, num_bnd_circles, num_cells_per_bnd,
                         bnd_to_cells_dependencies);
 }
-#endif
 
 static void free_sphere_part_tree (struct sphere_part_node * tree) {
 
@@ -1784,6 +1787,7 @@ static void free_sphere_part_tree (struct sphere_part_node * tree) {
       free_sphere_part_tree(tree->T);
    free(tree->T);
 }
+#endif
 
 static void free_point_sphere_part_tree (struct point_sphere_part_node * tree) {
 
