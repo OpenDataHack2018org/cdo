@@ -128,7 +128,7 @@ setPointSearchMethod(const char *methodstr)
   else if (STR_IS_EQ(methodstr, "spherepart")) pointSearchMethod = PointSearchMethod::spherepart;
   else if (STR_IS_EQ(methodstr, "full"))       pointSearchMethod = PointSearchMethod::full;
   else if (STR_IS_EQ(methodstr, "latbins"))    pointSearchMethod = PointSearchMethod::latbins;
-  else cdoAbort("gridsearch method %s not available!", methodstr);
+  else cdoAbort("Grid point search method %s not available!", methodstr);
   // clang-format on
 }
 

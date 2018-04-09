@@ -96,6 +96,8 @@ libcdo_la_SOURCES =            \
                griddes.h       \
                griddes_h5.cc    \
                griddes_nc.cc    \
+               grid_cell_search.cc   \
+               grid_cell_search.h   \
                grid_search.cc   \
                grid_search.h   \
                hetaeta.cc       \
