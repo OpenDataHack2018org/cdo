@@ -34,7 +34,14 @@ expand(std::stringstream &p_message, T &&... args)
   using expander = int[];
   // creating dummy array with expanding the parameter pack in its
   // initializer list while writing each element of the pack into message
-  expander{ 0, (void(p_message << std::forward<T>(args)), 0)... };
+  (void)expander{ 0, (void(p_message << std::forward<T>(args)), 0)... };
+  // first void: silence variable unused warning
+  // uses braced-init-list initialization rules, which evaluates
+  //  the elements inside a braced-init-list IN ORDER, to repetetively
+  //  execute a certain operation
+  // second void is to prevent malicious "operator," overloads, which
+  //  cannot exist for void types
+  // 0 at the end is to handle empty variadic pack (zero-size array initializer is illegal.
   p_message << std::endl;
 }
 

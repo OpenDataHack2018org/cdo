@@ -99,8 +99,10 @@ cdoStreamInqTimestep(int pstreamID, int tsID)
   ProcessType &process = processSelf();
   PstreamType *pstreamptr = pstreamToPointer(pstreamID);
   nrecs = pstreamInqTimestep(pstreamptr, tsID);
-  if (nrecs && tsID != pstreamptr->tsID)
+  Cdo_Debug(CdoDebug::PROCESS, "tsID: ", tsID, " ", pstreamptr->tsID);
+  if (nrecs && tsID == pstreamptr->tsID)
     {
+      Cdo_Debug(CdoDebug::PROCESS, "Increasing Timestep cnt");
       process.timesteps.insert(tsID);
       process.ntimesteps = process.timesteps.size();
     }
@@ -609,7 +611,7 @@ cdoInitialize(void *p_process)
   // std::cout << arg->processID << std::endl;
   Cdo_Debug(CdoDebug::PROCESS, "Initializing process: ", process->m_operatorCommand);
   process->threadID = pthread_self();
-// std::cout << "SomeMarker" << Process.size() << std::endl;
+  // std::cout << "SomeMarker" << Process.size() << std::endl;
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PSTREAM) Cdo_Debug(CdoDebug::PROCESS, "process ", processSelf().m_ID, " thread ", pthread_self());

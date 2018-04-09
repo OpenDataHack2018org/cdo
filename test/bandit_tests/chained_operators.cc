@@ -28,8 +28,8 @@ go_bandit([]() {
         "-in1_out1", "-in2_out1",   "-in1_out1",  "input_file1",
         "-in1_out1", "input_file2", "output_file"};
 
-    std::vector<int> expectedInputs{1, 2, 1, 1};
-    std::vector<int> expectedOutputs{1, 1, 1, 1};
+    std::vector<unsigned int> expectedInputs{1, 2, 1, 1};
+    std::vector<unsigned int> expectedOutputs{1, 1, 1, 1};
 
     /*clang-format off*/
     //          Name     Func  Help   oper    mod    in
@@ -38,7 +38,7 @@ go_bandit([]() {
 
     createProcesses(test_argv.size(), &test_argv[0]);
 
-    unsigned int i;
+    int i;
     for (i = 0; i < processNums(); i++) {
       auto process = getProcess(i);
       bandit::it("created inputs for:" +
@@ -76,12 +76,12 @@ go_bandit([]() {
             "-in1_out1",        "input_file2", "-in1_out1", "input_file3",
             "-in1_out1",        "input_file4"};
 
-        std::vector<int> expectedInputs{3, 2, 1, 1, 1, 1};
-        std::vector<int> expectedOutputs{0, 1, 1, 1, 1, 1};
+        std::vector<unsigned int> expectedInputs{3, 2, 1, 1, 1, 1};
+        std::vector<unsigned int> expectedOutputs{0, 1, 1, 1, 1, 1};
 
         createProcesses(test_argv.size(), &test_argv[0]);
 
-        unsigned int i;
+        int i;
         for (i = 0; i < processNums(); i++) {
           auto process = getProcess(i);
           std::string runInfo = std::string(getProcess(i)->operatorName) +

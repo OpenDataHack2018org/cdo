@@ -23,7 +23,6 @@ go_bandit([]() {
 
   // +1 because there has to be another string at the binning of testArgv since
   // the first entry will be ignored by expand wildcards
-  unsigned int expectedFileCnt = fileCount * wildcards.size() + 1;
 
   // storage for temp files;
   std::ofstream files[fileCount];
@@ -41,14 +40,14 @@ go_bandit([]() {
   // see comment at definition of expectedFileCnt
   testArgv.push_back("wildcards");
   // setting the actual filenames
-  for (int wildCardIDX = 0; wildCardIDX < wildcards.size(); wildCardIDX++) {
+  for (unsigned int wildCardIDX = 0; wildCardIDX < wildcards.size(); wildCardIDX++) {
     testArgv.push_back(prefix + wildcards[wildCardIDX] + suffix);
   }
 
   //--------------------------------------------------------------------------
   bandit::describe("Expanding wildcard", [&]() {
     std::vector<std::string> expandedWildCards = expandWildCards(testArgv);
-    for (int j = 0; j < wildcards.size(); j++) {
+    for (unsigned int j = 0; j < wildcards.size(); j++) {
       for (int i = 0; i < fileCount; i++) {
         int argvIdx = 1 + i + (fileCount * j);
         bandit::it("has expanded the filename", [&]() {
