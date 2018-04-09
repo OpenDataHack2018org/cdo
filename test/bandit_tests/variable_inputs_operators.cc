@@ -20,8 +20,8 @@ go_bandit([]() {
     std::vector<std::vector<const char *>> test_argvs = {{"-oper1","in1","in2"},{"-oper1","in1"}, {"-oper2","in1","in2", "ofile1"},{"-oper2","in1","ofile2"}};
 
     const int numberOfRuns = 4;
-    int expectedInputForRun[numberOfRuns] = {2,1,2,1};
-    int expectedOutputs[numberOfRuns] = {0,0,1,1};
+    unsigned int expectedInputForRun[numberOfRuns] = {2,1,2,1};
+    unsigned int expectedOutputs[numberOfRuns] = {0,0,1,1};
 
     /*clang-format off*/
     //          Name     Func  Help   oper    mod    in
