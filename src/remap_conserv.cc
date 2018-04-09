@@ -976,10 +976,8 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
   if (1 && cdoVerbose)
     {
-      cdoPrint("num_srch_cells_sum  : %zu", num_srch_cells_stat[0]);
-      cdoPrint("num_srch_cells_min  : %zu", num_srch_cells_stat[1]);
-      cdoPrint("num_srch_cells_mean : %3.1f", num_srch_cells_stat[0] / (double) tgt_grid_size);
-      cdoPrint("num_srch_cells_max  : %zu", num_srch_cells_stat[2]);
+      cdoPrint("Num search cells min,mean,max :  %zu  %3.1f  %zu",
+               num_srch_cells_stat[1], num_srch_cells_stat[0] / (double) tgt_grid_size, num_srch_cells_stat[2]);
     }
 
   // Finished with all cells: deallocate search arrays
