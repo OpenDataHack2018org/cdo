@@ -19,8 +19,9 @@ done
 #
 #1 bailung: gcc 7.2 sse4_2
 #2 mistral: intel 18.0.1 avx2 (interactiv)
+#3 bailung: gcc 7.2 sse4_2 sphere part search prototype
 #       3   4   5    6    7     8      9
 #1     25  35  72  200  770  6680
 #2     15  23  55  162  588  4492
 #2*8    3   4   8   22   76   533   1808
-
+#3      7   8  11   21   52   108    290
