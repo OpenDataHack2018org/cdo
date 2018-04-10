@@ -64,6 +64,7 @@ setProcessNum(int p_num)
 {
   processNum = p_num;
 }
+
 static pthread_mutex_t streamOpenReadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t streamOpenWriteMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t streamMutex = PTHREAD_MUTEX_INITIALIZER;

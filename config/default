@@ -241,6 +241,14 @@ case "${HOSTNAME}" in
                     LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
 	            CXX=pgc++ CXXFLAGS="-g -fast" \
 	            CC=pgcc   CFLAGS="-g -fast"
+        elif  test "$COMP" = gnu_pic ; then
+          ${CONFPATH}configure --prefix=$HOME/local \
+                    --with-fftw3 \
+                    $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
+                    F77=gfortran FFLAGS="-g -O2" \
+                    CXX=g++ CXXFLAGS='-g -Wall -O3 -march=native -mavx2 -fPIC' \
+                    CC=gcc  CFLAGS='-g -Wall -O3 -march=native -mavx2 -fPIC'
 	else
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
