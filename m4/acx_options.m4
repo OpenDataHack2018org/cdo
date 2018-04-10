@@ -247,10 +247,10 @@ AC_ARG_WITH([cmor],
                      [no],[AC_MSG_CHECKING([for cmor library])
                            AC_MSG_RESULT([suppressed])],
                      [yes],[AC_CHECK_HEADERS([cmor.h])
-                                 LIBS="${LIBS+${LIBS} }$UUID_C_LIB"
+                            LIBS="${LIBS+${LIBS} }$UUID_C_LIB"
                             AC_SEARCH_LIBS([cmor_load_table],[cmor],[AC_DEFINE([HAVE_LIBCMOR],[1],[Define to 1 for CMOR support])],
                                            [AC_MSG_ERROR([Could not link to cmor library!])])
-                            AC_SUBST([CMOR_LIBS],[" -lcmor"])],
+                            CMOR_LIBS="-lcmor $UUID_C_LIB"],
                      [*],[CMOR_ROOT=$with_cmor
                           AS_IF([test -d "$CMOR_ROOT"],
                                 [LDFLAGS="$LDFLAGS -L$CMOR_ROOT/lib"
@@ -260,7 +260,7 @@ AC_ARG_WITH([cmor],
                                                 [cmor],
                                                 [AC_DEFINE([HAVE_LIBCMOR],[1],[Define to 1 for CMOR support])],
                                                 [AC_MSG_ERROR([Could not link to cmor library!])])
-                                 CMOR_LIBS=" -L$CMOR_ROOT/lib -lcmor $UUID_C_LIB"],
+                                 CMOR_LIBS="-L$CMOR_ROOT/lib -lcmor $UUID_C_LIB"],
                                 [AC_MSG_ERROR([$CMOR_ROOT is not a directory! CMOR suppressed])])])],
             [AC_MSG_CHECKING([for the CMOR library])
              AC_MSG_RESULT([suppressed])])

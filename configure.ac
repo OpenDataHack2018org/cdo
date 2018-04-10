@@ -4,6 +4,7 @@
 #  autoconf 2.68
 #  libtool  2.4.2
 
+AC_PREREQ([2.68])
 AC_INIT([cdo], [1.9.4rc2], [http://mpimet.mpg.de/cdo])
 
 AC_DEFINE_UNQUOTED(CDO, ["$PACKAGE_VERSION"], [CDO version])
@@ -186,7 +187,6 @@ AS_IF([test x$enable_data = 'xno'],[AC_SUBST([ENABLE_DATA],[false])],[AC_SUBST([
 CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
 CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
 #  ----------------------------------------------------------------------
-
 # Add configure options
 ACX_OPTIONS
 
