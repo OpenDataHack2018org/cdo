@@ -1319,18 +1319,6 @@ parse_options_long(int argc, char *argv[])
           Debug = 1;
           DebugLevel = atoi(CDO_optarg);
           break;
-        case 'e': {
-#if defined(HAVE_GETHOSTNAME)
-            char host[1024];
-            gethostname(host, sizeof(host));
-            cdoExpName = CDO_optarg;
-            /* printf("host: %s %s\n", host, cdoExpName); */
-            cdoExpMode = STR_IS_EQ(host, cdoExpName) ? CDO_EXP_REMOTE : CDO_EXP_LOCAL;
-#else
-            cdoAbort("Function gethostname not available!");
-#endif
-            break;
-          }
         case 'f': setDefaultFileType(CDO_optarg, 1); break;
         case 'g': cdo_set_grids(CDO_optarg); break;
         case 'h': Help = 1; break;
@@ -1883,10 +1871,6 @@ int main(int argc, char *argv[])
   if ( Help )
     {
       cdoPrintHelp(operatorHelp(operatorName));
-    }
-  else if ( cdoExpMode == CDO_EXP_LOCAL )
-    {
-      exp_run(argc, argv, cdoExpName);
     }
   else
     {

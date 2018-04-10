@@ -88,7 +88,6 @@ char **cdoVarnames = NULL;
 
 char CDO_File_Suffix[32];
 
-int cdoExpMode = -1;
 const char *cdoExpName = NULL;
 
 const char *

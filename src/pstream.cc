@@ -345,6 +345,7 @@ PstreamType::openAppend(const char *p_filename)
   mode = 'a';
   m_fileID = fileID;
 }
+
 void
 PstreamType::closePipe()
 {
@@ -379,10 +380,7 @@ PstreamType::waitForPipe()
   std::unique_lock<std::mutex> locked_mutex(pipe->m_mutex);
   while (isopen)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE("wait of read close");
-        }
+      if (CdoDebug::PSTREAM) MESSAGE("wait of read close");
       pthread_cond_wait(pipe->isclosed, locked_mutex);
     }
   locked_mutex.unlock();
@@ -429,17 +427,6 @@ PstreamType::close()
 #ifdef HAVE_LIBPTHREAD
       if (Threading::cdoLockIO) pthread_mutex_unlock(&streamMutex);
 #endif
-
-      if (cdoExpMode == CDO_EXP_REMOTE)
-        {
-          if (mode == 'w')
-            {
-              extern const char *cdojobfiles;
-              FILE *fp = fopen(cdojobfiles, "a");
-              fprintf(fp, "%s\n", m_name.c_str());
-              fclose(fp);
-            }
-        }
 
       if (m_varlist)
         {

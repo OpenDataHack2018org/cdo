@@ -35,6 +35,7 @@ pstreamClose(int pstreamID)
   if (pstreamptr->rthreadID == pthread_self()) processSelf().addNvals(pstreamptr->getNvals());
   pstreamptr->close();
 }
+
 int
 pstreamInqVlist(int pstreamID)
 {

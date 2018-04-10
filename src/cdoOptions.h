@@ -17,14 +17,11 @@
 #ifndef CDOOPTIONS_H
 #define CDOOPTIONS_H
 
-/*TEMP*/  // replace with constexpr
-#define CDO_EXP_LOCAL 1
-#define CDO_EXP_REMOTE 2
-
 namespace Cdo
 {
 extern const char *progname;
 }
+
 namespace Options
 {
 extern bool benchmark;

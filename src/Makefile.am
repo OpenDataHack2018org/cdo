@@ -105,7 +105,6 @@ libcdo_la_SOURCES =            \
                institution.cc   \
                interpol.cc      \
                interpol.h      \
-               job.cc           \
                juldate.cc       \
                knn_weights.h   \
                listarray.cc     \

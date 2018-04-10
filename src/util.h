@@ -84,8 +84,6 @@ extern int cdoParIO;
 
 extern int cdoChunkType;
 
-extern int cdoExpMode;
-
 extern int CDO_Color;
 extern int CDO_Use_FFTW;
 extern int CDO_Version_Info;
