@@ -6,6 +6,6 @@ endif
 #
 EXTRA_DIST=config/default OPERATORS doc/cdo.pdf doc/cdo_cmor.pdf doc/cdo_eca.pdf doc/cdo_magics.pdf doc/cdo_refcard.pdf cdo.spec README
 #
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4 -I libcdi/m4
 #
 CLEANFILES  = `ls *~ 2> /dev/null`
