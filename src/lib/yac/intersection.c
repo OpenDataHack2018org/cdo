@@ -1164,22 +1164,16 @@ int yac_loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
       yac_internal_abort_message("edge is not a circle of longitude", __FILE__, __LINE__);
    }
 
-   unsigned ab_goes_across_pole;
-   unsigned cd_is_on_pole;
-   unsigned ab_is_point;
-   unsigned cd_is_point;
-   double angle_ab = get_vector_angle(a, b);
-   double angle_cd = get_vector_angle(c, d);
-
-   ab_goes_across_pole =
-      ((fabs(1.0 - fabs(a[2])) < tol || fabs(1.0 - fabs(b[2])) < tol) ||
-       (((a[0] > 0.0) ^ (b[0] > 0.0)) && ((a[1] > 0.0) ^ (b[1] > 0.0))));
-
-   cd_is_on_pole = fabs(1.0 - fabs(c[2])) < tol;
-
-   ab_is_point = angle_ab < tol;
-
-   cd_is_point = angle_cd < tol;
+   unsigned ab_goes_across_pole =
+      ((fabs(a[0]) < yac_angle_tol) && (fabs(a[1]) < yac_angle_tol)) ||
+      ((fabs(b[0]) < yac_angle_tol) && (fabs(b[1]) < yac_angle_tol)) ||
+      (((a[0] > 0.0) ^ (b[0] > 0.0)) && ((a[1] > 0.0) ^ (b[1] > 0.0)));
+   unsigned cd_is_on_pole =
+      (fabs(c[0]) < yac_angle_tol) && (fabs(c[1]) < yac_angle_tol);
+   unsigned ab_is_point =
+      compare_angles(get_vector_angle_2(a, b), SIN_COS_TOL) <= 0;
+   unsigned cd_is_point =
+      compare_angles(get_vector_angle_2(c, d), SIN_COS_TOL) <= 0;
 
    if (cd_is_on_pole) {
 
@@ -1524,32 +1518,30 @@ int yac_gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
    return result;
 }
 
-static
-int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
-
-   double angle_ab = get_vector_angle(a, b);
-   double angle_cd = get_vector_angle(c, d);
+static int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
 
    // if ab is a point
-   if (angle_ab < tol) {
+   if (compare_angles(get_vector_angle_2(a, b), SIN_COS_TOL) <= 0) {
 
       return (fabs(a[2] - c[2]) < tol) && vector_is_between_lat(c, d, a);
 
-   } else if (angle_cd < tol) {
+   // if cd is a point
+   } else if (compare_angles(get_vector_angle_2(c, d), SIN_COS_TOL) <= 0) {
 
       double cross_ab[3];
-
       crossproduct_ld(a, b, cross_ab);
 
-      double n = 1.0 / sqrt(cross_ab[0] * cross_ab[0] +
-                            cross_ab[1] * cross_ab[1] +
-                            cross_ab[2] * cross_ab[2]);
-      cross_ab[0] *= n;
-      cross_ab[1] *= n;
-      cross_ab[2] *= n;
+      double sq_sin_ab = cross_ab[0] * cross_ab[0] +
+                         cross_ab[1] * cross_ab[1] +
+                         cross_ab[2] * cross_ab[2];
 
-      return (fabs(get_vector_angle(cross_ab, c) - M_PI_2) < tol) &&
-             vector_is_between(a, b, c, sq_len_diff_vec(a, b));
+      double temp = (cross_ab[0]*c[0] + cross_ab[1]*c[1] + cross_ab[2]*c[2]);
+      double sq_sin_c_ab = (temp * temp) / sq_sin_ab;
+
+      // if c is in the plane defined by a and b
+      // and if c is betwenn a and b
+      return ((sq_sin_c_ab < yac_angle_tol * yac_angle_tol) &&
+              vector_is_between(a, b, c, sq_len_diff_vec(a, b)));
    }
 
    double t[3], s[3];
