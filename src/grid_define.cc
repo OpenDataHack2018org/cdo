@@ -85,11 +85,9 @@ cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagG
       cdo_print_grid(gridID_uv_destag, 1);
 
       cdoPrint("%s(): (gridXsize=%d, gridYsize=%d)", __func__, xsize, ysize);
-      cdoPrint("%s(): (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; "
-               "yfirst_V = %3.2f)",
+      cdoPrint("%s(): (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f)",
                __func__, xfirst_U, yfirst_U, xfirst_V, yfirst_V);
-      cdoPrint("%s(): (xlast_U  = %3.2f; ylast_U  = %3.2f); (xlast_V  = %3.2f; "
-               "ylast_V  = %3.2f)",
+      cdoPrint("%s(): (xlast_U  = %3.2f; ylast_U  = %3.2f); (xlast_V  = %3.2f; ylast_V  = %3.2f)",
                __func__, xlast_U, ylast_U, xlast_V, ylast_V);
     }
 
@@ -111,19 +109,15 @@ cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagG
       ylast = ylast_U + yinc * destagGridOffsets[1];
     }
   else
-    cdoAbort("%s() Unsupported destaggered grid offsets! We support only: "
-             "(-0.5,-0.5) or (0.5,0.5)",
-             __func__);
+    cdoAbort("%s() Unsupported destaggered grid offsets! We support only: (-0.5,-0.5) or (0.5,0.5)", __func__);
 
-  double *xvals = (double *) Malloc(xsize * sizeof(double));
-  gridGenXvals(xsize, xfirst, xlast, xinc, xvals);
-  gridDefXvals(gridID_uv_destag, xvals);
-  Free(xvals);
+  std::vector<double> xvals(xsize);
+  gridGenXvals(xsize, xfirst, xlast, xinc, xvals.data());
+  gridDefXvals(gridID_uv_destag, xvals.data());
 
-  double *yvals = (double *) Malloc(ysize * sizeof(double));
-  gridGenYvals(gridtype, ysize, yfirst, ylast, yinc, yvals);
-  gridDefYvals(gridID_uv_destag, yvals);
-  Free(yvals);
+  std::vector<double> yvals(ysize);
+  gridGenYvals(gridtype, ysize, yfirst, ylast, yinc, yvals.data());
+  gridDefYvals(gridID_uv_destag, yvals.data());
 
   if (CdoDebug::cdoDebugExt)
     {
@@ -207,8 +201,7 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
 
   if ((sampleFactor < 1) || (gridXsize < 1) || (gridYsize < 1) || (sampleFactor > (gridXsize / 4))
       || (sampleFactor > (gridYsize / 4)))
-    cdoAbort("%s(): Unsupported sampleFactor (%d)! Note that: gridXsize = %d, "
-             "gridYsize = %d",
+    cdoAbort("%s(): Unsupported sampleFactor (%d)! Note that: gridXsize = %d, gridYsize = %d",
              __func__, sampleFactor, gridXsize, gridYsize);
 
   if (CdoDebug::cdoDebugExt > 20) cdo_print_grid(gridSrcID, 1);
@@ -249,17 +242,15 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
         }
       else
         {
-          double *xvals = (double *) Malloc(gridXsize * sizeof(double));
-          gridInqXvals(gridSrcID, xvals);
+          std::vector<double> xvals(gridXsize);
+          gridInqXvals(gridSrcID, xvals.data());
           for (int i = 0, j = 0; i < gridXsize; i += sampleFactor) xvals[j++] = xvals[i];
-          gridDefXvals(gridID_sampled, xvals);
-          Free(xvals);
+          gridDefXvals(gridID_sampled, xvals.data());
 
-          double *yvals = (double *) Malloc(gridYsize * sizeof(double));
-          gridInqYvals(gridSrcID, yvals);
+          std::vector<double> yvals(gridYsize);
+          gridInqYvals(gridSrcID, yvals.data());
           for (int i = 0, j = 0; i < gridYsize; i += sampleFactor) yvals[j++] = yvals[i];
-          gridDefYvals(gridID_sampled, yvals);
-          Free(yvals);
+          gridDefYvals(gridID_sampled, yvals.data());
         }
     }
 
@@ -344,8 +335,7 @@ cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int subJ
 
   if ((subI0 < 0) || (subI0 > maxIndexI) || (subI1 <= subI0) || (subI1 > maxIndexI) || (subJ0 < 0) || (subJ0 > maxIndexJ)
       || (subJ1 <= subJ0) || (subJ1 > maxIndexJ))
-    cdoAbort("%s() Incorrect subgrid specified!  (subI0,subI1,subJ0,subJ1) "
-             "=(%d,%d,%d,%d) Note that: gridXsize = %d, gridYsize = %d",
+    cdoAbort("%s() Incorrect subgrid specified!  (subI0,subI1,subJ0,subJ1) =(%d,%d,%d,%d) Note that: gridXsize=%d, gridYsize=%d",
              __func__, subI0, subI1, subJ0, subJ1, gridXsize, gridYsize);
 
   int gridtype = gridInqType(gridSrcID);
@@ -392,14 +382,12 @@ cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int subJ
 
   if (gridInqXvals(gridSrcID, NULL) && gridInqYvals(gridSrcID, NULL))
     {
-      double *xvals = (double *) Malloc(gridXsize * sizeof(double));
-      double *yvals = (double *) Malloc(gridYsize * sizeof(double));
-      gridInqXvals(gridSrcID, xvals);
-      gridInqYvals(gridSrcID, yvals);
-      gridDefXvals(gridID_sampled, xvals);
-      gridDefYvals(gridID_sampled, yvals);
-      Free(xvals);
-      Free(yvals);
+      std::vector<double> xvals(gridXsize);
+      std::vector<double> yvals(gridYsize);
+      gridInqXvals(gridSrcID, xvals.data());
+      gridInqYvals(gridSrcID, yvals.data());
+      gridDefXvals(gridID_sampled, xvals.data());
+      gridDefYvals(gridID_sampled, yvals.data());
     }
 
   gridDefNP(gridID_sampled, gridInqNP(gridSrcID));

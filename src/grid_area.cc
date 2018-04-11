@@ -363,19 +363,19 @@ gridGenArea(int gridID, double *area)
   gridInqXunits(gridID, xunitstr);
   gridInqYunits(gridID, yunitstr);
 
-  double *grid_center_lon = (double *) Malloc(gridsize * sizeof(double));
-  double *grid_center_lat = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> grid_center_lon(gridsize);
+  std::vector<double> grid_center_lat(gridsize);
 
-  gridInqXvals(gridID, grid_center_lon);
-  gridInqYvals(gridID, grid_center_lat);
+  gridInqXvals(gridID, grid_center_lon.data());
+  gridInqYvals(gridID, grid_center_lat.data());
 
-  double *grid_corner_lon = (double *) Malloc(nv * gridsize * sizeof(double));
-  double *grid_corner_lat = (double *) Malloc(nv * gridsize * sizeof(double));
+  std::vector<double> grid_corner_lon(nv * gridsize);
+  std::vector<double> grid_corner_lat(nv * gridsize);
 
   if (gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL))
     {
-      gridInqXbounds(gridID, grid_corner_lon);
-      gridInqYbounds(gridID, grid_corner_lat);
+      gridInqXbounds(gridID, grid_corner_lon.data());
+      gridInqYbounds(gridID, grid_corner_lat.data());
     }
   else
     {
@@ -386,8 +386,8 @@ gridGenArea(int gridID, double *area)
           double dlon = 0;
           if (nlon == 1) dlon = 1;
 
-          grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon, grid_corner_lon, dlon);
-          grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat, grid_corner_lat);
+          grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon.data(), grid_corner_lon.data(), dlon);
+          grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat.data(), grid_corner_lat.data());
         }
       else
         {
@@ -396,11 +396,11 @@ gridGenArea(int gridID, double *area)
         }
     }
 
-  grid_to_radian(xunitstr, gridsize, grid_center_lon, "grid1 center longitudes");
-  grid_to_radian(xunitstr, gridsize * nv, grid_corner_lon, "grid1 corner longitudes");
+  grid_to_radian(xunitstr, gridsize, grid_center_lon.data(), "grid1 center longitudes");
+  grid_to_radian(xunitstr, gridsize * nv, grid_corner_lon.data(), "grid1 corner longitudes");
 
-  grid_to_radian(yunitstr, gridsize, grid_center_lat, "grid1 center latitudes");
-  grid_to_radian(yunitstr, gridsize * nv, grid_corner_lat, "grid1 corner latitudes");
+  grid_to_radian(yunitstr, gridsize, grid_center_lat.data(), "grid1 center latitudes");
+  grid_to_radian(yunitstr, gridsize * nv, grid_corner_lat.data(), "grid1 corner latitudes");
 
   if (lgriddestroy) gridDestroy(gridID);
 
@@ -425,10 +425,10 @@ gridGenArea(int gridID, double *area)
 
       // area[i] = mod_cell_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
       if (nv <= 4)
-        area[i] = mod_huiliers_area(nv, grid_corner_lon + i * nv, grid_corner_lat + i * nv);
+        area[i] = mod_huiliers_area(nv, &grid_corner_lon[i * nv], &grid_corner_lat[i * nv]);
       else
-        area[i] = mod_huiliers_area2(nv, grid_corner_lon + i * nv, grid_corner_lat + i * nv, grid_center_lon[i],
-                                     grid_center_lat[i]);
+        area[i] = mod_huiliers_area2(nv, &grid_corner_lon[i * nv], &grid_corner_lat[i * nv],
+                                     grid_center_lon[i], grid_center_lat[i]);
     }
 
   progressStatus(0, 1, 1);
@@ -449,11 +449,6 @@ gridGenArea(int gridID, double *area)
         if (IS_EQUAL(area[i], 0.)) nzero++;
       if (IS_EQUAL(total_area, 0.)) status = 2;
     }
-
-  Free(grid_center_lon);
-  Free(grid_center_lat);
-  Free(grid_corner_lon);
-  Free(grid_corner_lat);
 
   return status;
 }
