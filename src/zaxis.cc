@@ -21,12 +21,12 @@
 
 #define MAX_LINE_LEN 65536
 
-typedef struct
+struct zaxis_t
 {
-  double *vals;
-  double *lbounds;
-  double *ubounds;
-  double *vct;
+  std::vector<double> vals;
+  std::vector<double> lbounds;
+  std::vector<double> ubounds;
+  std::vector<double> vct;
   size_t vctsize;
   int type;
   int datatype;
@@ -35,23 +35,19 @@ typedef struct
   char name[CDI_MAX_NAME];
   char longname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
-} zaxis_t;
+};
 
 void
-zaxisInit(zaxis_t *zaxis)
+zaxisInit(zaxis_t &zaxis)
 {
-  zaxis->vals = NULL;
-  zaxis->lbounds = NULL;
-  zaxis->ubounds = NULL;
-  zaxis->vct = NULL;
-  zaxis->type = CDI_UNDEFID;
-  zaxis->datatype = CDI_UNDEFID;
-  zaxis->vctsize = 0;
-  zaxis->size = 0;
-  zaxis->scalar = false;
-  zaxis->name[0] = 0;
-  zaxis->longname[0] = 0;
-  zaxis->units[0] = 0;
+  zaxis.type = CDI_UNDEFID;
+  zaxis.datatype = CDI_UNDEFID;
+  zaxis.vctsize = 0;
+  zaxis.size = 0;
+  zaxis.scalar = false;
+  zaxis.name[0] = 0;
+  zaxis.longname[0] = 0;
+  zaxis.units[0] = 0;
 }
 
 static int
@@ -94,21 +90,9 @@ zaxisDefine(zaxis_t zaxis)
 
   if (zaxis.datatype != CDI_UNDEFID) zaxisDefDatatype(zaxisID, zaxis.datatype);
 
-  if (zaxis.vals)
-    {
-      zaxisDefLevels(zaxisID, zaxis.vals);
-      Free(zaxis.vals);
-    }
-  if (zaxis.lbounds)
-    {
-      zaxisDefLbounds(zaxisID, zaxis.lbounds);
-      Free(zaxis.lbounds);
-    }
-  if (zaxis.ubounds)
-    {
-      zaxisDefUbounds(zaxisID, zaxis.ubounds);
-      Free(zaxis.ubounds);
-    }
+  if (zaxis.vals.size()) zaxisDefLevels(zaxisID, zaxis.vals.data());
+  if (zaxis.lbounds.size()) zaxisDefLbounds(zaxisID, zaxis.lbounds.data());
+  if (zaxis.ubounds.size()) zaxisDefUbounds(zaxisID, zaxis.ubounds.data());
 
   if (zaxis.name[0]) zaxisDefName(zaxisID, zaxis.name);
   if (zaxis.longname[0]) zaxisDefLongname(zaxisID, zaxis.longname);
@@ -116,8 +100,8 @@ zaxisDefine(zaxis_t zaxis)
 
   if (zaxis.type == ZAXIS_HYBRID || zaxis.type == ZAXIS_HYBRID_HALF)
     {
-      if (zaxis.vctsize && zaxis.vct)
-        zaxisDefVct(zaxisID, (int) zaxis.vctsize, zaxis.vct);
+      if (zaxis.vctsize && zaxis.vct.size())
+        zaxisDefVct(zaxisID, (int) zaxis.vctsize, zaxis.vct.data());
       else
         cdoWarning("vct undefined!");
     }
@@ -153,37 +137,28 @@ zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, size_t *iatt, const 
         {
           const char *zaxistype = parameter2word(value);
 
-          if (STR_IS_EQ(zaxistype, "pressure"))
-            zaxis->type = ZAXIS_PRESSURE;
-          else if (STR_IS_EQ(zaxistype, "hybrid_half"))
-            zaxis->type = ZAXIS_HYBRID_HALF;
-          else if (STR_IS_EQ(zaxistype, "hybrid"))
-            zaxis->type = ZAXIS_HYBRID;
-          else if (STR_IS_EQ(zaxistype, "height"))
-            zaxis->type = ZAXIS_HEIGHT;
-          else if (STR_IS_EQ(zaxistype, "depth_below_sea"))
-            zaxis->type = ZAXIS_DEPTH_BELOW_SEA;
-          else if (STR_IS_EQ(zaxistype, "depth_below_land"))
-            zaxis->type = ZAXIS_DEPTH_BELOW_LAND;
-          else if (STR_IS_EQ(zaxistype, "isentropic"))
-            zaxis->type = ZAXIS_ISENTROPIC;
-          else if (STR_IS_EQ(zaxistype, "surface"))
-            zaxis->type = ZAXIS_SURFACE;
-          else if (STR_IS_EQ(zaxistype, "generic"))
-            zaxis->type = ZAXIS_GENERIC;
-          else
-            cdoAbort("Invalid zaxis type: %s (zaxis description file: %s)", zaxistype, dname);
+          // clang-format off
+          if      (STR_IS_EQ(zaxistype, "pressure")) zaxis->type = ZAXIS_PRESSURE;
+          else if (STR_IS_EQ(zaxistype, "hybrid_half")) zaxis->type = ZAXIS_HYBRID_HALF;
+          else if (STR_IS_EQ(zaxistype, "hybrid")) zaxis->type = ZAXIS_HYBRID;
+          else if (STR_IS_EQ(zaxistype, "height")) zaxis->type = ZAXIS_HEIGHT;
+          else if (STR_IS_EQ(zaxistype, "depth_below_sea")) zaxis->type = ZAXIS_DEPTH_BELOW_SEA;
+          else if (STR_IS_EQ(zaxistype, "depth_below_land")) zaxis->type = ZAXIS_DEPTH_BELOW_LAND;
+          else if (STR_IS_EQ(zaxistype, "isentropic")) zaxis->type = ZAXIS_ISENTROPIC;
+          else if (STR_IS_EQ(zaxistype, "surface")) zaxis->type = ZAXIS_SURFACE;
+          else if (STR_IS_EQ(zaxistype, "generic")) zaxis->type = ZAXIS_GENERIC;
+          else cdoAbort("Invalid zaxis type: %s (zaxis description file: %s)", zaxistype, dname);
+          // clang-format on
         }
       else if (STR_IS_EQ(key, "datatype"))
         {
           const char *datatype = parameter2word(value);
 
-          if (STR_IS_EQ(datatype, "double"))
-            zaxis->datatype = CDI_DATATYPE_FLT64;
-          else if (STR_IS_EQ(datatype, "float"))
-            zaxis->datatype = CDI_DATATYPE_FLT32;
-          else
-            cdoAbort("Invalid datatype: %s (zaxis description file: %s)", datatype, dname);
+          // clang-format off
+          if      (STR_IS_EQ(datatype, "double")) zaxis->datatype = CDI_DATATYPE_FLT64;
+          else if (STR_IS_EQ(datatype, "float")) zaxis->datatype = CDI_DATATYPE_FLT32;
+          else cdoAbort("Invalid datatype: %s (zaxis description file: %s)", datatype, dname);
+          // clang-format on
         }
       else if (STR_IS_EQ(key, "size"))
         zaxis->size = parameter2int(value);
@@ -201,27 +176,27 @@ zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, size_t *iatt, const 
         {
           if (zaxis->size == 0) cdoAbort("size undefined (zaxis description file: %s)!", dname);
           if (zaxis->size != nvalues) cdoAbort("size=%zu and number of levels=%zu differ!", zaxis->size, nvalues);
-          zaxis->vals = (double *) Malloc(zaxis->size * sizeof(double));
+          zaxis->vals.resize(zaxis->size);
           for (size_t i = 0; i < zaxis->size; ++i) zaxis->vals[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "lbounds"))
         {
           if (zaxis->size == 0) cdoAbort("size undefined (zaxis description file: %s)!", dname);
           if (zaxis->size != nvalues) cdoAbort("size=%zu and number of lbounds=%zu differ!", zaxis->size, nvalues);
-          zaxis->lbounds = (double *) Malloc(zaxis->size * sizeof(double));
+          zaxis->lbounds.resize(zaxis->size);
           for (size_t i = 0; i < zaxis->size; ++i) zaxis->lbounds[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "ubounds"))
         {
           if (zaxis->size == 0) cdoAbort("size undefined (zaxis description file: %s)!", dname);
           if (zaxis->size != nvalues) cdoAbort("size=%zu and number of ubounds=%zu differ!", zaxis->size, nvalues);
-          zaxis->ubounds = (double *) Malloc(zaxis->size * sizeof(double));
+          zaxis->ubounds.resize(zaxis->size);
           for (size_t i = 0; i < zaxis->size; ++i) zaxis->ubounds[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "vct"))
         {
           if (zaxis->vctsize == 0) cdoAbort("vctsize undefined (zaxis description file: %s)!", dname);
-          zaxis->vct = (double *) Malloc(zaxis->vctsize * sizeof(double));
+          zaxis->vct.resize(zaxis->vctsize);
           for (size_t i = 0; i < zaxis->vctsize; ++i) zaxis->vct[i] = parameter2double(kv->values[i]);
         }
       else
@@ -255,8 +230,7 @@ zaxis_read_attributes(size_t iatt, size_t nkv, kvmap_t *kvmap, int zaxisID)
         {
           for (int n = 0; n < num_rkeys; ++n)
             if (STR_IS_EQ(key, reserved_keys[n]))
-              cdoAbort("Found reserved key word >%s< in attribute names! Check "
-                       "name or position of >%s<.",
+              cdoAbort("Found reserved key word >%s< in attribute names! Check name or position of >%s<.",
                        key, attkey0);
         }
 
@@ -264,17 +238,15 @@ zaxis_read_attributes(size_t iatt, size_t nkv, kvmap_t *kvmap, int zaxisID)
 
       if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32)
         {
-          int *ivals = (int *) Malloc(nvalues * sizeof(int));
+          std::vector<int> ivals(nvalues);
           for (size_t i = 0; i < nvalues; ++i) ivals[i] = literal_to_int(kv->values[i]);
-          cdiDefAttInt(zaxisID, CDI_GLOBAL, key, dtype, nvalues, ivals);
-          Free(ivals);
+          cdiDefAttInt(zaxisID, CDI_GLOBAL, key, dtype, nvalues, ivals.data());
         }
       else if (dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64)
         {
-          double *dvals = (double *) Malloc(nvalues * sizeof(double));
+          std::vector<double> dvals(nvalues);
           for (size_t i = 0; i < nvalues; ++i) dvals[i] = literal_to_double(kv->values[i]);
-          cdiDefAttFlt(zaxisID, CDI_GLOBAL, key, dtype, nvalues, dvals);
-          Free(dvals);
+          cdiDefAttFlt(zaxisID, CDI_GLOBAL, key, dtype, nvalues, dvals.data());
         }
       else
         {
@@ -294,7 +266,7 @@ zaxisFromFile(FILE *gfp, const char *dname)
 
   size_t nkv = list_size(kvlist);
   if (nkv == 0) return -1;
-  kvmap_t *kvmap = (kvmap_t *) Malloc(nkv * sizeof(kvmap_t));
+  std::vector<kvmap_t> kvmap(nkv);
   for (size_t i = 0; i < nkv; ++i) kvmap[i].isValid = false;
 
   size_t ik = 0;
@@ -317,17 +289,15 @@ zaxisFromFile(FILE *gfp, const char *dname)
     }
 
   zaxis_t zaxis;
-  zaxisInit(&zaxis);
+  zaxisInit(zaxis);
 
   size_t iatt = 0;
-  zaxis_read_data(nkv, kvmap, &zaxis, &iatt, dname);
+  zaxis_read_data(nkv, kvmap.data(), &zaxis, &iatt, dname);
 
   int zaxisID = (zaxis.type == CDI_UNDEFID) ? CDI_UNDEFID : zaxisDefine(zaxis);
-  if (zaxisID != CDI_UNDEFID && iatt > 0) zaxis_read_attributes(iatt, nkv, kvmap, zaxisID);
+  if (zaxisID != CDI_UNDEFID && iatt > 0) zaxis_read_attributes(iatt, nkv, kvmap.data(), zaxisID);
 
   list_destroy(pmlist);
-
-  Free(kvmap);
 
   return zaxisID;
 }
@@ -363,9 +333,8 @@ gen_zaxis_height(zaxis_t *zaxis, const char *pline)
           zaxis->type = zaxistype;
           zaxis->size = 1;
           // zaxis->scalar = true;
-          double *levels = (double *) Malloc(sizeof(double));
-          *levels = value;
-          zaxis->vals = levels;
+          zaxis->vals.resize(1);
+          zaxis->vals[0] = value;
           strcpy(zaxis->units, units);
 
           size_t len = strlen(units);
@@ -388,14 +357,14 @@ zaxisFromName(const char *zaxisnameptr)
   strtolower(zaxisname);
 
   zaxis_t zaxis;
-  zaxisInit(&zaxis);
+  zaxisInit(zaxis);
 
   const char *pline = zaxisname;
   if (cmpstr(pline, "surface") == 0) /* surface */
     {
       zaxis.type = ZAXIS_SURFACE;
       zaxis.size = 1;
-      zaxis.vals = (double *) Malloc(zaxis.size * sizeof(double));
+      zaxis.vals.resize(zaxis.size);
       zaxis.vals[0] = 0;
     }
   else if (cmpstrlen(zaxisname, "height", len) == 0)
