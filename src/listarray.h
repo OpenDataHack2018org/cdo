@@ -18,6 +18,8 @@
 #ifndef LISTARRAY_H
 #define LISTARRAY_H
 
+void split_intstring(const char *intstr, int *first, int *last, int *inc);
+
 template <typename T>
 class ListArray
 {
@@ -33,47 +35,6 @@ private:
       {
         nalloc += allinc;
         array.resize(nalloc);
-      }
-  }
-
-  int
-  get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
-  {
-    int i;
-    int ival = idefault;
-
-    for (i = istart; i < iend; i++)
-      {
-        if (!(isdigit(intstr[i]) || intstr[i] == '-'))
-          {
-            if (intstr[i] == '/')
-              ival = parameter2intlist(intstr + i + 1);
-            else
-              fprintf(stderr, "Syntax error in >%.*s<! Character %c not allowed.\n", iend, intstr, intstr[i]);
-            break;
-          }
-      }
-
-    *ilast = i;
-
-    return ival;
-  }
-
-  void
-  split_intstring(const char *intstr, int *first, int *last, int *inc)
-  {
-    int istrlen = strlen(intstr);
-    *first = parameter2intlist(intstr);
-    *last = *first;
-    *inc = 1;
-
-    int i, start = 1;
-    *last = get_ival(intstr, *first, start, istrlen, &i);
-
-    if (i < istrlen)
-      {
-        start = i + 1;
-        *inc = get_ival(intstr, 1, start, istrlen, &i);
       }
   }
 
