@@ -63,7 +63,7 @@ season_to_months(const char *season, int *imonths)
 }
 
 static int
-seaslist(lista_t *ilista)
+seaslist(ListArray<int> &listArrayInt)
 {
   int imon[13]; /* 1-12 ! */
   for (int i = 0; i < 13; ++i) imon[i] = 0;
@@ -90,7 +90,7 @@ seaslist(lista_t *ilista)
 
   nsel = 0;
   for (int i = 1; i < 13; ++i)
-    if (imon[i]) lista_set_int(ilista, nsel++, i);
+    if (imon[i]) listArrayInt.setValue(nsel++, i);
 
   return nsel;
 }
@@ -142,7 +142,7 @@ datestr_to_double(const char *datestr, int opt)
 }
 
 static int
-datelist(lista_t *flista)
+datelist(ListArray<double> listArrayFlt)
 {
   bool set2 = true;
   double fval = 0;
@@ -156,7 +156,7 @@ datelist(lista_t *flista)
       if (operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0)
         {
           fval = (i == 0) ? -99999999999. : 99999999999.;
-          lista_set_flt(flista, i, fval);
+          listArrayFlt.setValue(i, fval);
         }
       else
         {
@@ -167,13 +167,13 @@ datelist(lista_t *flista)
             fval += 0.999;
         }
 
-      lista_set_flt(flista, i, fval);
+      listArrayFlt.setValue(i, fval);
     }
 
   if (nsel == 1 && set2)
     {
       fval += 0.999;
-      lista_set_flt(flista, nsel, fval);
+      listArrayFlt.setValue(nsel, fval);
       nsel = 2;
     }
 
@@ -194,11 +194,11 @@ Seltime(void *process)
   int nts1 = 0, nts2 = 0;
   int its1 = 0, its2 = 0;
   double selfval = 0;
-  lista_t *ilista = lista_new(INT_LISTA);
-  lista_t *flista = lista_new(FLT_LISTA);
   bool lconstout = false;
   bool process_nts1 = false, process_nts2 = false;
   std::vector<int> vdate_list, vtime_list;
+  ListArray<int> listArrayInt;
+  ListArray<double> listArrayFlt;
   field_type ***vars = NULL;
 
   cdoInitialize(process);
@@ -225,11 +225,11 @@ Seltime(void *process)
 
   if (operatorID == SELSEASON)
     {
-      nsel = seaslist(ilista);
+      nsel = seaslist(listArrayInt);
     }
   else if (operatorID == SELDATE)
     {
-      nsel = datelist(flista);
+      nsel = datelist(listArrayFlt);
     }
   else if (operatorID == SELTIME)
     {
@@ -240,31 +240,28 @@ Seltime(void *process)
           if (strchr(operatorArgv()[i], ':'))
             {
               sscanf(operatorArgv()[i], "%d:%d:%d", &hour, &minute, &second);
-              lista_set_int(ilista, i, cdiEncodeTime(hour, minute, second));
+              listArrayInt.setValue(i, cdiEncodeTime(hour, minute, second));
             }
           else
             {
-              lista_set_int(ilista, i, parameter2int(operatorArgv()[i]));
+              listArrayInt.setValue(i, parameter2int(operatorArgv()[i]));
             }
         }
     }
   else
     {
-      nsel = args2int_lista(operatorArgc(), operatorArgv(), ilista);
+      nsel = listArrayInt.argvToInt(operatorArgc(), operatorArgv());
     }
 
   if (nsel < 1) cdoAbort("No timestep selected!");
 
-  int *intarr = (int *) lista_dataptr(ilista);
-  double *fltarr = (double *) lista_dataptr(flista);
+  int *intarr = listArrayInt.data();
+  double *fltarr = listArrayFlt.data();
 
   if (operatorID == SELSMON)
     {
       if (nsel > 1) nts1 = intarr[1];
-      if (nsel > 2)
-        nts2 = intarr[2];
-      else
-        nts2 = nts1;
+      nts2 = (nsel > 2) ? intarr[2] : nts1;
 
       if (nsel > 3) cdoAbort("Too many parameters");
 
@@ -655,9 +652,6 @@ Seltime(void *process)
             }
         }
     }
-
-  lista_destroy(ilista);
-  lista_destroy(flista);
 
   if (lnts1 || nconst)
     {

@@ -55,8 +55,8 @@ Selvar(void *process)
   char **argnames = NULL;
   size_t nmiss;
   int gridnum = 0;
-  lista_t *ilista = lista_new(INT_LISTA);
-  lista_t *flista = lista_new(FLT_LISTA);
+  ListArray<int> listArrayInt;
+  ListArray<double> listArrayFlt;
 
   cdoInitialize(process);
 
@@ -88,7 +88,7 @@ Selvar(void *process)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  bool ldelete = (cdoOperatorF1(operatorID) == 1) ? true : false;
+  bool ldelete = (cdoOperatorF1(operatorID) == 1);
 
   int args_are_numeric = operatorArgc() > 0 && isdigit(*operatorArgv()[0]);
 
@@ -102,16 +102,16 @@ Selvar(void *process)
     }
   else if (TAKES_FLOATS(operatorID))
     {
-      nsel = args2flt_lista(operatorArgc(), operatorArgv(), flista);
-      fltarr = (double *) lista_dataptr(flista);
+      nsel = listArrayFlt.argvToFlt(operatorArgc(), operatorArgv());
+      fltarr = listArrayFlt.data();
 
       if (cdoVerbose)
         for (int i = 0; i < nsel; i++) cdoPrint("flt %d = %g", i + 1, fltarr[i]);
     }
   else
     {
-      nsel = args2int_lista(operatorArgc(), operatorArgv(), ilista);
-      intarr = (int *) lista_dataptr(ilista);
+      nsel = listArrayInt.argvToInt(operatorArgc(), operatorArgv());
+      intarr = listArrayInt.data();
 
       if (cdoVerbose)
         for (int i = 0; i < nsel; i++) cdoPrint("int %d = %d", i + 1, intarr[i]);
@@ -343,9 +343,6 @@ Selvar(void *process)
   pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  lista_destroy(ilista);
-  lista_destroy(flista);
 
   cdoFinish();
 

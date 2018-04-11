@@ -19,8 +19,7 @@
    This module contains the following operators:
 
       Intlevel   intlevel        Linear level interpolation
-      Intlevel   intlevel3d      Linear level interpolation on a 3d vertical
-   coordinates variable
+      Intlevel   intlevel3d      Linear level interpolation on a 3d vertical coordinates variable
 */
 
 #include <cdi.h>
@@ -300,9 +299,10 @@ Intlevel(void *process)
       argv++;
       if (cdoVerbose) cdoPrint("zvarname = %s", zvarname);
     }
-  lista_t *flista = lista_new(FLT_LISTA);
-  int nlev2 = args2flt_lista(argc, argv, flista);
-  double *lev2 = (double *) lista_dataptr(flista);
+
+  ListArray<double> listArrayFlt;
+  int nlev2 = listArrayFlt.argvToFlt(argc, argv);
+  double *lev2 = listArrayFlt.data();
 
   if (cdoVerbose)
     for (int i = 0; i < nlev2; ++i) cdoPrint("lev2 %d: %g", i, lev2[i]);
@@ -559,8 +559,6 @@ Intlevel(void *process)
   Free(lev_wgt2);
 
   Free(lev1);
-
-  lista_destroy(flista);
 
   cdoFinish();
 

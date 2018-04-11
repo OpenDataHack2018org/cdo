@@ -82,7 +82,7 @@ Vertintml(void *process)
   double minval, maxval;
   gribcode_t gribcodes;
   memset(&gribcodes, 0, sizeof(gribcode_t));
-  lista_t *flista = lista_new(FLT_LISTA);
+  ListArray<double> listArrayFlt;
 
   cdoInitialize(process);
 
@@ -139,8 +139,8 @@ Vertintml(void *process)
     }
   else
     {
-      nplev = args2flt_lista(operatorArgc(), operatorArgv(), flista);
-      plev = (double *) lista_dataptr(flista);
+      nplev = listArrayFlt.argvToFlt(operatorArgc(), operatorArgv());
+      plev = listArrayFlt.data();
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -644,8 +644,6 @@ Vertintml(void *process)
     }
 
   if (vct) Free(vct);
-
-  lista_destroy(flista);
 
   cdoFinish();
 

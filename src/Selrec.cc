@@ -32,7 +32,7 @@ Selrec(void *process)
 {
   int nrecs;
   int varID, levelID;
-  lista_t *ilista = lista_new(INT_LISTA);
+  ListArray<int> listArrayInt;
 
   cdoInitialize(process);
 
@@ -40,9 +40,9 @@ Selrec(void *process)
 
   operatorInputArg("records");
 
-  int nsel = args2int_lista(operatorArgc(), operatorArgv(), ilista);
+  int nsel = listArrayInt.argvToInt(operatorArgc(), operatorArgv());
 
-  int *intarr = (int *) lista_dataptr(ilista);
+  int *intarr = listArrayInt.data();
 
   if (cdoVerbose)
     {
@@ -96,8 +96,6 @@ Selrec(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  lista_destroy(ilista);
 
   cdoFinish();
 

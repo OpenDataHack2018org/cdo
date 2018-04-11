@@ -40,10 +40,9 @@ Intyear(void *process)
 
   operatorInputArg("years");
 
-  lista_t *ilist = lista_new(INT_LISTA);
-  int nyears = args2int_lista(operatorArgc(), operatorArgv(), ilist);
-
-  int *iyears = (int *) lista_dataptr(ilist);
+  ListArray<int> listArrayInt;
+  int nyears = listArrayInt.argvToInt(operatorArgc(), operatorArgv());
+  int *iyears = listArrayInt.data();
 
   std::vector<int> streamIDs(nyears);
 
@@ -165,8 +164,6 @@ Intyear(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  lista_destroy(ilist);
 
   cdoFinish();
 

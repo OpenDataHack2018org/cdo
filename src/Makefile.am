@@ -107,7 +107,6 @@ libcdo_la_SOURCES =            \
                interpol.h      \
                juldate.cc       \
                knn_weights.h   \
-               listarray.cc     \
                listarray.h     \
                list.cc          \
                list.h          \
