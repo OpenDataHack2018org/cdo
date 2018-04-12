@@ -150,6 +150,12 @@
       "makeCall": "make -j 12",
       "sync": true
     },
+    "localIntel": {
+      "hostname": "luthien",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --with-eccodes CC=/home/ram/src/tools/spack/opt/spack/linux-arch-x86_64/gcc-7.2.0/intel-18.0.1-si3z4sjcsfivnzl6znctszuevsktcflf/compilers_and_libraries_2018.1.163/linux/bin/intel64/icc CXX=/home/ram/src/tools/spack/opt/spack/linux-arch-x86_64/gcc-7.2.0/intel-18.0.1-si3z4sjcsfivnzl6znctszuevsktcflf/compilers_and_libraries_2018.1.163/linux/bin/intel64/icpc FC=/home/ram/src/tools/spack/opt/spack/linux-arch-x86_64/gcc-7.2.0/intel-18.0.1-si3z4sjcsfivnzl6znctszuevsktcflf/compilers_and_libraries_2018.1.163/linux/bin/intel64/ifort",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
     "linux32bit": {
       "hostname": "ubuntu-32bit",
       "configureCall": "./configure --with-netcdf ",
