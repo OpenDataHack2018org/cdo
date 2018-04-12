@@ -4,6 +4,7 @@ libcdo_la_SOURCES =            \
                array.h         \
                array.cc         \
                cdo_int.h       \
+               cdo_wtime.h       \
                compare.h       \
                cfortran.h       \
                libncl.h         \
