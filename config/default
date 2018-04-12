@@ -297,12 +297,11 @@ case "${HOSTNAME}" in
                     CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
 	;;
 # x86_64-archlinux
-    luthien*)
+    melian*)
       case "$COMP" in
       gcc|clang)
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
-                    --enable-maintainer-mode \
                     --enable-data \
 	            --with-magics \
 	            --with-netcdf \
@@ -314,32 +313,10 @@ case "${HOSTNAME}" in
                   --with-fftw3    \
                   --with-proj     \
                       --with-pic  \
-                      CC=$COMP CPPFLAGS=-I/usr/include/magics CFLAGS="-g -Wall -O3" LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
+                      CC=$COMP CXX=${COMP}++ CPPFLAGS=-I/usr/include/magics \
+                      CFLAGS="-g -Wall" CXXFLAGS="-g -Wall"  \
+                      LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
         ;;
-      g++|clang++)
-        case "$COMP" in
-          g++)
-            CC=gcc
-            ;;
-          clang++)
-            CC=clang
-            ;;
-        esac
- 	${CONFPATH}configure --prefix=$HOME/local \
-                    --program-suffix=-dev \
-                    --enable-maintainer-mode \
-                    --enable-data \
-                    --enable-cxx  \
-	            --with-netcdf \
-	              --with-hdf5 \
-                     --with-szlib \
-                  --with-eccodes  \
-                  --with-udunits2 \
-                  --with-fftw3    \
-                  --with-proj     \
-                      --with-pic  \
-                      CC=$CC CXX=$COMP CFLAGS="-g -Wall -O2" CXXFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
-	;;
       esac
     ;;
 # standard workstations at MPI-M debian jessie
