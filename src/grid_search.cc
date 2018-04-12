@@ -99,9 +99,7 @@ struct PointCloud
   // bool kdtree_get_bbox(BBOX& /* bb */) const { return false; }
 };
 
-typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloud<double>>, PointCloud<double>,
-                                            3 /* dim */
-                                            >
+typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloud<double>>, PointCloud<double>, 3>
     nfTree_t;
 
 static double
@@ -196,7 +194,6 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));
   // see  example_cartesian.c
-  if (cdoVerbose) cdoPrint("Init kdtree lib 3D: n=%zu  nthreads=%d", n, Threading::ompNumThreads);
 
   kdata_t min[3] = { 1.e9, 1.e9, 1.e9 };
   kdata_t max[3] = { -1.e9, -1.e9, -1.e9 };
@@ -237,7 +234,6 @@ static void *
 gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
 {
   PointCloud<double> *pointcloud = new PointCloud<double>();
-  if (cdoVerbose) cdoPrint("Init nanoflann 3D: n=%zu  nthreads=%d", n, Threading::ompNumThreads);
 
   double min[3] = { 1.e9, 1.e9, 1.e9 };
   double max[3] = { -1.e9, -1.e9, -1.e9 };
@@ -287,8 +283,6 @@ gs_create_nanoflann(size_t n, const double *restrict lons, const double *restric
 static void *
 gs_create_spherepart(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
 {
-  if (cdoVerbose) cdoPrint("Init spherepart 3D: n=%zu  nthreads=%d", n, Threading::ompNumThreads);
-
   double *coordinates_xyz = (double *) malloc(3 * n * sizeof(*coordinates_xyz));
   gs->coordinates_xyz = coordinates_xyz;
 
@@ -399,6 +393,14 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
   gs->plats = lats;
 
   // clang-format off
+  if (cdoVerbose)
+    {
+      if      (gs->method == PointSearchMethod::kdtree)     cdoPrint("Point search method: kdtree");
+      else if (gs->method == PointSearchMethod::full)       cdoPrint("Point search method: full");
+      else if (gs->method == PointSearchMethod::nanoflann)  cdoPrint("Point search method: nanoflann");
+      else if (gs->method == PointSearchMethod::spherepart) cdoPrint("Point search method: spherepart");
+    }
+
   if      (gs->method == PointSearchMethod::kdtree)     gs->search_container = gs_create_kdtree(n, lons, lats, gs);
   else if (gs->method == PointSearchMethod::full)       gs->search_container = gs_create_full(n, lons, lats);
   else if (gs->method == PointSearchMethod::nanoflann)  gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
