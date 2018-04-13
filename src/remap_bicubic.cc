@@ -16,10 +16,10 @@
 */
 
 #include "cdo_int.h"
+#include "cdo_wtime.h"
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link.h"
-#include "timer.h"
 
 // bicubic interpolation
 
@@ -102,8 +102,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
 
   if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
 
-  extern int timer_remap_bic;
-  if (cdoTimer) timer_start(timer_remap_bic);
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   progressInit();
 
@@ -189,7 +188,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
 
   weightLinks4ToRemapLinks(tgt_grid_size, weightLinks, rv);
 
-  if (cdoTimer) timer_stop(timer_remap_bic);
+  if (cdoVerbose) cdoPrint("Square search nearest: %.2f seconds", cdo_get_wtime() - start);
 }  // scrip_remap_weights_bicubic
 
 /*
@@ -210,8 +209,7 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
 
   if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
 
-  extern int timer_remap_bic;
-  if (cdoTimer) timer_start(timer_remap_bic);
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   progressInit();
 
@@ -298,5 +296,5 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
 
   progressStatus(0, 1, 1);
 
-  if (cdoTimer) timer_stop(timer_remap_bic);
+  if (cdoVerbose) cdoPrint("Square search nearest: %.2f seconds", cdo_get_wtime() - start);
 }  // remapBicubic

@@ -70,6 +70,13 @@ case "${HOSTNAME}" in
                     LDFLAGS="/opt/local/lib/gcc5/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
 	            CXX=g++-mp-5 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
                     CC=gcc-mp-5  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
+        elif  test "$COMP" = gnu_pic ; then
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
+                    $CDOLIBS \
+                    LDFLAGS="/opt/local/lib/gcc6/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
+	            CXX=g++ CXXFLAGS="-g -fPIC" \
+                    CC=gcc  CFLAGS="-g -fPIC"
         elif  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \

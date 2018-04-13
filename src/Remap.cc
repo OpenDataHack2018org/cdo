@@ -616,7 +616,6 @@ remapSetFracMin(size_t gridsize, double *array, double missval, RemapGrid *tgt_g
 }
 
 int timer_remap, timer_remap_init, timer_remap_sort;
-int timer_remap_bil, timer_remap_bic, timer_remap_dis, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
 
 static void
 remapTimerInit(void)
@@ -624,12 +623,6 @@ remapTimerInit(void)
   timer_remap = timer_new("remap");
   timer_remap_init = timer_new("remap init");
   timer_remap_sort = timer_new("remap sort");
-  timer_remap_bil = timer_new("remap bil");
-  timer_remap_bic = timer_new("remap bic");
-  timer_remap_dis = timer_new("remap dis");
-  timer_remap_con = timer_new("remap con");
-  timer_remap_con_l1 = timer_new("remap con loop1");
-  timer_remap_con_l2 = timer_new("remap con loop2");
 }
 
 static void

@@ -598,7 +598,7 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
     {
       if (!(src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D || tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D))
         {
-          double start = cdoVerbose ? omp_get_wtime() : 0;
+          double start = cdoVerbose ? cdo_get_wtime() : 0;
 
           search.srcBins.cell_bound_box.resize(4 * src_grid.size);
           if (tgt_grid.luse_cell_corners) search.tgtBins.cell_bound_box.resize(4 * tgt_grid.size);
