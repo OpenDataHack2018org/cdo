@@ -223,7 +223,7 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
   if (lon_is_circular) nlon1--;
   size_t gridsize1 = nlon1 * nym;
 
-  bool *grid1_mask = (bool *) Malloc(gridsize1 * sizeof(bool));
+  std::vector<bool> grid1_mask(gridsize1);
   for (size_t jj = 0; jj < nym; ++jj)
     for (size_t ii = 0; ii < nlon1; ++ii) grid1_mask[jj * nlon1 + ii] = !DBL_IS_EQUAL(fieldm[jj * nlon1 + ii], missval);
 
@@ -281,8 +281,6 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
     }
 
   progressStatus(0, 1, 1);
-
-  if (grid1_mask) Free(grid1_mask);
 }
 
 double
@@ -341,10 +339,10 @@ intgridbil(field_type *field1, field_type *field2)
       if (lon_is_circular) nlon1 += 1;
     }
 
-  double *lon1 = (double *) Malloc(nlon1 * sizeof(double));
-  double *lat1 = (double *) Malloc(nlat1 * sizeof(double));
-  gridInqXvals(gridID1, lon1);
-  gridInqYvals(gridID1, lat1);
+  std::vector<double> lon1(nlon1);
+  std::vector<double> lat1(nlat1);
+  gridInqXvals(gridID1, lon1.data());
+  gridInqYvals(gridID1, lat1.data());
 
   if (lgeorefgrid)
     {
@@ -352,8 +350,8 @@ intgridbil(field_type *field1, field_type *field2)
 
       gridInqXunits(gridID1, xunits);
 
-      grid_to_radian(xunits, nlon1, lon1, "grid1 center lon");
-      grid_to_radian(xunits, nlat1, lat1, "grid1 center lat");
+      grid_to_radian(xunits, nlon1, lon1.data(), "grid1 center lon");
+      grid_to_radian(xunits, nlat1, lat1.data(), "grid1 center lat");
 
       if (lon_is_circular) lon1[nlon1 - 1] = lon1[0] + 2 * M_PI;
     }
@@ -378,7 +376,7 @@ intgridbil(field_type *field1, field_type *field2)
         {
           double **field = array1_2D;
           array1_2D = (double **) Malloc(nlat1 * sizeof(double *));
-          lon1 = (double *) Realloc(lon1, (nlon1 + 1) * sizeof(double));
+          lon1.resize(nlon1 + 1);
           double *array = (double *) Malloc(nlat1 * (nlon1 + 1) * sizeof(double));
 
           for (size_t ilat = 0; ilat < nlat1; ilat++)
@@ -399,7 +397,7 @@ intgridbil(field_type *field1, field_type *field2)
       if (lat2 < MIN(lat1[0], lat1[nlat1 - 1]) || lat2 > MAX(lat1[0], lat1[nlat1 - 1]))
         cdoAbort("Latitude %f out of bounds (%f to %f)!", lat2, lat1[0], lat1[nlat1 - 1]);
 
-      *array2 = intlinarr2p(nlon1, nlat1, array1_2D, lon1, lat1, lon2, lat2);
+      *array2 = intlinarr2p(nlon1, nlat1, array1_2D, lon1.data(), lat1.data(), lon2, lat2);
       /*
       printf("%5d %f %f %f\n", index++, lon2, lat2, *array2);
       */
@@ -418,18 +416,18 @@ intgridbil(field_type *field1, field_type *field2)
 
       size_t gridsize2 = gridInqSize(gridID2);
 
-      double *xvals2 = (double *) Malloc(gridsize2 * sizeof(double));
-      double *yvals2 = (double *) Malloc(gridsize2 * sizeof(double));
+      std::vector<double> xvals2(gridsize2);
+      std::vector<double> yvals2(gridsize2);
 
       if (lgeorefgrid)
         {
-          gridInqXvals(gridID2, xvals2);
-          gridInqYvals(gridID2, yvals2);
+          gridInqXvals(gridID2, xvals2.data());
+          gridInqYvals(gridID2, yvals2.data());
 
           gridInqXunits(gridID2, xunits);
 
-          grid_to_radian(xunits, gridsize2, xvals2, "grid2 center lon");
-          grid_to_radian(xunits, gridsize2, yvals2, "grid2 center lat");
+          grid_to_radian(xunits, gridsize2, xvals2.data(), "grid2 center lon");
+          grid_to_radian(xunits, gridsize2, yvals2.data(), "grid2 center lat");
 
           for (size_t i = 0; i < gridsize2; ++i)
             {
@@ -439,11 +437,11 @@ intgridbil(field_type *field1, field_type *field2)
         }
       else
         {
-          double *xcoord = (double *) Malloc(xsize2 * sizeof(double));
-          double *ycoord = (double *) Malloc(ysize2 * sizeof(double));
+          std::vector<double> xcoord(xsize2);
+          std::vector<double> ycoord(ysize2);
 
-          gridInqXvals(gridID2, xcoord);
-          gridInqYvals(gridID2, ycoord);
+          gridInqXvals(gridID2, xcoord.data());
+          gridInqYvals(gridID2, ycoord.data());
 
           for (size_t j = 0; j < ysize2; ++j)
             for (size_t i = 0; i < xsize2; ++i)
@@ -451,21 +449,13 @@ intgridbil(field_type *field1, field_type *field2)
                 xvals2[j * xsize2 + i] = xcoord[i];
                 yvals2[j * xsize2 + i] = ycoord[j];
               }
-
-          Free(xcoord);
-          Free(ycoord);
         }
 
-      intlinarr2(missval, lon_is_circular, nlon1, nlat1, array1, lon1, lat1, gridsize2, array2, xvals2, yvals2);
+      intlinarr2(missval, lon_is_circular, nlon1, nlat1, array1, lon1.data(), lat1.data(), gridsize2, array2, xvals2.data(), yvals2.data());
 
       field2->nmiss = arrayNumMV(gridsize2, array2, missval);
-
-      Free(xvals2);
-      Free(yvals2);
     }
 
-  Free(lon1);
-  Free(lat1);
   Free(array1_2D);
 }
 
