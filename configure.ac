@@ -188,7 +188,8 @@ CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
 CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
 #  ----------------------------------------------------------------------
 # Add configure options
-ACX_OPTIONS
+ACX_CDO_OPTIONS
+ACX_CDI_OPTIONS
 
 # configure code from valgrind
 
