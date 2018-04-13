@@ -299,7 +299,7 @@ case "${HOSTNAME}" in
 # x86_64-archlinux
     melian*)
       case "$COMP" in
-      gcc|clang)
+        gcc)
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
                     --enable-data \
@@ -313,9 +313,27 @@ case "${HOSTNAME}" in
                   --with-fftw3    \
                   --with-proj     \
                       --with-pic  \
-                      CC=$COMP CXX=${COMP}++ CPPFLAGS=-I/usr/include/magics \
-                      CFLAGS="-g -Wall" CXXFLAGS="-g -Wall"  \
-                      LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
+                      CC=gcc CXX=g++ CPPFLAGS=-I/usr/include/magics \
+                      CFLAGS="-g -Wall -O3 -ftree-vectorize" CXXFLAGS="-g -Wall -O3 -ftree-vectorize"  \
+                      LIBS="-lopenjpeg"
+        ;;
+        clang)
+ 	${CONFPATH}configure --prefix=$HOME/local \
+                    --program-suffix=-dev \
+                    --enable-data \
+	            --with-magics \
+	            --with-netcdf \
+	              --with-hdf5 \
+                     --with-szlib \
+                  --with-grib_api \
+                  --with-eccodes  \
+                  --with-grib_api \
+                  --with-fftw3    \
+                  --with-proj     \
+                      --with-pic  \
+                      CC=clang CXX=clang++ CPPFLAGS=-I/usr/include/magics \
+                      CFLAGS="-g -Wall -ftree-vectorize" CXXFLAGS="-g -Wall -ftree-vectorize"  \
+                      LIBS="-lopenjpeg"
         ;;
       esac
     ;;
@@ -392,4 +410,10 @@ case "${HOSTNAME}" in
                     --with-fftw3 \
                     CC=gcc CFLAGS='-g -Wall -O3'
 	;;
+
+    *)
+      echo "Could not find host!!!";
+      echo "hostname used is: '${HOSTNAME}'"
+      exit 1;
+      ;;
 esac
