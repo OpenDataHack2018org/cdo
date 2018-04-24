@@ -314,7 +314,6 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
   if (cdoVerbose) cdoPrint("BBOX: min=%g/%g/%g  max=%g/%g/%g", min[0], min[1], min[2], max[0], max[1], max[2]);
 
   return (void *) yac_point_sphere_part_search_new(n, coordinates_xyz);
-  ;
 }
 
 static void
@@ -428,7 +427,11 @@ gridsearch_delete(GridSearch *gs)
 
       // clang-format off
       if      (gs->method == PointSearchMethod::kdtree)     gs_destroy_kdtree(gs->search_container);
-      else if (gs->method == PointSearchMethod::nanoflann)  delete ((PointCloud<double> *) gs->pointcloud);
+      else if (gs->method == PointSearchMethod::nanoflann)
+        {
+          delete ((PointCloud<double> *) gs->pointcloud);
+          delete ((nfTree_t *) gs->search_container);
+        }
       else if (gs->method == PointSearchMethod::spherepart)
         {
           free(gs->coordinates_xyz);
