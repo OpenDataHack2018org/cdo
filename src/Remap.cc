@@ -1043,8 +1043,9 @@ Remap(void *argument)
                       remapGridFree(remaps[n0].src_grid);
                       remapGridFree(remaps[n0].tgt_grid);
                       remapSearchFree(remaps[n0].search);
-                      for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
-                      r = nremaps - 1;
+                      // for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
+                      // r = nremaps - 1;
+                      r = n0;
                       remapInit(remaps[r]);
                     }
 
@@ -1062,8 +1063,7 @@ Remap(void *argument)
                       if (gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == false)
                         {
                           remap_num_srch_bins = (!remap_extrapolate && mapType == RemapMethod::DISTWGT)
-                                                    ? 1
-                                                    : remapGenNumBins(gridInqYsize(gridID1));
+                                                    ? 1 : remapGenNumBins(gridInqYsize(gridID1));
                         }
 
                       remap_set_int(REMAP_NUM_SRCH_BINS, remap_num_srch_bins);
