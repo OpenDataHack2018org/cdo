@@ -46,6 +46,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "cdo_int.h"  // HAVE_OPENMP4
 
@@ -81,22 +82,22 @@ printFeatures(void)
   fprintf(stderr, "3");
 #endif
 #endif
-#if defined(HAVE_LIBHDF5)
+#ifdef HAVE_LIBHDF5
   fprintf(stderr, " HDF5");
 #endif
-#if defined(HAVE_NETCDF4)
+#ifdef HAVE_NETCDF4
   fprintf(stderr, " NC4");
-#if defined(HAVE_NC4HDF5)
+#ifdef HAVE_NC4HDF5
   fprintf(stderr, "/HDF5");
-#if defined(HAVE_NC4HDF5_THREADSAFE)
+#ifdef HAVE_NC4HDF5_THREADSAFE
   fprintf(stderr, "/threadsafe");
 #endif
 #endif
 #endif
-#if defined(HAVE_LIBNC_DAP)
+#ifdef HAVE_LIBNC_DAP
   fprintf(stderr, " OPeNDAP");
 #endif
-#if defined(HAVE_LIBSZ)
+#ifdef HAVE_LIBSZ
   fprintf(stderr, " SZ");
 #endif
 /*
@@ -104,7 +105,7 @@ printFeatures(void)
 fprintf(stderr, " Z");
 #endif
 */
-#if defined(HAVE_LIBUDUNITS2)
+#ifdef HAVE_LIBUDUNITS2
   fprintf(stderr, " UDUNITS2");
 #endif
 #ifdef HAVE_LIBPROJ
@@ -116,7 +117,7 @@ fprintf(stderr, " Z");
 #ifdef HAVE_LIBMAGICS
   fprintf(stderr, " MAGICS");
 #endif
-#if defined(HAVE_LIBDRMAA)
+#ifdef HAVE_LIBDRMAA
   fprintf(stderr, " DRMAA");
 #endif
 #ifdef HAVE_LIBCURL
@@ -207,4 +208,29 @@ printLibraries(void)
 #endif
 
   fprintf(stderr, "\n");
+}
+
+
+void cdoConfig(const char *option)
+{
+  if ( STR_IS_EQ("has-hdf5", option) )
+    {
+#ifdef HAVE_LIBHDF5
+      fprintf(stdout, "yes\n");
+#else
+      fprintf(stdout, "no\n");
+#endif
+    }
+  else
+    {
+      fprintf(stdout, "unknown config option: %s\n", option);
+      fprintf(stdout, "\n");
+      fprintf(stdout, "Available config option:\n");
+      fprintf(stdout, "\n");
+      fprintf(stdout, "  has-hdf5    whether HDF5 is enabled\n");
+      
+      exit(EXIT_FAILURE);
+    }
+
+  exit(EXIT_SUCCESS);
 }

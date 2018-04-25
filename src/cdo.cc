@@ -103,6 +103,7 @@ extern "C" {
 void streamGrbDefDataScanningMode(int scanmode);
 }
 
+void cdoConfig(const char *option);
 void setCellSearchMethod(const char *methodstr);
 void setPointSearchMethod(const char *methodstr);
 
@@ -1108,17 +1109,19 @@ parse_options_long(int argc, char *argv[])
   int lsortparam;
   int ldebLevel;
   int lscmode;
+  int lconfig;
 
   // clang-format off
   struct cdo_option opt_long[] =
     {
-      { "precision",         required_argument,        &lprecision,   1  },
+      { "precision",         required_argument,         &lprecision,  1  },
       { "percentile",        required_argument,        &lpercentile,  1  },
       { "netcdf_hdr_pad",    required_argument,    &lnetcdf_hdr_pad,  1  },
       { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1  },
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1  },
       { "use_fftw",          required_argument,          &luse_fftw,  1  },
-      { "cellsearchmethod",  required_argument, &lcellsearchmethod,   1  },
+      { "cellsearchmethod",  required_argument,  &lcellsearchmethod,  1  },
+      { "config",            required_argument,            &lconfig,  1  },
       { "pointsearchmethod", required_argument, &lpointsearchmethod,  1  },
       { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
@@ -1164,6 +1167,7 @@ parse_options_long(int argc, char *argv[])
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
       lcellsearchmethod = 0;
+      lconfig = 0;
       lpointsearchmethod = 0;
       lgridsearchradius = 0;
       lremap_genweights = 0;
@@ -1252,6 +1256,10 @@ parse_options_long(int argc, char *argv[])
           else if (lcellsearchmethod)
             {
               setCellSearchMethod(CDO_optarg);
+            }
+          else if (lconfig)
+            {
+              cdoConfig(CDO_optarg);
             }
           else if (lpointsearchmethod)
             {
