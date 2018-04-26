@@ -63,8 +63,6 @@ public:
   std::vector<PstreamType *> inputStreams;
   std::vector<PstreamType *> outputStreams;
   int nChildActive = 0;
-  short m_cntIn;
-  short m_cntOut;
 
   double s_utime;
   double s_stime;
