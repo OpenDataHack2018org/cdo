@@ -4,12 +4,15 @@ echo 1..40 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
+HAS_NETCDF=`${CDO} --config has-nc`
+#
 CDOOUT=cout$$
 CDOERR=cerr$$
 TYPES="tim year mon day"
 STATS="min max range sum avg mean std std1 var var1"
-FMS="srv grb nc"
-if [ "@ENABLE_NETCDF@" = no ] ; then  FMS="srv grb"; fi
+FMS="srv grb"
+if [ "${HAS_NETCDF}" = yes ] ; then  FMS="$FMS nc"; fi
+#
 NTEST=1
 
 rm -rf TimstatDebugOutput

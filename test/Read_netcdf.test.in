@@ -4,6 +4,8 @@ echo 1..4 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
+HAS_NETCDF=`${CDO} --config has-nc`
+#
 CDOOUT=cout$$
 CDOERR=cerr$$
 #
@@ -21,7 +23,7 @@ for OPERATOR in sinfon infon; do
     DEBUG_OUT="--seperateDebugFromLog Read_netcdf_${OPERATOR}_${FILE}.debug"
     CDOCOMMAND="$CDO $DEBUG_OUT $OPERATOR $IFILE"
 
-    if [ "@ENABLE_NETCDF@" = yes ] ; then
+    if [ "${HAS_NETCDF}" = yes ] ; then
       echo "Running test: $NTEST"
       echo "$CDOCOMMAND"
 

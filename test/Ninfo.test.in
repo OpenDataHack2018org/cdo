@@ -3,6 +3,8 @@ echo 1..9 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 #
+HAS_NETCDF=`${CDO} --config has-nc`
+#
 NTEST=1
 #
 for grid  in r18x9 ni4 ni96 global_10 t63grid; do
@@ -53,7 +55,7 @@ if test 1 -eq $($CDOCOMMAND -topo,r1x1) ; then  echo "ok $NTEST - $CDOTEST -topo
 if test 1 -eq $($CDOCOMMAND -topo,global_1) ; then  echo "ok $NTEST - $CDOTEST -topo,global_1"; else echo "not ok $NTEST - $CDOTEST -topo,global_1"; fi; let NTEST+=1
 
 # create temporary data
-if [ "@ENABLE_NETCDF@" = yes ] ; then
+if [ "${HAS_NETCDF}" = yes ] ; then
   rm -f Ninfo_tempDataGeneration.debug
   $CDO --seperateDebugFromLog Ninfo_tempDataGeneration.debug -O -f nc -temp,r18x9 temp.small
   $CDO --seperateDebugFromLog Ninfo_tempDataGeneration.debug -O -f nc -temp,global_10 temp.global

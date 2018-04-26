@@ -227,6 +227,7 @@ void cdoConfig(const char *option)
   const char *has_nc4c = YN[cdiHaveFiletype(CDI_FILETYPE_NC4C)];
   const char *has_nc5 = YN[cdiHaveFiletype(CDI_FILETYPE_NC5)];
   const char *has_hdf5 = YN[0];
+  const char *has_cgribex = YN[0];
   const char *has_cmor = YN[0];
   const char *has_proj = YN[0];
   const char *has_threads = YN[0];
@@ -234,6 +235,10 @@ void cdoConfig(const char *option)
 
 #ifdef HAVE_LIBHDF5
   has_hdf5 = YN[1];
+#endif
+
+#ifdef HAVE_LIBCGRIBEX
+  has_cgribex = YN[1];
 #endif
 
 #ifdef HAVE_LIBCMOR
@@ -264,6 +269,7 @@ void cdoConfig(const char *option)
   else if ( STR_IS_EQ("has-nc4c", option) ) fprintf(stdout, "%s\n", has_nc4c);
   else if ( STR_IS_EQ("has-nc5", option) ) fprintf(stdout, "%s\n", has_nc5);
   else if ( STR_IS_EQ("has-hdf5", option) ) fprintf(stdout, "%s\n", has_hdf5);
+  else if ( STR_IS_EQ("has-cgribex", option) ) fprintf(stdout, "%s\n", has_cgribex);
   else if ( STR_IS_EQ("has-cmor", option) ) fprintf(stdout, "%s\n", has_cmor);
   else if ( STR_IS_EQ("has-proj", option) ) fprintf(stdout, "%s\n", has_proj);
   else if ( STR_IS_EQ("has-threads", option) ) fprintf(stdout, "%s\n", has_threads);
@@ -286,6 +292,7 @@ void cdoConfig(const char *option)
       fprintf(stdout, "  has-nc4c    whether NetCDF 4 classic is enabled\n");
       fprintf(stdout, "  has-nc5     whether NetCDF5 is enabled\n");
       fprintf(stdout, "  has-hdf5    whether HDF5 is enabled\n");
+      fprintf(stdout, "  has-cgribex whether CGRIBEX is enabled\n");
       fprintf(stdout, "  has-cmor    whether CMOR is enabled\n");
       fprintf(stdout, "  has-proj    whether PROJ is enabled\n");
       fprintf(stdout, "  has-threads whether PTHREADS is enabled\n");
