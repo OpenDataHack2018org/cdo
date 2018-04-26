@@ -8,7 +8,6 @@ CDOOUT=cout$$
 CDOERR=cerr$$
 OFORMAT="-f srv -b 32"
 FORMATS="srv ext ieg grb grb2 nc nc2 nc4"
-#FORMATS="nc4"
 #
 IFILE=$DATAPATH/pl_data
 NTEST=1
@@ -16,7 +15,6 @@ NTEST=1
 function fileformat()
 {
   FILEFORMAT=undefined
-  ENABLE_TEST=yes
 
   if [ "${FORMAT}" = srv  ] ; then  FILEFORMAT=SERVICE;  fi
   if [ "${FORMAT}" = ext  ] ; then  FILEFORMAT=EXTRA;    fi
@@ -27,14 +25,7 @@ function fileformat()
   if [ "${FORMAT}" = nc2  ] ; then  FILEFORMAT=netCDF2;  fi
   if [ "${FORMAT}" = nc4  ] ; then  FILEFORMAT=netCDF4;  fi
 
-  if [ "@ENABLE_SERVICE@" = no -a "${FORMAT}" = srv  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_EXTRA@" = no   -a "${FORMAT}" = ext  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_IEG@" = no     -a "${FORMAT}" = ieg  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_GRIB@" = no    -a "${FORMAT}" = grb  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_GRIBAPI@" = no -a "${FORMAT}" = grb2 ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_NETCDF@" = no  -a "${FORMAT}" = nc   ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_NETCDF@" = no  -a "${FORMAT}" = nc2  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_NC4@" = no     -a "${FORMAT}" = nc4  ] ; then  ENABLE_TEST=no; fi
+  HAS_FORMAT=`${CDO} --config has-${FORMAT}`
 }
 #
 function testfunc()
@@ -54,8 +45,10 @@ function testfunc()
 
   echo "$CDOCOMMAND"
 
-  if [ "${ENABLE_TEST}" = yes ] ; then
-    if [ "@ENABLE_THREADS@" = yes ] ; then
+  HAS_THREADS=`${CDO} --config has-threads`
+
+  if [ "${HAS_FORMAT}" = yes ] ; then
+    if [ "${HAS_THREADS}" = yes ] ; then
       $CDO $DEBUG_OUT -f $FORMAT setgrid,r12x6 ${IFILE} ifile$$
       CDOCOMMAND="$CDO $DEBUG_OUT $INSTR ifile$$ $OFILE"
 

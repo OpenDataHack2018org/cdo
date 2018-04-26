@@ -13,7 +13,6 @@ NTEST=1
 function fileformat()
 {
   FILEFORMAT=undefined
-  ENABLE_TEST=yes
 
   if [ "${FORMAT}" = srv  ] ; then  FILEFORMAT=SERVICE;  fi
   if [ "${FORMAT}" = ext  ] ; then  FILEFORMAT=EXTRA;    fi
@@ -25,15 +24,7 @@ function fileformat()
   if [ "${FORMAT}" = nc4  ] ; then  FILEFORMAT=netCDF4;  fi
   if [ "${FORMAT}" = nc5  ] ; then  FILEFORMAT=netCDF5;  fi
 
-  if [ "@ENABLE_SERVICE@" = no -a "${FORMAT}" = srv  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_EXTRA@" = no   -a "${FORMAT}" = ext  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_IEG@" = no     -a "${FORMAT}" = ieg  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_GRIB@" = no    -a "${FORMAT}" = grb  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_GRIBAPI@" = no -a "${FORMAT}" = grb2 ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_NETCDF@" = no  -a "${FORMAT}" = nc   ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_NETCDF@" = no  -a "${FORMAT}" = nc2  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_NC4@" = no     -a "${FORMAT}" = nc4  ] ; then  ENABLE_TEST=no; fi
-  if [ "@ENABLE_NC5@" = no     -a "${FORMAT}" = nc5  ] ; then  ENABLE_TEST=no; fi
+  HAS_FORMAT=`${CDO} --config has-${FORMAT}`
 }
 #
 for OPERATOR in write copy; do
@@ -44,11 +35,11 @@ for OPERATOR in write copy; do
     echo "Running test: $NTEST"
 
     FILEFORMAT=undefined
-    ENABLE_TEST=yes
+    HAS_FORMAT=no
 
     fileformat
 
-    if [ "${ENABLE_TEST}" = yes ] ; then
+    if [ "${HAS_FORMAT}" = yes ] ; then
       for DATATYPE in F32 F64; do
         FILE=file_${DATATYPE}_${FORMAT}
         RFILE=$DATAPATH/file_F32_srv_ref

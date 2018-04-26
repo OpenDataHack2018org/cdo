@@ -29,7 +29,9 @@ function testfunc()
       
   echo "$CDOCOMMAND"
 
-  if [ "@ENABLE_THREADS@" = yes ] ; then
+  HAS_THREADS=`${CDO} --config has-threads`
+
+  if [ "${HAS_THREADS}" = yes ] ; then
 
     $CDOCOMMAND
     test $? -eq 0 || let RSTAT+=1

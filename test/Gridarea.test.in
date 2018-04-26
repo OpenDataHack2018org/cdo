@@ -14,6 +14,8 @@ export PLANET_RADIUS
 #
 NTEST=1
 #
+HAS_THREADS=`${CDO} --config has-threads`
+#
 for GRID in $GRIDS; do
   CDOTEST="gridarea $GRID"
 
@@ -22,7 +24,7 @@ for GRID in $GRIDS; do
 
   CDOCOMMAND="$CDO $DEBUG_OUT outputf,%10.7f -fldsum -gridarea -random,$GRID"
 
-  if [ "@ENABLE_THREADS@" = yes ] ; then
+  if [ "${HAS_THREADS}" = yes ] ; then
     echo "Running test: $NTEST"
     echo "$CDOCOMMAND"
 

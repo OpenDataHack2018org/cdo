@@ -210,21 +210,21 @@ cdo_version(void)
 #ifdef SYSTEM_TYPE
   fprintf(stderr, "System: %s\n", SYSTEM_TYPE);
 #endif
-#if defined(CXX_COMPILER)
+#ifdef CXX_COMPILER
   fprintf(stderr, "CXX Compiler: %s\n", CXX_COMPILER);
-#if defined(CXX_VERSION)
+#ifdef CXX_VERSION
   fprintf(stderr, "CXX version : %s\n", CXX_VERSION);
 #endif
 #endif
-#if defined(C_COMPILER)
+#ifdef C_COMPILER
   fprintf(stderr, "C Compiler: %s\n", C_COMPILER);
-#if defined(C_VERSION)
+#ifdef C_VERSION
   fprintf(stderr, "C version : %s\n", C_VERSION);
 #endif
 #endif
-#if defined(F77_COMPILER)
+#ifdef F77_COMPILER
   fprintf(stderr, "F77 Compiler: %s\n", F77_COMPILER);
-#if defined(F77_VERSION)
+#ifdef F77_VERSION
   fprintf(stderr, "F77 version : %s\n", F77_VERSION);
 #endif
 #endif
