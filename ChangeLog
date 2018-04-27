@@ -1,7 +1,11 @@
-2018-04-26  Uwe Schulzweida
+2018-05-03  Uwe Schulzweida
 
 	* Using CDI library version 1.9.4
 	* Version 1.9.4 release
+
+2018-04-27  Uwe Schulzweida
+
+	* New operator yearmaxidx: Yearly maximum index
 
 2018-03-27  Uwe Schulzweida
 
