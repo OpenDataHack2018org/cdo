@@ -87,7 +87,7 @@ Vertintap(void *process)
   // int sortlevels = TRUE;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   bool extrapolate = false;
-  lista_t *flista = lista_new(FLT_LISTA);
+  ListArray<double> listArrayFlt;
 
   cdoInitialize(process);
 
@@ -143,8 +143,8 @@ Vertintap(void *process)
     }
   else
     {
-      nplev = args2flt_lista(operatorArgc(), operatorArgv(), flista);
-      plev = (double *) lista_dataptr(flista);
+      nplev = listArrayFlt.argvToFlt(operatorArgc(), operatorArgv());
+      plev = listArrayFlt.data();
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -472,8 +472,6 @@ Vertintap(void *process)
       Free(vardata1[varID]);
       if (varinterp[varID]) Free(vardata2[varID]);
     }
-
-  lista_destroy(flista);
 
   cdoFinish();
 

@@ -166,10 +166,10 @@ defLonLatGrid(int nx, int ny, double c0, double lts, double re)
       return -1;
     }
 
-  double *xvals = (double *) Malloc(nx * sizeof(double));
-  double *yvals = (double *) Malloc(ny * sizeof(double));
-  double *xbounds = (double *) Malloc(nx * 2 * sizeof(double));
-  double *ybounds = (double *) Malloc(nx * 2 * sizeof(double));
+  std::vector<double> xvals(nx);
+  std::vector<double> yvals(ny);
+  std::vector<double> xbounds(nx * 2);
+  std::vector<double> ybounds(ny * 2);
 
   for (i = 0; i < nx; ++i)
     {
@@ -198,16 +198,12 @@ defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   gridID = gridCreate(GRID_LONLAT, nx * ny);
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
-  gridDefXvals(gridID, xvals);
-  gridDefYvals(gridID, yvals);
+  gridDefXvals(gridID, xvals.data());
+  gridDefYvals(gridID, yvals.data());
   /*
-  gridDefXbounds(gridID, xbounds);
-  gridDefYbounds(gridID, ybounds);
+  gridDefXbounds(gridID, xbounds.data());
+  gridDefYbounds(gridID, ybounds.data());
   */
-  Free(xvals);
-  Free(yvals);
-  Free(xbounds);
-  Free(ybounds);
 
   return gridID;
 }
@@ -222,8 +218,8 @@ defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double 
   UNUSED(p4);
   UNUSED(xmax);
   UNUSED(ymin);
-  double *xvals = (double *) Malloc(nx * sizeof(double));
-  double *yvals = (double *) Malloc(ny * sizeof(double));
+  std::vector<double> xvals(nx);
+  std::vector<double> yvals(ny);
 
   for (int i = 0; i < nx; ++i) xvals[i] = xmin + i * dx + dx / 2;
 
@@ -235,11 +231,8 @@ defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double 
 
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
-  gridDefXvals(gridID, xvals);
-  gridDefYvals(gridID, yvals);
-
-  Free(xvals);
-  Free(yvals);
+  gridDefXvals(gridID, xvals.data());
+  gridDefYvals(gridID, yvals.data());
 
   return gridID;
 }
@@ -250,8 +243,8 @@ defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
 {
   UNUSED(xmax);
   UNUSED(ymin);
-  double *xvals = (double *) Malloc(nx * sizeof(double));
-  double *yvals = (double *) Malloc(ny * sizeof(double));
+  std::vector<double> xvals(nx);
+  std::vector<double> yvals(ny);
 
   for (int i = 0; i < nx; ++i) xvals[i] = xmin + i * dx + dx / 2;
 
@@ -261,13 +254,10 @@ defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
 
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
-  gridDefXvals(gridID, xvals);
-  gridDefYvals(gridID, yvals);
+  gridDefXvals(gridID, xvals.data());
+  gridDefYvals(gridID, yvals.data());
 
   grid_def_param_laea(gridID, a, lon0, lat0);
-
-  Free(xvals);
-  Free(yvals);
 
   return gridID;
 }
@@ -536,15 +526,7 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   else if (nx == xsize && ny == ysize && strcmp(proj.name, "Lambert Azimuthal Equal Area") == 0
            && memcmp(proj.ellipsoid, "Sphere", 6) == 0)
     {
-      double a;
-      if (proj.parameter[4] < 0)
-        {
-          a = 6370997.0;
-        }
-      else
-        {
-          a = proj.parameter[4];
-        }
+      double a = (proj.parameter[4] < 0) ? 6370997.0 : proj.parameter[4];
       gridID = defLaeaGrid(nx, ny, region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy, a,
                            proj.parameter[2], proj.parameter[3]);
     }
@@ -572,12 +554,6 @@ static int
 read_region(hid_t loc_id, int nx, int ny)
 {
   int gridID = -1;
-  hid_t grp_id;
-  hid_t region_id;
-  hid_t region_tid;
-  hid_t str64_tid, str128_tid, fltarr_tid;
-  herr_t status;
-  hsize_t dims;
   typedef struct region_t
   {
     double area_extent[4];
@@ -594,23 +570,20 @@ read_region(hid_t loc_id, int nx, int ny)
     char pcs_def[128];
   } region_t;
   region_t region;
-  int nfound;
   char proj[128];
   double a, lon0, lat0;
-  double xmin, ymin, xmax, ymax;
-  double dx, dy;
 
   if (cdoVerbose) cdoPrint("Read region:");
 
   /*
    * Create a data type for region
    */
-  region_tid = H5Tcreate(H5T_COMPOUND, sizeof(region_t));
-  dims = 4;
-  fltarr_tid = H5Tarray_create(H5T_NATIVE_DOUBLE, 1, &dims, NULL);
-  str64_tid = H5Tcopy(H5T_C_S1);
+  hid_t region_tid = H5Tcreate(H5T_COMPOUND, sizeof(region_t));
+  hsize_t dims = 4;
+  hid_t fltarr_tid = H5Tarray_create(H5T_NATIVE_DOUBLE, 1, &dims, NULL);
+  hid_t str64_tid = H5Tcopy(H5T_C_S1);
   H5Tset_size(str64_tid, 128);
-  str128_tid = H5Tcopy(H5T_C_S1);
+  hid_t str128_tid = H5Tcopy(H5T_C_S1);
   H5Tset_size(str128_tid, 128);
 
   H5Tinsert(region_tid, "area_extent", HOFFSET(region_t, area_extent), fltarr_tid);
@@ -626,9 +599,9 @@ read_region(hid_t loc_id, int nx, int ny)
   H5Tinsert(region_tid, "pcs_id", HOFFSET(region_t, pcs_id), str64_tid);
   H5Tinsert(region_tid, "pcs_def", HOFFSET(region_t, pcs_def), str128_tid);
 
-  grp_id = H5Gopen(loc_id, "/");
+  hid_t grp_id = H5Gopen(loc_id, "/");
 
-  region_id = H5Dopen(grp_id, "region");
+  hid_t region_id = H5Dopen(grp_id, "region");
   /*
   {
     hid_t tid;
@@ -643,7 +616,7 @@ read_region(hid_t loc_id, int nx, int ny)
       }
   }
   */
-  status = H5Dread(region_id, region_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &region);
+  herr_t status = H5Dread(region_id, region_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &region);
   UNUSED(status);
 
   if (cdoVerbose)
@@ -675,7 +648,7 @@ read_region(hid_t loc_id, int nx, int ny)
 
   /* check region */
 
-  nfound = scan_pcs_def(region.pcs_def, proj, &a, &lon0, &lat0);
+  int nfound = scan_pcs_def(region.pcs_def, proj, &a, &lon0, &lat0);
 
   if (cdoVerbose)
     {
@@ -685,13 +658,13 @@ read_region(hid_t loc_id, int nx, int ny)
       printf("lat0 = %g\n", lat0);
     }
 
-  xmin = region.area_extent[0];
-  ymin = region.area_extent[1];
-  xmax = region.area_extent[2];
-  ymax = region.area_extent[3];
+  double xmin = region.area_extent[0];
+  double ymin = region.area_extent[1];
+  double xmax = region.area_extent[2];
+  double ymax = region.area_extent[3];
 
-  dx = (xmax - xmin) / nx;
-  dy = (ymax - ymin) / ny;
+  double dx = (xmax - xmin) / nx;
+  double dy = (ymax - ymin) / ny;
   /*
   xsize = (int)lround((region.xmax-region.xmin)/region.dx);
   ysize = (int)lround((region.ymax-region.ymin)/region.dy);
@@ -710,17 +683,14 @@ read_region(hid_t loc_id, int nx, int ny)
 static void
 read_dataset(hid_t loc_id, const char *name, void *opdata)
 {
-  hid_t dset_id, type_id;
   hid_t dataspace;
   hsize_t dims_out[9]; /* dataset dimensions           */
   herr_t status;       /* Generic return value		*/
   hid_t attr, atype, atype_mem;
-  hid_t native_type;
   int iattr;
   float fattr;
   double dattr;
   char attname[CDI_MAX_NAME];
-  H5T_class_t type_class;
   H5T_class_t atype_class;
   size_t atype_size;
   int rank;
@@ -736,7 +706,6 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
   int dtype = CDI_DATATYPE_FLT32;
   char attstring[4096]; /* Buffer to read string attribute back */
   char varname[CDI_MAX_NAME];
-  short *mask = NULL;
   double minval, maxval;
   size_t nmiss;
   int num_attrs;
@@ -744,11 +713,11 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
   attstring[0] = 0;
   strcpy(varname, name);
 
-  dset_id = H5Dopen(loc_id, varname);
+  hid_t dset_id = H5Dopen(loc_id, varname);
 
-  type_id = H5Dget_type(dset_id); /* get datatype*/
+  hid_t type_id = H5Dget_type(dset_id); /* get datatype*/
 
-  type_class = H5Tget_class(type_id);
+  H5T_class_t type_class = H5Tget_class(type_id);
   if (type_class < 0)
     {
       cdoAbort(" Invalid datatype for %s", varname);
@@ -769,7 +738,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
       puts("   Datatype is 'H5T_NATIVE_COMPOUND'.\n");
   }
   */
-  native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+  hid_t native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
   if (H5Tequal(native_type, H5T_NATIVE_SCHAR) > 0)
     {
       ftype = 0;
@@ -1042,11 +1011,10 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
         {
           if (dtype == CDI_DATATYPE_FLT32)
             {
-              float *farray = (float *) Malloc(gridsize * nt * sizeof(float));
-              status = H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, farray);
+              std::vector<float> farray(gridsize * nt);
+              status = H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, farray.data());
               if (status < 0) cdoAbort("Reading of NATIVE_FLOAT variable %s failed!", varname);
               for (size_t i = 0; i < gridsize * nt; ++i) array[i] = farray[i];
-              Free(farray);
             }
           else
             {
@@ -1056,11 +1024,10 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
         }
       else
         {
-          int *iarray = (int *) Malloc(gridsize * nt * sizeof(int));
-          status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+          std::vector<int> iarray(gridsize * nt);
+          status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray.data());
           if (status < 0) cdoAbort("Reading of NATIVE_INT variable %s failed!", varname);
           for (size_t i = 0; i < gridsize * nt; ++i) array[i] = iarray[i];
-          Free(iarray);
         }
 
       ((datasets_t *) opdata)->obj[nset].name = strdup(varname);
@@ -1086,8 +1053,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       if (nz == 1) ((datasets_t *) opdata)->nsets++;
 
-      mask = (short *) Malloc(gridsize * nt * sizeof(short));
-      memset(mask, 0, gridsize * nt * sizeof(short));
+      std::vector<bool> mask(gridsize * nt, 0);
 
       nmiss = 0;
 
@@ -1118,7 +1084,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
           for (size_t i = 0; i < gridsize * nt; i++)
             if (!DBL_IS_EQUAL(array[i], missval))
               {
-                mask[i] = 0;
+                mask[i] = false;
 
                 if (lscalefactor) array[i] *= scalefactor;
                 if (laddoffset) array[i] += addoffset;
@@ -1126,14 +1092,14 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
             else
               {
                 nmiss++;
-                mask[i] = 1;
+                mask[i] = true;
               }
         }
 
       minval = 1e35;
       maxval = -1e35;
       for (size_t i = 0; i < gridsize * nt; i++)
-        if (mask[i] == 0)
+        if (mask[i] == false)
           {
             if (array[i] < minval) minval = array[i];
             if (array[i] > maxval) maxval = array[i];
@@ -1171,9 +1137,6 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
       ((datasets_t *) opdata)->obj[nset].offset = addoffset;
       ((datasets_t *) opdata)->obj[nset].scale = scalefactor;
       ((datasets_t *) opdata)->obj[nset].missval = missval;
-
-      Free(mask);
-      mask = NULL;
     }
   else
     {
@@ -1331,8 +1294,6 @@ get_vdate(int vlistID)
 static void
 dsets_init(datasets_t *dsets)
 {
-  int i;
-
   dsets->nsets = 0;
   dsets->mergelevel = 0;
   dsets->lgeoloc = 0;
@@ -1340,7 +1301,7 @@ dsets_init(datasets_t *dsets)
   dsets->lprojtype = 0;
   dsets->lmetadata = 0;
 
-  for (i = 0; i < MAX_DSETS; ++i)
+  for (int i = 0; i < MAX_DSETS; ++i)
     {
       dsets->obj[i].nx = 0;
       dsets->obj[i].ny = 0;
@@ -1370,7 +1331,6 @@ Importcmsaf(void *process)
   size_t nmiss;
   int ivar;
   int varID, levelID, tsID;
-  int nx, ny, nz, nt, gridsize;
   double *array;
   double missval, minval, maxval;
   hid_t file_id; /* HDF5 File ID	        	*/
@@ -1397,11 +1357,11 @@ Importcmsaf(void *process)
 
   if (dsets.nsets == 0) cdoAbort("No dataset found!");
 
-  gridsize = dsets.obj[0].gridsize;
-  nx = dsets.obj[0].nx;
-  ny = dsets.obj[0].ny;
-  nz = dsets.obj[0].nz;
-  nt = dsets.obj[0].nt;
+  int gridsize = dsets.obj[0].gridsize;
+  int nx = dsets.obj[0].nx;
+  int ny = dsets.obj[0].ny;
+  int nz = dsets.obj[0].nz;
+  int nt = dsets.obj[0].nt;
 
   for (ivar = 0; ivar < dsets.nsets; ++ivar)
     if (dsets.obj[ivar].nt > 1)
@@ -1464,12 +1424,10 @@ Importcmsaf(void *process)
     zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
   else
     {
-      double *levels;
-      levels = (double *) Malloc(nz * sizeof(double));
+      std::vector<double> levels(nz);
       for (i = 0; i < nz; ++i) levels[i] = i + 1;
       zaxisID = zaxisCreate(ZAXIS_GENERIC, nz);
-      zaxisDefLevels(zaxisID, levels);
-      Free(levels);
+      zaxisDefLevels(zaxisID, levels.data());
     }
 
   vlistID = vlistCreate();

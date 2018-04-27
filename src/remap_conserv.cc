@@ -16,23 +16,17 @@
 */
 
 #include "cdo_int.h"
+#include "cdo_wtime.h"
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link.h"
 #include "cdoOptions.h"
-#include "timer.h"
 
 extern "C" {
 #include "lib/yac/clipping.h"
 #include "lib/yac/area.h"
 #include "lib/yac/geometry.h"
 }
-
-//#define STIMER
-
-#ifdef STIMER
-#include <time.h>
-#endif
 
 struct search_t
 {
@@ -685,13 +679,12 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   // Variables necessary if segment manages to hit pole
   int src_remap_grid_type = src_grid->remap_grid_type;
   int tgt_remap_grid_type = tgt_grid->remap_grid_type;
-  extern int timer_remap_con;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
   progressInit();
 
-  if (cdoTimer) timer_start(timer_remap_con);
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   size_t src_grid_size = src_grid->size;
   size_t tgt_grid_size = tgt_grid->size;
@@ -770,10 +763,6 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   num_srch_cells_stat[1] = 100000;
   num_srch_cells_stat[2] = 0;
 
-#ifdef STIMER
-  double stimer = 0;
-#endif
-
 // Loop over destination grid
 
 #ifdef _OPENMP
@@ -798,10 +787,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
       weightLinks[tgt_cell_add].nlinks = 0;
 
-// Get search cells
-#ifdef STIMER
-      clock_t start = clock();
-#endif
+      // Get search cells
 
       if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D)
         {
@@ -842,10 +828,6 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
           num_srch_cells
               = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r, srch_add[ompthID]);
         }
-#ifdef STIMER
-      clock_t finish = clock();
-      stimer += ((double) (finish - start)) / CLOCKS_PER_SEC;
-#endif
 
       if (1 && cdoVerbose)
         {
@@ -970,10 +952,6 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
   progressStatus(0, 1, 1);
 
-#ifdef STIMER
-  printf("stime = %gs\n", stimer);
-#endif
-
   if (1 && cdoVerbose)
     {
       cdoPrint("Num search cells min,mean,max :  %zu  %3.1f  %zu",
@@ -1014,8 +992,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       remapVarsCheckWeights(rv);
     }
 
-  if (cdoTimer) timer_stop(timer_remap_con);
-
+  if (cdoVerbose) cdoPrint("Cells search: %.2f seconds", cdo_get_wtime() - start);
 }  // remapConservWeights
 
 void

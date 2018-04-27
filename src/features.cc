@@ -18,6 +18,8 @@
 #include "config.h"
 #endif
 
+#include <cdi.h>
+
 #if defined(HAVE_HDF5_H)
 #include <hdf5.h>
 #endif
@@ -46,6 +48,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "cdo_int.h"  // HAVE_OPENMP4
 
@@ -81,22 +84,22 @@ printFeatures(void)
   fprintf(stderr, "3");
 #endif
 #endif
-#if defined(HAVE_LIBHDF5)
+#ifdef HAVE_LIBHDF5
   fprintf(stderr, " HDF5");
 #endif
-#if defined(HAVE_NETCDF4)
+#ifdef HAVE_NETCDF4
   fprintf(stderr, " NC4");
-#if defined(HAVE_NC4HDF5)
+#ifdef HAVE_NC4HDF5
   fprintf(stderr, "/HDF5");
-#if defined(HAVE_NC4HDF5_THREADSAFE)
+#ifdef HAVE_NC4HDF5_THREADSAFE
   fprintf(stderr, "/threadsafe");
 #endif
 #endif
 #endif
-#if defined(HAVE_LIBNC_DAP)
+#ifdef HAVE_LIBNC_DAP
   fprintf(stderr, " OPeNDAP");
 #endif
-#if defined(HAVE_LIBSZ)
+#ifdef HAVE_LIBSZ
   fprintf(stderr, " SZ");
 #endif
 /*
@@ -104,7 +107,7 @@ printFeatures(void)
 fprintf(stderr, " Z");
 #endif
 */
-#if defined(HAVE_LIBUDUNITS2)
+#ifdef HAVE_LIBUDUNITS2
   fprintf(stderr, " UDUNITS2");
 #endif
 #ifdef HAVE_LIBPROJ
@@ -116,7 +119,7 @@ fprintf(stderr, " Z");
 #ifdef HAVE_LIBMAGICS
   fprintf(stderr, " MAGICS");
 #endif
-#if defined(HAVE_LIBDRMAA)
+#ifdef HAVE_LIBDRMAA
   fprintf(stderr, " DRMAA");
 #endif
 #ifdef HAVE_LIBCURL
@@ -198,7 +201,7 @@ printLibraries(void)
   {
     curl_version_info_data *version_data = curl_version_info(CURLVERSION_NOW);
     fprintf(stderr, " curl/%s", version_data->version);
-#if defined(LIBCURL_VERSION)
+#ifdef LIBCURL_VERSION
     if (strcmp(LIBCURL_VERSION, version_data->version) != 0) fprintf(stderr, "(h%s)", LIBCURL_VERSION);
 #else
     fprintf(stderr, "(header not found)");
@@ -207,4 +210,89 @@ printLibraries(void)
 #endif
 
   fprintf(stderr, "\n");
+}
+
+
+void cdoConfig(const char *option)
+{
+  static const char *YN[] = {"no", "yes"};
+  const char *has_srv = YN[cdiHaveFiletype(CDI_FILETYPE_SRV)];
+  const char *has_ext = YN[cdiHaveFiletype(CDI_FILETYPE_EXT)];
+  const char *has_ieg = YN[cdiHaveFiletype(CDI_FILETYPE_IEG)];
+  const char *has_grb = YN[cdiHaveFiletype(CDI_FILETYPE_GRB)];
+  const char *has_grb2 = YN[cdiHaveFiletype(CDI_FILETYPE_GRB2)];
+  const char *has_nc = YN[cdiHaveFiletype(CDI_FILETYPE_NC)];
+  const char *has_nc2 = YN[cdiHaveFiletype(CDI_FILETYPE_NC2)];
+  const char *has_nc4 = YN[cdiHaveFiletype(CDI_FILETYPE_NC4)];
+  const char *has_nc4c = YN[cdiHaveFiletype(CDI_FILETYPE_NC4C)];
+  const char *has_nc5 = YN[cdiHaveFiletype(CDI_FILETYPE_NC5)];
+  const char *has_hdf5 = YN[0];
+  const char *has_cmor = YN[0];
+  const char *has_proj = YN[0];
+  const char *has_threads = YN[0];
+  const char *has_openmp = YN[0];
+
+#ifdef HAVE_LIBHDF5
+  has_hdf5 = YN[1];
+#endif
+
+#ifdef HAVE_LIBCMOR
+  has_cmor = YN[1];
+#endif
+
+#ifdef HAVE_LIBPROJ
+  has_proj = YN[1];
+#endif
+
+#ifdef HAVE_LIBPTHREAD
+  has_threads = YN[1];
+#endif
+
+#ifdef _OPENMP
+  has_openmp = YN[1];
+#endif
+
+  if      ( STR_IS_EQ("has-srv", option) ) fprintf(stdout, "%s\n", has_srv);
+  else if ( STR_IS_EQ("has-ext", option) ) fprintf(stdout, "%s\n", has_ext);
+  else if ( STR_IS_EQ("has-ieg", option) ) fprintf(stdout, "%s\n", has_ieg);
+  else if ( STR_IS_EQ("has-grb", option) ) fprintf(stdout, "%s\n", has_grb);
+  else if ( STR_IS_EQ("has-grb1", option) ) fprintf(stdout, "%s\n", has_grb);
+  else if ( STR_IS_EQ("has-grb2", option) ) fprintf(stdout, "%s\n", has_grb2);
+  else if ( STR_IS_EQ("has-nc", option) ) fprintf(stdout, "%s\n", has_nc);
+  else if ( STR_IS_EQ("has-nc2", option) ) fprintf(stdout, "%s\n", has_nc2);
+  else if ( STR_IS_EQ("has-nc4", option) ) fprintf(stdout, "%s\n", has_nc4);
+  else if ( STR_IS_EQ("has-nc4c", option) ) fprintf(stdout, "%s\n", has_nc4c);
+  else if ( STR_IS_EQ("has-nc5", option) ) fprintf(stdout, "%s\n", has_nc5);
+  else if ( STR_IS_EQ("has-hdf5", option) ) fprintf(stdout, "%s\n", has_hdf5);
+  else if ( STR_IS_EQ("has-cmor", option) ) fprintf(stdout, "%s\n", has_cmor);
+  else if ( STR_IS_EQ("has-proj", option) ) fprintf(stdout, "%s\n", has_proj);
+  else if ( STR_IS_EQ("has-threads", option) ) fprintf(stdout, "%s\n", has_threads);
+  else if ( STR_IS_EQ("has-openmp", option) ) fprintf(stdout, "%s\n", has_openmp);
+  else
+    {
+      fprintf(stdout, "unknown config option: %s\n", option);
+      fprintf(stdout, "\n");
+      fprintf(stdout, "Available config option:\n");
+      fprintf(stdout, "\n");
+      fprintf(stdout, "  has-srv     whether SERVICE is enabled\n");
+      fprintf(stdout, "  has-ext     whether EXTRA is enabled\n");
+      fprintf(stdout, "  has-ieg     whether IEG is enabled\n");
+      fprintf(stdout, "  has-grb     whether GRIB 1 is enabled\n");
+      fprintf(stdout, "  has-grb1    whether GRIB 1 is enabled\n");
+      fprintf(stdout, "  has-grb2    whether GRIB 2 is enabled\n");
+      fprintf(stdout, "  has-nc      whether NetCDF is enabled\n");
+      fprintf(stdout, "  has-nc2     whether NetCDF 2 is enabled\n");
+      fprintf(stdout, "  has-nc4     whether NetCDF 4 is enabled\n");
+      fprintf(stdout, "  has-nc4c    whether NetCDF 4 classic is enabled\n");
+      fprintf(stdout, "  has-nc5     whether NetCDF5 is enabled\n");
+      fprintf(stdout, "  has-hdf5    whether HDF5 is enabled\n");
+      fprintf(stdout, "  has-cmor    whether CMOR is enabled\n");
+      fprintf(stdout, "  has-proj    whether PROJ is enabled\n");
+      fprintf(stdout, "  has-threads whether PTHREADS is enabled\n");
+      fprintf(stdout, "  has-openmp  whether OPENMP is enabled\n");
+      
+      exit(EXIT_FAILURE);
+    }
+
+  exit(EXIT_SUCCESS);
 }

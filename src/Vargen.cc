@@ -217,7 +217,8 @@ Vargen(void *process)
   double lon[NLON], lat[NLAT];
   size_t nlon = NLON;
   size_t nlat = NLAT;
-
+  ListArray<double> listArrayFlt;
+   
   cdoInitialize(process);
 
   // clang-format off
@@ -302,12 +303,10 @@ Vargen(void *process)
   else if (operatorID == STDATM)
     {
       double lon = 0, lat = 0;
-      lista_t *flista = lista_new(FLT_LISTA);
 
       operatorInputArg(cdoOperatorEnter(operatorID));
-      nlevels = args2flt_lista(operatorArgc(), operatorArgv(), flista);
-      levels = (double *) lista_dataptr(flista);
-      // lista_destroy(flista);
+      nlevels = listArrayFlt.argvToFlt(operatorArgc(), operatorArgv());
+      levels = listArrayFlt.data();
 
       if (cdoVerbose)
         for (int i = 0; i < nlevels; ++i) printf("levels %d: %g\n", i, levels[i]);
@@ -512,7 +511,6 @@ Vargen(void *process)
   vlistDestroy(vlistID);
 
   if (gridID != gridIDdata && gridIDdata != -1) Free(data);
-  if (levels) Free(levels);
 
   cdoFinish();
 

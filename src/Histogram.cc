@@ -50,10 +50,10 @@ Histogram(void *process)
 
   operatorInputArg("bins");
 
-  lista_t *flista = lista_new(FLT_LISTA);
-  int nbins = args2flt_lista(operatorArgc(), operatorArgv(), flista) - 1;
+  ListArray<double> listArrayFlt;
+  int nbins = listArrayFlt.argvToFlt(operatorArgc(), operatorArgv()) - 1;
   if (nbins < 1) cdoAbort("Too few arguments!");
-  double *fltarr = (double *) lista_dataptr(flista);
+  double *fltarr = listArrayFlt.data();
 
   if (cdoVerbose)
     {
@@ -219,8 +219,6 @@ Histogram(void *process)
     }
 
   if (array) Free(array);
-
-  lista_destroy(flista);
 
   cdoFinish();
 

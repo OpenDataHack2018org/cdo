@@ -103,6 +103,8 @@ extern "C" {
 void streamGrbDefDataScanningMode(int scanmode);
 }
 
+void cdoConfig(const char *option);
+void setCellSearchMethod(const char *methodstr);
 void setPointSearchMethod(const char *methodstr);
 
 #define PRINT_RLIMIT(resource)                                                           \
@@ -208,21 +210,21 @@ cdo_version(void)
 #ifdef SYSTEM_TYPE
   fprintf(stderr, "System: %s\n", SYSTEM_TYPE);
 #endif
-#if defined(CXX_COMPILER)
+#ifdef CXX_COMPILER
   fprintf(stderr, "CXX Compiler: %s\n", CXX_COMPILER);
-#if defined(CXX_VERSION)
+#ifdef CXX_VERSION
   fprintf(stderr, "CXX version : %s\n", CXX_VERSION);
 #endif
 #endif
-#if defined(C_COMPILER)
+#ifdef C_COMPILER
   fprintf(stderr, "C Compiler: %s\n", C_COMPILER);
-#if defined(C_VERSION)
+#ifdef C_VERSION
   fprintf(stderr, "C version : %s\n", C_VERSION);
 #endif
 #endif
-#if defined(F77_COMPILER)
+#ifdef F77_COMPILER
   fprintf(stderr, "F77 Compiler: %s\n", F77_COMPILER);
-#if defined(F77_VERSION)
+#ifdef F77_VERSION
   fprintf(stderr, "F77 version : %s\n", F77_VERSION);
 #endif
 #endif
@@ -1092,6 +1094,7 @@ parse_options_long(int argc, char *argv[])
   int c;
   int lnetcdf_hdr_pad;
   int luse_fftw;
+  int lcellsearchmethod;
   int lpointsearchmethod;
   int lgridsearchradius;
   int lremap_genweights;
@@ -1106,16 +1109,19 @@ parse_options_long(int argc, char *argv[])
   int lsortparam;
   int ldebLevel;
   int lscmode;
+  int lconfig;
 
   // clang-format off
   struct cdo_option opt_long[] =
     {
-      { "precision",         required_argument,        &lprecision,   1  },
+      { "precision",         required_argument,         &lprecision,  1  },
       { "percentile",        required_argument,        &lpercentile,  1  },
       { "netcdf_hdr_pad",    required_argument,    &lnetcdf_hdr_pad,  1  },
       { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1  },
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1  },
       { "use_fftw",          required_argument,          &luse_fftw,  1  },
+      { "cellsearchmethod",  required_argument,  &lcellsearchmethod,  1  },
+      { "config",            required_argument,            &lconfig,  1  },
       { "pointsearchmethod", required_argument, &lpointsearchmethod,  1  },
       { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
@@ -1160,6 +1166,8 @@ parse_options_long(int argc, char *argv[])
       lpercentile = 0;
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
+      lcellsearchmethod = 0;
+      lconfig = 0;
       lpointsearchmethod = 0;
       lgridsearchradius = 0;
       lremap_genweights = 0;
@@ -1245,6 +1253,14 @@ parse_options_long(int argc, char *argv[])
               if (intarg != 0 && intarg != 1) cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", intarg);
               CDO_Use_FFTW = intarg;
             }
+          else if (lcellsearchmethod)
+            {
+              setCellSearchMethod(CDO_optarg);
+            }
+          else if (lconfig)
+            {
+              cdoConfig(CDO_optarg);
+            }
           else if (lpointsearchmethod)
             {
               setPointSearchMethod(CDO_optarg);
@@ -1311,18 +1327,6 @@ parse_options_long(int argc, char *argv[])
           Debug = 1;
           DebugLevel = atoi(CDO_optarg);
           break;
-        case 'e': {
-#if defined(HAVE_GETHOSTNAME)
-            char host[1024];
-            gethostname(host, sizeof(host));
-            cdoExpName = CDO_optarg;
-            /* printf("host: %s %s\n", host, cdoExpName); */
-            cdoExpMode = STR_IS_EQ(host, cdoExpName) ? CDO_EXP_REMOTE : CDO_EXP_LOCAL;
-#else
-            cdoAbort("Function gethostname not available!");
-#endif
-            break;
-          }
         case 'f': setDefaultFileType(CDO_optarg, 1); break;
         case 'g': cdo_set_grids(CDO_optarg); break;
         case 'h': Help = 1; break;
@@ -1875,10 +1879,6 @@ int main(int argc, char *argv[])
   if ( Help )
     {
       cdoPrintHelp(operatorHelp(operatorName));
-    }
-  else if ( cdoExpMode == CDO_EXP_LOCAL )
-    {
-      exp_run(argc, argv, cdoExpName);
     }
   else
     {

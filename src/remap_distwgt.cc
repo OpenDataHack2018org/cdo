@@ -14,11 +14,9 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifdef _OPENMP
-#include <omp.h>  // omp_get_wtime
-#endif
 
 #include "cdo_int.h"
+#include "cdo_wtime.h"
 #include "remap.h"
 #include "remap_store_link.h"
 #include "cdoOptions.h"
@@ -46,9 +44,7 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
   std::vector<knnWeightsType> knnWeights;
   for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
-#ifdef _OPENMP
-  double start = cdoVerbose ? omp_get_wtime() : 0;
-#endif
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   // Loop over destination grid
 
@@ -95,9 +91,7 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
 
   weightLinksToRemapLinks(0, tgt_grid_size, weightLinks, rv);
 
-#ifdef _OPENMP
-  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
-#endif
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", cdo_get_wtime() - start);
 }  // remapDistwgtWeights
 
 void
@@ -118,9 +112,7 @@ remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict s
   std::vector<knnWeightsType> knnWeights;
   for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
-#ifdef _OPENMP
-  double start = cdoVerbose ? omp_get_wtime() : 0;
-#endif
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   // Loop over destination grid
 
@@ -157,9 +149,7 @@ remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict s
 
   progressStatus(0, 1, 1);
 
-#ifdef _OPENMP
-  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
-#endif
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", cdo_get_wtime() - start);
 }  // remapDistwgt
 
 void remapInit(remapType &remap);
@@ -200,9 +190,7 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
 
   remapSearchInit(mapType, remap.search, remap.src_grid, remap.tgt_grid);
 
-#ifdef _OPENMP
-  double start = cdoVerbose ? omp_get_wtime() : 0;
-#endif
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   // Loop over destination grid
 
@@ -242,7 +230,5 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   remapGridFree(remap.tgt_grid);
   remapSearchFree(remap.search);
 
-#ifdef _OPENMP
-  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
-#endif
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", cdo_get_wtime() - start);
 }  // intgriddis

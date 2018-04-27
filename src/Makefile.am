@@ -4,6 +4,7 @@ libcdo_la_SOURCES =            \
                array.h         \
                array.cc         \
                cdo_int.h       \
+               cdo_wtime.h       \
                compare.h       \
                cfortran.h       \
                libncl.h         \
@@ -96,6 +97,8 @@ libcdo_la_SOURCES =            \
                griddes.h       \
                griddes_h5.cc    \
                griddes_nc.cc    \
+               grid_cell_search.cc   \
+               grid_cell_search.h   \
                grid_search.cc   \
                grid_search.h   \
                hetaeta.cc       \
@@ -103,10 +106,8 @@ libcdo_la_SOURCES =            \
                institution.cc   \
                interpol.cc      \
                interpol.h      \
-               job.cc           \
                juldate.cc       \
                knn_weights.h   \
-               listarray.cc     \
                listarray.h     \
                list.cc          \
                list.h          \

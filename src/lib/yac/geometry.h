@@ -60,9 +60,13 @@
 #define SIN_COS_ZERO ((struct sin_cos_angle){.sin = 0.0, .cos = 1.0}) /* 0.0 */
 #define SIN_COS_TOL \
   ((struct sin_cos_angle){.sin = yac_angle_tol, .cos = yac_cos_angle_tol}) /* yac_angle_tol */
+#define SIN_COS_LOW_TOL \
+  ((struct sin_cos_angle){.sin = yac_angle_low_tol, .cos = yac_cos_angle_low_tol}) /* yac_angle_low_tol */
 
 extern const double yac_angle_tol;
 extern const double yac_cos_angle_tol;
+extern const double yac_angle_low_tol;
+extern const double yac_cos_angle_low_tol;
 
 struct line {
    struct {
@@ -233,8 +237,6 @@ void yac_find_overlapping_cells_s (struct grid_cell src_cell,
  *          3rd bit will be set if p is on edge b \n
  *          4th bit will be set if q is on edge b
   *         5th bit will be set if both great circles are identically
- *
- * \remark the user can provide NULL for p and/or q in that case the intersection points will not be returned
  */
 int yac_gcxgc (struct edge edge_a, struct edge edge_b,
                struct point * p, struct point * q);
@@ -255,8 +257,6 @@ int yac_gcxgc (struct edge edge_a, struct edge edge_b,
  *          3rd bit will be set if p is on edge b \n
  *          4th bit will be set if q is on edge b
   *         5th bit will be set if both great circles are identically
- *
- * \remark the user can provide NULL for p and/or q in that case the intersection points will not be returned
  */
  int yac_gcxgc_vec (double a[3], double b[3], double c[3], double d[3],
                     double p[3], double q[3]);
@@ -729,15 +729,39 @@ static inline struct sin_cos_angle get_vector_angle_2(
 static inline int compare_angles(
   struct sin_cos_angle a, struct sin_cos_angle b) {
 
-  int a_below_pi = (a.sin > 0.0) || ((a.sin == 0.0) && (a.cos > 0));
-  int b_below_pi = (b.sin > 0.0) || ((b.sin == 0.0) && (b.cos > 0));
+  // there are 0 section:
+  // 0: 0      <= angle < PI/4
+  // 1: PI/4   <= angle < 3*PI/4
+  // 2: 3*PI/4 <= angle < 5*PI/4
+  // 3: 5*PI/4 <= angle < 7*PI/4
+  // 4: 7*PI/4 <= angle < 2*PI
+  int t_a = fabs(a.cos) < M_SQRT1_2;
+  int t_b = fabs(b.cos) < M_SQRT1_2;
+  int a_section = t_a | ((((a.sin < 0.0) & t_a) |
+                          ((a.cos < 0.0) & (fabs(a.sin) < M_SQRT1_2))) << 1);
+  int b_section = t_b | ((((b.sin < 0.0) & t_b) |
+                          ((b.cos < 0.0) & (fabs(b.sin) < M_SQRT1_2))) << 1);
+  if (!a_section) a_section = (a.sin < 0.0) << 2;
+  if (!b_section) b_section = (b.sin < 0.0) << 2;
 
-  if (a_below_pi == b_below_pi) {
-    int ret = ((a.cos < b.cos) - (a.cos > b.cos));
-    if (a_below_pi) return ret;
-    else return -ret;
-  } else
-    return b_below_pi - a_below_pi;
+  if (a_section != b_section)
+    return (a_section > b_section) - (a_section < b_section);
+
+  switch (a_section) {
+    case(0):
+    case(4):
+    default:
+      if ((a.sin < 0.0) == (b.sin < 0.0))
+        return (a.sin > b.sin) - (a.sin < b.sin);
+      else
+        return (a.sin < 0.0) - (b.sin < 0.0);
+    case(1):
+      return (a.cos < b.cos) - (a.cos > b.cos);
+    case(2):
+      return (a.sin < b.sin) - (a.sin > b.sin);
+    case(3):
+      return (a.cos > b.cos) - (a.cos < b.cos);
+  }
 }
 
 //! computes (a+b), if (a+b) >= 2*PI, the result is (a+b-2*PI)

@@ -36,7 +36,7 @@ Replacevalues(void *process)
   int varID, levelID;
   size_t nmiss;
   int nvals = 0;
-  lista_t *flista = lista_new(FLT_LISTA);
+  ListArray<double> listArrayFlt;
   double *fltarr = NULL;
   double rmin = 0, rmax = 0;
   double newval = 0, newval2 = 0;
@@ -55,10 +55,10 @@ Replacevalues(void *process)
 
   if (operatorID == SETVALS)
     {
-      nvals = args2flt_lista(operatorArgc(), operatorArgv(), flista);
+      nvals = listArrayFlt.argvToFlt(operatorArgc(), operatorArgv());
       if (nvals < 2) cdoAbort("Too few arguments!");
       if (nvals % 2 != 0) cdoAbort("Need pairs of arguments!");
-      fltarr = (double *) lista_dataptr(flista);
+      fltarr = listArrayFlt.data();
       nvals = nvals / 2;
     }
   else if (operatorID == SETRTOC)
@@ -157,8 +157,6 @@ Replacevalues(void *process)
   pstreamClose(streamID1);
 
   if (array) Free(array);
-
-  lista_destroy(flista);
 
   cdoFinish();
 

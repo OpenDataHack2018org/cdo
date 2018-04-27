@@ -42,7 +42,9 @@ ltoptions.m4
 ltsugar.m4
 ltversion.m4
 lt~obsolete.m4
-
+#----- automake files ----
+config/config.guess
+config/config.sub
 
 #---- Makefiles.in ---------------
 Makefile.in

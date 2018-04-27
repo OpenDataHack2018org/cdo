@@ -11,6 +11,8 @@ FILES="datar.nc datag.nc datac.nc datau.nc testfile01c.nc"
 #
 NTEST=1
 #
+HAS_NETCDF=`${CDO} --config has-nc`
+#
 for OPERATOR in copy; do
   for FILE in $FILES; do
     RSTAT=0
@@ -24,7 +26,7 @@ for OPERATOR in copy; do
     CDOTEST="$OPERATOR $FILE"
     CDOCOMMAND="$CDO $DEBUG_OUT $OPERATOR $IFILE $OFILE"
 
-    if [ "@ENABLE_NETCDF@" = yes ] ; then
+    if [ "${HAS_NETCDF}" = yes ] ; then
       echo "Running test: $NTEST"
       echo "$CDOCOMMAND"
 

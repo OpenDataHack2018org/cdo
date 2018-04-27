@@ -14,29 +14,14 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef CDOOPTIONS_H
-#define CDOOPTIONS_H
 
-namespace Cdo
+#ifndef GRID_CELL_SEARCH_H
+#define GRID_CELL_SEARCH_H
+
+enum struct CellSearchMethod
 {
-extern const char *progname;
-}
-
-namespace Options
-{
-extern bool benchmark;
-extern bool silentMode;
-
-extern bool cdoCompress;
-extern int cdoCompType;
-extern int cdoCompLevel;
-extern bool cdoInteractive;
-}  // namespace Options
-
-namespace Threading
-{
-extern int ompNumThreads;
-extern bool cdoLockIO;
-}  // namespace Threading
+  spherepart,
+  latbins
+};
 
 #endif

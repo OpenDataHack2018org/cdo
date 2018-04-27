@@ -15,28 +15,120 @@
   GNU General Public License for more details.
 */
 
-#ifndef _LISTA_H
-#define _LISTA_H
+#ifndef LISTARRAY_H
+#define LISTARRAY_H
 
-#define INT_LISTA 1
-#define FLT_LISTA 2
+void split_intstring(const char *intstr, int *first, int *last, int *inc);
 
-typedef struct
+template <typename T>
+class ListArray
 {
-  void *array;
+private:
+  std::vector<T> array;
   int nalloc;
   int allinc;
-  int type;
-} lista_t;
 
-lista_t *lista_new(int type);
-void lista_destroy(lista_t *lista);
-void *lista_dataptr(lista_t *lista);
-void lista_set_int(lista_t *lista, int num, int ival);
-void lista_set_flt(lista_t *lista, int num, double fval);
-int lista_get_int(lista_t *lista, int num);
-double lista_get_flt(lista_t *lista, int num);
-int args2int_lista(int argc, char **argv, lista_t *lista);
-int args2flt_lista(int argc, char **argv, lista_t *lista);
+  void
+  ensureArraySize(int num)
+  {
+    while (nalloc < (num + 1))
+      {
+        nalloc += allinc;
+        array.resize(nalloc);
+      }
+  }
 
-#endif /* _LISTA_H */
+public:
+  ListArray()
+  {
+    nalloc = 0;
+    allinc = 1024;
+  }
+
+  T *
+  data()
+  {
+    return array.data();
+  }
+
+  void
+  setValue(int num, T value)
+  {
+    ensureArraySize(num);
+    array[num] = value;
+  }
+
+  T
+  getValue(int num)
+  {
+    return array[num];
+  }
+
+  int
+  argvToInt(int argc, char **argv)
+  {
+    int nint = 0;
+
+    for (int iarg = 0; iarg < argc; iarg++)
+      {
+        int first, last, inc;
+        split_intstring(argv[iarg], &first, &last, &inc);
+
+        if (inc >= 0)
+          {
+            for (int ival = first; ival <= last; ival += inc) setValue(nint++, ival);
+          }
+        else
+          {
+            for (int ival = first; ival >= last; ival += inc) setValue(nint++, ival);
+          }
+      }
+
+    return nint;
+  }
+
+  int
+  argvToFlt(int argc, char **argv)
+  {
+    int nint = 0;
+
+    for (int iarg = 0; iarg < argc; iarg++)
+      {
+        int len = (int) strlen(argv[iarg]);
+        int i;
+        for (i = 0; i < len; i++)
+          if (argv[iarg][i] != '/' && argv[iarg][i] != '-' && !isdigit(argv[iarg][i])) break;
+
+        if (i != len)
+          {
+            /*
+              if      ( strcmp(argv[iarg],  "inf") == 0 )
+              tmp_val =  DBL_MAX;
+              else if ( strcmp(argv[iarg], "-inf") == 0 )
+              tmp_val = -DBL_MAX;
+              else
+            */
+            double tmp_val = parameter2double(argv[iarg]);
+            setValue(nint++, tmp_val);
+          }
+        else
+          {
+            int first, last, inc;
+            split_intstring(argv[iarg], &first, &last, &inc);
+
+            if (inc >= 0)
+              {
+                for (int ival = first; ival <= last; ival += inc) setValue(nint++, (double) ival);
+              }
+            else
+              {
+                for (int ival = first; ival >= last; ival += inc) setValue(nint++, (double) ival);
+              }
+          }
+      }
+
+    return nint;
+  }
+};
+
+#endif /* LISTARRAY_H */

@@ -16,11 +16,10 @@
 */
 
 #include "cdo_int.h"
+#include "cdo_wtime.h"
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link.h"
-#include "timer.h"
-#include "cdoOptions.h"
 
 // bilinear interpolation
 
@@ -165,8 +164,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 
   if (src_grid->rank != 2) cdoAbort("Can't do bilinear interpolation when source grid rank != 2");
 
-  extern int timer_remap_bil;
-  if (cdoTimer) timer_start(timer_remap_bil);
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   progressInit();
 
@@ -252,7 +250,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 
   weightLinksToRemapLinks(0, tgt_grid_size, weightLinks, rv);
 
-  if (cdoTimer) timer_stop(timer_remap_bil);
+  if (cdoVerbose) cdoPrint("Square search nearest: %.2f seconds", cdo_get_wtime() - start);
 }  // scrip_remap_weights_bilinear
 
 /*
@@ -273,8 +271,7 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
 
   if (src_grid->rank != 2) cdoAbort("Can't do bilinear interpolation when source grid rank != 2");
 
-  extern int timer_remap_bil;
-  if (cdoTimer) timer_start(timer_remap_bil);
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   progressInit();
 
@@ -358,5 +355,5 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
 
   progressStatus(0, 1, 1);
 
-  if (cdoTimer) timer_stop(timer_remap_bil);
+  if (cdoVerbose) cdoPrint("Square search nearest: %.2f seconds", cdo_get_wtime() - start);
 }  // remapBilinear

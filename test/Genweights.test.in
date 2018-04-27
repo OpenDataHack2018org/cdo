@@ -19,6 +19,9 @@ GRIDS="n16 n32"
 IFILE=$DATAPATH/bathy4.grb
 NTEST=1
 #
+HAS_NETCDF=`${CDO} --config has-nc`
+HAS_THREADS=`${CDO} --config has-threads`
+#
 for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
   SETGRID=""
   if [ "$GRIDTYPE" != "regular" ]; then SETGRID="-setgridtype,$GRIDTYPE"; fi
@@ -41,10 +44,10 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
       CDOTEST="gen${RMOD} $GRID $GRIDTYPE"
       CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT gen${RMOD},$GRID $SETGRID $IFILE remapweights"
 
-      if [ "@ENABLE_THREADS@" = no -a "$GRIDTYPE" != "regular" ]; then
+      if [ "${HAS_THREADS}" = no -a "$GRIDTYPE" != "regular" ]; then
         test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP POSIX threads not enabled"
       else
-        if [ "@ENABLE_NETCDF@" = yes ] ; then
+        if [ "${HAS_NETCDF}" = yes ] ; then
           echo "Running test: $NTEST"
           echo "$CDOCOMMAND"
 

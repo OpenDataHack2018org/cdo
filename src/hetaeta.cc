@@ -650,7 +650,7 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
 }
 
 #if defined(TEST_HETAETA)
-#define NGP (512 * 1024)
+#define NGP (512)
 int Threading::ompNumThreads = 2;
 
 int

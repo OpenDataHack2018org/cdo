@@ -14,21 +14,13 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include <limits.h>
-#include <time.h>
-
-#include <cdi.h>
 
 #include "cdo_int.h"
+#include "cdo_wtime.h"
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
 #include "cdoOptions.h"
-#include "timer.h"
 
 #define ZERO 0.0
 #define ONE 1.0
@@ -37,8 +29,7 @@
 #define HALF 0.5
 #define QUART 0.25
 
-/* #define  BABY_STEP  0.001 */ /* original value */
-#define BABY_STEP 0.001
+#define BABY_STEP 0.001 /* original value */
 
 /* static double north_thresh =  1.45;  */ /* threshold for coord transformation */
 /* static double south_thresh = -2.00;  */ /* threshold for coord transformation */
@@ -1229,7 +1220,6 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
   long i;
 
   double findex = 0;
-  extern int timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
@@ -1246,7 +1236,7 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
       cdoPrint("South threshhold: %g", south_thresh);
     }
 
-  if (cdoTimer) timer_start(timer_remap_con);
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
 
   long src_grid_size = src_grid->size;
   long tgt_grid_size = tgt_grid->size;
@@ -1290,8 +1280,6 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
   for (i = 0; i < Threading::ompNumThreads; ++i) srch_add[i] = new size_t[tgt_grid_size];
 
   srch_corners = tgt_num_cell_corners;
-
-  if (cdoTimer) timer_start(timer_remap_con_l1);
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none)                                                                         \
@@ -1468,8 +1456,6 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
         }
     }
 
-  if (cdoTimer) timer_stop(timer_remap_con_l1);
-
   /* Finished with all cells: deallocate search arrays */
 
   for (i = 0; i < Threading::ompNumThreads; ++i)
@@ -1492,8 +1478,6 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
   for (i = 0; i < Threading::ompNumThreads; ++i) srch_add[i] = new size_t[src_grid_size];
 
   srch_corners = src_num_cell_corners;
-
-  if (cdoTimer) timer_start(timer_remap_con_l2);
 
   findex = 0;
 
@@ -1675,8 +1659,6 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 
   progressStatus(0, 1, 1);
 
-  if (cdoTimer) timer_stop(timer_remap_con_l2);
-
   /* Finished with all cells: deallocate search arrays */
 
   for (i = 0; i < Threading::ompNumThreads; ++i)
@@ -1824,6 +1806,5 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
   Free(tgt_centroid_lat);
   Free(tgt_centroid_lon);
 
-  if (cdoTimer) timer_stop(timer_remap_con);
-
+  if (cdoVerbose) cdoPrint("Cells search: %.2f seconds", cdo_get_wtime() - start);
 }  // remapConservWeightsScrip

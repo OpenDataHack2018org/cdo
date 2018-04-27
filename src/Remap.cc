@@ -616,7 +616,6 @@ remapSetFracMin(size_t gridsize, double *array, double missval, RemapGrid *tgt_g
 }
 
 int timer_remap, timer_remap_init, timer_remap_sort;
-int timer_remap_bil, timer_remap_bic, timer_remap_dis, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
 
 static void
 remapTimerInit(void)
@@ -624,12 +623,6 @@ remapTimerInit(void)
   timer_remap = timer_new("remap");
   timer_remap_init = timer_new("remap init");
   timer_remap_sort = timer_new("remap sort");
-  timer_remap_bil = timer_new("remap bil");
-  timer_remap_bic = timer_new("remap bic");
-  timer_remap_dis = timer_new("remap dis");
-  timer_remap_con = timer_new("remap con");
-  timer_remap_con_l1 = timer_new("remap con loop1");
-  timer_remap_con_l2 = timer_new("remap con loop2");
 }
 
 static void
@@ -1050,8 +1043,9 @@ Remap(void *argument)
                       remapGridFree(remaps[n0].src_grid);
                       remapGridFree(remaps[n0].tgt_grid);
                       remapSearchFree(remaps[n0].search);
-                      for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
-                      r = nremaps - 1;
+                      // for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
+                      // r = nremaps - 1;
+                      r = n0;
                       remapInit(remaps[r]);
                     }
 
@@ -1069,8 +1063,7 @@ Remap(void *argument)
                       if (gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == false)
                         {
                           remap_num_srch_bins = (!remap_extrapolate && mapType == RemapMethod::DISTWGT)
-                                                    ? 1
-                                                    : remapGenNumBins(gridInqYsize(gridID1));
+                                                    ? 1 : remapGenNumBins(gridInqYsize(gridID1));
                         }
 
                       remap_set_int(REMAP_NUM_SRCH_BINS, remap_num_srch_bins);

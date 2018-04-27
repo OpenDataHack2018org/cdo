@@ -70,6 +70,13 @@ case "${HOSTNAME}" in
                     LDFLAGS="/opt/local/lib/gcc5/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
 	            CXX=g++-mp-5 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
                     CC=gcc-mp-5  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
+        elif  test "$COMP" = gnu_pic ; then
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
+                    $CDOLIBS \
+                    LDFLAGS="/opt/local/lib/gcc6/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
+	            CXX=g++ CXXFLAGS="-g -fPIC" \
+                    CC=gcc  CFLAGS="-g -fPIC"
         elif  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
@@ -241,6 +248,14 @@ case "${HOSTNAME}" in
                     LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
 	            CXX=pgc++ CXXFLAGS="-g -fast" \
 	            CC=pgcc   CFLAGS="-g -fast"
+        elif  test "$COMP" = gnu_pic ; then
+          ${CONFPATH}configure --prefix=$HOME/local \
+                    --with-fftw3 \
+                    $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
+                    F77=gfortran FFLAGS="-g -O2" \
+                    CXX=g++ CXXFLAGS='-g -Wall -O3 -march=native -mavx2 -fPIC' \
+                    CC=gcc  CFLAGS='-g -Wall -O3 -march=native -mavx2 -fPIC'
 	else
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
@@ -282,12 +297,11 @@ case "${HOSTNAME}" in
                     CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
 	;;
 # x86_64-archlinux
-    luthien*)
+    melian*)
       case "$COMP" in
-      gcc|clang)
+        gcc)
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
-                    --enable-maintainer-mode \
                     --enable-data \
 	            --with-magics \
 	            --with-netcdf \
@@ -299,32 +313,28 @@ case "${HOSTNAME}" in
                   --with-fftw3    \
                   --with-proj     \
                       --with-pic  \
-                      CC=$COMP CPPFLAGS=-I/usr/include/magics CFLAGS="-g -Wall -O3" LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
+                      CC=gcc CXX=g++ CPPFLAGS=-I/usr/include/magics \
+                      CFLAGS="-g -Wall -O3 -ftree-vectorize" CXXFLAGS="-g -Wall -O3 -ftree-vectorize"  \
+                      LIBS="-lopenjpeg"
         ;;
-      g++|clang++)
-        case "$COMP" in
-          g++)
-            CC=gcc
-            ;;
-          clang++)
-            CC=clang
-            ;;
-        esac
+        clang)
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
-                    --enable-maintainer-mode \
                     --enable-data \
-                    --enable-cxx  \
+	            --with-magics \
 	            --with-netcdf \
 	              --with-hdf5 \
                      --with-szlib \
+                  --with-grib_api \
                   --with-eccodes  \
-                  --with-udunits2 \
+                  --with-grib_api \
                   --with-fftw3    \
                   --with-proj     \
                       --with-pic  \
-                      CC=$CC CXX=$COMP CFLAGS="-g -Wall -O2" CXXFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
-	;;
+                      CC=clang CXX=clang++ CPPFLAGS=-I/usr/include/magics \
+                      CFLAGS="-g -Wall -ftree-vectorize" CXXFLAGS="-g -Wall -ftree-vectorize"  \
+                      LIBS="-lopenjpeg"
+        ;;
       esac
     ;;
 # standard workstations at MPI-M debian jessie
@@ -400,4 +410,10 @@ case "${HOSTNAME}" in
                     --with-fftw3 \
                     CC=gcc CFLAGS='-g -Wall -O3'
 	;;
+
+    *)
+      echo "Could not find host!!!";
+      echo "hostname used is: '${HOSTNAME}'"
+      exit 1;
+      ;;
 esac

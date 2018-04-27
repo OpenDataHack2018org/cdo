@@ -66,13 +66,10 @@
 #include "config.h"
 #endif
 
-#ifdef _OPENMP
-#include <omp.h>  // omp_get_wtime
-#endif
-
 #include <cdi.h>
 
 #include "cdo_int.h"
+#include "cdo_wtime.h"
 #include "grid.h"
 #include "remap.h"
 
@@ -584,9 +581,8 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
 
   if (useGridsearch)
     {
-#ifdef _OPENMP
-      double start = cdoVerbose ? omp_get_wtime() : 0;
-#endif
+      double start = cdoVerbose ? cdo_get_wtime() : 0;
+
       bool xIsCyclic = src_grid.is_cyclic;
       size_t *dims = src_grid.dims;
       if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
@@ -595,17 +591,15 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
         search.gs = gridsearch_create(xIsCyclic, dims, src_grid.size, src_grid.cell_center_lon, src_grid.cell_center_lat);
 
       if (src_grid.lextrapolate) gridsearch_extrapolate(search.gs);
-#ifdef _OPENMP
-      if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", omp_get_wtime() - start);
-#endif
+
+      if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", cdo_get_wtime() - start);
     }
   else
     {
       if (!(src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D || tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D))
         {
-#ifdef _OPENMP
-          double start = cdoVerbose ? omp_get_wtime() : 0;
-#endif
+          double start = cdoVerbose ? cdo_get_wtime() : 0;
+
           search.srcBins.cell_bound_box.resize(4 * src_grid.size);
           if (tgt_grid.luse_cell_corners) search.tgtBins.cell_bound_box.resize(4 * tgt_grid.size);
 
@@ -620,9 +614,8 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
               vectorFree(search.srcBins.bin_lats);
               if (mapType == RemapMethod::CONSERV_YAC) vectorFree(search.tgtBins.cell_bound_box);
             }
-#ifdef _OPENMP
-          if (cdoVerbose) cdoPrint("Latitude bins created: %.2f seconds", omp_get_wtime() - start);
-#endif
+
+          if (cdoVerbose) cdoPrint("Latitude bins created: %.2f seconds", cdo_get_wtime() - start);
         }
     }
 }

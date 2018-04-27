@@ -1222,7 +1222,10 @@ static unsigned remove_zero_length_edges(struct point_list * list) {
 
     // if both points are nearly identical (angle between them is very small)
     if (!curr->to_be_removed &&
-        (get_vector_angle(curr->vec_coords, curr->next->vec_coords) < tol)) {
+        (compare_angles(
+           get_vector_angle_2(
+              curr->vec_coords, curr->next->vec_coords),
+           SIN_COS_LOW_TOL) <= 0)) {
       curr->to_be_removed = 1;
       temp_num_edges--;
     } else if (curr->edge_type == LAT_CIRCLE &&

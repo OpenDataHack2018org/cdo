@@ -47,6 +47,7 @@ pipe_t::close()
   pthread_cond_signal(tsDef);
   pthread_cond_signal(tsInq);
 }
+
 void
 pipe_t::pipe_init()
 {

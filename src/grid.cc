@@ -255,10 +255,9 @@ gridToZonal(int gridID1)
 
       if (gridInqYvals(gridID1, NULL))
         {
-          double *yvals = (double *) Malloc(gridsize * sizeof(double));
-          gridInqYvals(gridID1, yvals);
-          gridDefYvals(gridID2, yvals);
-          Free(yvals);
+          std::vector<double> yvals(gridsize);
+          gridInqYvals(gridID1, yvals.data());
+          gridDefYvals(gridID2, yvals.data());
         }
     }
   else
@@ -283,10 +282,9 @@ gridToMeridional(int gridID1)
 
       if (gridInqXvals(gridID1, NULL))
         {
-          double *xvals = (double *) Malloc(gridsize * sizeof(double));
-          gridInqXvals(gridID1, xvals);
-          gridDefXvals(gridID2, xvals);
-          Free(xvals);
+          std::vector<double> xvals(gridsize);
+          gridInqXvals(gridID1, xvals.data());
+          gridDefXvals(gridID2, xvals.data());
         }
 
       double yval = 0;
@@ -749,8 +747,8 @@ field2regular(int gridID1, int gridID2, double missval, double *array, size_t nm
   size_t ny = gridInqYsize(gridID1);
   int np = gridInqNP(gridID1);
 
-  int *rowlon = (int *) Malloc(ny * sizeof(int));
-  gridInqRowlon(gridID1, rowlon);
+  std::vector<int> rowlon(ny);
+  gridInqRowlon(gridID1, rowlon.data());
 
   double xfirstandlast[2] = { 0, 0 };
   gridInqXvals(gridID1, xfirstandlast);
@@ -761,24 +759,22 @@ field2regular(int gridID1, int gridID2, double missval, double *array, size_t nm
   size_t nx = 0;
   if (fabs(xfirst) > 0 || (np > 0 && fabs(xlast - (360.0 - 90.0 / np)) > 90.0 / np))
     {
-      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon, ny, missval, &iret, lmiss, lperio, lnearest);
+      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon.data(), ny, missval, &iret, lmiss, lperio, lnearest);
     }
   else
     {
       nx = 2 * ny;
-      (void) qu2reg3_double(array, rowlon, ny, nx, missval, &iret, lmiss, lperio, lnearest);
+      (void) qu2reg3_double(array, rowlon.data(), ny, nx, missval, &iret, lmiss, lperio, lnearest);
     }
 
   if (gridInqSize(gridID2) != nx * ny) cdoAbort("Gridsize differ!");
-
-  Free(rowlon);
 }
 
 int
 gridToRegular(int gridID1)
 {
   size_t nx = 0;
-  double *xvals = NULL;
+  std::vector<double> xvals;
 
   int gridtype = gridInqType(gridID1);
   if (gridtype != GRID_GAUSSIAN_REDUCED) cdoAbort("Not a reduced Gaussian grid!");
@@ -786,8 +782,8 @@ gridToRegular(int gridID1)
   int ny = gridInqYsize(gridID1);
   int np = gridInqNP(gridID1);
 
-  double *yvals = (double *) Malloc(ny * sizeof(double));
-  gridInqYvals(gridID1, yvals);
+  std::vector<double> yvals(ny);
+  gridInqYvals(gridID1, yvals.data());
 
   double xfirstandlast[2] = { 0, 0 };
   gridInqXvals(gridID1, xfirstandlast);
@@ -800,26 +796,23 @@ gridToRegular(int gridID1)
       long ilon_first, ilon_last;
       long row_count;
       int np4 = np * 4;
-      int *rowlon = NULL;
 
       if (np <= 0) cdoAbort("Number of values between pole and equator missing!");
 
       grib_get_reduced_row(np4, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
 
       nx = row_count;
-      xvals = (double *) Malloc(nx * sizeof(double));
+      xvals.resize(nx);
       for (size_t i = 0; i < nx; ++i)
         {
           xvals[i] = ((ilon_first + i) * 360.) / np4;
           if (xfirst > xlast) xvals[i] -= 360.;
         }
-
-      Free(rowlon);
     }
   else
     {
       nx = 2 * ny;
-      xvals = (double *) Malloc(nx * sizeof(double));
+      xvals.resize(nx);
       for (size_t i = 0; i < nx; ++i) xvals[i] = i * 360. / nx;
     }
 
@@ -829,12 +822,9 @@ gridToRegular(int gridID1)
   gridDefXsize(gridID2, nx);
   gridDefYsize(gridID2, ny);
 
-  gridDefXvals(gridID2, xvals);
-  gridDefYvals(gridID2, yvals);
+  gridDefXvals(gridID2, xvals.data());
+  gridDefYvals(gridID2, yvals.data());
   gridDefNP(gridID2, np);
-
-  Free(xvals);
-  Free(yvals);
 
   return gridID2;
 }
@@ -844,10 +834,9 @@ gridCopyMask(int gridID1, int gridID2, long gridsize)
 {
   if (gridInqMask(gridID1, NULL))
     {
-      int *mask = (int *) Malloc(gridsize * sizeof(int));
-      gridInqMask(gridID1, mask);
-      gridDefMask(gridID2, mask);
-      Free(mask);
+      std::vector<int> mask(gridsize);
+      gridInqMask(gridID1, mask.data());
+      gridDefMask(gridID2, mask.data());
     }
 }
 
@@ -1139,12 +1128,12 @@ gridToCurvilinear(int gridID1, int lbounds)
 
         if (xbounds && ybounds)
           {
-            double *xbounds2D = (double *) Malloc(4 * gridsize * sizeof(double));
-            double *ybounds2D = (double *) Malloc(4 * gridsize * sizeof(double));
+            std::vector<double> xbounds2D(4 * gridsize);
+            std::vector<double> ybounds2D(4 * gridsize);
 
             if (lproj_rll)
               {
-                gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
+                gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D.data(), ybounds2D.data());
               }
             else
               {
@@ -1169,28 +1158,26 @@ gridToCurvilinear(int gridID1, int lbounds)
                         }
 
                     if (lproj_sinu)
-                      cdo_sinu_to_lonlat(4 * gridsize, xbounds2D, ybounds2D);
+                      cdo_sinu_to_lonlat(4 * gridsize, xbounds2D.data(), ybounds2D.data());
                     else if (lproj_laea)
-                      cdo_laea_to_lonlat(gridID1, 4 * gridsize, xbounds2D, ybounds2D);
+                      cdo_laea_to_lonlat(gridID1, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
                     else if (lproj_lcc)
-                      cdo_lcc_to_lonlat(gridID1, 4 * gridsize, xbounds2D, ybounds2D);
+                      cdo_lcc_to_lonlat(gridID1, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
                     else if (lproj4)
-                      cdo_proj_to_lonlat(proj4param, 4 * gridsize, xbounds2D, ybounds2D);
+                      cdo_proj_to_lonlat(proj4param, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
                   }
                 else
                   {
-                    grid_gen_xbounds2D(nx, ny, xbounds, xbounds2D);
-                    grid_gen_ybounds2D(nx, ny, ybounds, ybounds2D);
+                    grid_gen_xbounds2D(nx, ny, xbounds, xbounds2D.data());
+                    grid_gen_ybounds2D(nx, ny, ybounds, ybounds2D.data());
                   }
               }
 
-            gridDefXbounds(gridID2, xbounds2D);
-            gridDefYbounds(gridID2, ybounds2D);
+            gridDefXbounds(gridID2, xbounds2D.data());
+            gridDefYbounds(gridID2, ybounds2D.data());
 
             if (xbounds) Free(xbounds);
             if (ybounds) Free(ybounds);
-            if (xbounds2D) Free(xbounds2D);
-            if (ybounds2D) Free(ybounds2D);
           }
 
       NO_BOUNDS:
@@ -1525,14 +1512,14 @@ gridCurvilinearToRegular(int gridID1)
   size_t nx = gridInqXsize(gridID1);
   size_t ny = gridInqYsize(gridID1);
 
-  double *xvals2D = (double *) Malloc(gridsize * sizeof(double));
-  double *yvals2D = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> xvals2D(gridsize);
+  std::vector<double> yvals2D(gridsize);
 
-  gridInqXvals(gridID1, xvals2D);
-  gridInqYvals(gridID1, yvals2D);
+  gridInqXvals(gridID1, xvals2D.data());
+  gridInqYvals(gridID1, yvals2D.data());
 
-  double *xvals = (double *) Malloc(nx * sizeof(double));
-  double *yvals = (double *) Malloc(ny * sizeof(double));
+  std::vector<double> xvals(nx);
+  std::vector<double> yvals(ny);
 
   for (size_t i = 0; i < nx; i++) xvals[i] = xvals2D[i];
   for (size_t j = 0; j < ny; j++) yvals[j] = yvals2D[j * nx];
@@ -1559,9 +1546,6 @@ gridCurvilinearToRegular(int gridID1)
           }
       }
 
-  Free(xvals2D);
-  Free(yvals2D);
-
   if (lx && ly)
     {
       gridID2 = gridCreate(GRID_LONLAT, gridsize);
@@ -1577,15 +1561,12 @@ gridCurvilinearToRegular(int gridID1)
       cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
       cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
-      grid_to_degree(xunits, nx, xvals, "grid1 center lon");
-      grid_to_degree(yunits, ny, yvals, "grid1 center lat");
+      grid_to_degree(xunits, nx, xvals.data(), "grid1 center lon");
+      grid_to_degree(yunits, ny, yvals.data(), "grid1 center lat");
 
-      gridDefXvals(gridID2, xvals);
-      gridDefYvals(gridID2, yvals);
+      gridDefXvals(gridID2, xvals.data());
+      gridDefYvals(gridID2, yvals.data());
     }
-
-  Free(xvals);
-  Free(yvals);
 
   return gridID2;
 }

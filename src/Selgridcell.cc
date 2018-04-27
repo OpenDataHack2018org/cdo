@@ -71,7 +71,7 @@ Selgridcell(void *process)
   {
     int gridID1, gridID2;
   } sindex_t;
-  lista_t *ilista = lista_new(INT_LISTA);
+  ListArray<int> listArrayInt;
 
   cdoInitialize(process);
 
@@ -105,8 +105,8 @@ Selgridcell(void *process)
     }
   else
     {
-      nind = args2int_lista(operatorArgc(), operatorArgv(), ilista);
-      indarr = (int *) lista_dataptr(ilista);
+      nind = listArrayInt.argvToInt(operatorArgc(), operatorArgv());
+      indarr = listArrayInt.data();
 
       if (cdoVerbose)
         for (int i = 0; i < nind; i++) cdoPrint("int %d = %d", i + 1, indarr[i]);
@@ -257,8 +257,6 @@ Selgridcell(void *process)
   pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  lista_destroy(ilista);
 
   cdoFinish();
 

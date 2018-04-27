@@ -64,13 +64,14 @@ zaxis_print_kernel(int zaxisID, FILE *fp)
   if (attstr[0]) fprintf(fp, "units     = \"%s\"\n", attstr);
 
   char **cvals = NULL;
-  double *vals = nvals ? (double *) Malloc(nvals * sizeof(double)) : NULL;
+  std::vector<double> vals;
+  if (nvals) vals.resize(nvals);
 
   if (nvals)
     {
-      zaxisInqLevels(zaxisID, vals);
+      zaxisInqLevels(zaxisID, vals.data());
       static const char prefix[] = "levels    = ";
-      printDblsPrefixAutoBrk(fp, dig, prefix, (int) sizeof(prefix) - 1, nvals, vals, 0);
+      printDblsPrefixAutoBrk(fp, dig, prefix, (int) sizeof(prefix) - 1, nvals, vals.data(), 0);
     }
   else if (type == ZAXIS_CHAR)
     {
@@ -87,19 +88,18 @@ zaxis_print_kernel(int zaxisID, FILE *fp)
   if (zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL))
     {
       {
-        zaxisInqLbounds(zaxisID, vals);
+        zaxisInqLbounds(zaxisID, vals.data());
         static const char prefix[] = "lbounds   = ";
-        printDblsPrefixAutoBrk(fp, dig, prefix, (int) sizeof(prefix) - 1, nvals, vals, 0);
+        printDblsPrefixAutoBrk(fp, dig, prefix, (int) sizeof(prefix) - 1, nvals, vals.data(), 0);
       }
 
       {
-        zaxisInqUbounds(zaxisID, vals);
+        zaxisInqUbounds(zaxisID, vals.data());
         static const char prefix[] = "ubounds   = ";
-        printDblsPrefixAutoBrk(fp, dig, prefix, (int) sizeof(prefix) - 1, nvals, vals, 0);
+        printDblsPrefixAutoBrk(fp, dig, prefix, (int) sizeof(prefix) - 1, nvals, vals.data(), 0);
       }
     }
 
-  if (vals) Free(vals);
   if (cvals) Free(cvals);
 
   if (type == ZAXIS_HYBRID || type == ZAXIS_HYBRID_HALF)
@@ -108,11 +108,10 @@ zaxis_print_kernel(int zaxisID, FILE *fp)
       if (vctsize)
         {
           fprintf(fp, "vctsize   = %d\n", vctsize);
-          double *vct = (double *) Malloc(vctsize * sizeof(double));
-          zaxisInqVct(zaxisID, vct);
+          std::vector<double> vct(vctsize);
+          zaxisInqVct(zaxisID, vct.data());
           static const char prefix[] = "vct       = ";
-          printDblsPrefixAutoBrk(fp, dig, prefix, (int) sizeof(prefix) - 1, vctsize, vct, vctsize / 2);
-          Free(vct);
+          printDblsPrefixAutoBrk(fp, dig, prefix, (int) sizeof(prefix) - 1, vctsize, vct.data(), vctsize / 2);
         }
     }
 

@@ -14,29 +14,18 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef CDOOPTIONS_H
-#define CDOOPTIONS_H
 
-namespace Cdo
+#include "cdo_int.h"
+#include "grid_cell_search.h"
+
+CellSearchMethod cellSearchMethod(CellSearchMethod::latbins);
+
+void
+setCellSearchMethod(const char *methodstr)
 {
-extern const char *progname;
+  // clang-format off
+  if      (STR_IS_EQ(methodstr, "spherepart")) cellSearchMethod = CellSearchMethod::spherepart;
+  else if (STR_IS_EQ(methodstr, "latbins"))    cellSearchMethod = CellSearchMethod::latbins;
+  else cdoAbort("Grid cell search method %s not available!", methodstr);
+  // clang-format on
 }
-
-namespace Options
-{
-extern bool benchmark;
-extern bool silentMode;
-
-extern bool cdoCompress;
-extern int cdoCompType;
-extern int cdoCompLevel;
-extern bool cdoInteractive;
-}  // namespace Options
-
-namespace Threading
-{
-extern int ompNumThreads;
-extern bool cdoLockIO;
-}  // namespace Threading
-
-#endif

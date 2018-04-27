@@ -19,6 +19,47 @@
 
 //#define SELDEBUG 1
 
+int
+get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
+{
+  int i;
+  int ival = idefault;
+
+  for (i = istart; i < iend; i++)
+    {
+      if (!(isdigit(intstr[i]) || intstr[i] == '-'))
+        {
+          if (intstr[i] == '/')
+            ival = parameter2intlist(intstr + i + 1);
+          else
+            fprintf(stderr, "Syntax error in >%.*s<! Character %c not allowed.\n", iend, intstr, intstr[i]);
+          break;
+        }
+    }
+  
+  *ilast = i;
+
+  return ival;
+}
+
+void
+split_intstring(const char *intstr, int *first, int *last, int *inc)
+{
+  int istrlen = strlen(intstr);
+  *first = parameter2intlist(intstr);
+  *last = *first;
+  *inc = 1;
+
+  int i, start = 1;
+  *last = get_ival(intstr, *first, start, istrlen, &i);
+
+  if (i < istrlen)
+    {
+      start = i + 1;
+      *inc = get_ival(intstr, 1, start, istrlen, &i);
+    }
+}
+
 sellist_t *
 sellist_create(list_t *kvlist)
 {
@@ -86,8 +127,6 @@ sellist_verify(sellist_t *sellist)
         }
     }
 }
-
-void split_intstring(const char *intstr, int *first, int *last, int *inc);
 
 int
 sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)

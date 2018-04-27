@@ -26,6 +26,7 @@
 #include "pipe.h"
 
 #include <sys/types.h> /* off_t */
+#include <memory>
 #include <vector>
 
 extern int pthreadScope;

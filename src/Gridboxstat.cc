@@ -25,9 +25,9 @@
       Gridboxstat    gridboxmean         Gridbox mean
       Gridboxstat    gridboxavg          Gridbox average
       Gridboxstat    gridboxstd          Gridbox standard deviation
-      Gridboxstat    gridboxstd1         Gridbox standard deviation [Normalize
-   by (n-1)] Gridboxstat    gridboxvar          Gridbox variance Gridboxstat
-   gridboxvar1         Gridbox variance [Normalize by (n-1)]
+      Gridboxstat    gridboxstd1         Gridbox standard deviation [Normalize by (n-1)]
+      Gridboxstat    gridboxvar          Gridbox variance 
+      Gridboxstat    gridboxvar1         Gridbox variance [Normalize by (n-1)]
 */
 
 #include <cdi.h>
@@ -37,39 +37,383 @@
 #include "grid.h"
 #include "cdoOptions.h"
 
-static int
-genBoxGrid(int gridID1, size_t xinc, size_t yinc)
+static void
+genBoxGridReg2D(int gridID1, size_t xinc, size_t yinc, int gridID2)
 {
   size_t i, j, i1;
-  int gridID2 = -1;
-  size_t nlon1 = 0, nlat1 = 0;
-  size_t gridsize2 = 0, nlon2 = 0, nlat2 = 0;
+
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
+  size_t nlon2 = gridInqXsize(gridID2);
+  size_t nlat2 = gridInqYsize(gridID2);
+
+  bool gridHasBounds = (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL));
+
+  {
+    std::vector<double> xvals1(nlon1);
+    std::vector<double> yvals1(nlat1);
+    std::vector<double> xvals2(nlon2);
+    std::vector<double> yvals2(nlat2);
+    gridInqXvals(gridID1, xvals1.data());
+    gridInqYvals(gridID1, yvals1.data());
+
+    j = 0;
+    for (i = 0; i < nlon1; i += xinc)
+      {
+        i1 = i + (xinc - 1);
+        if (i1 >= nlon1 - 1) i1 = nlon1 - 1;
+        xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i]) / 2.;
+        j++;
+      }
+
+    j = 0;
+    for (i = 0; i < nlat1; i += yinc)
+      {
+        i1 = i + (yinc - 1);
+        if (i1 >= nlat1 - 1) i1 = nlat1 - 1;
+        yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i]) / 2;
+        j++;
+      }
+
+    gridDefXvals(gridID2, xvals2.data());
+    gridDefYvals(gridID2, yvals2.data());
+  }
+
+  if (gridHasBounds)
+    {
+      std::vector<double> grid1_corner_lon(2 * nlon1);
+      std::vector<double> grid1_corner_lat(2 * nlat1);
+      std::vector<double> grid2_corner_lon(2 * nlon2);
+      std::vector<double> grid2_corner_lat(2 * nlat2);
+      gridInqXbounds(gridID1, grid1_corner_lon.data());
+      gridInqYbounds(gridID1, grid1_corner_lat.data());
+
+      j = 0;
+      for (i = 0; i < nlon1; i += xinc)
+        {
+          i1 = i + (xinc - 1);
+          if (i1 >= nlon1 - 1) i1 = nlon1 - 1;
+          grid2_corner_lon[2 * j] = grid1_corner_lon[2 * i];
+          grid2_corner_lon[2 * j + 1] = grid1_corner_lon[2 * i1 + 1];
+          j++;
+        }
+
+      j = 0;
+      for (i = 0; i < nlat1; i += yinc)
+        {
+          i1 = i + (yinc - 1);
+          if (i1 >= nlat1 - 1) i1 = nlat1 - 1;
+          grid2_corner_lat[2 * j] = grid1_corner_lat[2 * i];
+          grid2_corner_lat[2 * j + 1] = grid1_corner_lat[2 * i1 + 1];
+          j++;
+        }
+
+      gridDefNvertex(gridID2, 2);
+      gridDefXbounds(gridID2, grid2_corner_lon.data());
+      gridDefYbounds(gridID2, grid2_corner_lat.data());
+    }
+}
+
+
+static void
+genBoxGridCurv2D(int gridID1, size_t xinc, size_t yinc, int gridID2)
+{
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
+  size_t nlon2 = gridInqXsize(gridID2);
+  size_t nlat2 = gridInqYsize(gridID2);
+  size_t gridsize1 = gridInqSize(gridID1);
+  size_t gridsize2 = gridInqSize(gridID2);
+
   size_t x1, y1, x2, y2;
   size_t use_x1, use_y1;
   size_t g1_add, g2_add;
   int corner, add;
   int circular = gridIsCircular(gridID1);
-  double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
-  double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
   double on_up, on_lo, ox_up, ox_lo, an_le, an_ri, ax_le, ax_ri;
   double xvals2_0 = 0;
   double area_norm;
 
-  int gridtype = gridInqType(gridID1);
-  size_t gridsize1 = gridInqSize(gridID1);
+  bool gridHasBounds = (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL));
 
+  std::vector<double> xvals1(gridsize1);
+  std::vector<double> yvals1(gridsize1);
+  std::vector<double> xvals2(gridsize2);
+  std::vector<double> yvals2(gridsize2);
+  gridInqXvals(gridID1, xvals1.data());
+  gridInqYvals(gridID1, yvals1.data());
+
+  // Convert lat/lon units if required
+  {
+    char units[CDI_MAX_NAME];
+    gridInqXunits(gridID1, units);
+    grid_to_degree(units, gridsize1, xvals1.data(), "grid center lon");
+    gridInqYunits(gridID1, units);
+    grid_to_degree(units, gridsize1, yvals1.data(), "grid center lat");
+  }
+
+  std::vector<double> grid1_corner_lon, grid1_corner_lat;
+  std::vector<double> grid2_corner_lon, grid2_corner_lat;
+  if (gridHasBounds)
+    {
+      grid1_corner_lon.resize(4 * gridsize1);
+      grid1_corner_lat.resize(4 * gridsize1);
+      grid2_corner_lon.resize(4 * gridsize2);
+      grid2_corner_lat.resize(4 * gridsize2);
+      gridInqXbounds(gridID1, grid1_corner_lon.data());
+      gridInqYbounds(gridID1, grid1_corner_lat.data());
+
+      // Convert lat/lon units if required
+      {
+        char units[CDI_MAX_NAME];
+        gridInqXunits(gridID1, units);
+        grid_to_degree(units, 4 * gridsize1, grid1_corner_lon.data(), "grid corner lon");
+        gridInqYunits(gridID1, units);
+        grid_to_degree(units, 4 * gridsize1, grid1_corner_lat.data(), "grid corner lat");
+      }
+    }
+
+  // Process grid2 bounds
+  area_norm = xinc * yinc;
+  for (y2 = 0; y2 < nlat2; y2++)
+    {
+      for (x2 = 0; x2 < nlon2; x2++)
+        {
+          g2_add = (y2 * nlon2 + x2);
+          on_up = on_lo = 360.;
+          ox_up = ox_lo = -360.;
+          an_ri = an_le = 90.;
+          ax_ri = ax_le = -90.;
+
+          for (y1 = y2 * yinc; y1 < yinc * (y2 + 1); y1++)
+            {
+              use_y1 = (y1 >= nlat1) ? nlat1 - 1 : y1;
+              for (x1 = x2 * xinc; x1 < xinc * (x2 + 1); x1++)
+                {
+                  use_x1 = x1;
+                  if (x1 >= nlon1)
+                    {
+                      if (circular && use_y1 == y1)
+                        use_y1 -= 1;
+                      else
+                        use_x1 = nlon1 - 1;
+                    }
+
+                  g1_add = (use_y1 * nlon1) + use_x1;
+
+                  if (y1 == y2 * yinc && x1 == x2 * xinc)
+                    {
+                      xvals2_0 = xvals1[g1_add];
+                      xvals2[g2_add] = xvals1[g1_add] / area_norm;
+                      yvals2[g2_add] = yvals1[g1_add] / area_norm;
+                    }
+                  else if (fabs(xvals1[g1_add] - xvals2_0) > 270.)
+                    {
+                      if ((xvals1[g1_add] - xvals2_0) > 270.)
+                        xvals2[g2_add] += (xvals1[g1_add] - 360.) / area_norm;
+                      else if ((xvals1[g1_add] - xvals2_0) < -270.)
+                        xvals2[g2_add] += (xvals1[g1_add] + 360.) / area_norm;
+                      yvals2[g2_add] += yvals1[g1_add] / area_norm;
+                    }
+                  else
+                    {
+                      xvals2[g2_add] += xvals1[g1_add] / area_norm;
+                      yvals2[g2_add] += yvals1[g1_add] / area_norm;
+                    }
+
+                  if (gridHasBounds)
+                    {
+                      int c_flag[4], corner2, g1_add2, g1_add3;
+                      double lon, lat, lon2, lat2, lon3, lat3;
+                      /* upper left cell */
+                      if (y1 == y2 * yinc && x1 == x2 * xinc)
+                        {
+                          c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
+                          for (corner = 0; corner < 4; corner++)
+                            {
+                              add = 4 * g1_add + corner;
+                              lon = grid1_corner_lon[add];
+                              lat = grid1_corner_lat[add];
+                              g1_add2 = g1_add + 1;
+                              if (g1_add + nlon1 > gridsize1)
+                                {
+                                  cdoWarning("Can't find cell below upper left");
+                                  continue;
+                                }
+                              g1_add3 = g1_add + nlon1;
+                              for (corner2 = 0; corner2 < 4; corner2++)
+                                {
+                                  lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
+                                  lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
+                                  lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
+                                  lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
+                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
+                                      || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
+                                    c_flag[corner] = 1;
+                                }
+                            }
+                          for (corner = 0; corner < 4; corner++)
+                            if (!c_flag[corner]) break;
+                          on_up = grid1_corner_lon[4 * g1_add + corner];
+                          ax_le = grid1_corner_lat[4 * g1_add + corner];
+                          if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
+                        }
+
+                      /* upper right cell */
+                      if ((y1 == y2 * yinc) && (x1 == (x2 + 1) * xinc - 1))
+                        {
+                          c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
+                          for (corner = 0; corner < 4; corner++)
+                            {
+                              add = 4 * g1_add + corner;
+                              lon = grid1_corner_lon[add];
+                              lat = grid1_corner_lat[add];
+                              g1_add2 = g1_add - 1;
+                              if (g1_add + nlon1 > gridsize1)
+                                {
+                                  cdoWarning("Can't find cell below upper left");
+                                  continue;
+                                }
+                              g1_add3 = g1_add + nlon1;
+                              for (corner2 = 0; corner2 < 4; corner2++)
+                                {
+                                  lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
+                                  lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
+                                  lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
+                                  lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
+                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
+                                      || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
+                                    c_flag[corner] = 1;
+                                }
+                            }
+                          for (corner = 0; corner < 4; corner++)
+                            if (!c_flag[corner]) break;
+                          ox_up = grid1_corner_lon[4 * g1_add + corner];
+                          ax_ri = grid1_corner_lat[4 * g1_add + corner];
+                          if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
+                        }
+
+                      /* lower right cell */
+                      if ((y1 == (y2 + 1) * yinc - 1) && (x1 == (x2 + 1) * xinc - 1))
+                        {
+                          c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
+                          for (corner = 0; corner < 4; corner++)
+                            {
+                              add = 4 * g1_add + corner;
+                              lon = grid1_corner_lon[add];
+                              lat = grid1_corner_lat[add];
+                              g1_add2 = g1_add - 1;
+                              if (g1_add < nlon1)
+                                {
+                                  cdoWarning("Can't find cell above lower right left");
+                                  continue;
+                                }
+                              g1_add3 = g1_add - nlon1;
+                              for (corner2 = 0; corner2 < 4; corner2++)
+                                {
+                                  lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
+                                  lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
+                                  lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
+                                  lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
+                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
+                                      || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
+                                    c_flag[corner] = 1;
+                                }
+                            }
+                          for (corner = 0; corner < 4; corner++)
+                            if (!c_flag[corner]) break;
+                          ox_lo = grid1_corner_lon[4 * g1_add + corner];
+                          an_ri = grid1_corner_lat[4 * g1_add + corner];
+                          if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
+                        }
+
+                      /* lower left cell */
+                      if ((y1 == (y2 + 1) * yinc - 1) && (x1 == x2 * xinc))
+                        {
+                          c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
+                          for (corner = 0; corner < 4; corner++)
+                            {
+                              add = 4 * g1_add + corner;
+                              lon = grid1_corner_lon[add];
+                              lat = grid1_corner_lat[add];
+                              g1_add2 = g1_add + 1;
+                              if (g1_add < nlon1)
+                                {
+                                  cdoWarning("Can't find cell above lower right left");
+                                  continue;
+                                }
+                              g1_add3 = g1_add - nlon1;
+                              for (corner2 = 0; corner2 < 4; corner2++)
+                                {
+                                  lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
+                                  lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
+                                  lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
+                                  lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
+                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
+                                      || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
+                                    c_flag[corner] = 1;
+                                }
+                            }
+                          for (corner = 0; corner < 4; corner++)
+                            if (!c_flag[corner]) break;
+                          on_lo = grid1_corner_lon[4 * g1_add + corner];
+                          an_le = grid1_corner_lat[4 * g1_add + corner];
+                          if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
+                        }
+                    } /* if ( gridHasBounds) */
+                }     /* for ( x1 = x2*xinc; x1 < xinc*(x2+1) ; x1++ ) */
+            }         /* for ( y1 = y2*yinc; y1 < yinc*(y2+1); y1++ ) */
+
+          if (gridHasBounds)
+            {
+              /* upper left corner */
+              grid2_corner_lon[4 * g2_add + 3] = on_up;
+              grid2_corner_lat[4 * g2_add + 3] = ax_le;
+              /* upper right corner */
+              grid2_corner_lon[4 * g2_add + 2] = ox_up;
+              grid2_corner_lat[4 * g2_add + 2] = ax_ri;
+              /* lower right corner */
+              grid2_corner_lon[4 * g2_add + 1] = ox_lo;
+              grid2_corner_lat[4 * g2_add + 1] = an_ri;
+              /* lower left corner */
+              grid2_corner_lon[4 * g2_add + 0] = on_lo;
+              grid2_corner_lat[4 * g2_add + 0] = an_le;
+            }
+
+          //  while ( xvals2[g2_add] >  180. ) xvals2[g2_add] -= 360.;
+          //  while ( xvals2[g2_add] < -180. ) xvals2[g2_add] += 360.;
+        } /* for ( x2 = 0; x2 < nlon2; x2++ ) */
+    }     /* for ( y2 = 0; y2 < nlat2; y2++ ) */
+
+  gridDefXvals(gridID2, xvals2.data());
+  gridDefYvals(gridID2, yvals2.data());
+
+  if (gridHasBounds)
+    {
+      gridDefNvertex(gridID2, 4);
+      gridDefXbounds(gridID2, grid2_corner_lon.data());
+      gridDefYbounds(gridID2, grid2_corner_lat.data());
+    }
+}
+
+static int
+genBoxGrid(int gridID1, size_t xinc, size_t yinc)
+{
   if (xinc < 1 || yinc < 1) cdoAbort("xinc and yinc must not be smaller than 1!");
 
+  int gridID2 = -1;
+  int gridtype = gridInqType(gridID1);
   if (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC)
     {
-      nlon1 = gridInqXsize(gridID1);
-      nlat1 = gridInqYsize(gridID1);
+      size_t nlon1 = gridInqXsize(gridID1);
+      size_t nlat1 = gridInqYsize(gridID1);
+      if (xinc > nlon1 || yinc > nlat1) cdoAbort("xinc and/or yinc exceeds gridsize!");
 
-      nlon2 = nlon1 / xinc;
-      nlat2 = nlat1 / yinc;
+      size_t nlon2 = nlon1 / xinc;
+      size_t nlat2 = nlat1 / yinc;
       if (nlon1 % xinc) nlon2++;
       if (nlat1 % yinc) nlat2++;
-      gridsize2 = nlon2 * nlat2;
+      size_t gridsize2 = nlon2 * nlat2;
 
       gridID2 = gridCreate(gridtype, gridsize2);
       gridDefXsize(gridID2, nlon2);
@@ -80,358 +424,17 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
       cdoAbort("Unsupported grid: %s", gridNamePtr(gridtype));
     }
 
-  if (xinc > nlon1 || yinc > nlat1) cdoAbort("xinc and/or yinc exceeds gridsize!");
-
   if (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT)
     {
-      bool gridHasBounds = (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL));
-
-      double *xvals1 = (double *) Malloc(nlon1 * sizeof(double));
-      double *yvals1 = (double *) Malloc(nlat1 * sizeof(double));
-      double *xvals2 = (double *) Malloc(nlon2 * sizeof(double));
-      double *yvals2 = (double *) Malloc(nlat2 * sizeof(double));
-      gridInqXvals(gridID1, xvals1);
-      gridInqYvals(gridID1, yvals1);
-
-      if (gridHasBounds)
-        {
-          grid1_corner_lon = (double *) Malloc(2 * nlon1 * sizeof(double));
-          grid1_corner_lat = (double *) Malloc(2 * nlat1 * sizeof(double));
-          grid2_corner_lon = (double *) Malloc(2 * nlon2 * sizeof(double));
-          grid2_corner_lat = (double *) Malloc(2 * nlat2 * sizeof(double));
-          gridInqXbounds(gridID1, grid1_corner_lon);
-          gridInqYbounds(gridID1, grid1_corner_lat);
-        }
-
-      j = 0;
-      for (i = 0; i < nlon1; i += xinc)
-        {
-          i1 = i + (xinc - 1);
-          if (i1 >= nlon1 - 1) i1 = nlon1 - 1;
-          xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i]) / 2.;
-          if (gridHasBounds)
-            {
-              grid2_corner_lon[2 * j] = grid1_corner_lon[2 * i];
-              grid2_corner_lon[2 * j + 1] = grid1_corner_lon[2 * i1 + 1];
-            }
-          j++;
-        }
-      j = 0;
-      for (i = 0; i < nlat1; i += yinc)
-        {
-          i1 = i + (yinc - 1);
-          if (i1 >= nlat1 - 1) i1 = nlat1 - 1;
-          yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i]) / 2;
-          if (gridHasBounds)
-            {
-              grid2_corner_lat[2 * j] = grid1_corner_lat[2 * i];
-              grid2_corner_lat[2 * j + 1] = grid1_corner_lat[2 * i1 + 1];
-            }
-          j++;
-        }
-
-      gridDefXvals(gridID2, xvals2);
-      gridDefYvals(gridID2, yvals2);
-
-      Free(xvals2);
-      Free(yvals2);
-
-      Free(xvals1);
-      Free(yvals1);
-
-      if (gridHasBounds)
-        {
-          gridDefNvertex(gridID2, 2);
-          gridDefXbounds(gridID2, grid2_corner_lon);
-          gridDefYbounds(gridID2, grid2_corner_lat);
-          Free(grid2_corner_lon);
-          Free(grid2_corner_lat);
-
-          Free(grid1_corner_lon);
-          Free(grid1_corner_lat);
-        }
-    } /* if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT ) */
+      genBoxGridReg2D(gridID1, xinc, yinc, gridID2);
+    }
   else if (gridtype == GRID_GENERIC)
     {
     }
   else if (gridtype == GRID_CURVILINEAR)
     {
-      bool gridHasBounds = (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL));
-
-      double *xvals1 = (double *) Malloc(nlon1 * nlat1 * sizeof(double));
-      double *yvals1 = (double *) Malloc(nlon1 * nlat1 * sizeof(double));
-      double *xvals2 = (double *) Malloc(nlon2 * nlat2 * sizeof(double));
-      double *yvals2 = (double *) Malloc(nlon2 * nlat2 * sizeof(double));
-      gridInqXvals(gridID1, xvals1);
-      gridInqYvals(gridID1, yvals1);
-
-      /* Convert lat/lon units if required */
-      {
-        char units[CDI_MAX_NAME];
-        gridInqXunits(gridID1, units);
-        grid_to_degree(units, nlon1 * nlat1, xvals1, "grid center lon");
-        gridInqYunits(gridID1, units);
-        grid_to_degree(units, nlon1 * nlat1, yvals1, "grid center lat");
-      }
-
-      if (gridHasBounds)
-        {
-          grid1_corner_lon = (double *) Malloc(4 * nlon1 * nlat1 * sizeof(double));
-          grid1_corner_lat = (double *) Malloc(4 * nlon1 * nlat1 * sizeof(double));
-          grid2_corner_lon = (double *) Malloc(4 * nlon2 * nlat2 * sizeof(double));
-          grid2_corner_lat = (double *) Malloc(4 * nlon2 * nlat2 * sizeof(double));
-          gridInqXbounds(gridID1, grid1_corner_lon);
-          gridInqYbounds(gridID1, grid1_corner_lat);
-
-          /* Convert lat/lon units if required */
-          {
-            char units[CDI_MAX_NAME];
-            gridInqXunits(gridID1, units);
-            grid_to_degree(units, 4 * nlon1 * nlat1, grid1_corner_lon, "grid corner lon");
-            gridInqYunits(gridID1, units);
-            grid_to_degree(units, 4 * nlon1 * nlat1, grid1_corner_lat, "grid corner lat");
-          }
-        }
-
-      /* Process grid2 bounds */
-      area_norm = xinc * yinc;
-      for (y2 = 0; y2 < nlat2; y2++)
-        {
-          for (x2 = 0; x2 < nlon2; x2++)
-            {
-              g2_add = (y2 * nlon2 + x2);
-              on_up = on_lo = 360.;
-              ox_up = ox_lo = -360.;
-              an_ri = an_le = 90.;
-              ax_ri = ax_le = -90.;
-
-              for (y1 = y2 * yinc; y1 < yinc * (y2 + 1); y1++)
-                {
-                  if (y1 >= nlat1)
-                    use_y1 = nlat1 - 1;
-                  else
-                    use_y1 = y1;
-                  for (x1 = x2 * xinc; x1 < xinc * (x2 + 1); x1++)
-                    {
-                      use_x1 = x1;
-                      if (x1 >= nlon1)
-                        {
-                          if (circular && use_y1 == y1)
-                            use_y1 -= 1;
-                          else
-                            use_x1 = nlon1 - 1;
-                        }
-
-                      g1_add = (use_y1 * nlon1) + use_x1;
-
-                      if (y1 == y2 * yinc && x1 == x2 * xinc)
-                        {
-                          xvals2_0 = xvals1[g1_add];
-                          xvals2[g2_add] = xvals1[g1_add] / area_norm;
-                          yvals2[g2_add] = yvals1[g1_add] / area_norm;
-                        }
-                      else if (fabs(xvals1[g1_add] - xvals2_0) > 270.)
-                        {
-                          if ((xvals1[g1_add] - xvals2_0) > 270.)
-                            xvals2[g2_add] += (xvals1[g1_add] - 360.) / area_norm;
-                          else if ((xvals1[g1_add] - xvals2_0) < -270.)
-                            xvals2[g2_add] += (xvals1[g1_add] + 360.) / area_norm;
-                          yvals2[g2_add] += yvals1[g1_add] / area_norm;
-                        }
-                      else
-                        {
-                          xvals2[g2_add] += xvals1[g1_add] / area_norm;
-                          yvals2[g2_add] += yvals1[g1_add] / area_norm;
-                        }
-
-                      if (gridHasBounds)
-                        {
-                          int c_flag[4], corner2, g1_add2, g1_add3;
-                          double lon, lat, lon2, lat2, lon3, lat3;
-                          /* upper left cell */
-                          if (y1 == y2 * yinc && x1 == x2 * xinc)
-                            {
-                              c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
-                              for (corner = 0; corner < 4; corner++)
-                                {
-                                  add = 4 * g1_add + corner;
-                                  lon = grid1_corner_lon[add];
-                                  lat = grid1_corner_lat[add];
-                                  g1_add2 = g1_add + 1;
-                                  if (g1_add + nlon1 > gridsize1)
-                                    {
-                                      cdoWarning("Can't find cell below upper left");
-                                      continue;
-                                    }
-                                  g1_add3 = g1_add + nlon1;
-                                  for (corner2 = 0; corner2 < 4; corner2++)
-                                    {
-                                      lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
-                                      lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
-                                      lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
-                                      lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
-                                      if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
-                                          || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
-                                        c_flag[corner] = 1;
-                                    }
-                                }
-                              for (corner = 0; corner < 4; corner++)
-                                if (!c_flag[corner]) break;
-                              on_up = grid1_corner_lon[4 * g1_add + corner];
-                              ax_le = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
-                            }
-
-                          /* upper right cell */
-                          if ((y1 == y2 * yinc) && (x1 == (x2 + 1) * xinc - 1))
-                            {
-                              c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
-                              for (corner = 0; corner < 4; corner++)
-                                {
-                                  add = 4 * g1_add + corner;
-                                  lon = grid1_corner_lon[add];
-                                  lat = grid1_corner_lat[add];
-                                  g1_add2 = g1_add - 1;
-                                  if (g1_add + nlon1 > gridsize1)
-                                    {
-                                      cdoWarning("Can't find cell below upper left");
-                                      continue;
-                                    }
-                                  g1_add3 = g1_add + nlon1;
-                                  for (corner2 = 0; corner2 < 4; corner2++)
-                                    {
-                                      lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
-                                      lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
-                                      lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
-                                      lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
-                                      if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
-                                          || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
-                                        c_flag[corner] = 1;
-                                    }
-                                }
-                              for (corner = 0; corner < 4; corner++)
-                                if (!c_flag[corner]) break;
-                              ox_up = grid1_corner_lon[4 * g1_add + corner];
-                              ax_ri = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
-                            }
-
-                          /* lower right cell */
-                          if ((y1 == (y2 + 1) * yinc - 1) && (x1 == (x2 + 1) * xinc - 1))
-                            {
-                              c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
-                              for (corner = 0; corner < 4; corner++)
-                                {
-                                  add = 4 * g1_add + corner;
-                                  lon = grid1_corner_lon[add];
-                                  lat = grid1_corner_lat[add];
-                                  g1_add2 = g1_add - 1;
-                                  if (g1_add < nlon1)
-                                    {
-                                      cdoWarning("Can't find cell above lower "
-                                                 "right left");
-                                      continue;
-                                    }
-                                  g1_add3 = g1_add - nlon1;
-                                  for (corner2 = 0; corner2 < 4; corner2++)
-                                    {
-                                      lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
-                                      lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
-                                      lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
-                                      lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
-                                      if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
-                                          || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
-                                        c_flag[corner] = 1;
-                                    }
-                                }
-                              for (corner = 0; corner < 4; corner++)
-                                if (!c_flag[corner]) break;
-                              ox_lo = grid1_corner_lon[4 * g1_add + corner];
-                              an_ri = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
-                            }
-
-                          /* lower left cell */
-                          if ((y1 == (y2 + 1) * yinc - 1) && (x1 == x2 * xinc))
-                            {
-                              c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
-                              for (corner = 0; corner < 4; corner++)
-                                {
-                                  add = 4 * g1_add + corner;
-                                  lon = grid1_corner_lon[add];
-                                  lat = grid1_corner_lat[add];
-                                  g1_add2 = g1_add + 1;
-                                  if (g1_add < nlon1)
-                                    {
-                                      cdoWarning("Can't find cell above lower "
-                                                 "right left");
-                                      continue;
-                                    }
-                                  g1_add3 = g1_add - nlon1;
-                                  for (corner2 = 0; corner2 < 4; corner2++)
-                                    {
-                                      lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
-                                      lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
-                                      lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
-                                      lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
-                                      if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
-                                          || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
-                                        c_flag[corner] = 1;
-                                    }
-                                }
-                              for (corner = 0; corner < 4; corner++)
-                                if (!c_flag[corner]) break;
-                              on_lo = grid1_corner_lon[4 * g1_add + corner];
-                              an_le = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3) cdoWarning("found two matching corners!");
-                            }
-                        } /* if ( gridHasBounds) */
-                    }     /* for ( x1 = x2*xinc; x1 < xinc*(x2+1) ; x1++ ) */
-                }         /* for ( y1 = y2*yinc; y1 < yinc*(y2+1); y1++ ) */
-
-              if (gridHasBounds)
-                {
-                  /* upper left corner */
-                  grid2_corner_lon[4 * g2_add + 3] = on_up;
-                  grid2_corner_lat[4 * g2_add + 3] = ax_le;
-                  /* upper right corner */
-                  grid2_corner_lon[4 * g2_add + 2] = ox_up;
-                  grid2_corner_lat[4 * g2_add + 2] = ax_ri;
-                  /* lower right corner */
-                  grid2_corner_lon[4 * g2_add + 1] = ox_lo;
-                  grid2_corner_lat[4 * g2_add + 1] = an_ri;
-                  /* lower left corner */
-                  grid2_corner_lon[4 * g2_add + 0] = on_lo;
-                  grid2_corner_lat[4 * g2_add + 0] = an_le;
-                }
-
-              //  while ( xvals2[g2_add] >  180. ) xvals2[g2_add] -= 360.;
-              //  while ( xvals2[g2_add] < -180. ) xvals2[g2_add] += 360.;
-            } /* for ( x2 = 0; x2 < nlon2; x2++ ) */
-        }     /* for ( y2 = 0; y2 < nlat2; y2++ ) */
-
-      gridDefXvals(gridID2, xvals2);
-      gridDefYvals(gridID2, yvals2);
-
-      Free(xvals2);
-      Free(yvals2);
-
-      Free(xvals1);
-      Free(yvals1);
-
-      if (gridHasBounds)
-        {
-          gridDefNvertex(gridID2, 4);
-          gridDefXbounds(gridID2, grid2_corner_lon);
-          gridDefYbounds(gridID2, grid2_corner_lat);
-
-          Free(grid2_corner_lon);
-          Free(grid2_corner_lat);
-
-          Free(grid1_corner_lon);
-          Free(grid1_corner_lat);
-        }
-    } /* else if ( gridtype == GRID_CURVILINEAR ) */
+      genBoxGridCurv2D(gridID1, xinc, yinc, gridID2);
+    }
   else
     {
       cdoAbort("Unsupported grid: %s", gridNamePtr(gridtype));
@@ -571,8 +574,7 @@ Gridboxstat(void *process)
 
   int gridID1 = vlistGrid(vlistID1, 0);
   if (gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED)
-    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a "
-             "regular grid!");
+    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
   int gridID2 = genBoxGrid(gridID1, xinc, yinc);
   for (int index = 0; index < ngrids; index++) vlistChangeGridIndex(vlistID2, index, gridID2);
@@ -596,7 +598,6 @@ Gridboxstat(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       for (int recID = 0; recID < nrecs; recID++)

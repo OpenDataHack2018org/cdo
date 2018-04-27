@@ -268,22 +268,22 @@ printMap(int nlon, int nlat, double *array, double missval, double min, double m
   fflush(stdout);
 }
 
-typedef struct
+struct Infostat
 {
   double min, max, sum, sumi;
   size_t nvals, nmiss, nlevs;
-} infostat_type;
+};
 
 static void
-infostat_init(infostat_type *infostat)
+infostatInit(Infostat &infostat)
 {
-  infostat->nvals = 0;
-  infostat->nmiss = 0;
-  infostat->nlevs = 0;
-  infostat->min = DBL_MAX;
-  infostat->max = -DBL_MAX;
-  infostat->sum = 0;
-  infostat->sumi = 0;
+  infostat.nvals = 0;
+  infostat.nmiss = 0;
+  infostat.nlevs = 0;
+  infostat.min = DBL_MAX;
+  infostat.max = -DBL_MAX;
+  infostat.sum = 0;
+  infostat.sumi = 0;
 }
 
 void *
@@ -337,12 +337,12 @@ Info(void *process)
       int nvars = vlistNvars(vlistID);
       if (nvars == 0) continue;
 
-      infostat_type *infostat = (infostat_type *) Malloc(nvars * sizeof(infostat_type));
+      std::vector<Infostat> infostat(nvars);
 
       size_t gridsizemax = vlistGridsizeMax(vlistID);
       if (vlistNumber(vlistID) != CDI_REAL) gridsizemax *= 2;
 
-      double *array = (double *) Malloc(gridsizemax * sizeof(double));
+      std::vector<double> array(gridsizemax);
 
       int indg = 0;
       int tsID = 0;
@@ -355,7 +355,7 @@ Info(void *process)
           date2str(vdate, vdatestr, sizeof(vdatestr));
           time2str(vtime, vtimestr, sizeof(vtimestr));
 
-          for (varID = 0; varID < nvars; ++varID) infostat_init(&infostat[varID]);
+          for (varID = 0; varID < nvars; ++varID) infostatInit(infostat[varID]);
 
           for (int recID = 0; recID < nrecs; ++recID)
             {
@@ -379,9 +379,8 @@ Info(void *process)
                 }
 
               pstreamInqRecord(streamID, &varID, &levelID);
-              pstreamReadRecord(streamID, array, &nmiss);
+              pstreamReadRecord(streamID, array.data(), &nmiss);
 
-              infostat_type *infostatp = &infostat[varID];
               indg = (operatorID == XINFON) ? varID + 1 : indg + 1;
 
               int param = vlistInqVarParam(vlistID, varID);
@@ -396,8 +395,9 @@ Info(void *process)
 
               bool loutput = (operatorID != XINFON);
 
-              if (loutput) infostat_init(infostatp);
+              if (loutput) infostatInit(infostat[varID]);
 
+              Infostat *infostatp = &infostat[varID];
               infostatp->nlevs += 1;
               infostatp->nmiss += nmiss;
 
@@ -442,7 +442,7 @@ Info(void *process)
                   if (infostatp->nmiss > 0)
                     {
                       size_t nvals
-                          = arrayMinMaxSumMV(gridsize, array, missval, &infostatp->min, &infostatp->max, &infostatp->sum);
+                          = arrayMinMaxSumMV(gridsize, array.data(), missval, &infostatp->min, &infostatp->max, &infostatp->sum);
                       imiss = gridsize - nvals;
                       infostatp->nvals += nvals;
                     }
@@ -456,7 +456,7 @@ Info(void *process)
                     }
                   else
                     {
-                      arrayMinMaxSum(gridsize, array, &infostatp->min, &infostatp->max, &infostatp->sum);
+                      arrayMinMaxSum(gridsize, array.data(), &infostatp->min, &infostatp->max, &infostatp->sum);
                       infostatp->nvals += gridsize;
                     }
 
@@ -546,7 +546,7 @@ Info(void *process)
                       || gridInqType(gridID) == GRID_CURVILINEAR
                       || (gridInqType(gridID) == GRID_GENERIC && nlon * nlat == gridInqSize(gridID) && nlon < 1024))
                     {
-                      printMap(nlon, nlat, array, missval, infostatp->min, infostatp->max);
+                      printMap(nlon, nlat, array.data(), missval, infostatp->min, infostatp->max);
                     }
                 }
             }
@@ -554,9 +554,6 @@ Info(void *process)
         }
 
       pstreamClose(streamID);
-
-      if (array) Free(array);
-      if (infostat) Free(infostat);
     }
 
   dtlist_delete(dtlist);
