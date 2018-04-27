@@ -20,11 +20,11 @@
 
 #include <cdi.h>
 
-#if defined(HAVE_HDF5_H)
+#ifdef HAVE_HDF5_H
 #include <hdf5.h>
 #endif
 
-#if defined(HAVE_ZLIB_H)
+#ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
 
@@ -32,11 +32,11 @@
 #include <libxml/xmlversion.h>
 #endif
 
-#if defined(HAVE_CURL_CURL_H)
+#ifdef HAVE_CURL_CURL_H
 #include <curl/curl.h>
 #endif
 
-#if defined(HAVE_PROJ_API_H)
+#ifdef HAVE_PROJ_API_H
 #include <proj_api.h>
 #endif
 
@@ -65,10 +65,10 @@ printFeatures(void)
 #ifdef __cplusplus
   fprintf(stderr, " C++%d", (int) ((__cplusplus - (__cplusplus / 10000) * 10000) / 100));
 #endif
-#if defined(HAVE_CF_INTERFACE)
+#ifdef HAVE_CF_INTERFACE
   fprintf(stderr, " Fortran");
 #endif
-#if defined(ENABLE_DATA)
+#ifdef ENABLE_DATA
   fprintf(stderr, " DATA");
 #endif
 #ifdef HAVE_LIBPTHREAD
@@ -103,7 +103,7 @@ printFeatures(void)
   fprintf(stderr, " SZ");
 #endif
 /*
-#if defined(HAVE_LIBZ)
+#ifdef HAVE_LIBZ
 fprintf(stderr, " Z");
 #endif
 */
@@ -151,9 +151,9 @@ void
 printLibraries(void)
 {
   fprintf(stderr, "Libraries:");
-#if defined(HAVE_LIBHDF5)
+#ifdef HAVE_LIBHDF5
   fprintf(stderr, " HDF5");
-#if defined(H5_VERS_MAJOR)
+#ifdef H5_VERS_MAJOR
   unsigned h5h_majnum = H5_VERS_MAJOR, h5h_minnum = H5_VERS_MINOR, h5h_relnum = H5_VERS_RELEASE;
   fprintf(stderr, "/%u.%u.%u", h5h_majnum, h5h_minnum, h5h_relnum);
 
@@ -164,10 +164,10 @@ printLibraries(void)
 #endif
 #endif
 /*
-#if defined(HAVE_LIBZ)
+#ifdef HAVE_LIBZ
 {
   fprintf(stderr, " zlib/%s", zlibVersion());
-#if defined(ZLIB_VERSION)
+#ifdef ZLIB_VERSION
   if ( strcmp(ZLIB_VERSION, zlibVersion()) != 0 )
     fprintf(stderr, "(h%s)", ZLIB_VERSION);
 #else
@@ -178,21 +178,21 @@ printLibraries(void)
 */
 #ifdef HAVE_LIBPROJ
   fprintf(stderr, " proj");
-#if defined(PJ_VERSION)
+#ifdef PJ_VERSION
   fprintf(stderr, "/%g", PJ_VERSION * 0.01);
 #endif
 #endif
 
 #ifdef HAVE_LIBCMOR
   fprintf(stderr, " CMOR");
-#if defined(CMOR_VERSION_MAJOR)
+#ifdef CMOR_VERSION_MAJOR
   fprintf(stderr, "/%u.%u.%u", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR, CMOR_VERSION_PATCH);
 #endif
 #endif
 
 #ifdef HAVE_LIBXML2
   fprintf(stderr, " xml2");
-#if defined(LIBXML_DOTTED_VERSION)
+#ifdef LIBXML_DOTTED_VERSION
   fprintf(stderr, "/%s", LIBXML_DOTTED_VERSION);
 #endif
 #endif

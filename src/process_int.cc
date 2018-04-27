@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_PTHREAD_H)
+#ifdef HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
 #ifdef _OPENMP
@@ -391,22 +391,6 @@ cdoValidateProcesses()
   for (auto &process : Process)
     {
       process.second.checkStreamCnt();
-    }
-}
-
-void
-cdoStreamClose(int p_pstreamIDX)
-{
-  ProcessType &process = processSelf();
-  if (p_pstreamIDX >= process.getInStreamCnt())
-    {
-      process.outputStreams[p_pstreamIDX - process.getInStreamCnt()]->close();
-    }
-  else if (p_pstreamIDX < process.getInStreamCnt() + process.getOutStreamCnt())
-    {
-      PstreamType *pstream = process.inputStreams[p_pstreamIDX];
-      pstream->close();
-      process.addNvals(pstream->getNvals());
     }
 }
 

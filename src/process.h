@@ -15,8 +15,8 @@
   GNU General Public License for more details.
 */
 
-#ifndef _PROCESS_H
-#define _PROCESS_H
+#ifndef PROCESS_H
+#define PROCESS_H
 
 #include "pstream.h"
 #include "modules.h"
@@ -164,4 +164,4 @@ private:
   void defPrompt();
 };
 
-#endif /* _PROCESS_H */
+#endif /* PROCESS_H */
