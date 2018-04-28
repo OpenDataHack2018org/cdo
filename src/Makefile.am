@@ -335,6 +335,7 @@ cdo_SOURCES += Adisit.cc        \
                Selrec.cc        \
                Seltime.cc       \
                Selvar.cc        \
+               Selyearidx.cc    \
                Set.cc           \
                Setattribute.cc  \
                Setbox.cc        \

@@ -1552,10 +1552,11 @@ void init_modules()
   add_module("Selrec"        , {Selrec        , SelvarHelp        , SelrecOperators        , 1 , CDI_BOTH , 1  , 1  });
   add_module("Seloperator"   , {Seloperator   , {}                , SeloperatorOperators   , 1 , CDI_REAL , 1  , 1  });
   add_module("Seltime"       , {Seltime       , SeltimeHelp       , SeltimeOperators       , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Selyearidx"    , {Selyearidx    , {}                , SelyearidxOperators    , 1 , CDI_REAL , 2  , 1  });
   add_module("Set"           , {Set           , SetHelp           , SetOperators           , 1 , CDI_BOTH , 1  , 1  });
   add_module("Setattribute"  , {Setattribute  , SetattributeHelp  , SetattributeOperators  , 1 , CDI_REAL , 1  , 1  });
   add_module("Setbox"        , {Setbox        , SetboxHelp        , SetboxOperators        , 1 , CDI_REAL , 1  , 1  });
-  //add_module("Setgatt"       , {Setgatt       , SetgattHelp       , SetgattOperators       , 1 , CDI_BOTH , 1  , 1  });  
+  add_module("Setgatt"       , {Setgatt       , {}                , SetgattOperators       , 1 , CDI_BOTH , 1  , 1  });  
   add_module("Setgrid"       , {Setgrid       , SetgridHelp       , SetgridOperators       , 1 , CDI_BOTH , 1  , 1  });
   add_module("Sethalo"       , {Sethalo       , SethaloHelp       , SethaloOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Setmiss"       , {Setmiss       , SetmissHelp       , SetmissOperators       , 1 , CDI_REAL , 1  , 1  });

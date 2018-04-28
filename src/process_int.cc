@@ -437,7 +437,7 @@ cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
   int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
   if (outStreamIDX > process.getOutStreamCnt() || outStreamIDX < 0)
     {
-      ERROR("outstream ", outStreamIDX, " of ", process.m_ID, " not found.", "Was called with streamIDX = ", p_outStreamIDX);
+      ERROR("outstream ", outStreamIDX, " of ", process.m_ID, " not found.", " Was called with streamIDX = ", p_outStreamIDX);
     }
   PstreamType *outStream = process.outputStreams[outStreamIDX];
 

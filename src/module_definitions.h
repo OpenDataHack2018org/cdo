@@ -135,6 +135,7 @@ void *Selvar(void *argument);
 void *Seloperator(void *argument);
 void *Selrec(void *argument);
 void *Seltime(void *argument);
+void *Selyearidx(void *argument);
 void *Set(void *argument);
 void *Setattribute(void *argument);
 void *Setbox(void *argument);
