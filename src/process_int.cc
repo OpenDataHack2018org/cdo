@@ -100,11 +100,11 @@ cdoStreamInqTimestep(int pstreamID, int tsID)
   PstreamType *pstreamptr = pstreamToPointer(pstreamID);
   nrecs = pstreamInqTimestep(pstreamptr, tsID);
   Cdo_Debug(CdoDebug::PROCESS, "tsID: ", tsID, " ", pstreamptr->tsID);
-  if (nrecs && tsID == pstreamptr->tsID)
+  if (nrecs)
     {
-      Cdo_Debug(CdoDebug::PROCESS, "Increasing Timestep cnt");
       process.timesteps.insert(tsID);
       process.ntimesteps = process.timesteps.size();
+      Cdo_Debug(CdoDebug::PROCESS, "Timestep cnt for process: ", process.prompt, ": ", process.ntimesteps);
     }
   return nrecs;
 }
