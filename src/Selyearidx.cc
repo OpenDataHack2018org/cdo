@@ -89,6 +89,8 @@ Selyearidx(void *process)
       cdiDecodeDate(vdate, &year, &month, &day);
       int year1 = year;
 
+      bool lexactdate = gridsizemax == 1 && nrecs == 1;
+
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
@@ -119,7 +121,10 @@ Selyearidx(void *process)
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
               for (size_t i = 0; i < gridsize; ++i)
                 if ( nsets == (int) lround(vars1[varID][levelID].ptr[i]))
-                  vars2[varID][levelID].ptr[i] = array[i];
+                  {
+                    vars2[varID][levelID].ptr[i] = array[i];
+                    if (lexactdate) taxisCopyTimestep(taxisID3, taxisID2);
+                  }
             }
 
           nsets++;
@@ -128,7 +133,7 @@ Selyearidx(void *process)
 
       if ( nsets )
         {
-          taxisCopyTimestep(taxisID3, taxisID1);
+          if (!lexactdate) taxisCopyTimestep(taxisID3, taxisID1);
           pstreamDefTimestep(streamID3, tsID3);
 
           for (int recID = 0; recID < maxrecs; recID++)
