@@ -40,7 +40,7 @@
 void *
 Timselstat(void *process)
 {
-  int timestat_date = TIMESTAT_MEAN;
+  TimeStat timestat_date = TimeStat::MEAN;
   int nrecs = 0;
   int varID, levelID;
   int tsID;

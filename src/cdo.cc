@@ -106,6 +106,8 @@ void streamGrbDefDataScanningMode(int scanmode);
 void cdoConfig(const char *option);
 void setCellSearchMethod(const char *methodstr);
 void setPointSearchMethod(const char *methodstr);
+void setTimestatDate(const char *optarg);
+
 
 #define PRINT_RLIMIT(resource)                                                           \
   {                                                                                      \
@@ -1229,18 +1231,7 @@ parse_options_long(int argc, char *argv[])
             }
           else if (ltimestat_date)
             {
-              int timestatdate = -1;
-              if (STR_IS_EQ(CDO_optarg, "first"))
-                timestatdate = TIMESTAT_FIRST;
-              else if (STR_IS_EQ(CDO_optarg, "last"))
-                timestatdate = TIMESTAT_LAST;
-              else if (STR_IS_EQ(CDO_optarg, "middle"))
-                timestatdate = TIMESTAT_MEAN;
-              else if (STR_IS_EQ(CDO_optarg, "midhigh"))
-                timestatdate = TIMESTAT_MIDHIGH;
-              if (timestatdate < 0) cdoAbort("option --%s: unsupported argument: %s", "timestat_date", CDO_optarg);
-              extern int CDO_Timestat_Date;
-              CDO_Timestat_Date = timestatdate;
+              setTimestatDate(CDO_optarg);
             }
           else if (ltimestat_bounds)
             {
@@ -1552,10 +1543,11 @@ void init_modules()
   add_module("Selrec"        , {Selrec        , SelvarHelp        , SelrecOperators        , 1 , CDI_BOTH , 1  , 1  });
   add_module("Seloperator"   , {Seloperator   , {}                , SeloperatorOperators   , 1 , CDI_REAL , 1  , 1  });
   add_module("Seltime"       , {Seltime       , SeltimeHelp       , SeltimeOperators       , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Selyearidx"    , {Selyearidx    , {}                , SelyearidxOperators    , 1 , CDI_REAL , 2  , 1  });
   add_module("Set"           , {Set           , SetHelp           , SetOperators           , 1 , CDI_BOTH , 1  , 1  });
   add_module("Setattribute"  , {Setattribute  , SetattributeHelp  , SetattributeOperators  , 1 , CDI_REAL , 1  , 1  });
   add_module("Setbox"        , {Setbox        , SetboxHelp        , SetboxOperators        , 1 , CDI_REAL , 1  , 1  });
-  //add_module("Setgatt"       , {Setgatt       , SetgattHelp       , SetgattOperators       , 1 , CDI_BOTH , 1  , 1  });  
+  add_module("Setgatt"       , {Setgatt       , {}                , SetgattOperators       , 1 , CDI_BOTH , 1  , 1  });  
   add_module("Setgrid"       , {Setgrid       , SetgridHelp       , SetgridOperators       , 1 , CDI_BOTH , 1  , 1  });
   add_module("Sethalo"       , {Sethalo       , SethaloHelp       , SethaloOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Setmiss"       , {Setmiss       , SetmissHelp       , SetmissOperators       , 1 , CDI_REAL , 1  , 1  });

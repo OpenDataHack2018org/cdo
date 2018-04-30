@@ -4,6 +4,8 @@ echo 1..6 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
+HAS_GRIB=`${CDO} --config has-grb`
+#
 CDOOUT=cout$$
 CDOERR=cerr$$
 #
@@ -21,7 +23,7 @@ for OPERATOR in sinfo info; do
     DEBUG_OUT="--seperateDebugFromLog Read_grib_${OPERATOR}_${FILE}.debug"
     CDOCOMMAND="$CDO $DEBUG_OUT $OPERATOR $IFILE"
 
-    if [ "@ENABLE_GRIB@" = yes ] ; then
+    if [ "${HAS_GRIB}" = yes ] ; then
       echo "Running test: $NTEST"
       echo "$CDOCOMMAND"
 

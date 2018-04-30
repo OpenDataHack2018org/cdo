@@ -39,7 +39,7 @@
 void *
 Runstat(void *process)
 {
-  int timestat_date = TIMESTAT_MEAN;
+  TimeStat timestat_date = TimeStat::MEAN;
   int varID;
   int levelID;
   size_t nmiss;

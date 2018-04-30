@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_PTHREAD_H)
+#ifdef HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
 #ifdef _OPENMP
@@ -439,22 +439,6 @@ cdoValidateProcesses()
 }
 
 void
-cdoStreamClose(int p_pstreamIDX)
-{
-  ProcessType &process = processSelf();
-  if (p_pstreamIDX >= process.getInStreamCnt())
-    {
-      process.outputStreams[p_pstreamIDX - process.getInStreamCnt()]->close();
-    }
-  else if (p_pstreamIDX < process.getInStreamCnt() + process.getOutStreamCnt())
-    {
-      PstreamType *pstream = process.inputStreams[p_pstreamIDX];
-      pstream->close();
-      process.addNvals(pstream->getNvals());
-    }
-}
-
-void
 clearProcesses()
 {
   Process.clear();
@@ -497,7 +481,7 @@ cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
   int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
   if (outStreamIDX > process.getOutStreamCnt() || outStreamIDX < 0)
     {
-      ERROR("outstream ", outStreamIDX, " of ", process.m_ID, " not found.", "Was called with streamIDX = ", p_outStreamIDX);
+      ERROR("outstream ", outStreamIDX, " of ", process.m_ID, " not found.", " Was called with streamIDX = ", p_outStreamIDX);
     }
   PstreamType *outStream = process.outputStreams[outStreamIDX];
 

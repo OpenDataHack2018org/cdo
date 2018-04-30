@@ -27,8 +27,7 @@
       Seasstat   seasvar         Seasonal variance
       Seasstat   seasvar1        Seasonal variance [Normalize by (n-1)]
       Seasstat   seasstd         Seasonal standard deviation
-      Seasstat   seasstd1        Seasonal standard deviation [Normalize by
-   (n-1)]
+      Seasstat   seasstd1        Seasonal standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>
@@ -40,7 +39,7 @@
 void *
 Seasstat(void *process)
 {
-  int timestat_date = TIMESTAT_MEAN;
+  TimeStat timestat_date = TimeStat::MEAN;
   int vdate0 = 0, vtime0 = 0;
   int vdate1 = 0, vtime1 = 0;
   int nrecs;

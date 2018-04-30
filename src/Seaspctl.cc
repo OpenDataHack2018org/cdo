@@ -32,7 +32,7 @@
 void *
 Seaspctl(void *process)
 {
-  int timestat_date = TIMESTAT_MEAN;
+  TimeStat timestat_date = TimeStat::MEAN;
   int nrecs;
   int gridID, varID, levelID;
   int year, month, day, seas0 = 0;

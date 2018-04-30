@@ -88,62 +88,65 @@ static void
 timstatAddOperators(void)
 {
   // clang-format off
-  cdoOperatorAdd("timrange",  func_range, DATE_LEN, NULL);
-  cdoOperatorAdd("timmin",    func_min,   DATE_LEN, NULL);
-  cdoOperatorAdd("timmax",    func_max,   DATE_LEN, NULL);
-  cdoOperatorAdd("timsum",    func_sum,   DATE_LEN, NULL);
-  cdoOperatorAdd("timmean",   func_mean,  DATE_LEN, NULL);
-  cdoOperatorAdd("timavg",    func_avg,   DATE_LEN, NULL);
-  cdoOperatorAdd("timvar",    func_var,   DATE_LEN, NULL);
-  cdoOperatorAdd("timvar1",   func_var1,  DATE_LEN, NULL);
-  cdoOperatorAdd("timstd",    func_std,   DATE_LEN, NULL);
-  cdoOperatorAdd("timstd1",   func_std1,  DATE_LEN, NULL);
-  cdoOperatorAdd("yearrange", func_range, YEAR_LEN, NULL);
-  cdoOperatorAdd("yearmin",   func_min,   YEAR_LEN, NULL);
-  cdoOperatorAdd("yearmax",   func_max,   YEAR_LEN, NULL);
-  cdoOperatorAdd("yearsum",   func_sum,   YEAR_LEN, NULL);
-  cdoOperatorAdd("yearmean",  func_mean,  YEAR_LEN, NULL);
-  cdoOperatorAdd("yearavg",   func_avg,   YEAR_LEN, NULL);
-  cdoOperatorAdd("yearvar",   func_var,   YEAR_LEN, NULL);
-  cdoOperatorAdd("yearvar1",  func_var1,  YEAR_LEN, NULL);
-  cdoOperatorAdd("yearstd",   func_std,   YEAR_LEN, NULL);
-  cdoOperatorAdd("yearstd1",  func_std1,  YEAR_LEN, NULL);
-  cdoOperatorAdd("monrange",  func_range, MON_LEN, NULL);
-  cdoOperatorAdd("monmin",    func_min,   MON_LEN, NULL);
-  cdoOperatorAdd("monmax",    func_max,   MON_LEN, NULL);
-  cdoOperatorAdd("monsum",    func_sum,   MON_LEN, NULL);
-  cdoOperatorAdd("monmean",   func_mean,  MON_LEN, NULL);
-  cdoOperatorAdd("monavg",    func_avg,   MON_LEN, NULL);
-  cdoOperatorAdd("monvar",    func_var,   MON_LEN, NULL);
-  cdoOperatorAdd("monvar1",   func_var1,  MON_LEN, NULL);
-  cdoOperatorAdd("monstd",    func_std,   MON_LEN, NULL);
-  cdoOperatorAdd("monstd1",   func_std1,  MON_LEN, NULL);
-  cdoOperatorAdd("dayrange",  func_range, DAY_LEN, NULL);
-  cdoOperatorAdd("daymin",    func_min,   DAY_LEN, NULL);
-  cdoOperatorAdd("daymax",    func_max,   DAY_LEN, NULL);
-  cdoOperatorAdd("daysum",    func_sum,   DAY_LEN, NULL);
-  cdoOperatorAdd("daymean",   func_mean,  DAY_LEN, NULL);
-  cdoOperatorAdd("dayavg",    func_avg,   DAY_LEN, NULL);
-  cdoOperatorAdd("dayvar",    func_var,   DAY_LEN, NULL);
-  cdoOperatorAdd("dayvar1",   func_var1,  DAY_LEN, NULL);
-  cdoOperatorAdd("daystd",    func_std,   DAY_LEN, NULL);
-  cdoOperatorAdd("daystd1",   func_std1,  DAY_LEN, NULL);
-  cdoOperatorAdd("hourrange", func_range, HOUR_LEN, NULL);
-  cdoOperatorAdd("hourmin",   func_min,   HOUR_LEN, NULL);
-  cdoOperatorAdd("hourmax",   func_max,   HOUR_LEN, NULL);
-  cdoOperatorAdd("hoursum",   func_sum,   HOUR_LEN, NULL);
-  cdoOperatorAdd("hourmean",  func_mean,  HOUR_LEN, NULL);
-  cdoOperatorAdd("houravg",   func_avg,   HOUR_LEN, NULL);
-  cdoOperatorAdd("hourvar",   func_var,   HOUR_LEN, NULL);
-  cdoOperatorAdd("hourvar1",  func_var1,  HOUR_LEN, NULL);
-  cdoOperatorAdd("hourstd",   func_std,   HOUR_LEN, NULL);
-  cdoOperatorAdd("hourstd1",  func_std1,  HOUR_LEN, NULL);
+  cdoOperatorAdd("timrange",   func_range,  DATE_LEN, NULL);
+  cdoOperatorAdd("timmin",     func_min,    DATE_LEN, NULL);
+  cdoOperatorAdd("timmax",     func_max,    DATE_LEN, NULL);
+  cdoOperatorAdd("timsum",     func_sum,    DATE_LEN, NULL);
+  cdoOperatorAdd("timmean",    func_mean,   DATE_LEN, NULL);
+  cdoOperatorAdd("timavg",     func_avg,    DATE_LEN, NULL);
+  cdoOperatorAdd("timvar",     func_var,    DATE_LEN, NULL);
+  cdoOperatorAdd("timvar1",    func_var1,   DATE_LEN, NULL);
+  cdoOperatorAdd("timstd",     func_std,    DATE_LEN, NULL);
+  cdoOperatorAdd("timstd1",    func_std1,   DATE_LEN, NULL);
+  cdoOperatorAdd("yearrange",  func_range,  YEAR_LEN, NULL);
+  cdoOperatorAdd("yearmin",    func_min,    YEAR_LEN, NULL);
+  cdoOperatorAdd("yearmax",    func_max,    YEAR_LEN, NULL);
+  cdoOperatorAdd("yearminidx", func_minidx, YEAR_LEN, NULL);
+  cdoOperatorAdd("yearmaxidx", func_maxidx, YEAR_LEN, NULL);
+  cdoOperatorAdd("yearsum",    func_sum,    YEAR_LEN, NULL);
+  cdoOperatorAdd("yearmean",   func_mean,   YEAR_LEN, NULL);
+  cdoOperatorAdd("yearavg",    func_avg,    YEAR_LEN, NULL);
+  cdoOperatorAdd("yearvar",    func_var,    YEAR_LEN, NULL);
+  cdoOperatorAdd("yearvar1",   func_var1,   YEAR_LEN, NULL);
+  cdoOperatorAdd("yearstd",    func_std,    YEAR_LEN, NULL);
+  cdoOperatorAdd("yearstd1",   func_std1,   YEAR_LEN, NULL);
+  cdoOperatorAdd("monrange",   func_range,  MON_LEN, NULL);
+  cdoOperatorAdd("monmin",     func_min,    MON_LEN, NULL);
+  cdoOperatorAdd("monmax",     func_max,    MON_LEN, NULL);
+  cdoOperatorAdd("monsum",     func_sum,    MON_LEN, NULL);
+  cdoOperatorAdd("monmean",    func_mean,   MON_LEN, NULL);
+  cdoOperatorAdd("monavg",     func_avg,    MON_LEN, NULL);
+  cdoOperatorAdd("monvar",     func_var,    MON_LEN, NULL);
+  cdoOperatorAdd("monvar1",    func_var1,   MON_LEN, NULL);
+  cdoOperatorAdd("monstd",     func_std,    MON_LEN, NULL);
+  cdoOperatorAdd("monstd1",    func_std1,   MON_LEN, NULL);
+  cdoOperatorAdd("dayrange",   func_range,  DAY_LEN, NULL);
+  cdoOperatorAdd("daymin",     func_min,    DAY_LEN, NULL);
+  cdoOperatorAdd("daymax",     func_max,    DAY_LEN, NULL);
+  cdoOperatorAdd("daysum",     func_sum,    DAY_LEN, NULL);
+  cdoOperatorAdd("daymean",    func_mean,   DAY_LEN, NULL);
+  cdoOperatorAdd("dayavg",     func_avg,    DAY_LEN, NULL);
+  cdoOperatorAdd("dayvar",     func_var,    DAY_LEN, NULL);
+  cdoOperatorAdd("dayvar1",    func_var1,   DAY_LEN, NULL);
+  cdoOperatorAdd("daystd",     func_std,    DAY_LEN, NULL);
+  cdoOperatorAdd("daystd1",    func_std1,   DAY_LEN, NULL);
+  cdoOperatorAdd("hourrange",  func_range,  HOUR_LEN, NULL);
+  cdoOperatorAdd("hourmin",    func_min,    HOUR_LEN, NULL);
+  cdoOperatorAdd("hourmax",    func_max,    HOUR_LEN, NULL);
+  cdoOperatorAdd("hoursum",    func_sum,    HOUR_LEN, NULL);
+  cdoOperatorAdd("hourmean",   func_mean,   HOUR_LEN, NULL);
+  cdoOperatorAdd("houravg",    func_avg,    HOUR_LEN, NULL);
+  cdoOperatorAdd("hourvar",    func_var,    HOUR_LEN, NULL);
+  cdoOperatorAdd("hourvar1",   func_var1,   HOUR_LEN, NULL);
+  cdoOperatorAdd("hourstd",    func_std,    HOUR_LEN, NULL);
+  cdoOperatorAdd("hourstd1",   func_std1,   HOUR_LEN, NULL);
+  // clang-format on
 }
 
 
 void *Timstat(void *argument)
 {
-  int timestat_date = TIMESTAT_MEAN;
+  TimeStat timestat_date = TimeStat::MEAN;
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID;
@@ -164,11 +167,12 @@ void *Timstat(void *argument)
   int comparelen = cdoOperatorF2(operatorID);
 
   bool lrange  = operfunc == func_range;
+  bool lminidx = operfunc == func_minidx;
+  bool lmaxidx = operfunc == func_maxidx;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
-  // clang-format on
 
   if (operfunc == func_mean)
     {
@@ -266,7 +270,7 @@ void *Timstat(void *argument)
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **vars2 = NULL;
-  if (lvarstd || lrange) vars2 = field_malloc(vlistID1, FIELD_PTR);
+  if (lvarstd || lrange || lminidx || lmaxidx) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
   int otsID = 0;
@@ -311,6 +315,12 @@ void *Timstat(void *argument)
                       pvars2->nmiss = nmiss;
                       for (size_t i = 0; i < nwpv * gridsize; i++) pvars2->ptr[i] = pvars1->ptr[i];
                     }
+                  else if (lminidx || lmaxidx)
+                    {
+                      pvars2->nmiss = nmiss;
+                      for (size_t i = 0; i < nwpv * gridsize; i++) pvars2->ptr[i] = pvars1->ptr[i];
+                      for (size_t i = 0; i < nwpv * gridsize; i++) pvars1->ptr[i] = 0;
+                    }
 
                   if (nmiss > 0 || psamp1->ptr)
                     {
@@ -351,6 +361,14 @@ void *Timstat(void *argument)
                     {
                       farmin(pvars2, field);
                       farmax(pvars1, field);
+                    }
+                  else if (lminidx)
+                    {
+                      farminidx(pvars1, pvars2, field, nsets);
+                    }
+                  else if (lmaxidx)
+                    {
+                      farmaxidx(pvars1, pvars2, field, nsets);
                     }
                   else
                     {
@@ -500,7 +518,7 @@ void *Timstat(void *argument)
 
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
-  if (lvarstd || lrange) field_free(vars2, vlistID1);
+  if (lvarstd || lrange || lminidx || lmaxidx) field_free(vars2, vlistID1);
 
   dtlist_delete(dtlist);
 

@@ -4,6 +4,8 @@ echo 1..2 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
+HAS_NETCDF=`${CDO} --config has-nc`
+#
 NTEST=1
 #
 for OPERATOR in reducegrid; do
@@ -15,7 +17,7 @@ for OPERATOR in reducegrid; do
 
     CDOTEST="$OPERATOR on grid ${grid}"
 
-    if [ "@ENABLE_NETCDF@" = yes ] ; then
+    if [ "${HAS_NETCDF}" = yes ] ; then
 
       $CDO $DEBUG_OUT -f nc -temp,$REFGRID data_${grid}.nc
       $CDO $DEBUG_OUT -f nc -gtc,273.15 -temp,$REFGRID mask_${grid}.nc

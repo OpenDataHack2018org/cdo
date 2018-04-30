@@ -14,15 +14,19 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef _DATETIME_H
-#define _DATETIME_H
+#ifndef DATETIME_H
+#define DATETIME_H
 
 #include <stdio.h>
 
-#define TIMESTAT_FIRST 1
-#define TIMESTAT_LAST 2
-#define TIMESTAT_MEAN 3
-#define TIMESTAT_MIDHIGH 4
+enum struct TimeStat
+{
+  UNDEF,
+  FIRST,
+  LAST,
+  MEAN,
+  MIDHIGH,
+};
 
 typedef struct
 {
@@ -49,7 +53,7 @@ typedef struct
   size_t size;
   int has_bounds;
   int calendar;
-  int stat;
+  TimeStat stat;
   int timestat_date;
   dtinfo_type timestat;
   dtinfo_type *dtinfo;
@@ -66,7 +70,7 @@ void datetime_avg(int dpy, int ndates, cdo_datetime_t *datetime);
 dtlist_type *dtlist_new(void);
 void dtlist_delete(dtlist_type *dtlist);
 void dtlist_shift(dtlist_type *dtlist);
-void dtlist_set_stat(dtlist_type *dtlist, int stat);
+void dtlist_set_stat(dtlist_type *dtlist, TimeStat stat);
 void dtlist_set_calendar(dtlist_type *dtlist, int calendar);
 int dtlist_get_vdate(dtlist_type *dtlist, int tsID);
 int dtlist_get_vtime(dtlist_type *dtlist, int tsID);
@@ -74,4 +78,4 @@ void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID);
 void dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID);
 void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps);
 
-#endif /* _DATETIME_H */
+#endif /* DATETIME_H */

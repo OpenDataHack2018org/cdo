@@ -4,6 +4,8 @@ echo 1..2 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
+HAS_NETCDF=`${CDO} --config has-nc`
+#
 ABSLIM=0.001
 CDOOUT=cout$$
 CDOERR=cerr$$
@@ -22,7 +24,7 @@ for X in 1 2; do
   DEBUG_OUT="--seperateDebugFromLog Remapeta_${X}.debug"
   CDOCOMMAND="$CDO $DEBUG_OUT remapeta,$VCT $IFILE $OFILE"
 
-  if [ "@ENABLE_NETCDF@" = yes ] ; then
+  if [ "${HAS_NETCDF}" = yes ] ; then
     echo "Running test: $NTEST"
     echo "$CDOCOMMAND"
 

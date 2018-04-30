@@ -12,13 +12,13 @@
     },
     "mistral": {
       "hostname": "mistral.dkrz.de",
-      "dir": "/work/mh0287/users/ralf/builds/remote",
+      "dir": "/work/mh0287/users/ralf/builds/remote/cdo",
       "envConfigFiles": ["/etc/profile",".profile"],
       "CC": ["gcc","g++","icc","icpc"]
     },
     "cygwin": {
       "hostname": "cdo4windows-cyg.mpimet.mpg.de",
-      "dir": "/home/mpimet/ralf/builds/remote",
+      "dir": "/home/mpimet/ralf/builds/remote/cdo",
       "username": "mpimet",
       "CC": ["gcc","g++"]
     },
@@ -30,7 +30,7 @@
     },
     "wanglung": {
       "hostname": "wanglung.mpimet.mpg.de",
-      "dir": "/home/zmaw/m300064/builds/remote",
+      "dir": "/home/zmaw/m300064/builds/remote/cdo",
       "username": "m300064",
       "CC": ["icc","pgcc","cray","gcc"]
     },
