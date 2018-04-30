@@ -44,17 +44,20 @@ go_bandit([]() {
     testArgv.push_back(prefix + wildcards[wildCardIDX] + suffix);
   }
 
+  //for ignoring non wildcard elements as '[' and ']'
+  int k = 2;
   //--------------------------------------------------------------------------
   bandit::describe("Expanding wildcard", [&]() {
     std::vector<std::string> expandedWildCards = expandWildCards(testArgv);
     for (unsigned int j = 0; j < wildcards.size(); j++) {
       for (int i = 0; i < fileCount; i++) {
-        int argvIdx = 1 + i + (fileCount * j);
+        int argvIdx = k + i + (fileCount * j);
         bandit::it("has expanded the filename", [&]() {
           AssertThat(expandedWildCards[argvIdx],
                      snowhouse::Equals(fileNames[i]));
         });
       }
+      k += 2;
     }
     //--------------------------------------------------------------------------
   });

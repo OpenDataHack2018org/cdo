@@ -18,6 +18,8 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <iostream> // delete should not be used here 
+/*TEMP*/
 
 #include <wordexp.h>
 #include <stddef.h>
@@ -121,8 +123,9 @@ expandWildCards(std::vector<std::string> argv)
             {
               fprintf(stderr, "%s: ", __func__);
               if (status == WRDE_BADCHAR)
-                fprintf(stderr, "Argument '%s' contains one of the following unsupported unquoted characters: <newline>, `|', "
-                                "`&', `;', `<', `>', `(', `)', `{', `}'.\n",
+                fprintf(stderr,
+                        "Argument '%s' contains one of the following unsupported unquoted characters: <newline>, `|', "
+                        "`&', `;', `<', `>', `(', `)', `{', `}'.\n",
                         argv[idx].c_str());
               else if (status == WRDE_NOSPACE)
                 fprintf(stderr, "Not enough memory to store the result.\n");
@@ -133,9 +136,11 @@ expandWildCards(std::vector<std::string> argv)
               exit(EXIT_FAILURE);
             }
           // range based insert (glob_results.we_wordv is inserted before wildcard
-          argv.insert(argv.begin() + idx + 1, glob_results.we_wordv, glob_results.we_wordv + glob_results.we_wordc);
-          // delete wildcard
+          argv.insert(argv.begin() + idx + 1,"]");
+          argv.insert(argv.begin() + idx + 1,"[");
+          argv.insert(argv.begin() + idx + 2, glob_results.we_wordv, glob_results.we_wordv + glob_results.we_wordc);
           argv.erase(argv.begin() + idx);
+          // delete wildcard
           wordfree(&glob_results);
         }
     }

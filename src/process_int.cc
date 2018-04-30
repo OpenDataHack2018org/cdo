@@ -309,45 +309,62 @@ createNewProcess(ProcessType *p_parentProces, const char *argvEntry)
 }
 
 void
+handleFirstOperator(int p_argcStart, int argc, const char **argv, ProcessType *p_rootProcess)
+{
+  for (int i = p_argcStart; i < argc; i++)
+    {
+      Cdo_Debug(CdoDebug::PROCESS, "Creating new pstream for output file: ", argv[i]);
+      if (strcmp(argv[i], "]") == 0)
+        {
+          CdoError::Abort(Cdo::progname, "missing output file");
+        }
+      p_rootProcess->addFileOutStream(argv[i]);
+    }
+}
+
+void
 createProcesses(int argc, const char **argv)
 {
   Cdo_Debug(CdoDebug::PROCESS, "== Process Creation Start ==");
   Cdo_Debug(CdoDebug::PROCESS, "operators:  ", CdoDebug::argvToString(argc, argv));
+
   ProcessType *root_process = processCreate(argv[0]);
+  int cntOutFiles = (int) root_process->m_module.streamOutCnt;
 
-  ProcessType *currentProcess;
-  ProcessType *lastAdded;
-
-  int idx = 1;
-  std::stack<ProcessType *> call_stack;
-
-  call_stack.push(root_process);
-  currentProcess = call_stack.top();
-  int cntOutFiles = (int) currentProcess->m_module.streamOutCnt;
-
-  int temp_argc = argc - cntOutFiles;
-
-  for (int i = 0; i < cntOutFiles; i++)
-    {
-      Cdo_Debug(CdoDebug::PROCESS, "Creating new pstream for output file: ", argv[temp_argc + i]);
-      root_process->addFileOutStream(argv[temp_argc + i]);
-    }
-
+  unsigned int maxIdx = argc - cntOutFiles;
   if (cntOutFiles == -1)
     {
       handleObase(argv[argc - 1]);
       cntOutFiles = 1;
+      maxIdx = argc - 1;
+    }
+  else
+    {
+      handleFirstOperator(maxIdx, argc, argv, root_process);
     }
 
-  lastAdded = root_process;
-  if (idx < argc - cntOutFiles)
+  ProcessType *currentProcess;
+  ProcessType *lastAdded;
+  std::stack<ProcessType *> call_stack;
+
+  int unclosedBrackets = 0;
+  unsigned int idx = 1;
+
+  if (idx < maxIdx)
     {
+      call_stack.push(root_process);
+      currentProcess = call_stack.top();
+      lastAdded = root_process;
       const char *argvEntry;
+
       do
         {
-          argvEntry = argv[idx];
           Cdo_Debug(CdoDebug::PROCESS, "iteration ", idx, ", current argv: ", argv[idx],
                     ",  currentProcess: ", currentProcess->operatorName);
+
+          argvEntry = argv[idx];
+          //------------------------------------------------------
+          // case: operator
           if (argvEntry[0] == '-')
             {
               Cdo_Debug(CdoDebug::PROCESS, "Found new Operator: ", argvEntry);
@@ -355,25 +372,52 @@ createProcesses(int argc, const char **argv)
               lastAdded = currentProcess;
               call_stack.push(currentProcess);
             }
+          // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          // case: bracket start
+          else if (strcmp(argvEntry, "[") == 0)
+            {
+              unclosedBrackets++;
+            }
+          // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          // case: bracket end
+          else if (strcmp(argvEntry, "]") == 0)
+            {
+              unclosedBrackets--;
+              if (call_stack.top() != root_process)
+                {
+                  call_stack.pop();
+                  lastAdded = call_stack.top();
+                  currentProcess = call_stack.top();
+                }
+            }
+          // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          // case: file
           else if (currentProcess->m_module.streamInCnt != 0)
             {
               Cdo_Debug(CdoDebug::PROCESS, "adding in file to ", currentProcess->operatorName);
               currentProcess->addFileInStream(argvEntry);
             }
+          // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+          // remove finished
           while (call_stack.top()->hasAllInputs() && call_stack.top() != root_process)
             {
               Cdo_Debug(CdoDebug::PROCESS, "Removing ", call_stack.top()->operatorName, " from stack");
               call_stack.pop();
             }
+          //------------------------------------------------------
           currentProcess = call_stack.top();
           idx++;
         }
-      while (!currentProcess->hasAllInputs() && idx < argc - cntOutFiles);
+      while (!currentProcess->hasAllInputs() && idx < maxIdx);
     }
-
-  if (idx != argc - cntOutFiles)
+  //---------------------------------------------------------------
+  if (unclosedBrackets > 0)
     {
-      CdoError::Abort(Cdo::progname, " Too many input streams for operator '", lastAdded->operatorName, "'!");
+      CdoError::Abort(Cdo::progname, "Missing ']'.");
+    }
+  else if (unclosedBrackets < 0)
+    {
+      CdoError::Abort(Cdo::progname, "Missing '['.");
     }
 
   while (!call_stack.empty())
@@ -654,8 +698,9 @@ processInqPrompt(void)
   return process.inqPrompt();
 }
 
-extern "C" {
-size_t getPeakRSS();
+extern "C"
+{
+  size_t getPeakRSS();
 }
 
 void
