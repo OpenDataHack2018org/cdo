@@ -19,33 +19,50 @@
 #include "datetime.h"
 #include "util_string.h"
 
-int CDO_Timestat_Date = -1;
+TimeStat CDO_Timestat_Date = TimeStat::UNDEF;
 bool CDO_Timestat_Bounds = false;
 
+void
+setTimestatDate(const char *optarg)
+{
+  TimeStat timestatdate = TimeStat::UNDEF;
+
+  // clang-format off
+  if      (STR_IS_EQ(optarg, "first"))   timestatdate = TimeStat::FIRST;
+  else if (STR_IS_EQ(optarg, "last"))    timestatdate = TimeStat::LAST;
+  else if (STR_IS_EQ(optarg, "middle"))  timestatdate = TimeStat::MEAN;
+  else if (STR_IS_EQ(optarg, "midhigh")) timestatdate = TimeStat::MIDHIGH;
+  else if (STR_IS_EQ(optarg, "exact"))   timestatdate = TimeStat::EXACT;
+  // clang-format on
+
+  if (timestatdate == TimeStat::UNDEF) cdoAbort("option --%s: unsupported argument: %s", "timestat_date", optarg);
+
+  CDO_Timestat_Date = timestatdate;
+}
+
 static void
-get_timestat_date(int *tstat_date)
+getTimestatDate(TimeStat *tstat_date)
 {
   char *envstr = getenv("CDO_TIMESTAT_DATE");
   if (envstr == NULL) envstr = getenv("RUNSTAT_DATE");
   if (envstr)
     {
-      int env_date = -1;
+      TimeStat env_date = TimeStat::UNDEF;
       char envstrl[8];
 
       memcpy(envstrl, envstr, 8);
       envstrl[7] = 0;
       strtolower(envstrl);
 
-      if (memcmp(envstrl, "first", 5) == 0)
-        env_date = TIMESTAT_FIRST;
-      else if (memcmp(envstrl, "last", 4) == 0)
-        env_date = TIMESTAT_LAST;
-      else if (memcmp(envstrl, "middle", 6) == 0)
-        env_date = TIMESTAT_MEAN;
-      else if (memcmp(envstrl, "midhigh", 7) == 0)
-        env_date = TIMESTAT_MIDHIGH;
+      // clang-format off
+      if      (memcmp(envstrl, "first", 5) == 0)   env_date = TimeStat::FIRST;
+      else if (memcmp(envstrl, "last", 4) == 0)    env_date = TimeStat::LAST;
+      else if (memcmp(envstrl, "middle", 6) == 0)  env_date = TimeStat::MEAN;
+      else if (memcmp(envstrl, "midhigh", 7) == 0) env_date = TimeStat::MIDHIGH;
+      else if (memcmp(envstrl, "exact", 5) == 0)   env_date = TimeStat::EXACT;
+      // clang-format on
 
-      if (env_date >= 0)
+      if (env_date != TimeStat::UNDEF)
         {
           *tstat_date = env_date;
           if (cdoVerbose) cdoPrint("Set CDO_TIMESTAT_DATE to %s", envstr);
@@ -60,14 +77,12 @@ dtlist_init(dtlist_type *dtlist)
   dtlist->size = 0;
   dtlist->calendar = -1;
   dtlist->has_bounds = -1;
-  dtlist->stat = TIMESTAT_LAST;
+  dtlist->stat = TimeStat::LAST;
   dtlist->dtinfo = NULL;
 
-  if (CDO_Timestat_Date == -1)
-    {
-      CDO_Timestat_Date = 0;
-      get_timestat_date(&CDO_Timestat_Date);
-    }
+  static bool init = false;
+  if (!init) getTimestatDate(&CDO_Timestat_Date);
+  init = true;
 }
 
 dtlist_type *
@@ -239,19 +254,19 @@ dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
 {
   if ((size_t) nsteps > dtlist->size) cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps, dtlist->size);
 
-  int stat = dtlist->stat;
-  if (CDO_Timestat_Date > 0) stat = CDO_Timestat_Date;
+  TimeStat stat = dtlist->stat;
+  if (CDO_Timestat_Date != TimeStat::UNDEF) stat = CDO_Timestat_Date;
 
-  if (stat == TIMESTAT_MEAN)
+  if (stat == TimeStat::MEAN)
     dtlist_mean(dtlist, nsteps);
-  else if (stat == TIMESTAT_MIDHIGH)
+  else if (stat == TimeStat::MIDHIGH)
     dtlist_midhigh(dtlist, nsteps);
-  else if (stat == TIMESTAT_FIRST)
+  else if (stat == TimeStat::FIRST)
     dtlist->timestat.v = dtlist->dtinfo[0].v;
-  else if (stat == TIMESTAT_LAST)
+  else if (stat == TimeStat::LAST)
     dtlist->timestat.v = dtlist->dtinfo[nsteps - 1].v;
   else
-    cdoAbort("Internal error; implementation missing for timestat=%d", stat);
+    cdoAbort("Internal error; implementation missing for timestat=%d", (int)stat);
 
   if (dtlist->has_bounds)
     {
@@ -283,7 +298,7 @@ dtlist_shift(dtlist_type *dtlist)
 }
 
 void
-dtlist_set_stat(dtlist_type *dtlist, int stat)
+dtlist_set_stat(dtlist_type *dtlist, TimeStat stat)
 {
   dtlist->stat = stat;
 }

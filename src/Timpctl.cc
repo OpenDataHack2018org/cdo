@@ -36,7 +36,7 @@
 static void
 timpctl(int operatorID)
 {
-  int timestat_date = TIMESTAT_MEAN;
+  TimeStat timestat_date = TimeStat::MEAN;
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
   int nrecs;
   int gridID, varID, levelID;

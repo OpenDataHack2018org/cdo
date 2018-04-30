@@ -145,7 +145,7 @@ timstatAddOperators(void)
 
 void *Timstat(void *argument)
 {
-  int timestat_date = TIMESTAT_MEAN;
+  TimeStat timestat_date = TimeStat::MEAN;
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID;

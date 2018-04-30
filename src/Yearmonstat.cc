@@ -32,7 +32,7 @@
 void *
 Yearmonstat(void *process)
 {
-  int timestat_date = TIMESTAT_MEAN;
+  TimeStat timestat_date = TimeStat::MEAN;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
   int nrecs;

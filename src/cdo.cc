@@ -106,6 +106,8 @@ void streamGrbDefDataScanningMode(int scanmode);
 void cdoConfig(const char *option);
 void setCellSearchMethod(const char *methodstr);
 void setPointSearchMethod(const char *methodstr);
+void setTimestatDate(const char *optarg);
+
 
 #define PRINT_RLIMIT(resource)                                                           \
   {                                                                                      \
@@ -1229,18 +1231,7 @@ parse_options_long(int argc, char *argv[])
             }
           else if (ltimestat_date)
             {
-              int timestatdate = -1;
-              if (STR_IS_EQ(CDO_optarg, "first"))
-                timestatdate = TIMESTAT_FIRST;
-              else if (STR_IS_EQ(CDO_optarg, "last"))
-                timestatdate = TIMESTAT_LAST;
-              else if (STR_IS_EQ(CDO_optarg, "middle"))
-                timestatdate = TIMESTAT_MEAN;
-              else if (STR_IS_EQ(CDO_optarg, "midhigh"))
-                timestatdate = TIMESTAT_MIDHIGH;
-              if (timestatdate < 0) cdoAbort("option --%s: unsupported argument: %s", "timestat_date", CDO_optarg);
-              extern int CDO_Timestat_Date;
-              CDO_Timestat_Date = timestatdate;
+              setTimestatDate(CDO_optarg);
             }
           else if (ltimestat_bounds)
             {
