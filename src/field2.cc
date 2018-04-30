@@ -540,6 +540,65 @@ farmax(field_type *field1, field_type field2)
 }
 
 void
+farminidx(field_type *field1, field_type *field2, field_type field3, int idx)
+{
+  int nwpv = field2->nwpv;
+  int grid2 = field2->grid;
+  int grid3 = field3.grid;
+  size_t nmiss2 = field2->nmiss;
+  size_t nmiss3 = field3.nmiss;
+  double missval1 = field1->missval;
+  double missval2 = field2->missval;
+  double missval3 = field3.missval;
+  double *restrict array1 = field1->ptr;
+  double *restrict array2 = field2->ptr;
+  const double *restrict array3 = field3.ptr;
+
+  if (nwpv != 2) nwpv = 1;
+
+  size_t len = nwpv * gridInqSize(grid2);
+  if (len != (nwpv * gridInqSize(grid3))) cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  if (nmiss2 > 0 || nmiss3 > 0)
+    {
+      for (size_t i = 0; i < len; i++)
+        {
+          if ( DBL_IS_EQUAL(array3[i], missval3) )
+            {
+              if ( DBL_IS_EQUAL(array2[i], missval2) ) array1[i] = missval1;
+            }
+          else
+            {
+              if ( DBL_IS_EQUAL(array2[i], missval2) )
+                {
+                  array2[i] = array3[i];
+                  array1[i] = idx;
+                }
+              else if (array3[i] < array2[i])
+                {
+                  array2[i] = array3[i];
+                  array1[i] = idx;
+                }
+            }
+        }
+
+      field2->nmiss = arrayNumMV(len, array2, missval2);
+      field1->nmiss = arrayNumMV(len, array1, missval1);
+    }
+  else
+    {
+      for (size_t i = 0; i < len; i++)
+        {
+          if (array3[i] < array2[i])
+            {
+              array2[i] = array3[i];
+              array1[i] = idx;
+            }
+        }
+    }
+}
+
+void
 farmaxidx(field_type *field1, field_type *field2, field_type field3, int idx)
 {
   int nwpv = field2->nwpv;
@@ -565,10 +624,7 @@ farmaxidx(field_type *field1, field_type *field2, field_type field3, int idx)
         {
           if ( DBL_IS_EQUAL(array3[i], missval3) )
             {
-              if ( DBL_IS_EQUAL(array2[i], missval2) )
-                {
-                  array1[i] = missval1;
-                }
+              if ( DBL_IS_EQUAL(array2[i], missval2) ) array1[i] = missval1;
             }
           else
             {

@@ -46,7 +46,8 @@
 #define func_brs 31
 #define func_rank 32
 #define func_roc 33
-#define func_maxidx 34
+#define func_minidx 34
+#define func_maxidx 35
 
 
 #define func_add 41

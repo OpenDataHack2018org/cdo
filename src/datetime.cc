@@ -32,7 +32,6 @@ setTimestatDate(const char *optarg)
   else if (STR_IS_EQ(optarg, "last"))    timestatdate = TimeStat::LAST;
   else if (STR_IS_EQ(optarg, "middle"))  timestatdate = TimeStat::MEAN;
   else if (STR_IS_EQ(optarg, "midhigh")) timestatdate = TimeStat::MIDHIGH;
-  else if (STR_IS_EQ(optarg, "exact"))   timestatdate = TimeStat::EXACT;
   // clang-format on
 
   if (timestatdate == TimeStat::UNDEF) cdoAbort("option --%s: unsupported argument: %s", "timestat_date", optarg);
@@ -59,7 +58,6 @@ getTimestatDate(TimeStat *tstat_date)
       else if (memcmp(envstrl, "last", 4) == 0)    env_date = TimeStat::LAST;
       else if (memcmp(envstrl, "middle", 6) == 0)  env_date = TimeStat::MEAN;
       else if (memcmp(envstrl, "midhigh", 7) == 0) env_date = TimeStat::MIDHIGH;
-      else if (memcmp(envstrl, "exact", 5) == 0)   env_date = TimeStat::EXACT;
       // clang-format on
 
       if (env_date != TimeStat::UNDEF)
@@ -257,16 +255,13 @@ dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
   TimeStat stat = dtlist->stat;
   if (CDO_Timestat_Date != TimeStat::UNDEF) stat = CDO_Timestat_Date;
 
-  if (stat == TimeStat::MEAN)
-    dtlist_mean(dtlist, nsteps);
-  else if (stat == TimeStat::MIDHIGH)
-    dtlist_midhigh(dtlist, nsteps);
-  else if (stat == TimeStat::FIRST)
-    dtlist->timestat.v = dtlist->dtinfo[0].v;
-  else if (stat == TimeStat::LAST)
-    dtlist->timestat.v = dtlist->dtinfo[nsteps - 1].v;
-  else
-    cdoAbort("Internal error; implementation missing for timestat=%d", (int)stat);
+  // clang-format off
+  if      (stat == TimeStat::MEAN)    dtlist_mean(dtlist, nsteps);
+  else if (stat == TimeStat::MIDHIGH) dtlist_midhigh(dtlist, nsteps);
+  else if (stat == TimeStat::FIRST)   dtlist->timestat.v = dtlist->dtinfo[0].v;
+  else if (stat == TimeStat::LAST)    dtlist->timestat.v = dtlist->dtinfo[nsteps - 1].v;
+  else cdoAbort("Internal error; implementation missing for timestat=%d", (int)stat);
+  // clang-format on
 
   if (dtlist->has_bounds)
     {

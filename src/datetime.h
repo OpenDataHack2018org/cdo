@@ -26,7 +26,6 @@ enum struct TimeStat
   LAST,
   MEAN,
   MIDHIGH,
-  EXACT
 };
 
 typedef struct

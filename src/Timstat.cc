@@ -101,6 +101,7 @@ timstatAddOperators(void)
   cdoOperatorAdd("yearrange",  func_range,  YEAR_LEN, NULL);
   cdoOperatorAdd("yearmin",    func_min,    YEAR_LEN, NULL);
   cdoOperatorAdd("yearmax",    func_max,    YEAR_LEN, NULL);
+  cdoOperatorAdd("yearminidx", func_minidx, YEAR_LEN, NULL);
   cdoOperatorAdd("yearmaxidx", func_maxidx, YEAR_LEN, NULL);
   cdoOperatorAdd("yearsum",    func_sum,    YEAR_LEN, NULL);
   cdoOperatorAdd("yearmean",   func_mean,   YEAR_LEN, NULL);
@@ -166,6 +167,7 @@ void *Timstat(void *argument)
   int comparelen = cdoOperatorF2(operatorID);
 
   bool lrange  = operfunc == func_range;
+  bool lminidx = operfunc == func_minidx;
   bool lmaxidx = operfunc == func_maxidx;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
@@ -268,7 +270,7 @@ void *Timstat(void *argument)
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **vars2 = NULL;
-  if (lvarstd || lrange || lmaxidx) vars2 = field_malloc(vlistID1, FIELD_PTR);
+  if (lvarstd || lrange || lminidx || lmaxidx) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
   int otsID = 0;
@@ -313,7 +315,7 @@ void *Timstat(void *argument)
                       pvars2->nmiss = nmiss;
                       for (size_t i = 0; i < nwpv * gridsize; i++) pvars2->ptr[i] = pvars1->ptr[i];
                     }
-                  else if (lmaxidx)
+                  else if (lminidx || lmaxidx)
                     {
                       pvars2->nmiss = nmiss;
                       for (size_t i = 0; i < nwpv * gridsize; i++) pvars2->ptr[i] = pvars1->ptr[i];
@@ -359,6 +361,10 @@ void *Timstat(void *argument)
                     {
                       farmin(pvars2, field);
                       farmax(pvars1, field);
+                    }
+                  else if (lminidx)
+                    {
+                      farminidx(pvars1, pvars2, field, nsets);
                     }
                   else if (lmaxidx)
                     {
@@ -512,7 +518,7 @@ void *Timstat(void *argument)
 
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
-  if (lvarstd || lrange || lmaxidx) field_free(vars2, vlistID1);
+  if (lvarstd || lrange || lminidx || lmaxidx) field_free(vars2, vlistID1);
 
   dtlist_delete(dtlist);
 
