@@ -155,7 +155,7 @@ pstreamToPointer(int idx)
 void
 PstreamType::init()
 {
-  isopen = true;
+  isopen = false;
   ispipe = false;
   m_fileID = -1;
   m_vlistID = -1;
@@ -189,6 +189,7 @@ PstreamType::pstreamOpenReadPipe()
 
   if (CdoDebug::PSTREAM) MESSAGE("pipe ", pipe->name);
 
+  isopen = true;
   return self;
 #else
   cdoAbort("Cannot use pipes, pthread support not compiled in!");
@@ -221,9 +222,9 @@ PstreamType::pstreamOpenReadFile(const char *p_args)
   int fileID = streamOpenRead(filename.c_str());
   if (fileID < 0)
     {
-      isopen = false;
       cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
     }
+    isopen = true;
 
   if (cdoDefaultFileType == CDI_UNDEFID) cdoDefaultFileType = streamInqFiletype(fileID);
 
@@ -338,6 +339,7 @@ PstreamType::openAppend(const char *p_filename)
     {
       cdiOpenError(fileID, "Open failed on >%s<", p_filename);
     }
+  isopen = true;
 
   int filetype = streamInqFiletype(fileID);
   set_comp(fileID, filetype);
@@ -425,6 +427,7 @@ PstreamType::close()
       if (Threading::cdoLockIO) pthread_mutex_lock(&streamMutex);
 #endif
       streamClose(m_fileID);
+      isopen = false;
 #ifdef HAVE_LIBPTHREAD
       if (Threading::cdoLockIO) pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1027,10 +1030,11 @@ pstreamCloseAll()
 {
   for (auto pstream_iter : _pstream_map)
     {
-      if (pstream_iter.second.m_fileID != CDI_UNDEFID)
+      if (pstream_iter.second.m_fileID != CDI_UNDEFID && pstream_iter.second.isopen)
         {
           if (CdoDebug::PSTREAM) MESSAGE("Close file ", pstream_iter.second.m_name, " id ", pstream_iter.second.m_fileID);
           streamClose(pstream_iter.second.m_fileID);
+          pstream_iter.second.isopen = false;
         }
     }
   _pstream_map.clear();
@@ -1058,8 +1062,9 @@ set_comp(int fileID, int filetype)
       streamDefCompType(fileID, Options::cdoCompType);
       streamDefCompLevel(fileID, Options::cdoCompLevel);
 
-      if (Options::cdoCompType == CDI_COMPRESS_SZIP && (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2
-                                                        && filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C))
+      if (Options::cdoCompType == CDI_COMPRESS_SZIP
+          && (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2 && filetype != CDI_FILETYPE_NC4
+              && filetype != CDI_FILETYPE_NC4C))
         cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
 
       if (Options::cdoCompType == CDI_COMPRESS_JPEG && filetype != CDI_FILETYPE_GRB2)
