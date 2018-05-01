@@ -152,7 +152,7 @@
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseason", "selmonth", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
-#define  SelyearidxOperators    {"selyearidx"}
+#define  SelyearidxOperators    {"selyearidx", "seltimeidx"}
 #define  SetOperators           {"setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
 #define  SetattributeOperators  {"setattribute"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}

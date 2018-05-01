@@ -30,10 +30,17 @@ void *
 Selyearidx(void *process)
 {
   int varID, levelID;
+  int vtime;
   int year, month, day;
+  int hour, minute, second;
   size_t nmiss;
 
   cdoInitialize(process);
+
+  cdoOperatorAdd("selyearidx",   0,   0, NULL);
+  cdoOperatorAdd("seltimeidx",   1,   0, NULL);
+
+  bool ltime = cdoOperatorF1(cdoOperatorID());
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int vlistID1 = cdoStreamInqVlist(streamID1);
@@ -76,6 +83,8 @@ Selyearidx(void *process)
         }
     }
 
+  int calendar = taxisInqCalendar(taxisID2);
+
   int tsID = 0;
   int tsID2 = 0;
   int tsID3 = 0;
@@ -109,7 +118,9 @@ Selyearidx(void *process)
       while ((nrecs = cdoStreamInqTimestep(streamID2, tsID2)))
         {
           vdate = taxisInqVdate(taxisID2);
+          vtime = taxisInqVtime(taxisID2);
           cdiDecodeDate(vdate, &year, &month, &day);
+          cdiDecodeTime(vtime, &hour, &minute, &second);
 
           if ( year1 != year ) break;
 
@@ -122,8 +133,11 @@ Selyearidx(void *process)
               for (size_t i = 0; i < gridsize; ++i)
                 if ( nsets == (int) lround(vars1[varID][levelID].ptr[i]))
                   {
-                    vars2[varID][levelID].ptr[i] = array[i];
                     if (lexactdate) taxisCopyTimestep(taxisID3, taxisID2);
+                    if ( ltime )
+                      vars2[varID][levelID].ptr[i] = date_to_julday(calendar, vdate) + (hour*3600 + minute*60 + second)/86400.;
+                    else
+                      vars2[varID][levelID].ptr[i] = array[i];
                   }
             }
 
