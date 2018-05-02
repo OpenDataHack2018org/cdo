@@ -262,6 +262,7 @@ cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
 #else
       status = 1;
       cdoWarning("%s mapping parameter %s missing!", projection, "false_easting and false_northing");
+      cdoAbort("proj4 support not compiled in!");
 #endif
     }
 
