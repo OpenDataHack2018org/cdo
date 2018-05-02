@@ -40,8 +40,8 @@ Vertwind(void *process)
   size_t nmiss;
   int tempID = -1, sqID = -1, psID = -1, omegaID = -1;
   char varname[CDI_MAX_NAME];
-  double *vct = NULL;
-  double *hpress = NULL, *ps_prog = NULL;
+  std::vector<double> vct;
+  std::vector<double> hpress, ps_prog;
 
   cdoInitialize(process);
 
@@ -66,24 +66,20 @@ Vertwind(void *process)
           vlistInqVarName(vlistID1, varID, varname);
           strtolower(varname);
 
-          if (strcmp(varname, "st") == 0)
-            code = temp_code;
-          else if (strcmp(varname, "sq") == 0)
-            code = sq_code;
-          else if (strcmp(varname, "aps") == 0)
-            code = ps_code;
-          else if (strcmp(varname, "omega") == 0)
-            code = omega_code;
+          // clang-format off
+          if      (strcmp(varname, "st") == 0) code = temp_code;
+          else if (strcmp(varname, "sq") == 0) code = sq_code;
+          else if (strcmp(varname, "aps") == 0) code = ps_code;
+          else if (strcmp(varname, "omega") == 0) code = omega_code;
+          // clang-format on
         }
 
-      if (code == temp_code)
-        tempID = varID;
-      else if (code == sq_code)
-        sqID = varID;
-      else if (code == ps_code)
-        psID = varID;
-      else if (code == omega_code)
-        omegaID = varID;
+      // clang-format off
+      if      (code == temp_code)  tempID = varID;
+      else if (code == sq_code)    sqID = varID;
+      else if (code == ps_code)    psID = varID;
+      else if (code == omega_code) omegaID = varID;
+      // clang-format on
     }
 
   if (tempID == -1 || sqID == -1 || omegaID == -1)
@@ -107,14 +103,14 @@ Vertwind(void *process)
 
   size_t gridsize = gridInqSize(gridID);
   int nlevel = zaxisInqSize(zaxisID);
-  double *level = (double *) Malloc(nlevel * sizeof(double));
-  cdoZaxisInqLevels(zaxisID, level);
+  std::vector<double> level(nlevel);
+  cdoZaxisInqLevels(zaxisID, level.data());
 
-  double *temp = (double *) Malloc(gridsize * nlevel * sizeof(double));
-  double *sq = (double *) Malloc(gridsize * nlevel * sizeof(double));
-  double *omega = (double *) Malloc(gridsize * nlevel * sizeof(double));
-  double *wms = (double *) Malloc(gridsize * nlevel * sizeof(double));
-  double *fpress = (double *) Malloc(gridsize * nlevel * sizeof(double));
+  std::vector<double> temp(gridsize * nlevel);
+  std::vector<double> sq(gridsize * nlevel);
+  std::vector<double> omega(gridsize * nlevel);
+  std::vector<double> wms(gridsize * nlevel);
+  std::vector<double> fpress(gridsize * nlevel);
 
   if (zaxisInqType(zaxisID) == ZAXIS_PRESSURE)
     {
@@ -126,14 +122,14 @@ Vertwind(void *process)
     }
   else if (zaxisInqType(zaxisID) == ZAXIS_HYBRID)
     {
-      ps_prog = (double *) Malloc(gridsize * sizeof(double));
-      hpress = (double *) Malloc(gridsize * (nlevel + 1) * sizeof(double));
+      ps_prog.resize(gridsize);
+      hpress.resize(gridsize * (nlevel + 1));
 
       nvct = zaxisInqVctSize(zaxisID);
       if (nlevel == (nvct / 2 - 1))
         {
-          vct = (double *) Malloc(nvct * sizeof(double));
-          zaxisInqVct(zaxisID, vct);
+          vct.resize(nvct);
+          zaxisInqVct(zaxisID, vct.data());
         }
       else
         cdoAbort("Unsupported vertical coordinate table format!");
@@ -173,16 +169,16 @@ Vertwind(void *process)
           size_t offset = (size_t) levelID * gridsize;
 
           if (varID == tempID)
-            pstreamReadRecord(streamID1, temp + offset, &nmiss);
+            pstreamReadRecord(streamID1, &temp[offset], &nmiss);
           else if (varID == sqID)
-            pstreamReadRecord(streamID1, sq + offset, &nmiss);
+            pstreamReadRecord(streamID1, &sq[offset], &nmiss);
           else if (varID == omegaID)
-            pstreamReadRecord(streamID1, omega + offset, &nmiss);
+            pstreamReadRecord(streamID1, &omega[offset], &nmiss);
           else if (varID == psID && zaxisInqType(zaxisID) == ZAXIS_HYBRID)
-            pstreamReadRecord(streamID1, ps_prog, &nmiss);
+            pstreamReadRecord(streamID1, ps_prog.data(), &nmiss);
         }
 
-      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID) presh(fpress, hpress, vct, ps_prog, nlevel, gridsize);
+      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID) presh(fpress.data(), hpress.data(), vct.data(), ps_prog.data(), nlevel, gridsize);
 
       for (levelID = 0; levelID < nlevel; ++levelID)
         {
@@ -200,13 +196,11 @@ Vertwind(void *process)
                   // Virtuelle Temperatur bringt die Feuchteabhaengigkeit hinein
                   double tv = temp[offset + i] * (1. + 0.608 * sq[offset + i]);
 
-                  // Die Dichte erhaelt man nun mit der Gasgleichung
-                  // rho=p/(R*tv) Level in Pa!
+                  // Die Dichte erhaelt man nun mit der Gasgleichung rho=p/(R*tv) Level in Pa!
                   double rho = fpress[offset + i] / (R * tv);
                   /*
-                    Nun daraus die Vertikalgeschwindigkeit im m/s, indem man die
-                    Vertikalgeschwindigkeit in Pa/s durch die Erdbeschleunigung
-                    und die Dichte teilt
+                    Nun daraus die Vertikalgeschwindigkeit im m/s, indem man die Vertikalgeschwindigkeit
+                    in Pa/s durch die Erdbeschleunigung und die Dichte teilt
                   */
                   wms[offset + i] = omega[offset + i] / (G * rho);
                 }
@@ -222,7 +216,7 @@ Vertwind(void *process)
             if (DBL_IS_EQUAL(wms[offset + i], missval_out)) nmiss_out++;
 
           pstreamDefRecord(streamID2, 0, levelID);
-          pstreamWriteRecord(streamID2, wms + offset, nmiss_out);
+          pstreamWriteRecord(streamID2, &wms[offset], nmiss_out);
         }
 
       tsID++;
@@ -232,18 +226,6 @@ Vertwind(void *process)
   pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  Free(temp);
-  Free(sq);
-  Free(omega);
-  Free(wms);
-  Free(fpress);
-
-  if (ps_prog) Free(ps_prog);
-  if (hpress) Free(hpress);
-  if (vct) Free(vct);
-
-  Free(level);
 
   cdoFinish();
 
