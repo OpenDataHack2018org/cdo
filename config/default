@@ -54,8 +54,8 @@ case "${HOSTNAME}" in
                     --enable-maintainer-mode \
                     $CDOLIBS \
                     LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
-	            CXX=clang++ CXXFLAGS="-g -Wall -O3" \
-	            CC=clang    CFLAGS="-g -Wall -O3"
+	            CXX=clang++ CXXFLAGS="-g -Wall -Wextra -O3" \
+	            CC=clang    CFLAGS="-g -Wall -Wextra -O3"
         elif  test "$COMP" = gnu4.9 ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
@@ -119,8 +119,8 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
-	            CXX=clang++ CXXFLAGS="-g -Wall -pedantic -O3 -march=native" \
-	            CC=clang    CFLAGS="-g -Wall -pedantic -O3 -march=native"
+	            CXX=clang++ CXXFLAGS="-g -Wall -Wextra -pedantic -O3 -march=native" \
+	            CC=clang    CFLAGS="-g -Wall -Wextra -pedantic -O3 -march=native"
         elif  test "$COMP" = clang4 ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
