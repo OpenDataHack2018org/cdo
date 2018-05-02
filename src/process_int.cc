@@ -646,6 +646,55 @@ cdoInitialize(void *p_process)
 #endif
 }
 
+const char *
+processInqPrompt(void)
+{
+
+  ProcessType &process = processSelf();
+  return process.inqPrompt();
+}
+
+extern "C"
+{
+  size_t getPeakRSS();
+}
+
+static void
+printEndTimes(char *p_memstring, size_t memstringLen)
+{
+  size_t memmax = getPeakRSS();
+  if (memmax)
+    {
+      size_t muindex = 0;
+      const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
+      const size_t nmu = sizeof(mu) / sizeof(char *);
+      while (memmax > 9999 && muindex < nmu - 1)
+        {
+          memmax /= 1024;
+          muindex++;
+        }
+      snprintf(p_memstring, memstringLen, " %zu%s", memmax, mu[muindex]);
+    }
+}
+
+static void
+processAccuTime(double utime, double stime)
+{
+  ProcessType *process = getProcess(0);
+  process->a_utime += utime;
+  process->a_stime += stime;
+}
+
+void
+processStartTime(double *utime, double *stime)
+{
+  // used in: Command.cc, CDItest.cc, process.cc
+  ProcessType &process = processSelf();
+
+  *utime = process.s_utime;
+  *stime = process.s_stime;
+}
+
 void
 cdoFinish(void)
 {
@@ -667,60 +716,9 @@ cdoFinish(void)
 
   char memstring[32] = { "" };
 
-  if (process.m_ID == 0)
-    {
-      printEndTimes(memstring);
-    }
+  if (process.m_ID == 0) printEndTimes(memstring, sizeof(memstring));
+
   process.printBenchmarks(times, memstring);
-}
-
-const char *
-processInqPrompt(void)
-{
-
-  ProcessType &process = processSelf();
-  return process.inqPrompt();
-}
-
-extern "C"
-{
-  size_t getPeakRSS();
-}
-
-void
-printEndTimes(char *p_memstring)
-{
-  size_t memmax = getPeakRSS();
-  if (memmax)
-    {
-      size_t muindex = 0;
-      const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
-      const size_t nmu = sizeof(mu) / sizeof(char *);
-      while (memmax > 9999 && muindex < nmu - 1)
-        {
-          memmax /= 1024;
-          muindex++;
-        }
-      snprintf(p_memstring, sizeof(p_memstring), " %zu%s", memmax, mu[muindex]);
-    }
-}
-
-void
-processAccuTime(double utime, double stime)
-{
-  ProcessType *process = getProcess(0);
-  process->a_utime += utime;
-  process->a_stime += stime;
-}
-
-void
-processStartTime(double *utime, double *stime)
-{
-  // used in: Command.cc, CDItest.cc, process.cc
-  ProcessType &process = processSelf();
-
-  *utime = process.s_utime;
-  *stime = process.s_stime;
 }
 
 int

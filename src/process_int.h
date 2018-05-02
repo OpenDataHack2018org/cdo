@@ -25,7 +25,7 @@
  */
 void cdoInitialize(void *process);
 void cdoFinish();
-void printEndTimes(char *p_memstring);
+
 /**
  * Add operator to process.
  *
@@ -173,7 +173,6 @@ ProcessType *getProcess(int p_processID);
  */
 void clearProcesses();
 
-void processAccuTime(double utime, double stime);
 void processStartTime(double *utime, double *stime);
 
 /**

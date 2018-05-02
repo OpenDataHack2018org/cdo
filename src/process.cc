@@ -518,12 +518,18 @@ void
 ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
 {
 #if defined(HAVE_SYS_TIMES_H)
-  if (cdoBenchmark)
-    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime, p_times.c_systime, p_times.c_cputime, p_memstring);
+  if ( m_ID == 0 )
+    {
+      if (cdoBenchmark)
+        fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime, p_times.c_systime, p_times.c_cputime, p_memstring);
+      else if (!Options::silentMode)
+        fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
+    }
   else
     {
-      if (!Options::silentMode) fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
+      fprintf(stderr, "\n");
     }
+
   if (cdoBenchmark && m_ID == 0)
     {
       p_times.p_usertime = a_utime;
