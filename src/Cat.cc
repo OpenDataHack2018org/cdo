@@ -51,6 +51,8 @@ Cat(void *process)
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
 
+  progressInit();
+
   for (int indf = 0; indf < nfiles; ++indf)
     {
       if (cdoVerbose) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
