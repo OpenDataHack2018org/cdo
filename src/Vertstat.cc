@@ -28,8 +28,7 @@
       Vertstat   vertvar         Vertical variance
       Vertstat   vertvar1        Vertical variance [Normalize by (n-1)]
       Vertstat   vertstd         Vertical standard deviation
-      Vertstat   vertstd1        Vertical standard deviation [Normalize by
-   (n-1)]
+      Vertstat   vertstd1        Vertical standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>
@@ -96,52 +95,47 @@ int
 getLayerThickness(bool useweights, bool genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights)
 {
   int status = 0;
-  int i;
-  double *levels = (double *) Malloc(nlev * sizeof(double));
-  double *lbounds = (double *) Malloc(nlev * sizeof(double));
-  double *ubounds = (double *) Malloc(nlev * sizeof(double));
+  std::vector<double> levels(nlev);
+  std::vector<double> lbounds(nlev);
+  std::vector<double> ubounds(nlev);
 
-  cdoZaxisInqLevels(zaxisID, levels);
+  cdoZaxisInqLevels(zaxisID, levels.data());
   if (genbounds)
     {
       status = 2;
-      genLayerBounds(nlev, levels, lbounds, ubounds);
+      genLayerBounds(nlev, levels.data(), lbounds.data(), ubounds.data());
     }
   else if (useweights && zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL))
     {
       status = 1;
-      zaxisInqLbounds(zaxisID, lbounds);
-      zaxisInqUbounds(zaxisID, ubounds);
+      zaxisInqLbounds(zaxisID, lbounds.data());
+      zaxisInqUbounds(zaxisID, ubounds.data());
     }
   else
     {
-      for (i = 0; i < nlev; ++i)
+      for (int i = 0; i < nlev; ++i)
         {
           lbounds[i] = 0.;
           ubounds[i] = 1.;
         }
     }
 
-  for (i = 0; i < nlev; ++i) thickness[i] = fabs(ubounds[i] - lbounds[i]);
+  for (int i = 0; i < nlev; ++i) thickness[i] = fabs(ubounds[i] - lbounds[i]);
 
   double lsum = 0;
   double wsum = 0;
-  for (i = 0; i < nlev; ++i) lsum += thickness[i];
-  for (i = 0; i < nlev; ++i) weights[i] = thickness[i];
-  for (i = 0; i < nlev; ++i) weights[i] /= (lsum / nlev);
-  for (i = 0; i < nlev; ++i) wsum += weights[i];
+  for (int i = 0; i < nlev; ++i) lsum += thickness[i];
+  for (int i = 0; i < nlev; ++i) weights[i] = thickness[i];
+  for (int i = 0; i < nlev; ++i) weights[i] /= (lsum / nlev);
+  for (int i = 0; i < nlev; ++i) wsum += weights[i];
 
   if (cdoVerbose)
     {
       cdoPrint("zaxisID=%d  nlev=%d  layersum=%g  weightsum=%g", index, nlev, lsum, wsum);
       printf("         level     bounds   thickness  weight\n");
-      for (i = 0; i < nlev; ++i)
+      for (int i = 0; i < nlev; ++i)
         printf("   %3d  %6g  %6g/%-6g  %6g  %6g\n", i + 1, levels[i], lbounds[i], ubounds[i], thickness[i], weights[i]);
     }
-
-  Free(levels);
-  Free(lbounds);
-  Free(ubounds);
 
   return status;
 }
@@ -185,14 +179,14 @@ Vertstat(void *process)
   int gridID;
   int varID, levelID;
   size_t nmiss;
-  typedef struct
+  struct vert_t
   {
     int zaxisID;
     int status;
     int numlevel;
-    double *thickness;
-    double *weights;
-  } vert_t;
+    std::vector<double> thickness;
+    std::vector<double> weights;
+  };
 
   cdoInitialize(process);
 
@@ -241,7 +235,7 @@ Vertstat(void *process)
 
   int nzaxis = vlistNzaxis(vlistID1);
   int nlev, zaxisID;
-  vert_t *vert = (vert_t *) Malloc(nzaxis * sizeof(vert_t));
+  std::vector<vert_t> vert(nzaxis);
   if (needWeights)
     {
       bool useweights = true;
@@ -264,10 +258,10 @@ Vertstat(void *process)
           // if ( nlev > 1 )
           {
             vert[index].numlevel = nlev;
-            vert[index].thickness = (double *) Malloc(nlev * sizeof(double));
-            vert[index].weights = (double *) Malloc(nlev * sizeof(double));
+            vert[index].thickness.resize(nlev);
+            vert[index].weights.resize(nlev);
             vert[index].status
-                = getLayerThickness(useweights, genbounds, index, zaxisID, nlev, vert[index].thickness, vert[index].weights);
+              = getLayerThickness(useweights, genbounds, index, zaxisID, nlev, vert[index].thickness.data(), vert[index].weights.data());
           }
           if (!useweights) vert[index].status = 3;
         }
@@ -282,10 +276,10 @@ Vertstat(void *process)
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  field_type *vars1 = (field_type *) Malloc(nvars * sizeof(field_type));
-  field_type *samp1 = (field_type *) Malloc(nvars * sizeof(field_type));
-  field_type *vars2 = NULL;
-  if (lvarstd || lrange) vars2 = (field_type *) Malloc(nvars * sizeof(field_type));
+  std::vector<field_type> vars1(nvars);
+  std::vector<field_type> samp1(nvars);
+  std::vector<field_type> vars2;
+  if (lvarstd || lrange) vars2.resize(nvars);
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -490,17 +484,7 @@ Vertstat(void *process)
       if (lvarstd) Free(vars2[varID].ptr);
     }
 
-  Free(vars1);
-  Free(samp1);
-  if (lvarstd) Free(vars2);
-
   if (field.ptr) Free(field.ptr);
-
-  if (needWeights)
-    for (int index = 0; index < nzaxis; ++index)
-      if (vert[index].numlevel > 1) Free(vert[index].weights);
-
-  Free(vert);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
