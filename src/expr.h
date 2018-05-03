@@ -83,9 +83,12 @@ typedef struct
   struct nodeTypeTag *op[1];  // operands (expandable)
 } oprNodeType;
 
+enum {PARAM_VAR, PARAM_CONST};
+
 // parameter
-typedef struct
+struct paramType
 {
+  int type;
   bool select;
   bool remove;
   bool lmiss;
@@ -103,7 +106,7 @@ typedef struct
   double missval;
   double *data;
   double *weight;
-} paramType;
+};
 
 typedef struct nodeTypeTag
 {

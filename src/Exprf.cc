@@ -187,6 +187,7 @@ params_new(int vlistID)
       vlistInqVarLongname(vlistID, varID, longname);
       vlistInqVarUnits(vlistID, varID, units);
 
+      params[varID].type = PARAM_VAR;
       params[varID].select = false;
       params[varID].remove = false;
       params[varID].lmiss = true;
@@ -375,7 +376,7 @@ Expr(void *process)
 
   parseParamInit(&parse_arg, vlistID1, pointID, surfaceID, params);
 
-  /* Set all input variables to 'needed' if replacing is switched off */
+  // Set all input variables to 'needed' if replacing is switched off
   for (int varID = 0; varID < nvars1; varID++) parse_arg.needed[varID] = !replacesVariables;
 
   int vartsID = params_add_ts(&parse_arg);
@@ -392,6 +393,16 @@ Expr(void *process)
   if (cdoVerbose)
     for (int varID = 0; varID < nvars1; varID++)
       if (parse_arg.needed[varID]) cdoPrint("Needed var: %d %s", varID, params[varID].name);
+
+  for (int varID = 0; varID < parse_arg.nparams; varID++)
+    {
+      if (params[varID].ngp == 0 && params[varID].nlev == 0)
+        {
+          params[varID].ngp = 1;
+          params[varID].nlev = 1;
+          params[varID].type = PARAM_CONST;
+        }
+    }
 
   if (cdoVerbose)
     for (int varID = 0; varID < parse_arg.nparams; varID++)
@@ -421,6 +432,7 @@ Expr(void *process)
   for (int pidx = 0; pidx < parse_arg.nparams; pidx++)
     {
       if (pidx < nvars1 && params[pidx].select == false) continue;
+      if (pidx >= nvars1 && params[pidx].type == PARAM_CONST) continue;
       if (pidx >= nvars1 && params[pidx].name[0] == '_') continue;
       if (pidx >= nvars1 && params[pidx].remove == true) continue;
       if (pidx >= nvars1 && params[pidx].coord) continue;
