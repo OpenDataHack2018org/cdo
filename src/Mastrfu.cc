@@ -27,28 +27,24 @@
 #include "grid.h"
 #include "pstream_int.h"
 
+
 static void
-mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, double missval)
+mastrfu(int gridID, int zaxisID, std::vector<std::vector<double>> &field1, std::vector<std::vector<double>> &field2, size_t nmiss, double missval)
 {
   size_t ilat;
   int ilev, n;
-  double fact = 4 * atan(1.0) * 6371000 / 9.81;
+  constexpr double fact = 4 * atan(1.0) * 6371000 / 9.81;
   char units[CDI_MAX_NAME];
 
   size_t nlat = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
-  double *phi = (double *) Malloc(nlat * sizeof(double));
-  double *dummy = (double *) Malloc(nlat * sizeof(double));
-  double *cosphi = (double *) Malloc(nlat * sizeof(double));
-  double *plevel = (double *) Malloc(nlev * sizeof(double));
-  double **field1 = (double **) Malloc(nlev * sizeof(double *));
-  double **field2 = (double **) Malloc(nlev * sizeof(double *));
+  std::vector<double> phi(nlat);
+  std::vector<double> cosphi(nlat);
+  std::vector<double> plevel(nlev);
 
-  cdoZaxisInqLevels(zaxisID, plevel);
+  cdoZaxisInqLevels(zaxisID, plevel.data());
 
-  // gaussaw(phi, dummy, nlat);
-
-  gridInqYvals(gridID, phi);
+  gridInqYvals(gridID, phi.data());
   gridInqYunits(gridID, units);
 
   if (memcmp(units, "degree", 6) == 0)
@@ -57,12 +53,6 @@ mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, d
   for (ilat = 0; ilat < nlat; ilat++) phi[ilat] = sin(phi[ilat]);
 
   for (ilat = 0; ilat < nlat; ilat++) cosphi[ilat] = sqrt(1.0 - phi[ilat] * phi[ilat]);
-
-  for (ilev = 0; ilev < nlev; ilev++)
-    {
-      field1[ilev] = array1 + ilev * nlat;
-      field2[ilev] = array2 + ilev * nlat;
-    }
 
   for (ilev = 0; ilev < nlev; ilev++)
     for (ilat = 0; ilat < nlat; ilat++) field2[ilev][ilat] = 0.0;
@@ -92,13 +82,6 @@ mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, d
                     += fact * (field1[n][ilat] + field1[n + 1][ilat]) * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
             }
     }
-
-  Free(field2);
-  Free(field1);
-  Free(plevel);
-  Free(cosphi);
-  Free(dummy);
-  Free(phi);
 }
 
 void *
@@ -106,7 +89,6 @@ Mastrfu(void *process)
 {
   int nrecs;
   int varID, levelID;
-  size_t offset;
   size_t nmiss, nmiss1;
 
   cdoInitialize(process);
@@ -152,8 +134,8 @@ Mastrfu(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  double *array1 = (double *) Malloc(gridsize * nlev * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * nlev * sizeof(double));
+  VECTOR_2D(double, array1, nlev, gridsize);
+  VECTOR_2D(double, array2, nlev, gridsize);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -165,8 +147,7 @@ Mastrfu(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          offset = gridsize * levelID;
-          pstreamReadRecord(streamID1, array1 + offset, &nmiss1);
+          pstreamReadRecord(streamID1, array1[levelID].data(), &nmiss1);
           nmiss += nmiss1;
         }
 
@@ -177,17 +158,14 @@ Mastrfu(void *process)
           varID = 0;
           levelID = recID;
           pstreamDefRecord(streamID2, varID, levelID);
-          offset = gridsize * levelID;
-          pstreamWriteRecord(streamID2, array2 + offset, nmiss);
+          pstreamWriteRecord(streamID2, array2[levelID].data(), nmiss);
         }
+
       tsID++;
     }
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array1) Free(array1);
-  if (array2) Free(array2);
 
   cdoFinish();
 

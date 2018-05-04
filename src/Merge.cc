@@ -27,13 +27,14 @@
 #include "pstream_int.h"
 #include "util_files.h"
 
+
 static void
 checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 {
   char vname1[CDI_MAX_NAME], vname2[CDI_MAX_NAME];
   int k;
   int mlev1 = 0, mlev2 = 0;
-  double *lev1 = NULL, *lev2 = NULL;
+  std::vector<double> lev1, lev2;
 
   int nvars1 = vlistNvars(vlistID1);
   int nvars2 = vlistNvars(vlistID2);
@@ -51,9 +52,9 @@ checkDupEntry(int vlistID1, int vlistID2, const char *filename)
       if (nlev1 > mlev1)
         {
           mlev1 = nlev1;
-          lev1 = (double *) Realloc(lev1, mlev1 * sizeof(double));
+          lev1.resize(mlev1);
         }
-      cdoZaxisInqLevels(zaxisID1, lev1);
+      cdoZaxisInqLevels(zaxisID1, lev1.data());
 
       for (int varID2 = 0; varID2 < nvars2; ++varID2)
         {
@@ -70,9 +71,9 @@ checkDupEntry(int vlistID1, int vlistID2, const char *filename)
               if (nlev2 > mlev2)
                 {
                   mlev2 = nlev2;
-                  lev2 = (double *) Realloc(lev2, mlev2 * sizeof(double));
+                  lev2.resize(mlev2);
                 }
-              cdoZaxisInqLevels(zaxisID2, lev2);
+              cdoZaxisInqLevels(zaxisID2, lev2.data());
 
               if (zaxisInqLevels(zaxisID1, NULL) && zaxisInqLevels(zaxisID2, NULL))
                 {
@@ -100,9 +101,6 @@ checkDupEntry(int vlistID1, int vlistID2, const char *filename)
             }
         }
     }
-
-  if (lev1) Free(lev1);
-  if (lev2) Free(lev2);
 }
 /*
 static
@@ -125,7 +123,6 @@ Merge(void *process)
   int nrecs = 0;
   int levelID, levelID2;
   int index;
-  size_t gridsize;
   size_t nmiss;
 
   cdoInitialize(process);
@@ -140,10 +137,10 @@ Merge(void *process)
   if (!cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename))
     cdoAbort("Outputfile %s already exists!", ofilename);
 
-  int *streamIDs = (int *) Malloc(nmerge * sizeof(int));
-  int *vlistIDs = (int *) Malloc(nmerge * sizeof(int));
-  int *numrecs = (int *) Malloc(nmerge * sizeof(int));
-  int *numsteps = (int *) Malloc(nmerge * sizeof(int));
+  std::vector<int> streamIDs(nmerge);
+  std::vector<int> vlistIDs(nmerge);
+  std::vector<int> numrecs(nmerge);
+  std::vector<int> numsteps(nmerge);
 
   for (index = 0; index < nmerge; index++)
     {
@@ -214,11 +211,11 @@ Merge(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
   pstreamDefVlist(streamID2, vlistID2);
 
-  double *array = NULL;
+  std::vector<double> array;
   if (!lcopy)
     {
-      gridsize = vlistGridsizeMax(vlistID2);
-      array = (double *) Malloc(gridsize * sizeof(double));
+      size_t gridsizemax = vlistGridsizeMax(vlistID2);
+      array.resize(gridsizemax);
     }
 
   int tsID = 0;
@@ -259,8 +256,7 @@ Merge(void *process)
         {
           for (index = 1; index < nmerge; index++)
             if (vlistIDs[index] != -1 && numrecs[index] != 0)
-              cdoWarning("Input stream %d has %d timestep%s. Stream %d has "
-                         "more timesteps, skipped!",
+              cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!",
                          taxisindex + 1, tsID, tsID == 1 ? "" : "s", index + 1);
           break;
         }
@@ -269,8 +265,7 @@ Merge(void *process)
           for (index = 1; index < nmerge; index++)
             if (vlistIDs[index] != -1 && numrecs[index] == 0)
               {
-                cdoWarning("Input stream %d has %d timestep%s. Stream %d has "
-                           "more timesteps, skipped!",
+                cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!",
                            index + 1, tsID, tsID == 1 ? "" : "s", taxisindex + 1);
                 break;
               }
@@ -304,8 +299,8 @@ Merge(void *process)
                 }
               else
                 {
-                  pstreamReadRecord(streamID1, array, &nmiss);
-                  pstreamWriteRecord(streamID2, array, nmiss);
+                  pstreamReadRecord(streamID1, array.data(), &nmiss);
+                  pstreamWriteRecord(streamID2, array.data(), nmiss);
                 }
             }
         }
@@ -318,14 +313,6 @@ Merge(void *process)
   pstreamClose(streamID2);
 
   vlistDestroy(vlistID2);
-
-  if (streamIDs) Free(streamIDs);
-  if (vlistIDs) Free(vlistIDs);
-  if (numrecs) Free(numrecs);
-  if (numsteps) Free(numsteps);
-
-  if (!lcopy)
-    if (array) Free(array);
 
   cdoFinish();
 

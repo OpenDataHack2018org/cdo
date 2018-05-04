@@ -52,10 +52,10 @@ invertLonDes(int vlistID)
           size_t nlat = gridInqYsize(gridID1);
           size_t size = (gridtype == GRID_CURVILINEAR) ? nlon * nlat : nlon;
 
-          double *xv1 = (double *) Malloc(size * sizeof(double));
-          double *xv2 = (double *) Malloc(size * sizeof(double));
+          std::vector<double> xv1(size);
+          std::vector<double> xv2(size);
 
-          gridInqXvals(gridID1, xv1);
+          gridInqXvals(gridID1, xv1.data());
 
           if (gridtype == GRID_CURVILINEAR)
             {
@@ -67,10 +67,7 @@ invertLonDes(int vlistID)
               for (size_t ilon = 0; ilon < nlon; ilon++) xv2[nlon - ilon - 1] = xv1[ilon];
             }
 
-          gridDefXvals(gridID2, xv2);
-
-          if (xv2) Free(xv2);
-          if (xv1) Free(xv1);
+          gridDefXvals(gridID2, xv2.data());
         }
 
       if (gridInqXbounds(gridID1, NULL))
@@ -80,10 +77,10 @@ invertLonDes(int vlistID)
           int nv = gridInqNvertex(gridID1);
           size_t size = (gridtype == GRID_CURVILINEAR) ? nv * nlon * nlat : nv * nlon;
 
-          double *xb1 = (double *) Malloc(size * sizeof(double));
-          double *xb2 = (double *) Malloc(size * sizeof(double));
+          std::vector<double> xb1(size);
+          std::vector<double> xb2(size);
 
-          gridInqXbounds(gridID1, xb1);
+          gridInqXbounds(gridID1, xb1.data());
 
           if (gridtype == GRID_CURVILINEAR)
             {
@@ -101,10 +98,7 @@ invertLonDes(int vlistID)
                 }
             }
 
-          gridDefXbounds(gridID2, xb2);
-
-          if (xb2) Free(xb2);
-          if (xb1) Free(xb1);
+          gridDefXbounds(gridID2, xb2.data());
         }
 
       vlistChangeGrid(vlistID, gridID1, gridID2);
@@ -122,36 +116,33 @@ invertLatCoord(int gridID)
       size_t nlat = gridInqYsize(gridID);
       size_t size = (gridtype == GRID_CURVILINEAR) ? nlon * nlat : nlat;
 
-      double *yv1 = (double *) Malloc(size * sizeof(double));
-      double *yv2 = (double *) Malloc(size * sizeof(double));
+      std::vector<double> yv1(size);
+      std::vector<double> yv2(size);
 
       if (gridtype == GRID_CURVILINEAR)
         {
-          gridInqXvals(gridID, yv1);
+          gridInqXvals(gridID, yv1.data());
 
           for (size_t ilat = 0; ilat < nlat; ilat++)
             for (size_t ilon = 0; ilon < nlon; ilon++) yv2[(nlat - ilat - 1) * nlon + ilon] = yv1[ilat * nlon + ilon];
 
-          gridDefXvals(gridID, yv2);
+          gridDefXvals(gridID, yv2.data());
 
-          gridInqYvals(gridID, yv1);
+          gridInqYvals(gridID, yv1.data());
 
           for (size_t ilat = 0; ilat < nlat; ilat++)
             for (size_t ilon = 0; ilon < nlon; ilon++) yv2[(nlat - ilat - 1) * nlon + ilon] = yv1[ilat * nlon + ilon];
 
-          gridDefYvals(gridID, yv2);
+          gridDefYvals(gridID, yv2.data());
         }
       else
         {
-          gridInqYvals(gridID, yv1);
+          gridInqYvals(gridID, yv1.data());
 
           for (size_t ilat = 0; ilat < nlat; ilat++) yv2[nlat - ilat - 1] = yv1[ilat];
 
-          gridDefYvals(gridID, yv2);
+          gridDefYvals(gridID, yv2.data());
         }
-
-      if (yv2) Free(yv2);
-      if (yv1) Free(yv1);
     }
 
   if (gridInqYbounds(gridID, NULL))
@@ -161,10 +152,10 @@ invertLatCoord(int gridID)
       int nv = gridInqNvertex(gridID);
       size_t size = (gridtype == GRID_CURVILINEAR) ? nv * nlon * nlat : nv * nlat;
 
-      double *yb1 = (double *) Malloc(size * sizeof(double));
-      double *yb2 = (double *) Malloc(size * sizeof(double));
+      std::vector<double> yb1(size);
+      std::vector<double> yb2(size);
 
-      gridInqYbounds(gridID, yb1);
+      gridInqYbounds(gridID, yb1.data());
 
       if (gridtype == GRID_CURVILINEAR)
         {
@@ -182,10 +173,7 @@ invertLatCoord(int gridID)
             }
         }
 
-      gridDefYbounds(gridID, yb2);
-
-      if (yb2) Free(yb2);
-      if (yb1) Free(yb1);
+      gridDefYbounds(gridID, yb2.data());
     }
 }
 
@@ -316,8 +304,8 @@ Invert(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
+  std::vector<double> array2(gridsize);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -329,7 +317,7 @@ Invert(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           pstreamDefRecord(streamID2, varID, levelID);
 
@@ -338,15 +326,15 @@ Invert(void *process)
               gridID1 = vlistInqVarGrid(vlistID1, varID);
 
               if (operfunc2 == func_lat)
-                invertLatData(array1, array2, gridID1);
+                invertLatData(array1.data(), array2.data(), gridID1);
               else
-                invertLonData(array1, array2, gridID1);
+                invertLonData(array1.data(), array2.data(), gridID1);
 
-              pstreamWriteRecord(streamID2, array2, nmiss);
+              pstreamWriteRecord(streamID2, array2.data(), nmiss);
             }
           else
             {
-              pstreamWriteRecord(streamID2, array1, nmiss);
+              pstreamWriteRecord(streamID2, array1.data(), nmiss);
             }
         }
       tsID++;
@@ -354,9 +342,6 @@ Invert(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array1) Free(array1);
-  if (array2) Free(array2);
 
   cdoFinish();
 

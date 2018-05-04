@@ -26,8 +26,9 @@
 #include "pstream_int.h"
 #include "grid.h"
 
-static void
-gen_index(int gridID1, int gridID2, int *index)
+
+void
+genGridIndex(int gridID1, int gridID2, int *index)
 {
   int i1;
 
@@ -54,36 +55,36 @@ gen_index(int gridID1, int gridID2, int *index)
 
       if (!(gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL))) cdoAbort("Grid 2 has no values!");
 
-      double *xvals1 = (double *) Malloc(nlon1 * sizeof(double));
-      double *yvals1 = (double *) Malloc(nlat1 * sizeof(double));
-      double *xvals2 = (double *) Malloc(nlon2 * sizeof(double));
-      double *yvals2 = (double *) Malloc(nlat2 * sizeof(double));
+      std::vector<double> xvals1(nlon1);
+      std::vector<double> yvals1(nlat1);
+      std::vector<double> xvals2(nlon2);
+      std::vector<double> yvals2(nlat2);
 
-      int *xindex = (int *) Malloc(nlon2 * sizeof(int));
-      int *yindex = (int *) Malloc(nlat2 * sizeof(int));
+      std::vector<int> xindex(nlon2);
+      std::vector<int> yindex(nlat2);
 
-      gridInqXvals(gridID1, xvals1);
-      gridInqYvals(gridID1, yvals1);
+      gridInqXvals(gridID1, xvals1.data());
+      gridInqYvals(gridID1, yvals1.data());
 
       /* Convert lat/lon units if required */
       {
         char units[CDI_MAX_NAME];
         gridInqXunits(gridID1, units);
-        grid_to_degree(units, nlon1, xvals1, "grid1 center lon");
+        grid_to_degree(units, nlon1, xvals1.data(), "grid1 center lon");
         gridInqYunits(gridID1, units);
-        grid_to_degree(units, nlat1, yvals1, "grid1 center lat");
+        grid_to_degree(units, nlat1, yvals1.data(), "grid1 center lat");
       }
 
-      gridInqXvals(gridID2, xvals2);
-      gridInqYvals(gridID2, yvals2);
+      gridInqXvals(gridID2, xvals2.data());
+      gridInqYvals(gridID2, yvals2.data());
 
       /* Convert lat/lon units if required */
       {
         char units[CDI_MAX_NAME];
         gridInqXunits(gridID2, units);
-        grid_to_degree(units, nlon2, xvals2, "grid2 center lon");
+        grid_to_degree(units, nlon2, xvals2.data(), "grid2 center lon");
         gridInqYunits(gridID2, units);
-        grid_to_degree(units, nlat2, yvals2, "grid2 center lat");
+        grid_to_degree(units, nlat2, yvals2.data(), "grid2 center lat");
       }
 
       for (int i2 = 0; i2 < nlat2; i2++)
@@ -91,10 +92,7 @@ gen_index(int gridID1, int gridID2, int *index)
           for (i1 = 0; i1 < nlat1; i1++)
             if (fabs(yvals2[i2] - yvals1[i1]) < 0.001) break;
 
-          if (i1 == nlat1)
-            yindex[i2] = -1;
-          else
-            yindex[i2] = i1;
+          yindex[i2] = (i1 == nlat1) ? -1 : i1;
         }
 
       for (int i2 = 0; i2 < nlon2; i2++)
@@ -116,10 +114,7 @@ gen_index(int gridID1, int gridID2, int *index)
                 }
             }
 
-          if (i1 == nlon1)
-            xindex[i2] = -1;
-          else
-            xindex[i2] = i1;
+          xindex[i2] = (i1 == nlon1) ? -1 : i1;
         }
       /*
       for ( i2 = 0; i2 < nlon2; i2++ )
@@ -137,13 +132,6 @@ gen_index(int gridID1, int gridID2, int *index)
             else
               index[k++] = yindex[j] * nlon1 + xindex[i];
           }
-
-      Free(xindex);
-      Free(yindex);
-      Free(xvals1);
-      Free(yvals1);
-      Free(xvals2);
-      Free(yvals2);
     }
   else
     cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype1));
@@ -179,11 +167,11 @@ Enlargegrid(void *process)
   size_t gridsize1 = gridInqSize(gridID1);
   size_t gridsize2 = gridInqSize(gridID2);
 
-  double *array1 = (double *) Malloc(gridsize1 * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize2 * sizeof(double));
-  int *gindex = (int *) Malloc(gridsize1 * sizeof(int));
+  std::vector<double> array1(gridsize1);
+  std::vector<double> array2(gridsize2);
+  std::vector<int> gindex(gridsize1);
 
-  gen_index(gridID2, gridID1, gindex);
+  genGridIndex(gridID2, gridID1, gindex.data());
 
   int vlistID2 = vlistDuplicate(vlistID1);
 
@@ -202,7 +190,6 @@ Enlargegrid(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -210,7 +197,7 @@ Enlargegrid(void *process)
           int varID, levelID;
           size_t nmiss;
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, array1.data(), &nmiss);
 
           double missval1 = vlistInqVarMissval(vlistID1, varID);
 
@@ -218,9 +205,9 @@ Enlargegrid(void *process)
           for (size_t i = 0; i < gridsize1; i++)
             if (gindex[i] >= 0) array2[gindex[i]] = array1[i];
 
-          nmiss = arrayNumMV(gridsize2, array2, missval1);
+          nmiss = arrayNumMV(gridsize2, array2.data(), missval1);
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, array2, nmiss);
+          pstreamWriteRecord(streamID2, array2.data(), nmiss);
         }
 
       tsID++;
@@ -228,10 +215,6 @@ Enlargegrid(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (gindex) Free(gindex);
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   cdoFinish();
 
