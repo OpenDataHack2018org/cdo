@@ -35,14 +35,11 @@ void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon
 static void
 setcbox(double constant, double *array, int gridID, long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
-  long nlon, nlat;
-  long ilat, ilon;
+  long nlon = gridInqXsize(gridID);
+  long nlat = gridInqYsize(gridID);
 
-  nlon = gridInqXsize(gridID);
-  nlat = gridInqYsize(gridID);
-
-  for (ilat = 0; ilat < nlat; ilat++)
-    for (ilon = 0; ilon < nlon; ilon++)
+  for (long ilat = 0; ilat < nlat; ilat++)
+    for (long ilon = 0; ilon < nlon; ilon++)
       if ((lat1 <= ilat && ilat <= lat2 && ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))))
         {
           array[nlon * ilat + ilon] = constant;
@@ -52,42 +49,32 @@ setcbox(double constant, double *array, int gridID, long lat1, long lat2, long l
 void *
 Setbox(void *process)
 {
-  int SETCLONLATBOX, SETCINDEXBOX;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, nvars;
-  int tsID, varID, levelID;
-  size_t gridsize;
-  int vlistID1, vlistID2;
+  int nrecs;
+  int varID, levelID;
   int gridID = -1;
-  int index, ngrids, gridtype;
+  int index, gridtype;
   size_t nmiss;
-  int *vars;
-  int ndiffgrids;
   long lat1, lat2, lon11, lon12, lon21, lon22;
-  double constant;
-  double *array;
-  int taxisID1, taxisID2;
 
   cdoInitialize(process);
 
-  SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0, "constant, western and eastern longitude and "
-                                                        "southern and northern latitude");
-  SETCINDEXBOX = cdoOperatorAdd("setcindexbox", 0, 0, "constant, index of first and last longitude "
-                                                      "and index of first and last latitude");
+  // clang-format off
+  int SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0, "constant, western and eastern longitude and southern and northern latitude");
+  int SETCINDEXBOX = cdoOperatorAdd("setcindexbox", 0, 0, "constant, index of first and last longitude and index of first and last latitude");
+  // clang-format on
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  constant = parameter2double(operatorArgv()[0]);
+  double constant = parameter2double(operatorArgv()[0]);
 
-  streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
-  ngrids = vlistNgrids(vlistID1);
-  ndiffgrids = 0;
+  int ngrids = vlistNgrids(vlistID1);
+  int ndiffgrids = 0;
   for (index = 1; index < ngrids; index++)
     if (vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index)) ndiffgrids++;
 
@@ -101,8 +88,7 @@ Setbox(void *process)
     }
 
   if (gridInqType(gridID) == GRID_GAUSSIAN_REDUCED)
-    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a "
-             "regular grid!");
+    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
   if (index == ngrids) cdoAbort("No regular grid found!");
   if (ndiffgrids > 0) cdoAbort("Too many different grids!");
@@ -114,27 +100,24 @@ Setbox(void *process)
   else
     genindexbox(1, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
 
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  nvars = vlistNvars(vlistID1);
-  vars = (int *) Malloc(nvars * sizeof(int));
-  for (varID = 0; varID < nvars; varID++)
-    {
-      vars[varID] = (gridID == vlistInqVarGrid(vlistID1, varID));
-    }
+  int nvars = vlistNvars(vlistID1);
+  std::vector<bool> vars(nvars);
+  for (varID = 0; varID < nvars; varID++) vars[varID] = (gridID == vlistInqVarGrid(vlistID1, varID));
 
-  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  gridsize = gridInqSize(gridID);
-  array = (double *) Malloc(gridsize * sizeof(double));
+  size_t gridsize = gridInqSize(gridID);
+  std::vector<double> array(gridsize);
 
-  tsID = 0;
+  int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -146,14 +129,14 @@ Setbox(void *process)
 
           if (vars[varID])
             {
-              pstreamReadRecord(streamID1, array, &nmiss);
+              pstreamReadRecord(streamID1, array.data(), &nmiss);
 
-              setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
+              setcbox(constant, array.data(), gridID, lat1, lat2, lon11, lon12, lon21, lon22);
 
               double missval = vlistInqVarMissval(vlistID1, varID);
-              nmiss = arrayNumMV(gridsize, array, missval);
+              nmiss = arrayNumMV(gridsize, array.data(), missval);
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2, array, nmiss);
+              pstreamWriteRecord(streamID2, array.data(), nmiss);
             }
         }
 
@@ -162,9 +145,6 @@ Setbox(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (vars) Free(vars);
-  if (array) Free(array);
 
   cdoFinish();
 

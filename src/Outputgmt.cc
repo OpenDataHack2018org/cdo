@@ -53,7 +53,7 @@ check_ncorner(int ncorner, const double *lon_bounds, const double *lat_bounds)
   return ncorner_new;
 }
 
-void
+static void
 make_cyclic(double *array1, double *array2, int nlon, int nlat)
 {
   int ij1, ij2;
@@ -182,11 +182,9 @@ Outputgmt(void *process)
   bool lzon = false, lmer = false, lhov = false;
   bool lgrid_gen_bounds = false, luse_grid_corner = false;
   char varname[CDI_MAX_NAME];
-  double *array2 = NULL;
-  double *uf = NULL, *vf = NULL, *alpha = NULL, *auv = NULL;
-  double *grid_center_lat2 = NULL, *grid_center_lon2 = NULL;
-  double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
-  int *grid_mask = NULL;
+  std::vector<double> grid_center_lat2, grid_center_lon2;
+  std::vector<double> grid_corner_lat, grid_corner_lon;
+  std::vector<int> grid_mask;
   CPT cpt;
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];
@@ -257,8 +255,8 @@ Outputgmt(void *process)
 
   if (gridInqMaskGME(gridID, NULL))
     {
-      grid_mask = (int *) Malloc(gridsize * sizeof(int));
-      gridInqMaskGME(gridID, grid_mask);
+      grid_mask.resize(gridsize);
+      gridInqMaskGME(gridID, grid_mask.data());
     }
 
   if (gridInqType(gridID) != GRID_UNSTRUCTURED)
@@ -291,31 +289,31 @@ Outputgmt(void *process)
 
   bool grid_is_circular = gridIsCircular(gridID);
 
-  double *grid_center_lat = (double *) Malloc(gridsize * sizeof(double));
-  double *grid_center_lon = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> grid_center_lat(gridsize);
+  std::vector<double> grid_center_lon(gridsize);
 
-  gridInqYvals(gridID, grid_center_lat);
-  gridInqXvals(gridID, grid_center_lon);
+  gridInqYvals(gridID, grid_center_lat.data());
+  gridInqXvals(gridID, grid_center_lon.data());
 
   /* Convert lat/lon units if required */
   gridInqXunits(gridID, units);
-  grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
+  grid_to_degree(units, gridsize, grid_center_lon.data(), "grid center lon");
   gridInqYunits(gridID, units);
-  grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
+  grid_to_degree(units, gridsize, grid_center_lat.data(), "grid center lat");
 
   int nvals = gridsize;
-  double *plon = grid_center_lon;
-  double *plat = grid_center_lat;
+  double *plon = grid_center_lon.data();
+  double *plat = grid_center_lat.data();
 
   if (operatorID == OUTPUTCENTER2 && grid_is_circular)
     {
       gridsize2 = nlat * (nlon + 1);
 
-      grid_center_lat2 = (double *) Malloc(gridsize2 * sizeof(double));
-      grid_center_lon2 = (double *) Malloc(gridsize2 * sizeof(double));
+      grid_center_lat2.resize(gridsize2);
+      grid_center_lon2.resize(gridsize2);
 
-      make_cyclic(grid_center_lat, grid_center_lat2, nlon, nlat);
-      make_cyclic(grid_center_lon, grid_center_lon2, nlon, nlat);
+      make_cyclic(grid_center_lat.data(), grid_center_lat2.data(), nlon, nlat);
+      make_cyclic(grid_center_lon.data(), grid_center_lon2.data(), nlon, nlat);
 
       for (int j = 0; j < nlat; ++j)
         {
@@ -324,27 +322,27 @@ Outputgmt(void *process)
         }
 
       nvals = gridsize2;
-      plon = grid_center_lon2;
-      plat = grid_center_lat2;
+      plon = grid_center_lon2.data();
+      plat = grid_center_lat2.data();
     }
 
-  double *zaxis_center_lev = (double *) Malloc(nlev * sizeof(double));
-  double *zaxis_lower_lev = (double *) Malloc(nlev * sizeof(double));
-  double *zaxis_upper_lev = (double *) Malloc(nlev * sizeof(double));
+  std::vector<double> zaxis_center_lev(nlev);
+  std::vector<double> zaxis_lower_lev(nlev);
+  std::vector<double> zaxis_upper_lev(nlev);
 
-  cdoZaxisInqLevels(zaxisID, zaxis_center_lev);
+  cdoZaxisInqLevels(zaxisID, zaxis_center_lev.data());
 
   if (luse_grid_corner)
     {
       if (ncorner == 0) cdoAbort("grid corner missing!");
       size_t nalloc = ncorner * gridsize;
-      grid_corner_lat = (double *) Realloc(grid_corner_lat, nalloc * sizeof(double));
-      grid_corner_lon = (double *) Realloc(grid_corner_lon, nalloc * sizeof(double));
+      grid_corner_lat.resize(nalloc);
+      grid_corner_lon.resize(nalloc);
 
       if (gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL))
         {
-          gridInqYbounds(gridID, grid_corner_lat);
-          gridInqXbounds(gridID, grid_corner_lon);
+          gridInqYbounds(gridID, grid_corner_lat.data());
+          gridInqXbounds(gridID, grid_corner_lon.data());
         }
       else
         {
@@ -354,21 +352,21 @@ Outputgmt(void *process)
               char yunitstr[CDI_MAX_NAME];
               gridInqXunits(gridID, xunitstr);
               gridInqYunits(gridID, yunitstr);
-              if (!lzon) grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon, grid_corner_lon, 0);
-              if (!lmer) grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat, grid_corner_lat);
+              if (!lzon) grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon.data(), grid_corner_lon.data(), 0);
+              if (!lmer) grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat.data(), grid_corner_lat.data());
             }
           else
             cdoAbort("Grid corner missing!");
         }
 
       /* Note: using units from latitude instead from bounds */
-      grid_to_degree(units, ncorner * gridsize, grid_corner_lon, "grid corner lon");
-      grid_to_degree(units, ncorner * gridsize, grid_corner_lat, "grid corner lat");
+      grid_to_degree(units, ncorner * gridsize, grid_corner_lon.data(), "grid corner lon");
+      grid_to_degree(units, ncorner * gridsize, grid_corner_lat.data(), "grid corner lat");
 
       if (zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL))
         {
-          zaxisInqLbounds(zaxisID, zaxis_lower_lev);
-          zaxisInqUbounds(zaxisID, zaxis_upper_lev);
+          zaxisInqLbounds(zaxisID, zaxis_lower_lev.data());
+          zaxisInqUbounds(zaxisID, zaxis_upper_lev.data());
         }
       else
         {
@@ -384,21 +382,23 @@ Outputgmt(void *process)
         }
     }
 
-  double *array = (double *) Malloc(gridsize * sizeof(double));
-  double *parray = array;
+  std::vector<double> array(gridsize);
+  double *parray = array.data();
 
+  std::vector<double> array2;
   if (operatorID == OUTPUTCENTER2 && grid_is_circular)
     {
-      array2 = (double *) Malloc(nlat * (nlon + 1) * sizeof(double));
-      parray = array2;
+      array2.resize(nlat * (nlon + 1));
+      parray = array2.data();
     }
 
+  std::vector<double> uf, vf, alpha, auv;
   if (operatorID == OUTPUTVECTOR)
     {
-      uf = (double *) Malloc(gridsize * sizeof(double));
-      vf = (double *) Malloc(gridsize * sizeof(double));
-      alpha = (double *) Malloc(gridsize * sizeof(double));
-      auv = (double *) Malloc(gridsize * sizeof(double));
+      uf.resize(gridsize);
+      vf.resize(gridsize);
+      alpha.resize(gridsize);
+      auv.resize(gridsize);
     }
 
   int tsID = 0;
@@ -445,9 +445,9 @@ Outputgmt(void *process)
           if (varID != varID0) continue;
           if (recID > 0 && !lzon && !lmer) continue;
 
-          pstreamReadRecord(streamID, array, &nmiss);
+          pstreamReadRecord(streamID, array.data(), &nmiss);
 
-          if (operatorID == OUTPUTCENTER2 && grid_is_circular) make_cyclic(array, array2, nlon, nlat);
+          if (operatorID == OUTPUTCENTER2 && grid_is_circular) make_cyclic(array.data(), array2.data(), nlon, nlat);
 
           double level = zaxis_center_lev[levelID];
 
@@ -461,7 +461,7 @@ Outputgmt(void *process)
               if (cdoVerbose)
                 {
                   double minval, maxval, meanval;
-                  arrayMinMaxMeanMV(gridsize, array, missval, &minval, &maxval, &meanval);
+                  arrayMinMaxMeanMV(gridsize, array.data(), missval, &minval, &maxval, &meanval);
                   double range = maxval - minval;
                   fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range / 20);
                   fprintf(stderr, "pscontour -K -JQ0/10i -Rd -I -Cgmt.cpt "
@@ -471,7 +471,7 @@ Outputgmt(void *process)
 
               for (int i = 0; i < nvals; i++)
                 {
-                  if (grid_mask && grid_mask[i] == 0) continue;
+                  if (grid_mask.size() && grid_mask[i] == 0) continue;
 
                   if (operatorID == OUTPUTCENTER)
                     {
@@ -527,9 +527,9 @@ Outputgmt(void *process)
             {
               if (nrecs < 2) cdoAbort("Too few fields!");
 
-              arrayCopy(gridsize, array, uf);
+              arrayCopy(gridsize, array.data(), uf.data());
               pstreamInqRecord(streamID, &varID, &levelID);
-              pstreamReadRecord(streamID, vf, &nmiss);
+              pstreamReadRecord(streamID, vf.data(), &nmiss);
 
               for (int j = 0; j < nlat; j += ninc)
                 for (int i = 0; i < nlon; i += ninc)
@@ -554,14 +554,14 @@ Outputgmt(void *process)
             }
           else if (operatorID == OUTPUTVRML)
             {
-              output_vrml(nlon, nlat, gridsize, array, missval, &cpt);
+              output_vrml(nlon, nlat, gridsize, array.data(), missval, &cpt);
             }
           else if (operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT)
             {
               if (cdoVerbose)
                 {
                   double minval, maxval, meanval;
-                  arrayMinMaxMeanMV(gridsize, array, missval, &minval, &maxval, &meanval);
+                  arrayMinMaxMeanMV(gridsize, array.data(), missval, &minval, &maxval, &meanval);
                   double range = maxval - minval;
                   fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range / 20);
                   fprintf(stderr, "psxy -K -JQ0/10i -Rd -L -Cgmt.cpt -m "
@@ -575,7 +575,7 @@ Outputgmt(void *process)
 
               for (size_t i = 0; i < gridsize; i++)
                 {
-                  if (grid_mask && grid_mask[i] == 0) continue;
+                  if (grid_mask.size() && grid_mask[i] == 0) continue;
 
                   if (!DBL_IS_EQUAL(array[i], missval))
                     fprintf(stdout, "> -Z%g", array[i]);
@@ -668,8 +668,8 @@ Outputgmt(void *process)
                     }
                   else
                     {
-                      const double *lon_bounds = grid_corner_lon + i * ncorner;
-                      const double *lat_bounds = grid_corner_lat + i * ncorner;
+                      const double *lon_bounds = grid_corner_lon.data() + i * ncorner;
+                      const double *lat_bounds = grid_corner_lat.data() + i * ncorner;
                       int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
 
                       for (int ic = 0; ic < ncorner_new; ic++) fprintf(stdout, "   %g  %g\n", lon_bounds[ic], lat_bounds[ic]);
@@ -686,20 +686,6 @@ Outputgmt(void *process)
     }
 
   pstreamClose(streamID);
-
-  if (array) Free(array);
-  if (array2) Free(array2);
-  if (grid_mask) Free(grid_mask);
-  if (grid_center_lon) Free(grid_center_lon);
-  if (grid_center_lat) Free(grid_center_lat);
-  if (grid_center_lon2) Free(grid_center_lon2);
-  if (grid_center_lat2) Free(grid_center_lat2);
-  if (grid_corner_lon) Free(grid_corner_lon);
-  if (grid_corner_lat) Free(grid_corner_lat);
-
-  Free(zaxis_center_lev);
-  Free(zaxis_lower_lev);
-  Free(zaxis_upper_lev);
 
   cdoFinish();
 
