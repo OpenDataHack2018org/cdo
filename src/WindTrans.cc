@@ -228,7 +228,7 @@ DestaggerUV()
   bool lcopy = false;
   int UorV;
   size_t nlon = 0, nlat = 0;
-  double *ivar = NULL, *ovar = NULL;
+  std::vector<double> ivar, ovar;
   double dxU = 0, dyU = 0, dxV = 0, dyV = 0;
 
   // Note: Already initialized by the caller! Don't call again:
@@ -503,13 +503,13 @@ DestaggerUV()
       if (CdoDebug::cdoDebugExt)
         cdoPrint("Allocating memory for maximum gridsize (for input) = %ld [%4.3f MB]",
                  gridsize, gridsize * sizeof(double) / (1024.0 * 1024));
-      ivar = (double *) Malloc(gridsize * sizeof(double));  // storage for other fields than
+      ivar.resize(gridsize);  // storage for other fields than
 
       gridsize = gridInqSize(gridID1);  // actual size of U-wind should be same as V-wind
       if (CdoDebug::cdoDebugExt)
         cdoPrint("Allocating memory for gridsize (destaggered output)= %ld; nlon=%zu, nlat=%zu",
                  gridsize, nlon, nlat);
-      ovar = (double *) Malloc(gridsize * sizeof(double));
+      ovar.resize(gridsize);
     }  // end of  if (!lcopy)
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -602,7 +602,7 @@ DestaggerUV()
                               // record with U or V is not staggered
                 {
                   size_t nmiss;
-                  pstreamReadRecord(streamID1, ivar, &nmiss);
+                  pstreamReadRecord(streamID1, ivar.data(), &nmiss);
                   // read the original record with staggered u or v
                   gridsize = gridInqSize(gridID1);
 
@@ -612,10 +612,10 @@ DestaggerUV()
                   // We handle one level at the time; klev=1;offset=0.
                   if ((dxU < 0.0) && (dyV < 0.0))
                     // UorV = 0: U-wind; 1: V-wind
-                    destaggerUorV(ivar, ovar, 1, nlat, nlon, UorV, 0);
+                    destaggerUorV(ivar.data(), ovar.data(), 1, nlat, nlon, UorV, 0);
                   else if ((dyU > 0.0) && (dxV > 0.0))
                     // UorV = 0: U-wind; 1: V-wind
-                    destaggerUorV_positiveOrder(ivar, ovar, 1, nlat, nlon, UorV, 0);
+                    destaggerUorV_positiveOrder(ivar.data(), ovar.data(), 1, nlat, nlon, UorV, 0);
                   else
                     cdoAbort("Unsupported destaggering grid offset: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) "
                              "where: xincU=%3.2f, yincU=%3.2f, xincV=%3.2f, yincV=%3.2f",
@@ -638,7 +638,7 @@ DestaggerUV()
                              vlistInqVarGrid(vlistID2, varID));
 
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, ovar, nmiss);
+                  pstreamWriteRecord(streamID2, ovar.data(), nmiss);
                 }
               else
                 {  // copy the record to the output unchanged...
@@ -667,9 +667,6 @@ DestaggerUV()
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (ivar) Free(ivar);
-  if (ovar) Free(ovar);
 
   cdoFinish();
 
@@ -742,10 +739,10 @@ rot_uv_north(int gridID, double *us, double *vs)
   size_t nx = gridInqXsize(gridID);
   size_t ny = gridInqYsize(gridID);
 
-  double *xvals = (double *) Malloc(nx * ny * sizeof(double));
-  double *yvals = (double *) Malloc(nx * ny * sizeof(double));
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  std::vector<double> xvals(nx * ny);
+  std::vector<double> yvals(nx * ny);
+  gridInqXvals(gridID, xvals.data());
+  gridInqYvals(gridID, yvals.data());
 
   int scanningMode = gridInqScanningMode(gridID);
   bool jScansPositively = (scanningMode == 64);
@@ -1014,9 +1011,6 @@ rot_uv_north(int gridID, double *us, double *vs)
       }
 
   if (CdoDebug::cdoDebugExt >= 20) cdoPrint("%s(gridname=%s) finished.", __func__, gridNamePtr(gridInqType(gridID)));
-
-  Free(xvals);
-  Free(yvals);
 }
 
 static void
@@ -1046,19 +1040,19 @@ rot_uv_back_mode64(int gridID, double *us, double *vs)
   long nlon = gridInqXsize(gridID);
   long nlat = gridInqYsize(gridID);
 
-  double *xvals = (double *) Malloc(nlon * sizeof(double));
-  double *yvals = (double *) Malloc(nlat * sizeof(double));
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  std::vector<double> xvals(nlon);
+  std::vector<double> yvals(nlat);
+  gridInqXvals(gridID, xvals.data());
+  gridInqYvals(gridID, yvals.data());
 
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID, units);
   grid_to_degree(units, 1, &xpole, "xpole");
-  grid_to_degree(units, nlon, xvals, "grid center lon");
+  grid_to_degree(units, nlon, xvals.data(), "grid center lon");
   gridInqYunits(gridID, units);
   grid_to_degree(units, 1, &ypole, "ypole");
-  grid_to_degree(units, nlat, yvals, "grid center lat");
+  grid_to_degree(units, nlat, yvals.data(), "grid center lat");
 
   double u, v;
   for (long ilat = 0; ilat < nlat; ilat++)
@@ -1074,9 +1068,6 @@ rot_uv_back_mode64(int gridID, double *us, double *vs)
         us[i] = u;
         vs[i] = v;
       }
-
-  Free(xvals);
-  Free(yvals);
 }
 
 static void
@@ -1114,10 +1105,10 @@ project_uv_latlon(int gridID, double *us, double *vs)
   size_t nx = gridInqXsize(gridID);
   size_t ny = gridInqYsize(gridID);
 
-  double *xvals = (double *) Malloc(nx * ny * sizeof(double));
-  double *yvals = (double *) Malloc(nx * ny * sizeof(double));
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  std::vector<double> xvals(nx * ny);
+  std::vector<double> yvals(nx * ny);
+  gridInqXvals(gridID, xvals.data());
+  gridInqYvals(gridID, yvals.data());
 
   int signLon = ((xvals[1] - xvals[0]) < 0) ? -1 : 1;
   int signLat = ((yvals[1] - yvals[0]) < 0) ? -1 : 1;
@@ -1212,9 +1203,6 @@ project_uv_latlon(int gridID, double *us, double *vs)
       }
 
   if (CdoDebug::cdoDebugExt >= 20) cdoPrint("%s(gridname=%s) finished.", __func__, gridNamePtr(gridInqType(gridID)));
-
-  Free(xvals);
-  Free(yvals);
 }
 
 void *

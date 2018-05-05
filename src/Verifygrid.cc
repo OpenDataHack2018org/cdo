@@ -24,10 +24,11 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream_int.h"
+#include "time.h"
 extern "C" {
 #include "lib/yac/geometry.h"
 }
-#include "time.h"
+
 
 static void
 quick_sort(double *array, size_t array_length)
@@ -86,7 +87,7 @@ static void
 quick_sort_of_subarray_by_lat(double *array, size_t subarray_start, size_t subarray_end)
 {
   size_t subarray_length = (subarray_end - subarray_start) / 2 + 1;
-  double *subarray = (double *) Malloc(subarray_length * sizeof(double));
+  std::vector<double> subarray(subarray_length);
   size_t subarray_index = 0;
 
   for (size_t index = subarray_start + 1; index <= subarray_end + 1; index += 2)
@@ -95,7 +96,7 @@ quick_sort_of_subarray_by_lat(double *array, size_t subarray_start, size_t subar
       subarray_index += 1;
     }
 
-  quick_sort(subarray, subarray_length);
+  quick_sort(subarray.data(), subarray_length);
 
   subarray_index = 0;
 
@@ -104,8 +105,6 @@ quick_sort_of_subarray_by_lat(double *array, size_t subarray_start, size_t subar
       array[index] = subarray[subarray_index];
       subarray_index += 1;
     }
-
-  Free(subarray);
 }
 
 static double
@@ -318,7 +317,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
   constexpr double eps = 0.000000001;
   double center_point_xyz[3];
-  double *cell_corners_xyz_open_cell = (double *) Malloc(3 * ncorner * sizeof(double));
+  std::vector<double> cell_corners_xyz_open_cell(3 * ncorner);
 
   double corner_coordinates[3];
   double center_point_plane_projection[2];
@@ -331,7 +330,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
   size_t no_of_cells_with_center_points_out_of_bounds = 0;
   size_t no_unique_center_points = 1;
 
-  int *no_cells_with_a_specific_no_of_corners = (int *) Malloc(ncorner * sizeof(int));
+  std::vector<int> no_cells_with_a_specific_no_of_corners(ncorner);
 
   for (int i = 0; i < ncorner; i++) no_cells_with_a_specific_no_of_corners[i] = 0;
 
@@ -649,9 +648,6 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
                 no_of_cells_with_center_points_out_of_bounds);
 
   // cdoPrint("");
-
-  Free(no_cells_with_a_specific_no_of_corners);
-  Free(cell_corners_xyz_open_cell);
 }
 
 void *
@@ -673,7 +669,7 @@ Verifygrid(void *argument)
   for (int gridno = 0; gridno < ngrids; ++gridno)
     {
       bool lgeo = true;
-      bool lgrid_gen_bounds = false, luse_grid_corner = true;
+      bool luse_grid_corner = true;
 
       int gridID = vlistGrid(vlistID, gridno);
       int gridtype = gridInqType(gridID);
@@ -689,7 +685,6 @@ Verifygrid(void *argument)
           else
             {
               gridID = gridToCurvilinear(gridID, 1);
-              lgrid_gen_bounds = true;
             }
         }
 
@@ -704,60 +699,47 @@ Verifygrid(void *argument)
       */
       if (lgeo)
         {
-          double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
+          std::vector<double> grid_corner_lat, grid_corner_lon;
           int ncorner = 4;
           if (gridInqType(gridID) == GRID_UNSTRUCTURED) ncorner = gridInqNvertex(gridID);
 
-          double *grid_center_lat = (double *) Malloc(gridsize * sizeof(double));
-          double *grid_center_lon = (double *) Malloc(gridsize * sizeof(double));
+          std::vector<double> grid_center_lat(gridsize);
+          std::vector<double> grid_center_lon(gridsize);
 
-          gridInqYvals(gridID, grid_center_lat);
-          gridInqXvals(gridID, grid_center_lon);
+          gridInqYvals(gridID, grid_center_lat.data());
+          gridInqXvals(gridID, grid_center_lon.data());
 
           /* Convert lat/lon units if required */
           gridInqXunits(gridID, units);
-          grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
+          grid_to_degree(units, gridsize, grid_center_lon.data(), "grid center lon");
           gridInqYunits(gridID, units);
-          grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
+          grid_to_degree(units, gridsize, grid_center_lat.data(), "grid center lat");
 
           if (luse_grid_corner)
             {
               if (ncorner == 0) cdoAbort("grid corner missing!");
               size_t nalloc = ncorner * gridsize;
-              grid_corner_lat = (double *) Realloc(grid_corner_lat, nalloc * sizeof(double));
-              grid_corner_lon = (double *) Realloc(grid_corner_lon, nalloc * sizeof(double));
+              grid_corner_lat.resize(nalloc);
+              grid_corner_lon.resize(nalloc);
 
               if (gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL))
                 {
-                  gridInqYbounds(gridID, grid_corner_lat);
-                  gridInqXbounds(gridID, grid_corner_lon);
+                  gridInqYbounds(gridID, grid_corner_lat.data());
+                  gridInqXbounds(gridID, grid_corner_lon.data());
                 }
               else
                 {
-                  if (lgrid_gen_bounds)
-                    {
-                      char xunitstr[CDI_MAX_NAME];
-                      char yunitstr[CDI_MAX_NAME];
-                      gridInqXunits(gridID, xunitstr);
-                      gridInqYunits(gridID, yunitstr);
-                    }
-                  else
-                    cdoAbort("Grid corner missing!");
+                  cdoAbort("Grid corner missing!");
                 }
 
               /* Note: using units from latitude instead from bounds */
-              grid_to_degree(units, ncorner * gridsize, grid_corner_lon, "grid corner lon");
-              grid_to_degree(units, ncorner * gridsize, grid_corner_lat, "grid corner lat");
+              grid_to_degree(units, ncorner * gridsize, grid_corner_lon.data(), "grid corner lon");
+              grid_to_degree(units, ncorner * gridsize, grid_corner_lat.data(), "grid corner lat");
             }
 
           if (operatorID == VERIFYGRID)
-            verify_grid(gridtype, gridsize, gridno, ngrids, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon,
-                        grid_corner_lat);
-
-          if (grid_center_lon) Free(grid_center_lon);
-          if (grid_center_lat) Free(grid_center_lat);
-          if (grid_corner_lon) Free(grid_corner_lon);
-          if (grid_corner_lat) Free(grid_corner_lat);
+            verify_grid(gridtype, gridsize, gridno, ngrids, ncorner, grid_center_lon.data(), grid_center_lat.data(),
+                        grid_corner_lon.data(), grid_corner_lat.data());
         }
       else
         {

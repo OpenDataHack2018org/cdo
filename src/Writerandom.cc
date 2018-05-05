@@ -55,11 +55,11 @@ Writerandom(void *process)
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      double **recdata = (double **) Malloc(nrecs * sizeof(double *));
-      int *recvarID = (int *) Malloc(nrecs * sizeof(int));
-      int *reclevelID = (int *) Malloc(nrecs * sizeof(int));
-      size_t *recnmiss = (size_t *) Malloc(nrecs * sizeof(size_t));
-      int *recindex = (int *) Malloc(nrecs * sizeof(int));
+      std::vector<std::vector<double>> recdata(nrecs);
+      std::vector<int> recvarID(nrecs);
+      std::vector<int> reclevelID(nrecs);
+      std::vector<size_t> recnmiss(nrecs);
+      std::vector<int> recindex(nrecs);
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -67,8 +67,8 @@ Writerandom(void *process)
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           recvarID[recID] = varID;
           reclevelID[recID] = levelID;
-          recdata[recID] = (double *) Malloc(gridsize * sizeof(double));
-          pstreamReadRecord(streamID1, recdata[recID], &recnmiss[recID]);
+          recdata[recID].resize(gridsize);
+          pstreamReadRecord(streamID1, recdata[recID].data(), &recnmiss[recID]);
         }
 
       for (int recID = 0; recID < nrecs; recID++) recindex[recID] = -1;
@@ -103,16 +103,8 @@ Writerandom(void *process)
           levelID = reclevelID[rindex];
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, recdata[rindex], recnmiss[rindex]);
+          pstreamWriteRecord(streamID2, recdata[rindex].data(), recnmiss[rindex]);
         }
-
-      for (int recID = 0; recID < nrecs; recID++) Free(recdata[recID]);
-
-      Free(recdata);
-      Free(recvarID);
-      Free(reclevelID);
-      Free(recnmiss);
-      Free(recindex);
 
       tsID++;
     }

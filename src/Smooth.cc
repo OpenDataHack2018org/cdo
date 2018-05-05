@@ -56,7 +56,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   size_t numNeighbors = spoint.maxpoints;
   if (numNeighbors > gridsize) numNeighbors = gridsize;
 
-  uint8_t *mask = (uint8_t *) Malloc(gridsize * sizeof(uint8_t));
+  std::vector<uint8_t> vmask(gridsize);
+  uint8_t *mask = vmask.data();
   for (size_t i = 0; i < gridsize; ++i) mask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
   std::vector<double> xvals(gridsize);
@@ -141,8 +142,6 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   if (gs) gridsearch_delete(gs);
 
   if (gridID0 != gridID) gridDestroy(gridID);
-
-  Free(mask);
 }
 
 static inline void
@@ -163,7 +162,8 @@ smooth9(int gridID, double missval, const double *restrict array1, double *restr
   size_t nlat = gridInqYsize(gridID);
   int grid_is_cyclic = gridIsCircular(gridID);
 
-  uint8_t *mask = (uint8_t *) Malloc(gridsize * sizeof(uint8_t));
+  std::vector<uint8_t> vmask(gridsize);
+  uint8_t *mask = vmask.data();
 
   for (size_t i = 0; i < gridsize; ++i) mask[i] = !DBL_IS_EQUAL(missval, array1[i]);
 
@@ -251,8 +251,6 @@ smooth9(int gridID, double missval, const double *restrict array1, double *restr
             }
         }
     }
-
-  Free(mask);
 }
 
 double
@@ -313,20 +311,15 @@ smoothGetParameter(int *xnsmooth, smoothpoint_t *spoint)
           if (kv->nvalues < 1) cdoAbort("Missing value for parameter key >%s<!", key);
           const char *value = kv->values[0];
 
-          if (STR_IS_EQ(key, "nsmooth"))
-            *xnsmooth = parameter2int(value);
-          else if (STR_IS_EQ(key, "maxpoints"))
-            spoint->maxpoints = parameter2sizet(value);
-          else if (STR_IS_EQ(key, "weight0"))
-            spoint->weight0 = parameter2double(value);
-          else if (STR_IS_EQ(key, "weightR"))
-            spoint->weightR = parameter2double(value);
-          else if (STR_IS_EQ(key, "radius"))
-            spoint->radius = radius_str_to_deg(value);
-          else if (STR_IS_EQ(key, "form"))
-            spoint->form = convert_form(value);
-          else
-            cdoAbort("Invalid parameter key >%s<!", key);
+          // clang-format off
+          if      (STR_IS_EQ(key, "nsmooth")) *xnsmooth = parameter2int(value);
+          else if (STR_IS_EQ(key, "maxpoints")) spoint->maxpoints = parameter2sizet(value);
+          else if (STR_IS_EQ(key, "weight0")) spoint->weight0 = parameter2double(value);
+          else if (STR_IS_EQ(key, "weightR")) spoint->weightR = parameter2double(value);
+          else if (STR_IS_EQ(key, "radius")) spoint->radius = radius_str_to_deg(value);
+          else if (STR_IS_EQ(key, "form")) spoint->form = convert_form(value);
+          else cdoAbort("Invalid parameter key >%s<!", key);
+          // clang-format on
         }
 
       list_destroy(kvlist);
