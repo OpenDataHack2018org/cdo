@@ -285,8 +285,7 @@ Maskbox(void *process)
     }
 
   if (gridtype == GRID_GAUSSIAN_REDUCED)
-    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a "
-             "regular grid!");
+    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
   if (index == ngrids) cdoAbort("No regular lon/lat grid found!");
   if (ndiffgrids > 0) cdoAbort("Too many different grids!");
@@ -333,27 +332,25 @@ Maskbox(void *process)
     }
   else if (operatorID == MASKREGION)
     {
-      double *xcoords = (double *) Malloc(MAX_VALS * sizeof(double));
-      double *ycoords = (double *) Malloc(MAX_VALS * sizeof(double));
+      std::vector<double> xcoords(MAX_VALS);
+      std::vector<double> ycoords(MAX_VALS);
       int nfiles = operatorArgc();
 
       for (int i = 0; i < nfiles; i++)
         {
           const char *polyfile = operatorArgv()[i];
           FILE *fp = fopen(polyfile, "r");
-
           if (fp == 0) cdoAbort("Open failed on %s", polyfile);
+
           while (TRUE)
             {
-              int number = ReadCoords(xcoords, ycoords, polyfile, fp);
+              int number = ReadCoords(xcoords.data(), ycoords.data(), polyfile, fp);
               if (number == 0) break;
               if (number < 3) cdoAbort("Too less values in file %s", polyfile);
-              maskregion(mask, gridID, xcoords, ycoords, number);
+              maskregion(mask, gridID, xcoords.data(), ycoords.data(), number);
             }
           fclose(fp);
         }
-      if (xcoords) Free(xcoords);
-      if (ycoords) Free(ycoords);
     }
 
   int tsID = 0;

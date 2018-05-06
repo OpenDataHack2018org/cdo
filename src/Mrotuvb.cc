@@ -55,11 +55,9 @@ void
 rotate_uv2(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat, double *u_lon, double *v_lat)
 {
   /*
- real,intent(in)      :: u_i(ix,iy,iz),v_j(ix,iy,iz)                  ! vector
- components in i-j-direction real,intent(out)     ::
- u_lon(ix,iy,iz),v_lat(ix,iy,iz)              ! vector components in lon-lat
- direction real,intent(in)      :: lat(ix,iy),lon(ix,iy)
- ! latitudes and longitudes
+    real,intent(in)      :: u_i(ix,iy,iz),v_j(ix,iy,iz)       ! vector components in i-j-direction
+    real,intent(out)     :: u_lon(ix,iy,iz),v_lat(ix,iy,iz)   ! vector components in lon-lat direction
+    real,intent(in)      :: lat(ix,iy),lon(ix,iy)             ! latitudes and longitudes
   */
   double dlat_i, dlat_j, dlon_i, dlon_j, dist_i, dist_j;
   double lat_factor;
@@ -158,8 +156,8 @@ uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y, double *g
   double gx2, gy2;
 
   size_t gridsizex = (nlon + 2) * nlat;
-  double *gxhelp = (double *) Malloc(gridsizex * sizeof(double));
-  double *gyhelp = (double *) Malloc(gridsizex * sizeof(double));
+  std::vector<double> gxhelp(gridsizex);
+  std::vector<double> gyhelp(gridsizex);
 
   /* load to a help field */
   for (size_t j = 0; j < nlat; j++)
@@ -248,9 +246,6 @@ uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y, double *g
         /* printf("%d %d %g %g %g %g \n", j, i, gx2, gy2,
          * grid3x[IX2D(j,i,nlon)], grid3y[IX2D(j,i,nlon)]); */
       }
-
-  Free(gxhelp);
-  Free(gyhelp);
 }
 
 void *
@@ -282,8 +277,7 @@ Mrotuvb(void *process)
   int gridID2 = vlistGrid(vlistID2, 0);
   size_t gridsize = gridInqSize(gridID1);
   if (gpint == true && gridID1 == gridID2)
-    cdoAbort("Input grids are the same, use parameter >noint< to disable "
-             "interpolation!");
+    cdoAbort("Input grids are the same, use parameter >noint< to disable interpolation!");
   if (gpint == false && gridID1 != gridID2) cdoAbort("Input grids are not the same!");
   if (gridsize != gridInqSize(gridID2)) cdoAbort("Grids have different size!");
 
@@ -301,58 +295,53 @@ Mrotuvb(void *process)
   size_t nlon = gridInqXsize(gridID1);
   size_t nlat = gridInqYsize(gridID1);
 
-  double *grid1x = (double *) Malloc(gridsize * sizeof(double));
-  double *grid1y = (double *) Malloc(gridsize * sizeof(double));
-  double *grid2x = (double *) Malloc(gridsize * sizeof(double));
-  double *grid2y = (double *) Malloc(gridsize * sizeof(double));
-  double *grid3x = (double *) Malloc(gridsize * sizeof(double));
-  double *grid3y = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> grid1x(gridsize);
+  std::vector<double> grid1y(gridsize);
+  std::vector<double> grid2x(gridsize);
+  std::vector<double> grid2y(gridsize);
+  std::vector<double> grid3x(gridsize);
+  std::vector<double> grid3y(gridsize);
 
-  gridInqXvals(gridID1, grid1x);
-  gridInqYvals(gridID1, grid1y);
+  gridInqXvals(gridID1, grid1x.data());
+  gridInqYvals(gridID1, grid1y.data());
 
   /* Convert lat/lon units if required */
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID1, units);
-    grid_to_degree(units, gridsize, grid1x, "grid1 center lon");
+    grid_to_degree(units, gridsize, grid1x.data(), "grid1 center lon");
     gridInqYunits(gridID1, units);
-    grid_to_degree(units, gridsize, grid1y, "grid1 center lat");
+    grid_to_degree(units, gridsize, grid1y.data(), "grid1 center lat");
   }
 
-  gridInqXvals(gridID2, grid2x);
-  gridInqYvals(gridID2, grid2y);
+  gridInqXvals(gridID2, grid2x.data());
+  gridInqYvals(gridID2, grid2y.data());
 
   /* Convert lat/lon units if required */
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID2, units);
-    grid_to_degree(units, gridsize, grid2x, "grid2 center lon");
+    grid_to_degree(units, gridsize, grid2x.data(), "grid2 center lon");
     gridInqYunits(gridID2, units);
-    grid_to_degree(units, gridsize, grid2y, "grid2 center lat");
+    grid_to_degree(units, gridsize, grid2y.data(), "grid2 center lat");
   }
 
   if (gpint)
     {
-      uv_to_p_grid(nlon, nlat, grid1x, grid1y, grid2x, grid2y, grid3x, grid3y);
+      uv_to_p_grid(nlon, nlat, grid1x.data(), grid1y.data(), grid2x.data(), grid2y.data(), grid3x.data(), grid3y.data());
     }
   else
     {
-      arrayCopy(gridsize, grid1x, grid3x);
-      arrayCopy(gridsize, grid1y, grid3y);
+      arrayCopy(gridsize, grid1x.data(), grid3x.data());
+      arrayCopy(gridsize, grid1y.data(), grid3y.data());
     }
-
-  if (grid1x) Free(grid1x);
-  if (grid1y) Free(grid1y);
-  if (grid2x) Free(grid2x);
-  if (grid2y) Free(grid2y);
 
   int gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
   gridDefDatatype(gridID3, gridInqDatatype(gridID1));
   gridDefXsize(gridID3, nlon);
   gridDefYsize(gridID3, nlat);
-  gridDefXvals(gridID3, grid3x);
-  gridDefYvals(gridID3, grid3y);
+  gridDefXvals(gridID3, grid3x.data());
+  gridDefYvals(gridID3, grid3y.data());
 
   for (size_t i = 0; i < gridsize; i++)
     {
@@ -384,17 +373,17 @@ Mrotuvb(void *process)
   double missval1 = vlistInqVarMissval(vlistID1, 0);
   double missval2 = vlistInqVarMissval(vlistID2, 0);
 
-  double *ufield = (double *) Malloc(gridsize * sizeof(double));
-  double *vfield = (double *) Malloc(gridsize * sizeof(double));
-  double *urfield = (double *) Malloc(gridsize * sizeof(double));
-  double *vrfield = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> ufield(gridsize);
+  std::vector<double> vfield(gridsize);
+  std::vector<double> urfield(gridsize);
+  std::vector<double> vrfield(gridsize);
 
-  double *uhelp = NULL, *vhelp = NULL;
+  std::vector<double> uhelp, vhelp;
   if (gpint)
     {
       size_t gridsizex = (nlon + 2) * nlat;
-      uhelp = (double *) Malloc(gridsizex * sizeof(double));
-      vhelp = (double *) Malloc(gridsizex * sizeof(double));
+      uhelp.resize(gridsizex);
+      vhelp.resize(gridsizex);
     }
 
   int tsID = 0;
@@ -413,8 +402,8 @@ Mrotuvb(void *process)
           pstreamInqRecord(streamID1, &varID1, &levelID);
           pstreamInqRecord(streamID2, &varID2, &levelID);
 
-          pstreamReadRecord(streamID1, ufield, &nmiss1);
-          pstreamReadRecord(streamID2, vfield, &nmiss2);
+          pstreamReadRecord(streamID1, ufield.data(), &nmiss1);
+          pstreamReadRecord(streamID2, vfield.data(), &nmiss2);
 
           /* remove missing values */
           if (nmiss1 || nmiss2)
@@ -462,7 +451,7 @@ Mrotuvb(void *process)
 
           /* rotate*/
 
-          rotate_uv2(ufield, vfield, nlon, nlat, grid3x, grid3y, urfield, vrfield);
+          rotate_uv2(ufield.data(), vfield.data(), nlon, nlat, grid3x.data(), grid3y.data(), urfield.data(), vrfield.data());
 
           /* calc lat, lon, Auv and alpha */
           /*
@@ -488,9 +477,9 @@ Mrotuvb(void *process)
           nmiss1 = 0;
           nmiss2 = 0;
           pstreamDefRecord(streamID3, 0, levelID);
-          pstreamWriteRecord(streamID3, urfield, nmiss1);
+          pstreamWriteRecord(streamID3, urfield.data(), nmiss1);
           pstreamDefRecord(streamID3, 1, levelID);
-          pstreamWriteRecord(streamID3, vrfield, nmiss2);
+          pstreamWriteRecord(streamID3, vrfield.data(), nmiss2);
         }
 
       tsID++;
@@ -499,18 +488,6 @@ Mrotuvb(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (ufield) Free(ufield);
-  if (vfield) Free(vfield);
-  if (urfield) Free(urfield);
-  if (vrfield) Free(vrfield);
-  if (gpint)
-    {
-      if (uhelp) Free(uhelp);
-      if (vhelp) Free(vhelp);
-    }
-  if (grid3x) Free(grid3x);
-  if (grid3y) Free(grid3y);
 
   cdoFinish();
 
