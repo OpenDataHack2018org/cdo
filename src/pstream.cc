@@ -211,10 +211,7 @@ PstreamType::pstreamOpenReadFile(const char *p_args)
     pthread_mutex_lock(&streamOpenReadMutex);
 #endif
   int fileID = streamOpenRead(filename.c_str());
-  if (fileID < 0)
-    {
-      cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
-    }
+  if (fileID < 0) cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
 
   isopen = true;
 
@@ -292,41 +289,28 @@ PstreamType::pstreamOpenWriteFile(int filetype)
 void
 PstreamType::openAppend(const char *p_filename)
 {
-  if (processNum == 1 && Threading::ompNumThreads == 1)
-    {
-      timer_start(timer_write);
-    }
+  if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_write);
+
 #ifdef HAVE_LIBPTHREAD
   if (Threading::cdoLockIO)
-    {
-      pthread_mutex_lock(&streamMutex);
-    }
+    pthread_mutex_lock(&streamMutex);
   else
-    {
-      pthread_mutex_lock(&streamOpenReadMutex);
-    }
+    pthread_mutex_lock(&streamOpenReadMutex);
 #endif
 
   int fileID = streamOpenAppend(p_filename);
 
 #ifdef HAVE_LIBPTHREAD
   if (Threading::cdoLockIO)
-    {
-      pthread_mutex_unlock(&streamMutex);
-    }
+    pthread_mutex_unlock(&streamMutex);
   else
-    {
-      pthread_mutex_unlock(&streamOpenReadMutex);
-    }
+    pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
-  if (processNum == 1 && Threading::ompNumThreads == 1)
-    {
-      timer_stop(timer_write);
-    }
-  if (fileID < 0)
-    {
-      cdiOpenError(fileID, "Open failed on >%s<", p_filename);
-    }
+
+  if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_write);
+
+  if (fileID < 0) cdiOpenError(fileID, "Open failed on >%s<", p_filename);
+
   isopen = true;
 
   int filetype = streamInqFiletype(fileID);
@@ -457,8 +441,7 @@ PstreamType::inqVlist()
 
       int nsubtypes = vlistNsubtypes(vlistID);
       if (nsubtypes > 1)
-        cdoWarning("Subtypes are unsupported, the processing results are "
-                   "possibly wrong!");
+        cdoWarning("Subtypes are unsupported, the processing results are possibly wrong!");
 
       if (cdoDefaultTimeType != CDI_UNDEFID) taxisDefType(vlistInqTaxis(vlistID), cdoDefaultTimeType);
 
@@ -598,10 +581,8 @@ PstreamType::inqRecord(int *varID, int *levelID)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       pipe->pipeInqRecord(varID, levelID);
     }
 
@@ -628,11 +609,8 @@ PstreamType::defRecord(int varID, int levelID)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
+      if (CdoDebug::PSTREAM) MESSAGE(m_name.c_str(), " pstreamid ", self);
 
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(m_name.c_str(), " pstreamid ", self);
-        }
       pipe->pipeDefRecord(varID, levelID);
     }
   else
@@ -681,10 +659,8 @@ PstreamType::readRecord(double *data, size_t *nmiss)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       pipe->pipeReadRecord(m_vlistID, data, nmiss);
     }
   else
@@ -764,10 +740,8 @@ PstreamType::writeRecord(double *data, size_t nmiss)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       pipe->pipeWriteRecord(data, nmiss);
     }
   else
