@@ -11,6 +11,7 @@ Version 1.9.4 (26 April 2018):
      * option -r doesn't work [Bug #8334]
      * enspctl: changed parameter type from int to float [Bug #8386]
      * segfault with chained operators on timeseries data [Bug #8230]
+     * setattribute: added support for \n in text attributes
      * expr: removed character [LlDd] from definition of float constants
      
 Version 1.9.3 (29 January 2018):
