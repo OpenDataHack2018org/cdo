@@ -68,7 +68,7 @@ public:
 
   int self;  // aka the id of the pstream
   std::pair<int, int> m_id;
-  int mode;
+  int m_mode;
   int m_fileID;
   int m_vlistID;
   int tsID;

@@ -162,6 +162,7 @@ PstreamType::init()
   tsID = -1;
   m_filetype = -1;
   m_name = "";
+  m_mode = 0;
   tsID0 = 0;
   mfiles = 0;
   nfiles = 0;
@@ -190,6 +191,7 @@ PstreamType::pstreamOpenReadPipe()
   if (CdoDebug::PSTREAM) MESSAGE("pipe ", pipe->name);
 
   isopen = true;
+
   return self;
 #else
   cdoAbort("Cannot use pipes, pthread support not compiled in!");
@@ -224,7 +226,8 @@ PstreamType::pstreamOpenReadFile(const char *p_args)
     {
       cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
     }
-    isopen = true;
+
+  isopen = true;
 
   if (cdoDefaultFileType == CDI_UNDEFID) cdoDefaultFileType = streamInqFiletype(fileID);
 
@@ -236,7 +239,7 @@ PstreamType::pstreamOpenReadFile(const char *p_args)
     pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
 
-  mode = 'r';
+  m_mode = 'r';
   m_name = filename;
   m_fileID = fileID;
 }
@@ -245,12 +248,11 @@ int
 PstreamType::pstreamOpenWritePipe(const char *pipename, int filetype)
 {
 #ifdef HAVE_LIBPTHREAD
-  if (CdoDebug::PSTREAM)
-    {
-      MESSAGE("pipe ", pipename);
-    }
+  if (CdoDebug::PSTREAM) MESSAGE("pipe ", pipename);
+
   wthreadID = pthread_self();
   m_filetype = filetype;
+
   return self;
 #else
   return -1;
@@ -260,10 +262,7 @@ PstreamType::pstreamOpenWritePipe(const char *pipename, int filetype)
 int
 PstreamType::pstreamOpenWriteFile(int filetype)
 {
-  if (CdoDebug::PSTREAM)
-    {
-      MESSAGE("Opening (w) file ", m_name);
-    }
+  if (CdoDebug::PSTREAM) MESSAGE("Opening (w) file ", m_name);
 
   if (filetype == CDI_UNDEFID) filetype = CDI_FILETYPE_GRB;
 
@@ -294,7 +293,7 @@ PstreamType::pstreamOpenWriteFile(int filetype)
 
   set_comp(fileID, filetype);
 
-  mode = 'w';
+  m_mode = 'w';
   m_fileID = fileID;
   m_filetype = filetype;
 
@@ -344,8 +343,8 @@ PstreamType::openAppend(const char *p_filename)
   int filetype = streamInqFiletype(fileID);
   set_comp(fileID, filetype);
 
+  m_mode = 'a';
   m_name = p_filename;
-  mode = 'a';
   m_fileID = fileID;
 }
 
@@ -397,10 +396,8 @@ PstreamType::close()
 #ifdef HAVE_LIBPTHREAD
       pthread_t threadID = pthread_self();
 
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE("thID: ", threadID, " rthID: ", rthreadID, " wthID: ", wthreadID);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE("thID: ", threadID, " rthID: ", rthreadID, " wthID: ", wthreadID);
+
       if (pthread_equal(threadID, rthreadID))
         {
           closePipe();
@@ -419,10 +416,8 @@ PstreamType::close()
     }
   else
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(m_name.c_str(), " fileID ", m_fileID);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(m_name.c_str(), " fileID ", m_fileID);
+
 #ifdef HAVE_LIBPTHREAD
       if (Threading::cdoLockIO) pthread_mutex_lock(&streamMutex);
 #endif
