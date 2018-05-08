@@ -47,7 +47,6 @@
 #include "dmemory.h"
 #include "compare.h"
 #include "cdo_vlist.h"
-#include "functs.h"
 #include "array.h"
 #include "cdoOptions.h"
 #include "cdo_history.h"
@@ -164,16 +163,14 @@ PstreamType::init()
   m_name = "";
   m_mode = 0;
   tsID0 = 0;
-  mfiles = 0;
-  nfiles = 0;
   m_varID = -1;
-  m_varlist = NULL;
 #ifdef HAVE_LIBPTHREAD
   pipe = NULL;
   rthreadID = 0;
   wthreadID = 0;
 #endif
 }
+
 PstreamType::PstreamType(int p_id) : self(p_id) { init(); }
 
 bool
@@ -203,15 +200,7 @@ PstreamType::pstreamOpenReadFile(const char *p_args)
 {
   std::string filename;
 
-  if (mfiles)
-    {
-      filename = m_mfnames[0];
-      nfiles = 1;
-    }
-  else
-    {
-      filename = std::string(p_args);
-    }
+  filename = std::string(p_args);
 
   if (CdoDebug::PSTREAM) MESSAGE("Opening (r) file: ", filename.c_str());
 
@@ -427,10 +416,10 @@ PstreamType::close()
       if (Threading::cdoLockIO) pthread_mutex_unlock(&streamMutex);
 #endif
 
-      if (m_varlist)
+      if (m_varlist.size())
         {
-          Free(m_varlist);
-          m_varlist = NULL;
+          m_varlist.clear();
+          m_varlist.shrink_to_fit();
         }
     }
 }
@@ -486,27 +475,27 @@ PstreamType::defVarList(int p_vlistID)
 
   if (m_vlistID != -1) cdoAbort("Internal problem, vlist already defined!");
 
-  if (m_varlist != NULL) cdoAbort("Internal problem, varlist already allocated!");
+  if (m_varlist.size() != 0) cdoAbort("Internal problem, varlist already allocated!");
 
   int nvars = vlistNvars(p_vlistID);
   assert(nvars > 0);
 
-  varlist_t *varlist = (varlist_t *) Malloc(nvars * sizeof(varlist_t));
+  m_varlist.resize(nvars);
 
   for (int varID = 0; varID < nvars; ++varID)
     {
-      varlist[varID].gridsize = gridInqSize(vlistInqVarGrid(p_vlistID, varID));
-      varlist[varID].datatype = vlistInqVarDatatype(p_vlistID, varID);
-      varlist[varID].missval = vlistInqVarMissval(p_vlistID, varID);
-      varlist[varID].addoffset = vlistInqVarAddoffset(p_vlistID, varID);
-      varlist[varID].scalefactor = vlistInqVarScalefactor(p_vlistID, varID);
+      m_varlist[varID].gridsize = gridInqSize(vlistInqVarGrid(p_vlistID, varID));
+      m_varlist[varID].datatype = vlistInqVarDatatype(p_vlistID, varID);
+      m_varlist[varID].missval = vlistInqVarMissval(p_vlistID, varID);
+      m_varlist[varID].addoffset = vlistInqVarAddoffset(p_vlistID, varID);
+      m_varlist[varID].scalefactor = vlistInqVarScalefactor(p_vlistID, varID);
 
-      varlist[varID].check_datarange = false;
+      m_varlist[varID].check_datarange = false;
 
-      int laddoffset = IS_NOT_EQUAL(varlist[varID].addoffset, 0);
-      int lscalefactor = IS_NOT_EQUAL(varlist[varID].scalefactor, 1);
+      int laddoffset = IS_NOT_EQUAL(m_varlist[varID].addoffset, 0);
+      int lscalefactor = IS_NOT_EQUAL(m_varlist[varID].scalefactor, 1);
 
-      int datatype = varlist[varID].datatype;
+      int datatype = m_varlist[varID].datatype;
 
       if (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4
           || filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5)
@@ -515,30 +504,29 @@ PstreamType::defVarList(int p_vlistID)
               && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC5))
             {
               datatype = CDI_DATATYPE_INT16;
-              varlist[varID].datatype = datatype;
+              m_varlist[varID].datatype = datatype;
             }
 
           if (datatype == CDI_DATATYPE_UINT16
               && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC5))
             {
               datatype = CDI_DATATYPE_INT32;
-              varlist[varID].datatype = datatype;
+              m_varlist[varID].datatype = datatype;
             }
 
           if (laddoffset || lscalefactor)
             {
               if (datatype == CDI_DATATYPE_INT8 || datatype == CDI_DATATYPE_UINT8 || datatype == CDI_DATATYPE_INT16
                   || datatype == CDI_DATATYPE_UINT16)
-                varlist[varID].check_datarange = true;
+                m_varlist[varID].check_datarange = true;
             }
           else if (cdoCheckDatarange)
             {
-              varlist[varID].check_datarange = true;
+              m_varlist[varID].check_datarange = true;
             }
         }
     }
 
-  m_varlist = varlist;
   m_vlistID = p_vlistID; /* used for -r/-a */
 }
 
@@ -788,7 +776,7 @@ PstreamType::writeRecord(double *data, size_t nmiss)
       int varID = m_varID;
       if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_write);
 
-      if (m_varlist)
+      if (varID < (int)m_varlist.size())
         if (m_varlist[varID].check_datarange) checkDatarange(varID, data, nmiss);
 
 #ifdef HAVE_LIBPTHREAD
@@ -809,10 +797,8 @@ PstreamType::writeRecordF(float *data, size_t nmiss)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       cdoAbort("pipeWriteRecord not implemented for memtype float!");
     }
   else
@@ -845,59 +831,8 @@ PstreamType::inqTimestep(int p_tsID)
 #endif
   if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_read);
 
-  if (nrecs == 0 && mfiles && (nfiles < mfiles))
-    {
-      int nfile = nfiles;
-      std::string filename;
-      int fileID;
-      int vlistIDold, vlistIDnew;
-
-      tsID0 += p_tsID;
-
-      vlistIDold = vlistDuplicate(streamInqVlist(m_fileID));
-      streamClose(m_fileID);
-
-      filename = m_mfnames[nfile];
-      nfiles++;
-
-#ifdef HAVE_LIBPTHREAD
-      if (Threading::cdoLockIO)
-        pthread_mutex_lock(&streamMutex);
-      else
-        pthread_mutex_lock(&streamOpenReadMutex);
-#endif
-      if (cdoVerbose) cdoPrint("Continuation file: %s", filename.c_str());
-
-      if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_read);
-      fileID = streamOpenRead(filename.c_str());
-      vlistIDnew = streamInqVlist(fileID);
-      if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_read);
-
-      vlistCompare(vlistIDold, vlistIDnew, CMP_HRD);
-      vlistDestroy(vlistIDold);
-#ifdef HAVE_LIBPTHREAD
-      if (Threading::cdoLockIO)
-        pthread_mutex_unlock(&streamMutex);
-      else
-        pthread_mutex_unlock(&streamOpenReadMutex);
-#endif
-      if (fileID < 0) cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
-
-      m_name = filename;
-      m_fileID = fileID;
-
-      if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_read);
-#ifdef HAVE_LIBPTHREAD
-      if (Threading::cdoLockIO) pthread_mutex_lock(&streamMutex);
-#endif
-      nrecs = streamInqTimestep(m_fileID, 0);
-#ifdef HAVE_LIBPTHREAD
-      if (Threading::cdoLockIO) pthread_mutex_unlock(&streamMutex);
-#endif
-      if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_read);
-    }
-
   if (p_tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID) taxisDefType(vlistInqTaxis(m_vlistID), cdoDefaultTimeType);
+
   return nrecs;
 }
 
@@ -907,10 +842,8 @@ PstreamType::defTimestep(int p_tsID)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       pipe->pipeDefTimestep(m_vlistID, p_tsID);
     }
   else

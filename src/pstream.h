@@ -74,14 +74,12 @@ public:
   int tsID;
   int m_filetype;
   int tsID0;
-  int mfiles;
-  int nfiles;
   int m_varID; /* next varID defined with streamDefVar */
   bool ispipe;
   bool isopen;
   std::string m_name;
   std::vector<std::string> m_mfnames;
-  varlist_t *m_varlist;
+  std::vector<varlist_t> m_varlist;
 #ifdef HAVE_LIBPTHREAD
   std::shared_ptr<pipe_t> pipe;
   pthread_t rthreadID; /* read  thread ID */
