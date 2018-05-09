@@ -323,6 +323,15 @@ handleFirstOperator(int p_argcStart, int argc, const char **argv, ProcessType *p
 }
 
 void
+checkSingleBracketOnly(const char *p_argvEntry, char p_bracketType)
+{
+  if (strlen(p_argvEntry) != 1)
+    {
+      CdoError::Abort(Cdo::progname, "Only single ", p_bracketType, " allowed");
+    }
+}
+
+void
 createProcesses(int argc, const char **argv)
 {
   Cdo_Debug(CdoDebug::PROCESS, "== Process Creation Start ==");
@@ -344,8 +353,8 @@ createProcesses(int argc, const char **argv)
     }
 
   ProcessType *currentProcess;
-  ProcessType *lastAdded;
   std::stack<ProcessType *> call_stack;
+  std::set<ProcessType *> bracketOperators;
 
   int unclosedBrackets = 0;
   unsigned int idx = 1;
@@ -353,14 +362,13 @@ createProcesses(int argc, const char **argv)
   if (idx < maxIdx)
     {
       call_stack.push(root_process);
-      currentProcess = call_stack.top();
-      lastAdded = root_process;
       const char *argvEntry;
 
       do
         {
+          currentProcess = call_stack.top();
           Cdo_Debug(CdoDebug::PROCESS, "iteration ", idx, ", current argv: ", argv[idx],
-                    ",  currentProcess: ", currentProcess->operatorName);
+                    ",  currentProcess: ", currentProcess->m_operatorCommand);
 
           argvEntry = argv[idx];
           //------------------------------------------------------
@@ -369,26 +377,24 @@ createProcesses(int argc, const char **argv)
             {
               Cdo_Debug(CdoDebug::PROCESS, "Found new Operator: ", argvEntry);
               currentProcess = createNewProcess(currentProcess, argvEntry);
-              lastAdded = currentProcess;
               call_stack.push(currentProcess);
             }
           // - - - - - - - - - - - - - - - - - - - - - - - - - - -
           // case: bracket start
-          else if (strcmp(argvEntry, "[") == 0)
+          else if (argvEntry[0] == '[')
             {
+              checkSingleBracketOnly(argvEntry, '[');
+              bracketOperators.insert(currentProcess);
               unclosedBrackets++;
             }
           // - - - - - - - - - - - - - - - - - - - - - - - - - - -
           // case: bracket end
-          else if (strcmp(argvEntry, "]") == 0)
+          else if (argvEntry[0] == ']')
             {
+              checkSingleBracketOnly(argvEntry, ']');
               unclosedBrackets--;
-              if (call_stack.top() != root_process)
-                {
-                  call_stack.pop();
-                  lastAdded = call_stack.top();
-                  currentProcess = call_stack.top();
-                }
+              bracketOperators.erase(call_stack.top());
+              call_stack.pop();
             }
           // - - - - - - - - - - - - - - - - - - - - - - - - - - -
           // case: file
@@ -399,16 +405,16 @@ createProcesses(int argc, const char **argv)
             }
           // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
           // remove finished
-          while (call_stack.top()->hasAllInputs() && call_stack.top() != root_process)
+          while (!call_stack.empty() && call_stack.top()->hasAllInputs()
+                 && bracketOperators.find(call_stack.top()) == bracketOperators.end())
             {
               Cdo_Debug(CdoDebug::PROCESS, "Removing ", call_stack.top()->operatorName, " from stack");
               call_stack.pop();
             }
           //------------------------------------------------------
-          currentProcess = call_stack.top();
           idx++;
         }
-      while (!currentProcess->hasAllInputs() && idx < maxIdx);
+      while (!call_stack.empty() && idx < maxIdx);
     }
   //---------------------------------------------------------------
   if (unclosedBrackets > 0)
