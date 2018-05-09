@@ -33,7 +33,7 @@ mastrfu(int gridID, int zaxisID, std::vector<std::vector<double>> &field1, std::
 {
   size_t ilat;
   int ilev, n;
-  constexpr double fact = 4 * atan(1.0) * 6371000 / 9.81;
+  double fact = 4 * atan(1.0) * 6371000 / 9.81;
   char units[CDI_MAX_NAME];
 
   size_t nlat = gridInqSize(gridID);
