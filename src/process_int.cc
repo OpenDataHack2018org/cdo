@@ -354,7 +354,7 @@ createProcesses(int argc, const char **argv)
 
   ProcessType *currentProcess;
   std::stack<ProcessType *> call_stack;
-  std::stack<std::pair<ProcessType *, int>> bracketStack;
+  std::set<ProcessType *> bracketOperators;
 
   int unclosedBrackets = 0;
   unsigned int idx = 1;
@@ -366,7 +366,7 @@ createProcesses(int argc, const char **argv)
 
       do
         {
-      currentProcess = call_stack.top();
+          currentProcess = call_stack.top();
           Cdo_Debug(CdoDebug::PROCESS, "iteration ", idx, ", current argv: ", argv[idx],
                     ",  currentProcess: ", currentProcess->m_operatorCommand);
 
@@ -384,6 +384,7 @@ createProcesses(int argc, const char **argv)
           else if (argvEntry[0] == '[')
             {
               checkSingleBracketOnly(argvEntry, '[');
+              bracketOperators.insert(currentProcess);
               unclosedBrackets++;
             }
           // - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -392,6 +393,7 @@ createProcesses(int argc, const char **argv)
             {
               checkSingleBracketOnly(argvEntry, ']');
               unclosedBrackets--;
+              bracketOperators.erase(call_stack.top());
               call_stack.pop();
             }
           // - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -403,10 +405,10 @@ createProcesses(int argc, const char **argv)
             }
           // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
           // remove finished
-          while (!call_stack.empty() && call_stack.top()->hasAllInputs())
+          while (!call_stack.empty() && call_stack.top()->hasAllInputs()
+                 && bracketOperators.find(call_stack.top()) == bracketOperators.end())
             {
               Cdo_Debug(CdoDebug::PROCESS, "Removing ", call_stack.top()->operatorName, " from stack");
-
               call_stack.pop();
             }
           //------------------------------------------------------
