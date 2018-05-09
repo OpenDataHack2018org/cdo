@@ -159,7 +159,7 @@ genBoxavgGrid(int gridID1, size_t xinc, size_t yinc)
 }
 
 static void
-boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
+boxavg(Field *field1, Field *field2, size_t xinc, size_t yinc)
 {
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
@@ -204,7 +204,7 @@ boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
 }
 
 static void
-thinout(field_type *field1, field_type *field2, int xinc, int yinc)
+thinout(Field *field1, Field *field2, int xinc, int yinc)
 {
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
@@ -331,7 +331,7 @@ Intgrid(void *process)
   gridsize = gridInqSize(gridID2);
   std::vector<double> array2(gridsize);
 
-  field_type field1, field2;
+  Field field1, field2;
   field_init(&field1);
   field_init(&field2);
 

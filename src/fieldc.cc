@@ -19,7 +19,7 @@
 #include <cdi.h>
 
 void
-farcfun(field_type *field, double rconst, int function)
+farcfun(Field *field, double rconst, int function)
 {
   switch (function)
     {
@@ -33,7 +33,7 @@ farcfun(field_type *field, double rconst, int function)
 }
 
 void
-farcmul(field_type *field, double rconst)
+farcmul(Field *field, double rconst)
 {
   int i, len;
   int nwpv = field->nwpv;
@@ -63,7 +63,7 @@ farcmul(field_type *field, double rconst)
 }
 
 void
-farcdiv(field_type *field, double rconst)
+farcdiv(Field *field, double rconst)
 {
   int i, len;
   int grid = field->grid;
@@ -87,7 +87,7 @@ farcdiv(field_type *field, double rconst)
 }
 
 void
-farcadd(field_type *field, double rconst)
+farcadd(Field *field, double rconst)
 {
   int i, len;
   int grid = field->grid;
@@ -109,13 +109,13 @@ farcadd(field_type *field, double rconst)
 }
 
 void
-farcsub(field_type *field, double rconst)
+farcsub(Field *field, double rconst)
 {
   farcadd(field, -rconst);
 }
 
 void
-farinv(field_type *field)
+farinv(Field *field)
 {
   int grid = field->grid;
   double missval1 = field->missval;
@@ -130,7 +130,7 @@ farinv(field_type *field)
 }
 
 void
-farround(field_type *field)
+farround(Field *field)
 {
   int grid = field->grid;
   double missval1 = field->missval;
@@ -143,7 +143,7 @@ farround(field_type *field)
 }
 
 void
-farmod(field_type *field, double divisor)
+farmod(Field *field, double divisor)
 {
   int grid = field->grid;
   double missval1 = field->missval;

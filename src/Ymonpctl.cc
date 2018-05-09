@@ -51,7 +51,7 @@ Ymonpctl(void *process)
   int vdates1[NMONTH], vtimes1[NMONTH];
   int vdates2[NMONTH];
   long nsets[NMONTH];
-  field_type **vars1[NMONTH];
+  Field **vars1[NMONTH];
   HISTOGRAM_SET *hsets[NMONTH];
 
   cdoInitialize(process);
@@ -99,7 +99,7 @@ Ymonpctl(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 

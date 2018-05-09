@@ -81,12 +81,12 @@ Yearmonstat(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
-  field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  Field **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  Field **samp1 = field_malloc(vlistID1, FIELD_NONE);
 
   int tsID = 0;
   int otsID = 0;

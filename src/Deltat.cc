@@ -46,7 +46,7 @@ Deltat(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  field_type **vars = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars = field_malloc(vlistID1, FIELD_PTR);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   std::vector<double> array1(gridsizemax);

@@ -67,7 +67,7 @@ Yseasstat(void *process)
   int seas_nsets[NSEAS];
   size_t nmiss;
   date_time_t datetime[NSEAS];
-  field_type **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
+  Field **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
 
   cdoInitialize(process);
 
@@ -121,7 +121,7 @@ Yseasstat(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
@@ -155,9 +155,9 @@ Yseasstat(void *process)
               recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
-          field_type *psamp1 = &samp1[seas][varID][levelID];
-          field_type *pvars1 = &vars1[seas][varID][levelID];
-          field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
+          Field *psamp1 = &samp1[seas][varID][levelID];
+          Field *pvars1 = &vars1[seas][varID][levelID];
+          Field *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
           int nsets = seas_nsets[seas];
 
           size_t gridsize = pvars1->size;
@@ -222,8 +222,8 @@ Yseasstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[seas][varID][levelID];
-            field_type *pvars2 = &vars2[seas][varID][levelID];
+            Field *pvars1 = &vars1[seas][varID][levelID];
+            Field *pvars2 = &vars2[seas][varID][levelID];
 
             farmoq(pvars2, *pvars1);
           }
@@ -242,9 +242,9 @@ Yseasstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *psamp1 = &samp1[seas][varID][levelID];
-            field_type *pvars1 = &vars1[seas][varID][levelID];
-            field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
+            Field *psamp1 = &samp1[seas][varID][levelID];
+            Field *pvars1 = &vars1[seas][varID][levelID];
+            Field *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
 
             if (lmean)
               {
@@ -286,7 +286,7 @@ Yseasstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[seas][varID][levelID];
+            Field *pvars1 = &vars1[seas][varID][levelID];
 
             pstreamDefRecord(streamID2, varID, levelID);
             pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);

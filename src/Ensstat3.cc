@@ -128,7 +128,7 @@ Ensstat3(void *process)
   /* ("first touch strategy")                            */
   /* --> #pragma omp parallel for ...                    */
   /* *************************************************** */
-  field_type *field = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
+  Field *field = (Field *) Malloc(Threading::ompNumThreads * sizeof(Field));
   for (i = 0; i < Threading::ompNumThreads; i++)
     {
       field_init(&field[i]);

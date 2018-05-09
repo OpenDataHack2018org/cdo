@@ -21,7 +21,7 @@
 #include "array.h"
 
 static void
-faraddcplx(field_type *field1, field_type field2)
+faraddcplx(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -45,7 +45,7 @@ faraddcplx(field_type *field1, field_type field2)
 }
 
 static void
-farsubcplx(field_type *field1, field_type field2)
+farsubcplx(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -69,7 +69,7 @@ farsubcplx(field_type *field1, field_type field2)
 }
 
 static void
-farmulcplx(field_type *field1, field_type field2)
+farmulcplx(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -85,7 +85,7 @@ farmulcplx(field_type *field1, field_type field2)
   size_t len = nwpv * gridsize;
   if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  // z1 · z2 = (x1x2 - y1y2) + i(x1y2 + x2y1)
+  // z1 x z2 = (x1x2 - y1y2) + i(x1y2 + x2y1)
   for (size_t i = 0; i < gridsize; i++)
     {
       double a1r = array1[2 * i];
@@ -96,7 +96,7 @@ farmulcplx(field_type *field1, field_type field2)
 }
 
 static void
-fardivcplx(field_type *field1, field_type field2)
+fardivcplx(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -124,7 +124,7 @@ fardivcplx(field_type *field1, field_type field2)
 }
 
 void
-farfuncplx(field_type *field1, field_type field2, int function)
+farfuncplx(Field *field1, Field field2, int function)
 {
   // clang-format off
   switch (function)

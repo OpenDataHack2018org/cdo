@@ -124,7 +124,7 @@ Splittime(void *process)
   for (varID = 0; varID < nvars; varID++)
     if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) nconst++;
 
-  std::vector<std::vector<field_type>> vars;
+  std::vector<std::vector<Field>> vars;
   if (nconst)
     {
       vars.resize(nvars);

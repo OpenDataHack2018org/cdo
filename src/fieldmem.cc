@@ -25,17 +25,17 @@
 #include "util.h"
 
 void
-field_init(field_type *field)
+field_init(Field *field)
 {
-  memset(field, 0, sizeof(field_type));
+  memset(field, 0, sizeof(Field));
 }
 
-field_type **
+Field **
 field_allocate(int vlistID, int ptype, int init)
 {
   int nvars = vlistNvars(vlistID);
 
-  field_type **field = (field_type **) Malloc(nvars * sizeof(field_type *));
+  Field **field = (Field **) Malloc(nvars * sizeof(Field *));
 
   for (int varID = 0; varID < nvars; ++varID)
     {
@@ -46,7 +46,7 @@ field_allocate(int vlistID, int ptype, int init)
       int nlevel = zaxisInqSize(zaxisID);
       double missval = vlistInqVarMissval(vlistID, varID);
 
-      field[varID] = (field_type *) Malloc(nlevel * sizeof(field_type));
+      field[varID] = (Field *) Malloc(nlevel * sizeof(Field));
 
       for (int levelID = 0; levelID < nlevel; ++levelID)
         {
@@ -103,20 +103,20 @@ field_allocate(int vlistID, int ptype, int init)
   return field;
 }
 
-field_type **
+Field **
 field_malloc(int vlistID, int ptype)
 {
   return field_allocate(vlistID, ptype, 0);
 }
 
-field_type **
+Field **
 field_calloc(int vlistID, int ptype)
 {
   return field_allocate(vlistID, ptype, 1);
 }
 
 void
-field_free(field_type **field, int vlistID)
+field_free(Field **field, int vlistID)
 {
   int nvars = vlistNvars(vlistID);
   for (int varID = 0; varID < nvars; ++varID)

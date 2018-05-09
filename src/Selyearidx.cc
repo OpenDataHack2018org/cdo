@@ -67,8 +67,8 @@ Selyearidx(void *process)
 
   std::vector<double> array(gridsizemax);
 
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
-  field_type **vars2 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   int nvars = vlistNvars(vlistID1);
   for (varID = 0; varID < nvars; ++varID)

@@ -23,7 +23,7 @@
 #include "array.h"
 
 double
-fldfun(field_type field, int function)
+fldfun(Field field, int function)
 {
   double rval = 0;
 
@@ -59,7 +59,7 @@ fldfun(field_type field, int function)
 }
 
 double
-fldrange(field_type field)
+fldrange(Field field)
 {
   double range;
 
@@ -76,7 +76,7 @@ fldrange(field_type field)
 }
 
 double
-fldmin(field_type field)
+fldmin(Field field)
 {
   double rmin;
 
@@ -93,7 +93,7 @@ fldmin(field_type field)
 }
 
 double
-fldmax(field_type field)
+fldmax(Field field)
 {
   double rmax;
 
@@ -110,7 +110,7 @@ fldmax(field_type field)
 }
 
 double
-fldsum(field_type field)
+fldsum(Field field)
 {
   double rsum = 0;
 
@@ -127,7 +127,7 @@ fldsum(field_type field)
 }
 
 double
-fldmean(field_type field)
+fldmean(Field field)
 {
   double rmean = 0;
 
@@ -144,7 +144,7 @@ fldmean(field_type field)
 }
 
 double
-fldmeanw(field_type field)
+fldmeanw(Field field)
 {
   double rmean = 0;
 
@@ -161,7 +161,7 @@ fldmeanw(field_type field)
 }
 
 double
-fldavg(field_type field)
+fldavg(Field field)
 {
   double ravg = 0;
 
@@ -178,7 +178,7 @@ fldavg(field_type field)
 }
 
 double
-fldavgw(field_type field)
+fldavgw(Field field)
 {
   double ravg = 0;
 
@@ -306,7 +306,7 @@ prekurtsum(const double *restrict array, size_t len, size_t nmiss, const double 
 }
 
 double
-fldvar(field_type field)
+fldvar(Field field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -323,7 +323,7 @@ fldvar(field_type field)
 }
 
 double
-fldvar1(field_type field)
+fldvar1(Field field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -340,7 +340,7 @@ fldvar1(field_type field)
 }
 
 double
-fldkurt(field_type field)
+fldkurt(Field field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -363,7 +363,7 @@ fldkurt(field_type field)
 }
 
 double
-fldskew(field_type field)
+fldskew(Field field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -424,7 +424,7 @@ prevarsumw(const double *restrict array, const double *restrict w, size_t len, s
 }
 
 double
-fldvarw(field_type field)
+fldvarw(Field field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -441,7 +441,7 @@ fldvarw(field_type field)
 }
 
 double
-fldvar1w(field_type field)
+fldvar1w(Field field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -475,31 +475,31 @@ varToStd(double rvar, double missval)
 }
 
 double
-fldstd(field_type field)
+fldstd(Field field)
 {
   return varToStd(fldvar(field), field.missval);
 }
 
 double
-fldstd1(field_type field)
+fldstd1(Field field)
 {
   return varToStd(fldvar1(field), field.missval);
 }
 
 double
-fldstdw(field_type field)
+fldstdw(Field field)
 {
   return varToStd(fldvarw(field), field.missval);
 }
 
 double
-fldstd1w(field_type field)
+fldstd1w(Field field)
 {
   return varToStd(fldvar1w(field), field.missval);
 }
 
 void
-fldrms(field_type field, field_type field2, field_type *field3)
+fldrms(Field field, Field field2, Field *field3)
 {
   size_t i;
   size_t len;
@@ -549,7 +549,7 @@ else
 }
 
 void
-varrms(field_type field, field_type field2, field_type *field3)
+varrms(Field field, Field field2, Field *field3)
 {
   size_t i, k, nlev, len;
   size_t rnmiss = 0;
@@ -602,7 +602,7 @@ else
 
 /* RQ */
 double
-fldpctl(field_type field, const double pn)
+fldpctl(Field field, const double pn)
 {
   double pctl = field.missval;
 
@@ -629,7 +629,7 @@ fldpctl(field_type field, const double pn)
 /* QR */
 
 double
-fldrank(field_type field)
+fldrank(Field field)
 {
   double res = 0;
   // Using first value as reference (observation)
@@ -658,13 +658,13 @@ fldrank(field_type field)
 }
 
 double
-fldroc(field_type field)
+fldroc(Field field)
 {
   return field.missval;
 }
 
 double
-fldbrs(field_type field)
+fldbrs(Field field)
 {
   const size_t nmiss = field.nmiss;
   const size_t len = field.size;
@@ -695,19 +695,19 @@ fldbrs(field_type field)
   return brs / count;
 }
 
-/*  field_type UTILITIES */
+/*  Field UTILITIES */
 /*  update the number non missing values */
 void
-fldunm(field_type *field)
+fldunm(Field *field)
 {
   field->nmiss = arrayNumMV(field->size, field->ptr, field->missval);
 }
 
 /*  check for non missval values */
 int
-fldhvs(field_type *fieldPtr, const size_t nlevels)
+fldhvs(Field *fieldPtr, const size_t nlevels)
 {
-  field_type field;
+  Field field;
 
   for (size_t level = 0; level < nlevels; level++)
     {

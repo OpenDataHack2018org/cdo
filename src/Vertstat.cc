@@ -272,13 +272,13 @@ Vertstat(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  std::vector<field_type> vars1(nvars);
-  std::vector<field_type> samp1(nvars);
-  std::vector<field_type> vars2;
+  std::vector<Field> vars1(nvars);
+  std::vector<Field> samp1(nvars);
+  std::vector<Field> vars2;
   if (lvarstd || lrange) vars2.resize(nvars);
 
   for (varID = 0; varID < nvars; varID++)

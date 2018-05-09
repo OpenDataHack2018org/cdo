@@ -59,8 +59,8 @@ Ymonstat(void *process)
   int vdates[NMONTH], vtimes[NMONTH];
   int mon[NMONTH];
   int nmon = 0;
-  field_type **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
-  field_type field;
+  Field **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
+  Field field;
 
   cdoInitialize(process);
 
@@ -149,9 +149,9 @@ Ymonstat(void *process)
               recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
-          field_type *psamp1 = &samp1[month][varID][levelID];
-          field_type *pvars1 = &vars1[month][varID][levelID];
-          field_type *pvars2 = vars2[month] ? &vars2[month][varID][levelID] : NULL;
+          Field *psamp1 = &samp1[month][varID][levelID];
+          Field *pvars1 = &vars1[month][varID][levelID];
+          Field *pvars2 = vars2[month] ? &vars2[month][varID][levelID] : NULL;
           int nsets = month_nsets[month];
 
           size_t gridsize = pvars1->size;
@@ -216,8 +216,8 @@ Ymonstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[month][varID][levelID];
-            field_type *pvars2 = &vars2[month][varID][levelID];
+            Field *pvars1 = &vars1[month][varID][levelID];
+            Field *pvars2 = &vars2[month][varID][levelID];
 
             farmoq(pvars2, *pvars1);
           }
@@ -266,9 +266,9 @@ Ymonstat(void *process)
 
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *psamp1 = &samp1[month][varID][levelID];
-          field_type *pvars1 = &vars1[month][varID][levelID];
-          field_type *pvars2 = vars2[month] ? &vars2[month][varID][levelID] : NULL;
+          Field *psamp1 = &samp1[month][varID][levelID];
+          Field *pvars1 = &vars1[month][varID][levelID];
+          Field *pvars2 = vars2[month] ? &vars2[month][varID][levelID] : NULL;
 
           if (lmean)
             {
@@ -310,7 +310,7 @@ Ymonstat(void *process)
 
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *pvars1 = &vars1[month][varID][levelID];
+          Field *pvars1 = &vars1[month][varID][levelID];
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);

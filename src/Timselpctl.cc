@@ -92,11 +92,11 @@ Timselpctl(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars1 = field_malloc(vlistID1, FIELD_PTR);
   HISTOGRAM_SET *hset = hsetCreate(nvars);
 
   for (varID = 0; varID < nvars; varID++)

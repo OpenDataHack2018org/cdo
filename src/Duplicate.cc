@@ -68,7 +68,7 @@ Duplicate(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  std::vector<field_type **> vars;
+  std::vector<Field **> vars;
   std::vector<int> vdate, vtime;
 
   int tsID = 0;

@@ -78,7 +78,7 @@ Ydaystat(void *process)
   int dayoy_nsets[MAX_DOY];
   size_t nmiss;
   int vdates[MAX_DOY], vtimes[MAX_DOY];
-  field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
+  Field **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
   cdoInitialize(process);
 
@@ -132,7 +132,7 @@ Ydaystat(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
@@ -173,9 +173,9 @@ Ydaystat(void *process)
               recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
-          field_type *psamp1 = &samp1[dayoy][varID][levelID];
-          field_type *pvars1 = &vars1[dayoy][varID][levelID];
-          field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
+          Field *psamp1 = &samp1[dayoy][varID][levelID];
+          Field *pvars1 = &vars1[dayoy][varID][levelID];
+          Field *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
           int nsets = dayoy_nsets[dayoy];
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -240,8 +240,8 @@ Ydaystat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[dayoy][varID][levelID];
-            field_type *pvars2 = &vars2[dayoy][varID][levelID];
+            Field *pvars1 = &vars1[dayoy][varID][levelID];
+            Field *pvars2 = &vars2[dayoy][varID][levelID];
 
             farmoq(pvars2, *pvars1);
           }
@@ -280,9 +280,9 @@ Ydaystat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *psamp1 = &samp1[dayoy][varID][levelID];
-            field_type *pvars1 = &vars1[dayoy][varID][levelID];
-            field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
+            Field *psamp1 = &samp1[dayoy][varID][levelID];
+            Field *pvars1 = &vars1[dayoy][varID][levelID];
+            Field *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
 
             if (lmean)
               {
@@ -324,7 +324,7 @@ Ydaystat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[dayoy][varID][levelID];
+            Field *pvars1 = &vars1[dayoy][varID][levelID];
 
             pstreamDefRecord(streamID2, varID, levelID);
             pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);

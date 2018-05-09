@@ -38,7 +38,7 @@ Trend(void *process)
   {
     nwork = 5
   };
-  field_type **work[5];
+  Field **work[5];
 
   cdoInitialize(process);
 
@@ -68,7 +68,7 @@ Trend(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field1, field2;
+  Field field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double *) Malloc(gridsize * sizeof(double));

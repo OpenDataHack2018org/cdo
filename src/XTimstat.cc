@@ -79,7 +79,7 @@ typedef struct
   int tsIDnext;
   int streamID, nrecs;
   RecordInfo *recinfo;
-  field_type **vars;
+  Field **vars;
 } readarg_t;
 
 static int num_recs = 0;
@@ -90,7 +90,7 @@ cdoReadTimestep(void *rarg)
   int varID, levelID;
   size_t nmiss;
   readarg_t *readarg = (readarg_t *) rarg;
-  field_type **input_vars = readarg->vars;
+  Field **input_vars = readarg->vars;
   RecordInfo *recinfo = readarg->recinfo;
   int streamID = readarg->streamID;
   int tsIDnext = readarg->tsIDnext;
@@ -124,7 +124,7 @@ cdoReadTimestep(void *rarg)
 }
 
 static void
-cdoUpdateVars(int nvars, int vlistID, field_type **vars)
+cdoUpdateVars(int nvars, int vlistID, Field **vars)
 {
   void *tmp = NULL;
 
@@ -292,10 +292,10 @@ XTimstat(void *process)
 
   int FIELD_MEMTYPE = 0;
   if (CDO_Memtype == MEMTYPE_FLOAT) FIELD_MEMTYPE = FIELD_FLT;
-  field_type **input_vars = field_malloc(vlistID1, FIELD_PTR | FIELD_PTR2 | FIELD_MEMTYPE);
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
-  field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
-  field_type **vars2 = NULL;
+  Field **input_vars = field_malloc(vlistID1, FIELD_PTR | FIELD_PTR2 | FIELD_MEMTYPE);
+  Field **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  Field **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  Field **vars2 = NULL;
   if (lvarstd) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   readarg_t readarg;
@@ -372,8 +372,8 @@ XTimstat(void *process)
                   int varID = recinfo[recID].varID;
                   int levelID = recinfo[recID].levelID;
 
-                  field_type *pvars1 = &vars1[varID][levelID];
-                  field_type *pinput_var = &input_vars[varID][levelID];
+                  Field *pvars1 = &vars1[varID][levelID];
+                  Field *pinput_var = &input_vars[varID][levelID];
 
                   int nwpv = pvars1->nwpv;
                   size_t gridsize = pvars1->size;
@@ -402,8 +402,8 @@ XTimstat(void *process)
                   int varID = recinfo[recID].varID;
                   int levelID = recinfo[recID].levelID;
 
-                  field_type *pvars1 = &vars1[varID][levelID];
-                  field_type *pinput_var = &input_vars[varID][levelID];
+                  Field *pvars1 = &vars1[varID][levelID];
+                  Field *pinput_var = &input_vars[varID][levelID];
 
                   int nwpv = pvars1->nwpv;
                   size_t gridsize = pvars1->size;
@@ -423,7 +423,7 @@ XTimstat(void *process)
 
                   if (lvarstd)
                     {
-                      field_type *pvars2 = &vars2[varID][levelID];
+                      Field *pvars2 = &vars2[varID][levelID];
                       farsumq(pvars2, *pinput_var);
                       farsum(pvars1, *pinput_var);
                     }
@@ -439,8 +439,8 @@ XTimstat(void *process)
               {
                 int varID = recinfo[recID].varID;
                 int levelID = recinfo[recID].levelID;
-                field_type *pvars1 = &vars1[varID][levelID];
-                field_type *pvars2 = &vars2[varID][levelID];
+                Field *pvars1 = &vars1[varID][levelID];
+                Field *pvars2 = &vars2[varID][levelID];
 
                 if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
@@ -464,7 +464,7 @@ XTimstat(void *process)
             {
               int varID = recinfo[recID].varID;
               int levelID = recinfo[recID].levelID;
-              field_type *pvars1 = &vars1[varID][levelID];
+              Field *pvars1 = &vars1[varID][levelID];
 
               if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
@@ -480,8 +480,8 @@ XTimstat(void *process)
             {
               int varID = recinfo[recID].varID;
               int levelID = recinfo[recID].levelID;
-              field_type *pvars1 = &vars1[varID][levelID];
-              field_type *pvars2 = &vars2[varID][levelID];
+              Field *pvars1 = &vars1[varID][levelID];
+              Field *pvars2 = &vars2[varID][levelID];
 
               if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
@@ -515,7 +515,7 @@ XTimstat(void *process)
           {
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[varID][levelID];
+            Field *pvars1 = &vars1[varID][levelID];
 
             if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
@@ -551,7 +551,7 @@ XTimstat(void *process)
         {
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *pvars1 = &vars1[varID][levelID];
+          Field *pvars1 = &vars1[varID][levelID];
 
           if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 

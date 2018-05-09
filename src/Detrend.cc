@@ -86,7 +86,7 @@ Detrend(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
-  std::vector<field_type **> vars;
+  std::vector<Field **> vars;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))

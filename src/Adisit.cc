@@ -89,7 +89,7 @@ adipot(double t, double s, double p)
 }
 
 static void
-calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho, field_type sao, field_type tis)
+calc_adisit(long gridsize, long nlevel, double *pressure, Field tho, Field sao, Field tis)
 {
   /* pressure units: hPa     */
   /* tho units:      Celsius */
@@ -117,7 +117,7 @@ calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho, field_
 }
 
 static void
-calc_adipot(long gridsize, long nlevel, double *pressure, field_type t, field_type s, field_type tpot)
+calc_adipot(long gridsize, long nlevel, double *pressure, Field t, Field s, Field tpot)
 {
   /* pressure units: hPa     */
   /* t units:      Celsius */
@@ -234,7 +234,7 @@ Adisit(void *process)
       for (i = 0; i < nlevel; ++i) cdoPrint("%5d  %g", i + 1, pressure[i]);
     }
 
-  field_type tho, sao, tis;
+  Field tho, sao, tis;
   field_init(&tho);
   field_init(&sao);
   field_init(&tis);

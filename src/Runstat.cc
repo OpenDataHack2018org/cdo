@@ -109,10 +109,10 @@ Runstat(void *process)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  field_type ***vars1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
-  field_type ***vars2 = NULL, ***samp1 = NULL;
-  if (!runstat_nomiss) samp1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
-  if (lvarstd || lrange) vars2 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  Field ***vars1 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
+  Field ***vars2 = NULL, ***samp1 = NULL;
+  if (!runstat_nomiss) samp1 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
+  if (lvarstd || lrange) vars2 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
 
   for (int its = 0; its < ndates; its++)
     {
@@ -143,9 +143,9 @@ Runstat(void *process)
               recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
-          field_type *psamp1 = samp1 ? &samp1[tsID][varID][levelID] : NULL;
-          field_type *pvars1 = &vars1[tsID][varID][levelID];
-          field_type *pvars2 = vars2 ? &vars2[tsID][varID][levelID] : NULL;
+          Field *psamp1 = samp1 ? &samp1[tsID][varID][levelID] : NULL;
+          Field *pvars1 = &vars1[tsID][varID][levelID];
+          Field *pvars2 = vars2 ? &vars2[tsID][varID][levelID] : NULL;
 
           size_t gridsize = pvars1->size;
 
@@ -225,9 +225,9 @@ Runstat(void *process)
 
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *psamp1 = samp1 ? &samp1[0][varID][levelID] : NULL;
-          field_type *pvars1 = &vars1[0][varID][levelID];
-          field_type *pvars2 = vars2 ? &vars2[0][varID][levelID] : NULL;
+          Field *psamp1 = samp1 ? &samp1[0][varID][levelID] : NULL;
+          Field *pvars1 = &vars1[0][varID][levelID];
+          Field *pvars2 = vars2 ? &vars2[0][varID][levelID] : NULL;
           int nsets = ndates;
 
           if (lmean)
@@ -269,7 +269,7 @@ Runstat(void *process)
 
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *pvars1 = &vars1[0][varID][levelID];
+          Field *pvars1 = &vars1[0][varID][levelID];
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
@@ -299,9 +299,9 @@ Runstat(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          field_type *psamp1 = samp1 ? &samp1[ndates - 1][varID][levelID] : NULL;
-          field_type *pvars1 = &vars1[ndates - 1][varID][levelID];
-          field_type *pvars2 = vars2 ? &vars2[ndates - 1][varID][levelID] : NULL;
+          Field *psamp1 = samp1 ? &samp1[ndates - 1][varID][levelID] : NULL;
+          Field *pvars1 = &vars1[ndates - 1][varID][levelID];
+          Field *pvars2 = vars2 ? &vars2[ndates - 1][varID][levelID] : NULL;
 
           size_t gridsize = pvars1->size;
 

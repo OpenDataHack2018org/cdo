@@ -155,7 +155,7 @@ remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict s
 void remapInit(remapType &remap);
 
 void
-intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
+intgriddis(Field *field1, Field *field2, size_t numNeighbors)
 {
   RemapMethod mapType = RemapMethod::DISTWGT;
   int gridID1 = field1->grid;

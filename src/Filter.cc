@@ -172,7 +172,7 @@ Filter(void *process)
   int calendar = taxisInqCalendar(taxisID1);
 
   int nvars = vlistNvars(vlistID1);
-  std::vector<field_type **> vars;
+  std::vector<Field **> vars;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))

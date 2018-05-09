@@ -259,7 +259,7 @@ void *Timstat(void *argument)
   int FIELD_MEMTYPE = 0;
   if (CDO_Memtype == MEMTYPE_FLOAT) FIELD_MEMTYPE = MEMTYPE_FLOAT;
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.memtype = FIELD_MEMTYPE;
   if (FIELD_MEMTYPE == MEMTYPE_FLOAT)
@@ -267,9 +267,9 @@ void *Timstat(void *argument)
   else
     field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
-  field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
-  field_type **vars2 = NULL;
+  Field **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  Field **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars2 = NULL;
   if (lvarstd || lrange || lminidx || lmaxidx) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
@@ -299,9 +299,9 @@ void *Timstat(void *argument)
                   recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
                 }
 
-              field_type *psamp1 = &samp1[varID][levelID];
-              field_type *pvars1 = &vars1[varID][levelID];
-              field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
+              Field *psamp1 = &samp1[varID][levelID];
+              Field *pvars1 = &vars1[varID][levelID];
+              Field *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
               nwpv = pvars1->nwpv;
               size_t gridsize = pvars1->size;
@@ -384,8 +384,8 @@ void *Timstat(void *argument)
 
                 int varID = recinfo[recID].varID;
                 int levelID = recinfo[recID].levelID;
-                field_type *pvars1 = &vars1[varID][levelID];
-                field_type *pvars2 = &vars2[varID][levelID];
+                Field *pvars1 = &vars1[varID][levelID];
+                Field *pvars2 = &vars2[varID][levelID];
 
                 farmoq(pvars2, *pvars1);
               }
@@ -404,9 +404,9 @@ void *Timstat(void *argument)
 
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *psamp1 = &samp1[varID][levelID];
-          field_type *pvars1 = &vars1[varID][levelID];
-          field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
+          Field *psamp1 = &samp1[varID][levelID];
+          Field *pvars1 = &vars1[varID][levelID];
+          Field *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
           if (lmean)
             {
@@ -453,8 +453,8 @@ void *Timstat(void *argument)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *psamp1 = &samp1[varID][levelID];
-            field_type *pvars1 = &vars1[varID][levelID];
+            Field *psamp1 = &samp1[varID][levelID];
+            Field *pvars1 = &vars1[varID][levelID];
 
             int nwpv = pvars1->nwpv;
             size_t gridsize = gridInqSize(pvars1->grid);
@@ -490,8 +490,8 @@ void *Timstat(void *argument)
 
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *psamp1 = &samp1[varID][levelID];
-          field_type *pvars1 = &vars1[varID][levelID];
+          Field *psamp1 = &samp1[varID][levelID];
+          Field *pvars1 = &vars1[varID][levelID];
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);

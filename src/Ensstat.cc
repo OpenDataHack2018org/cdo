@@ -60,7 +60,7 @@ typedef struct
   ens_file_t *ef;
   double *array2;
   double *count2;
-  field_type *field;
+  Field *field;
   int operfunc;
   double pn;
   bool lpctl;
@@ -77,7 +77,7 @@ ensstat_func(void *ensarg)
   int t = arg->t;
   int nfiles = arg->nfiles;
   ens_file_t *ef = arg->ef;
-  field_type *field = arg->field;
+  Field *field = arg->field;
 
   bool lmiss = false;
   for (int fileID = 0; fileID < nfiles; fileID++)
@@ -188,7 +188,7 @@ Ensstat(void *process)
 
   ens_file_t *ef = (ens_file_t *) Malloc(nfiles * sizeof(ens_file_t));
 
-  field_type *field = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
+  Field *field = (Field *) Malloc(Threading::ompNumThreads * sizeof(Field));
   for (int i = 0; i < Threading::ompNumThreads; i++)
     {
       field_init(&field[i]);

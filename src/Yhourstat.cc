@@ -71,7 +71,7 @@ Yhourstat(void *process)
   int houroy_nsets[MAX_HOUR];
   size_t nmiss;
   int vdates[MAX_HOUR], vtimes[MAX_HOUR];
-  field_type **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
+  Field **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
 
   cdoInitialize(process);
 
@@ -123,7 +123,7 @@ Yhourstat(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
@@ -159,9 +159,9 @@ Yhourstat(void *process)
               recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
-          field_type *psamp1 = &samp1[houroy][varID][levelID];
-          field_type *pvars1 = &vars1[houroy][varID][levelID];
-          field_type *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
+          Field *psamp1 = &samp1[houroy][varID][levelID];
+          Field *pvars1 = &vars1[houroy][varID][levelID];
+          Field *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
           int nsets = houroy_nsets[houroy];
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -226,8 +226,8 @@ Yhourstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[houroy][varID][levelID];
-            field_type *pvars2 = &vars2[houroy][varID][levelID];
+            Field *pvars1 = &vars1[houroy][varID][levelID];
+            Field *pvars2 = &vars2[houroy][varID][levelID];
 
             farmoq(pvars2, *pvars1);
           }
@@ -246,9 +246,9 @@ Yhourstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *psamp1 = &samp1[houroy][varID][levelID];
-            field_type *pvars1 = &vars1[houroy][varID][levelID];
-            field_type *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
+            Field *psamp1 = &samp1[houroy][varID][levelID];
+            Field *pvars1 = &vars1[houroy][varID][levelID];
+            Field *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
 
             if (lmean)
               {
@@ -290,7 +290,7 @@ Yhourstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[houroy][varID][levelID];
+            Field *pvars1 = &vars1[houroy][varID][levelID];
 
             pstreamDefRecord(streamID2, varID, levelID);
             pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);

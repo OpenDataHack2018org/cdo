@@ -33,7 +33,7 @@ enum field_flag
   FIELD_ALL = FIELD_PTR | FIELD_WGT
 };
 
-typedef struct
+struct Field
 {
   int fpeRaised;
   int nwpv;  // number of words per value; real:1  complex:2
@@ -49,7 +49,7 @@ typedef struct
   double *ptr;
   float *ptrf;
   void *ptr2;
-} field_type;
+};
 
 struct RecordInfo
 {
@@ -59,115 +59,115 @@ struct RecordInfo
 };
 
 // fieldmem.cc
-void field_init(field_type *field);
-field_type **field_malloc(const int vlistID, const int ptype);
-field_type **field_calloc(const int vlistID, const int ptype);
-void field_free(field_type **field, const int vlistID);
+void field_init(Field *field);
+Field **field_malloc(const int vlistID, const int ptype);
+Field **field_calloc(const int vlistID, const int ptype);
+void field_free(Field **field, const int vlistID);
 
 // field.cc
-double fldfun(field_type field, int function);
-double fldrange(field_type field);
-double fldmin(field_type field);
-double fldmax(field_type field);
-double fldsum(field_type field);
-double fldavg(field_type field);
-double fldmean(field_type field);
-double fldstd(field_type field);
-double fldstd1(field_type field);
-double fldvar(field_type field);
-double fldvar1(field_type field);
-double fldavgw(field_type field);
-double fldmeanw(field_type field);
-double fldstdw(field_type field);
-double fldstd1w(field_type field);
-double fldvarw(field_type field);
-double fldvar1w(field_type field);
-double fldpctl(field_type field, const double pn);
-void fldunm(field_type *field);
-int fldhvs(field_type *field, const size_t nlevels);
-double fldskew(field_type field);
-double fldkurt(field_type field);
+double fldfun(Field field, int function);
+double fldrange(Field field);
+double fldmin(Field field);
+double fldmax(Field field);
+double fldsum(Field field);
+double fldavg(Field field);
+double fldmean(Field field);
+double fldstd(Field field);
+double fldstd1(Field field);
+double fldvar(Field field);
+double fldvar1(Field field);
+double fldavgw(Field field);
+double fldmeanw(Field field);
+double fldstdw(Field field);
+double fldstd1w(Field field);
+double fldvarw(Field field);
+double fldvar1w(Field field);
+double fldpctl(Field field, const double pn);
+void fldunm(Field *field);
+int fldhvs(Field *field, const size_t nlevels);
+double fldskew(Field field);
+double fldkurt(Field field);
 
 // ENS VALIDATION
-double fldbrs(field_type field);
-double fldrank(field_type field);
-double fldroc(field_type field);
+double fldbrs(Field field);
+double fldrank(Field field);
+double fldroc(Field field);
 
 // fieldzon.cc
-void zonfun(field_type field1, field_type *field2, const int function);
-void zonmin(field_type field1, field_type *field2);
-void zonmax(field_type field1, field_type *field2);
-void zonrange(field_type field1, field_type *field2);
-void zonsum(field_type field1, field_type *field2);
-void zonavg(field_type field1, field_type *field2);
-void zonmean(field_type field1, field_type *field2);
-void zonstd(field_type field1, field_type *field2);
-void zonstd1(field_type field1, field_type *field2);
-void zonvar(field_type field1, field_type *field2);
-void zonvar1(field_type field1, field_type *field2);
-void zonpctl(field_type field1, field_type *field2, const int k);
+void zonfun(Field field1, Field *field2, const int function);
+void zonmin(Field field1, Field *field2);
+void zonmax(Field field1, Field *field2);
+void zonrange(Field field1, Field *field2);
+void zonsum(Field field1, Field *field2);
+void zonavg(Field field1, Field *field2);
+void zonmean(Field field1, Field *field2);
+void zonstd(Field field1, Field *field2);
+void zonstd1(Field field1, Field *field2);
+void zonvar(Field field1, Field *field2);
+void zonvar1(Field field1, Field *field2);
+void zonpctl(Field field1, Field *field2, const int k);
 
 /* fieldmer.cc */
 
-void merfun(field_type field1, field_type *field2, const int function);
-void mermin(field_type field1, field_type *field2);
-void mermax(field_type field1, field_type *field2);
-void merrange(field_type field1, field_type *field2);
-void mersum(field_type field1, field_type *field2);
-void meravgw(field_type field1, field_type *field2);
-void mermeanw(field_type field1, field_type *field2);
-void merstdw(field_type field1, field_type *field2);
-void merstd1w(field_type field1, field_type *field2);
-void mervarw(field_type field1, field_type *field2);
-void mervar1w(field_type field1, field_type *field2);
-void merpctl(field_type field1, field_type *field2, const int k);
+void merfun(Field field1, Field *field2, const int function);
+void mermin(Field field1, Field *field2);
+void mermax(Field field1, Field *field2);
+void merrange(Field field1, Field *field2);
+void mersum(Field field1, Field *field2);
+void meravgw(Field field1, Field *field2);
+void mermeanw(Field field1, Field *field2);
+void merstdw(Field field1, Field *field2);
+void merstd1w(Field field1, Field *field2);
+void mervarw(Field field1, Field *field2);
+void mervar1w(Field field1, Field *field2);
+void merpctl(Field field1, Field *field2, const int k);
 
-void fldrms(field_type field1, field_type field2, field_type *field3);
+void fldrms(Field field1, Field field2, Field *field3);
 
-void varrms(field_type field1, field_type field2, field_type *field3);
+void varrms(Field field1, Field field2, Field *field3);
 
 // fieldc.cc
-void farcfun(field_type *field, const double rconst, const int function);
+void farcfun(Field *field, const double rconst, const int function);
 
-void farcmul(field_type *field, const double rconst);
-void farcdiv(field_type *field, const double rconst);
-void farcadd(field_type *field, const double rconst);
-void farcsub(field_type *field, const double rconst);
+void farcmul(Field *field, const double rconst);
+void farcdiv(Field *field, const double rconst);
+void farcadd(Field *field, const double rconst);
+void farcsub(Field *field, const double rconst);
 
-void farmod(field_type *field, const double divisor);
+void farmod(Field *field, const double divisor);
 
-void farinv(field_type *field);
-void farround(field_type *field);
+void farinv(Field *field);
+void farround(Field *field);
 
 // field2.cc
-void farfun(field_type *field1, field_type field2, int function);
+void farfun(Field *field1, Field field2, int function);
 
-void farcpy(field_type *field1, field_type field2);
-void faradd(field_type *field1, field_type field2);
-void farsum(field_type *field1, field_type field2);
-void farsumw(field_type *field1, field_type field2, double w);
-void farsumq(field_type *field1, field_type field2);
-void farsumqw(field_type *field1, field_type field2, double w);
-void farsumtr(field_type *field1, field_type field2, const double refval);
-void farsub(field_type *field1, field_type field2);
-void farmul(field_type *field1, field_type field2);
-void fardiv(field_type *field1, field_type field2);
-void farmin(field_type *field1, field_type field2);
-void farmax(field_type *field1, field_type field2);
-void farminidx(field_type *field1, field_type *field2, field_type field3, int idx);
-void farmaxidx(field_type *field1, field_type *field2, field_type field3, int idx);
-void farvar(field_type *field1, field_type field2, field_type field3, int divisor);
-void farstd(field_type *field1, field_type field2, field_type field3, int divisor);
-void farcvar(field_type *field1, field_type field2, int nsets, int divisor);
-void farcstd(field_type *field1, field_type field2, int nsets, int divisor);
-void farmoq(field_type *field1, field_type field2);
-void farmoqw(field_type *field1, field_type field2, double w);
-void faratan2(field_type *field1, field_type field2);
-void farsetmiss(field_type *field1, field_type field2);
+void farcpy(Field *field1, Field field2);
+void faradd(Field *field1, Field field2);
+void farsum(Field *field1, Field field2);
+void farsumw(Field *field1, Field field2, double w);
+void farsumq(Field *field1, Field field2);
+void farsumqw(Field *field1, Field field2, double w);
+void farsumtr(Field *field1, Field field2, const double refval);
+void farsub(Field *field1, Field field2);
+void farmul(Field *field1, Field field2);
+void fardiv(Field *field1, Field field2);
+void farmin(Field *field1, Field field2);
+void farmax(Field *field1, Field field2);
+void farminidx(Field *field1, Field *field2, Field field3, int idx);
+void farmaxidx(Field *field1, Field *field2, Field field3, int idx);
+void farvar(Field *field1, Field field2, Field field3, int divisor);
+void farstd(Field *field1, Field field2, Field field3, int divisor);
+void farcvar(Field *field1, Field field2, int nsets, int divisor);
+void farcstd(Field *field1, Field field2, int nsets, int divisor);
+void farmoq(Field *field1, Field field2);
+void farmoqw(Field *field1, Field field2, double w);
+void faratan2(Field *field1, Field field2);
+void farsetmiss(Field *field1, Field field2);
 
-void farcount(field_type *field1, field_type field2);
+void farcount(Field *field1, Field field2);
 
 // field2cplx.cc
-void farfuncplx(field_type *field1, field_type field2, int function);
+void farfuncplx(Field *field1, Field field2, int function);
 
 #endif /* FIELD_H */

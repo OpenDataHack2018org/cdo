@@ -100,13 +100,13 @@ Seasstat(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
-  field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
-  field_type **vars2 = NULL;
+  Field **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  Field **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars2 = NULL;
   if (lvarstd || lrange) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
@@ -155,9 +155,9 @@ Seasstat(void *process)
                   recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
                 }
 
-              field_type *psamp1 = &samp1[varID][levelID];
-              field_type *pvars1 = &vars1[varID][levelID];
-              field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
+              Field *psamp1 = &samp1[varID][levelID];
+              Field *pvars1 = &vars1[varID][levelID];
+              Field *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
               size_t gridsize = pvars1->size;
 
@@ -221,8 +221,8 @@ Seasstat(void *process)
 
                 int varID = recinfo[recID].varID;
                 int levelID = recinfo[recID].levelID;
-                field_type *pvars1 = &vars1[varID][levelID];
-                field_type *pvars2 = &vars2[varID][levelID];
+                Field *pvars1 = &vars1[varID][levelID];
+                Field *pvars2 = &vars2[varID][levelID];
 
                 farmoq(pvars2, *pvars1);
               }
@@ -241,9 +241,9 @@ Seasstat(void *process)
 
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *psamp1 = &samp1[varID][levelID];
-          field_type *pvars1 = &vars1[varID][levelID];
-          field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
+          Field *psamp1 = &samp1[varID][levelID];
+          Field *pvars1 = &vars1[varID][levelID];
+          Field *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
           if (lmean)
             {
@@ -303,7 +303,7 @@ Seasstat(void *process)
 
           int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *pvars1 = &vars1[varID][levelID];
+          Field *pvars1 = &vars1[varID][levelID];
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);

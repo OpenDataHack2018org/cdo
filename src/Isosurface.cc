@@ -23,7 +23,7 @@
 double intlin(double x, double y1, double x1, double y2, double x2);
 
 static void
-isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, field_type *field2D)
+isosurface(double isoval, long nlev1, double *lev1, Field *field3D, Field *field2D)
 {
   size_t gridsize = gridInqSize(field3D->grid);
   size_t nmiss = field3D->nmiss;
@@ -118,7 +118,7 @@ Isosurface(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
@@ -126,7 +126,7 @@ Isosurface(void *process)
 
   std::vector<bool> liso(nvars);
   std::vector<bool> vars(nvars);
-  std::vector<field_type> vars1(nvars);
+  std::vector<Field> vars1(nvars);
 
   for (varID = 0; varID < nvars; varID++)
     {
