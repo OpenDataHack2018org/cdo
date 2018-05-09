@@ -56,7 +56,7 @@ Trend(void *process)
   int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   for (varID = 0; varID < nvars; varID++) vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
 

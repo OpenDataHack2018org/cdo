@@ -90,7 +90,7 @@ Timstat3(void *process)
   int nvars = vlistNvars(vlistID[0]);
 
   int maxrecs = vlistNrecs(vlistID[0]);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   int taxisID1 = vlistInqTaxis(vlistID[0]);
   int taxisID3 = taxisDuplicate(taxisID1);

@@ -232,7 +232,7 @@ Importbinary(void *process)
 
   int *var_zaxisID = (int *) Malloc(nvars * sizeof(int));
   int *var_dfrm = (int *) Malloc(nrecs * sizeof(int));
-  std::vector<recinfo_type> recinfo(nrecs);
+  std::vector<RecordInfo> recinfo(nrecs);
 
   int recID = 0;
   for (ivar = 0; ivar < nvars; ++ivar)

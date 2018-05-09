@@ -72,7 +72,7 @@ Timcount(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;

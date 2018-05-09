@@ -102,7 +102,7 @@ Inttime(void *process)
   int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   std::vector<double> array(gridsizemax);

@@ -108,7 +108,7 @@ Ymonstat(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   field_init(&field);

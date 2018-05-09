@@ -60,7 +60,7 @@ Regres(void *process)
   pstreamDefVlist(streamID3, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 

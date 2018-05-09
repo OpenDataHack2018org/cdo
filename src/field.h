@@ -51,12 +51,12 @@ typedef struct
   void *ptr2;
 } field_type;
 
-typedef struct
+struct RecordInfo
 {
   short varID;
   short levelID;
   bool lconst;
-} recinfo_type;
+};
 
 // fieldmem.cc
 void field_init(field_type *field);

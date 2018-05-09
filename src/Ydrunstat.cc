@@ -103,7 +103,7 @@ Ydrunstat(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   cdo_datetime_t *datetime = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
 

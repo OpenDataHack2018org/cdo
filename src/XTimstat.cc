@@ -78,7 +78,7 @@ typedef struct
 {
   int tsIDnext;
   int streamID, nrecs;
-  recinfo_type *recinfo;
+  RecordInfo *recinfo;
   field_type **vars;
 } readarg_t;
 
@@ -91,7 +91,7 @@ cdoReadTimestep(void *rarg)
   size_t nmiss;
   readarg_t *readarg = (readarg_t *) rarg;
   field_type **input_vars = readarg->vars;
-  recinfo_type *recinfo = readarg->recinfo;
+  RecordInfo *recinfo = readarg->recinfo;
   int streamID = readarg->streamID;
   int tsIDnext = readarg->tsIDnext;
   int nrecs = readarg->nrecs;
@@ -321,7 +321,7 @@ XTimstat(void *process)
   int otsID = 0;
   int nrecs = cdoStreamInqTimestep(streamID1, tsID);
   int maxrecs = nrecs;
-  recinfo_type *recinfo = (recinfo_type *) Malloc(maxrecs * sizeof(recinfo_type));
+  RecordInfo *recinfo = (RecordInfo *) Malloc(maxrecs * sizeof(RecordInfo));
 
   tsID++;
   while (TRUE)
