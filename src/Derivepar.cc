@@ -51,7 +51,6 @@ Derivepar(void *process)
   double *single2;
   // double *lwater = NULL, *iwater = NULL;
   size_t nmiss, nmissout = 0;
-  double *full_press = NULL;
   double minval, maxval;
   int instNum, tableNum;
   gribcode_t gribcodes;
@@ -159,41 +158,31 @@ Derivepar(void *process)
 
           if (code < 0)
             {
-              if (sgeopotID == -1 && strcmp(varname, "geosp") == 0)
-                code = gribcodes.geopot;
-              else if (psID == -1 && strcmp(varname, "aps") == 0)
-                code = gribcodes.ps;
-              else if (psID == -1 && strcmp(varname, "ps") == 0)
-                code = gribcodes.ps;
-              else if (lnpsID == -1 && strcmp(varname, "lsp") == 0)
-                code = gribcodes.lsp;
-              else if (tempID == -1 && strcmp(varname, "t") == 0)
-                code = gribcodes.temp;
-              else if (humID == -1 && strcmp(varname, "q") == 0)
-                code = gribcodes.hum;
-              // else if ( geopotID  == -1 && strcmp(stdname,
-              // "geopotential_full") == 0 ) code = gribcodes.geopot; else if (
-              // strcmp(varname, "clwc")    == 0 ) code = 246; else if (
-              // strcmp(varname, "ciwc")    == 0 ) code = 247;
+              // clang-format off
+              if      (sgeopotID == -1 && strcmp(varname, "geosp") == 0) code = gribcodes.geopot;
+              else if (psID == -1 && strcmp(varname, "aps") == 0) code = gribcodes.ps;
+              else if (psID == -1 && strcmp(varname, "ps") == 0) code = gribcodes.ps;
+              else if (lnpsID == -1 && strcmp(varname, "lsp") == 0) code = gribcodes.lsp;
+              else if (tempID == -1 && strcmp(varname, "t") == 0) code = gribcodes.temp;
+              else if (humID == -1 && strcmp(varname, "q") == 0) code = gribcodes.hum;
+              // else if ( geopotID  == -1 && strcmp(stdname, "geopotential_full") == 0 ) code = gribcodes.geopot;
+              // else if ( strcmp(varname, "clwc") == 0 ) code = 246;
+              // else if ( strcmp(varname, "ciwc") == 0 ) code = 247;
+              // clang-format on
             }
         }
 
-      if (code == gribcodes.geopot && nlevel == 1)
-        sgeopotID = varID;
-      else if (code == gribcodes.geopot && nlevel == nhlevf)
-        geopotID = varID;
-      else if (code == gribcodes.temp && nlevel == nhlevf)
-        tempID = varID;
-      else if (code == gribcodes.hum && nlevel == nhlevf)
-        humID = varID;
-      else if (code == gribcodes.ps && nlevel == 1)
-        psID = varID;
-      else if (code == gribcodes.lsp && nlevel == 1)
-        lnpsID = varID;
-      else if (code == gribcodes.gheight && nlevel == nhlevf)
-        gheightID = varID;
+      // clang-format off
+      if      (code == gribcodes.geopot && nlevel == 1) sgeopotID = varID;
+      else if (code == gribcodes.geopot && nlevel == nhlevf) geopotID = varID;
+      else if (code == gribcodes.temp && nlevel == nhlevf) tempID = varID;
+      else if (code == gribcodes.hum && nlevel == nhlevf) humID = varID;
+      else if (code == gribcodes.ps && nlevel == 1) psID = varID;
+      else if (code == gribcodes.lsp && nlevel == 1) lnpsID = varID;
+      else if (code == gribcodes.gheight && nlevel == nhlevf) gheightID = varID;
       // else if ( code == 246 ) clwcID    = varID;
       // else if ( code == 247 ) ciwcID    = varID;
+      // clang-format on
 
       if (operatorID == SEALEVELPRESSURE) humID = -1;
 
@@ -216,36 +205,34 @@ Derivepar(void *process)
 
   if (tempID == -1) cdoAbort("%s not found!", var_stdname(air_temperature));
 
-  double *array = (double *) Malloc(gridsize * sizeof(double));
-  double *sgeopot = (double *) Malloc(gridsize * sizeof(double));
-  double *ps = (double *) Malloc(gridsize * sizeof(double));
-  double *temp = (double *) Malloc(gridsize * nhlevf * sizeof(double));
+  std::vector<double> array(gridsize);
+  std::vector<double> sgeopot(gridsize);
+  std::vector<double> ps(gridsize);
+  std::vector<double> temp(gridsize * nhlevf);
 
-  // lwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
-  // iwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+  std::vector<double> half_press(gridsize * (nhlevf + 1));
 
-  double *half_press = (double *) Malloc(gridsize * (nhlevf + 1) * sizeof(double));
-
-  double *hum = NULL;
-  double *gheight = NULL;
+  std::vector<double> hum;
+  std::vector<double> gheight;
   if (operatorID == GHEIGHT)
     {
       if (humID == -1)
         cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity),
                    var_stdname(specific_humidity));
       else
-        hum = (double *) Malloc(gridsize * nhlevf * sizeof(double));
+        hum.resize(gridsize * nhlevf);
 
-      gheight = (double *) Malloc(gridsize * (nhlevf + 1) * sizeof(double));
+      gheight.resize(gridsize * (nhlevf + 1));
     }
 
-  double *sealevelpressure = NULL;
+  std::vector<double> full_press;
+  std::vector<double> sealevelpressure;
   if (operatorID == SEALEVELPRESSURE)
     {
-      full_press = (double *) Malloc(gridsize * nhlevf * sizeof(double));
+      full_press.resize(gridsize * nhlevf);
 
       surfaceID = zaxisFromName("surface");
-      sealevelpressure = (double *) Malloc(gridsize * sizeof(double));
+      sealevelpressure.resize(gridsize);
     }
 
   if (zaxisIDh != -1 && sgeopotID == -1)
@@ -255,7 +242,7 @@ Derivepar(void *process)
       else
         cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
 
-      arrayFill(gridsize, sgeopot, 0.0);
+      arrayFill(gridsize, sgeopot.data(), 0.0);
     }
 
   presID = lnpsID;
@@ -317,40 +304,40 @@ Derivepar(void *process)
           zaxisID = vlistInqVarZaxis(vlistID1, varID);
           nlevel = zaxisInqSize(zaxisID);
           offset = gridsize * levelID;
-          pstreamReadRecord(streamID1, array, &nmiss);
+          pstreamReadRecord(streamID1, array.data(), &nmiss);
 
           if (zaxisIDh != -1)
             {
               if (varID == sgeopotID)
                 {
-                  arrayCopy(gridsize, array, sgeopot);
+                  arrayCopy(gridsize, array.data(), sgeopot.data());
                 }
               else if (varID == geopotID && sgeopotID == -1 && (levelID + 1) == nhlevf)
                 {
-                  arrayCopy(gridsize, array, sgeopot);
+                  arrayCopy(gridsize, array.data(), sgeopot.data());
                 }
               else if (varID == presID)
                 {
                   if (lnpsID != -1)
                     for (size_t i = 0; i < gridsize; ++i) ps[i] = exp(array[i]);
                   else if (psID != -1)
-                    arrayCopy(gridsize, array, ps);
+                    arrayCopy(gridsize, array.data(), ps.data());
                 }
               else if (varID == tempID)
-                arrayCopy(gridsize, array, temp + offset);
+                arrayCopy(gridsize, array.data(), &temp[offset]);
               else if (varID == humID)
-                arrayCopy(gridsize, array, hum + offset);
+                arrayCopy(gridsize, array.data(), &hum[offset]);
             }
         }
 
       if (zaxisIDh != -1)
         {
           /* check range of ps_prog */
-          arrayMinMaxMask(gridsize, ps, NULL, &minval, &maxval);
+          arrayMinMaxMask(gridsize, ps.data(), NULL, &minval, &maxval);
           if (minval < MIN_PS || maxval > MAX_PS) cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           /* check range of surface geopot */
-          arrayMinMaxMask(gridsize, sgeopot, NULL, &minval, &maxval);
+          arrayMinMaxMask(gridsize, sgeopot.data(), NULL, &minval, &maxval);
           if (minval < MIN_FIS || maxval > MAX_FIS) cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
         }
 
@@ -359,7 +346,7 @@ Derivepar(void *process)
       for (levelID = 0; levelID < nlevel; levelID++)
         {
           offset = gridsize * levelID;
-          single2 = temp + offset;
+          single2 = &temp[offset];
 
           arrayMinMaxMask(gridsize, single2, NULL, &minval, &maxval);
           if (minval < MIN_T || maxval > MAX_T)
@@ -373,7 +360,7 @@ Derivepar(void *process)
           for (levelID = 0; levelID < nlevel; levelID++)
             {
               offset = gridsize * levelID;
-              single2 = hum + offset;
+              single2 = &hum[offset];
 
               // corr_hum(gridsize, single2, MIN_Q);
 
@@ -385,9 +372,9 @@ Derivepar(void *process)
 
       if (operatorID == GHEIGHT)
         {
-          presh(NULL, half_press, vct, ps, nhlevf, gridsize);
-          arrayCopy(gridsize, sgeopot, gheight + gridsize * nhlevf);
-          MakeGeopotHeight(gheight, temp, hum, half_press, gridsize, nhlevf);
+          presh(NULL, half_press.data(), vct, ps.data(), nhlevf, gridsize);
+          arrayCopy(gridsize, sgeopot.data(), gheight.data() + gridsize * nhlevf);
+          MakeGeopotHeight(gheight.data(), temp.data(), hum.data(), half_press.data(), gridsize, nhlevf);
 
           nmissout = 0;
           varID = 0;
@@ -395,18 +382,18 @@ Derivepar(void *process)
           for (levelID = 0; levelID < nlevel; levelID++)
             {
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2, gheight + levelID * gridsize, nmissout);
+              pstreamWriteRecord(streamID2, gheight.data() + levelID * gridsize, nmissout);
             }
         }
       else if (operatorID == SEALEVELPRESSURE)
         {
-          presh(full_press, half_press, vct, ps, nhlevf, gridsize);
+          presh(full_press.data(), half_press.data(), vct, ps.data(), nhlevf, gridsize);
 
-          extra_P(sealevelpressure, half_press + gridsize * (nhlevf), full_press + gridsize * (nhlevf - 1), sgeopot,
-                  temp + gridsize * (nhlevf - 1), gridsize);
+          extra_P(sealevelpressure.data(), &half_press[gridsize * (nhlevf)], &full_press[gridsize * (nhlevf - 1)], sgeopot.data(),
+                  &temp[gridsize * (nhlevf - 1)], gridsize);
 
           pstreamDefRecord(streamID2, 0, 0);
-          pstreamWriteRecord(streamID2, sealevelpressure, 0);
+          pstreamWriteRecord(streamID2, sealevelpressure.data(), 0);
         }
       else
         cdoAbort("Internal error");
@@ -419,17 +406,6 @@ Derivepar(void *process)
 
   vlistDestroy(vlistID2);
 
-  Free(ps);
-  Free(sgeopot);
-  Free(temp);
-  if (gheight) Free(gheight);
-  if (sealevelpressure) Free(sealevelpressure);
-  if (hum) Free(hum);
-
-  if (full_press) Free(full_press);
-  if (half_press) Free(half_press);
-
-  Free(array);
   if (vct) Free(vct);
 
   cdoFinish();

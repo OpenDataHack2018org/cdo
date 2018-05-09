@@ -476,17 +476,12 @@ interpolate(field_type *field1, field_type *field2)
   long ilon, ilat, nxlon, nxlat, olon, olat;
   long l11, l12, l21, l22, l1, l2;
   double volon1, volon2, volat1, volat2;
-  double *volon11, *volon12;
-  double *volon21, *volon22;
   double vilon1, vilon2, vilat1, vilat2;
   double vlon1, vlon2, vlat1, vlat2;
-  long *ilon11, *ilon12;
-  long *ilon21, *ilon22;
-  long *ilat1, *ilat2;
   long ilon1, ilon2;
   double sum, wsum;
   int k, n;
-  double *xin_array, *xlon, *xlat;
+  double *xin_array;
   double **in0, **xin, **xout;
   int wrap_around, xlat_is_ascending;
   double a11, a12, a21, a22, b11, b12, b21, b22, t;
@@ -631,7 +626,7 @@ interpolate(field_type *field1, field_type *field2)
 
   for (ilat = 0; ilat < nxlat; ilat++) xin[ilat] = xin_array + ilat * nxlon;
 
-  xlon = (double *) Malloc(nxlon * sizeof(double));
+  std::vector<double> xlon(nxlon);
   for (ilon = 0; ilon < nlon; ilon++)
     {
       xlon[2 * ilon + 1] = lon[ilon];
@@ -639,7 +634,7 @@ interpolate(field_type *field1, field_type *field2)
     }
   xlon[2 * nlon] = (lon[nlon - 1] + lon[nlon]) / 2;
 
-  xlat = (double *) Malloc((2 * nlat + 1) * sizeof(double));
+  std::vector<double> xlat(2 * nlat + 1);
   for (ilat = 0; ilat < nlat; ilat++)
     {
       xlat[2 * ilat + 1] = lat[ilat];
@@ -650,14 +645,14 @@ interpolate(field_type *field1, field_type *field2)
   in0 = (double **) Malloc(nlat * sizeof(double *));
   for (ilat = 0; ilat < nlat; ilat++) in0[ilat] = arrayIn + ilat * nlon;
 
-  ilon11 = (long *) Malloc(out_nlon * sizeof(long));
-  ilon12 = (long *) Malloc(out_nlon * sizeof(long));
-  ilon21 = (long *) Malloc(out_nlon * sizeof(long));
-  ilon22 = (long *) Malloc(out_nlon * sizeof(long));
-  volon11 = (double *) Malloc(out_nlon * sizeof(double));
-  volon12 = (double *) Malloc(out_nlon * sizeof(double));
-  volon21 = (double *) Malloc(out_nlon * sizeof(double));
-  volon22 = (double *) Malloc(out_nlon * sizeof(double));
+  std::vector<long> ilon11(out_nlon);
+  std::vector<long> ilon12(out_nlon);
+  std::vector<long> ilon21(out_nlon);
+  std::vector<long> ilon22(out_nlon);
+  std::vector<double> volon11(out_nlon);
+  std::vector<double> volon12(out_nlon);
+  std::vector<double> volon21(out_nlon);
+  std::vector<double> volon22(out_nlon);
 
   for (olon = 0; olon < out_nlon; olon++)
     {
@@ -686,8 +681,8 @@ interpolate(field_type *field1, field_type *field2)
       ilon22[olon] = l22;
     }
 
-  ilat1 = (long *) Malloc(out_nlat * sizeof(long));
-  ilat2 = (long *) Malloc(out_nlat * sizeof(long));
+  std::vector<long> ilat1(out_nlat);
+  std::vector<long> ilat2(out_nlat);
 
   xlat_is_ascending = xlat[0] <= xlat[nxlat - 1];
   for (olat = 0; olat < out_nlat; olat++)
@@ -946,18 +941,6 @@ interpolate(field_type *field1, field_type *field2)
   Free(lato_array);
   Free(xin);
   Free(xin_array);
-  Free(xlon);
-  Free(xlat);
   Free(in0);
-  Free(ilon11);
-  Free(ilon12);
-  Free(ilon21);
-  Free(ilon22);
-  Free(volon11);
-  Free(volon12);
-  Free(volon21);
-  Free(volon22);
-  Free(ilat1);
-  Free(ilat2);
   Free(xout);
 }

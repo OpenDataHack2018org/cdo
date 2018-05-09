@@ -1,7 +1,11 @@
-2018-05-03  Uwe Schulzweida
+2018-05-09  Uwe Schulzweida
 
 	* Using CDI library version 1.9.4
 	* Version 1.9.4 release
+
+2018-05-08  Uwe Schulzweida
+
+	* setattribute: added support for \n in text attributes
 
 2018-05-03  Uwe Schulzweida
 

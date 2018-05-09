@@ -21,7 +21,7 @@
 #include "pstream_int.h"
 
 static void
-set_attributes(list_t *kvlist, int vlistID)
+setAttributes(list_t *kvlist, int vlistID)
 {
   enum
   {
@@ -32,7 +32,7 @@ set_attributes(list_t *kvlist, int vlistID)
   int ngrids = vlistNgrids(vlistID);
   int nzaxis = vlistNzaxis(vlistID);
   int maxvars = nvars + ngrids * 2 + nzaxis;
-  int *varIDs = (int *) Malloc(maxvars * sizeof(int));
+  std::vector<int> varIDs(maxvars);
 
   int kvn = list_size(kvlist);
   char **wname = (char **) Malloc(kvn * sizeof(char *));
@@ -162,13 +162,23 @@ set_attributes(list_t *kvlist, int vlistID)
               else
                 {
                   int len = (value && *value) ? (int) strlen(value) : 0;
-                  cdiDefAttTxt(cdiID, varID, attname, len, value);
+                  int outlen = 0;
+                  char *outvalue = NULL;
+                  if ( len ) outvalue = (char*) malloc(len);
+                  for ( int i = 0; i < len; ++i )
+                    {
+                      if ( i > 0 && value[i-1] == '\\' && value[i] == 'n' )
+                        outvalue[outlen-1] = '\n';
+                      else
+                        outvalue[outlen++] = value[i];
+                    }
+                  cdiDefAttTxt(cdiID, varID, attname, outlen, outvalue);
+                  if ( outvalue ) free(outvalue);
                 }
             }
         }
     }
 
-  Free(varIDs);
   for (int i = 0; i < kvn; ++i)
     if (wname[i]) free(wname[i]);
 }
@@ -222,7 +232,7 @@ Setattribute(void *process)
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
-  set_attributes(kvlist, vlistID2);
+  setAttributes(kvlist, vlistID2);
 
   if (pmlist)
     list_destroy(pmlist);
@@ -236,12 +246,12 @@ Setattribute(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  double *array = NULL;
+  std::vector<double> array;
   if (!lcopy)
     {
       size_t gridsize = (size_t) vlistGridsizeMax(vlistID1);
       if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-      array = (double *) Malloc(gridsize * sizeof(double));
+      array.resize(gridsize);
     }
 
   int tsID = 0;
@@ -262,8 +272,8 @@ Setattribute(void *process)
           else
             {
               size_t nmiss;
-              pstreamReadRecord(streamID1, array, &nmiss);
-              pstreamWriteRecord(streamID2, array, nmiss);
+              pstreamReadRecord(streamID1, array.data(), &nmiss);
+              pstreamWriteRecord(streamID2, array.data(), nmiss);
             }
         }
 
@@ -272,8 +282,6 @@ Setattribute(void *process)
 
   pstreamClose(streamID1);
   pstreamClose(streamID2);
-
-  if (array) Free(array);
 
   cdoFinish();
 

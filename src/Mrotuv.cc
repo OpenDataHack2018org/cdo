@@ -31,11 +31,9 @@ void
 rotate_uv(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat, double *u_lon, double *v_lat)
 {
   /*
- real,intent(in)      :: u_i(ix,iy,iz),v_j(ix,iy,iz)                  ! vector
- components in i-j-direction real,intent(out)     ::
- u_lon(ix,iy,iz),v_lat(ix,iy,iz)              ! vector components in lon-lat
- direction real,intent(in)      :: lat(ix,iy),lon(ix,iy)
- ! latitudes and longitudes
+    real,intent(in)      :: u_i(ix,iy,iz),v_j(ix,iy,iz)      ! vector components in i-j-direction real,intent(out)     ::
+                            u_lon(ix,iy,iz),v_lat(ix,iy,iz)  ! vector components in lon-lat direction
+    real,intent(in)      :: lat(ix,iy),lon(ix,iy)            ! latitudes and longitudes
   */
   double dlat_i, dlat_j, dlon_i, dlon_j, dist_i, dist_j;
   double lat_factor;
@@ -238,46 +236,46 @@ Mrotuv(void *process)
   size_t nlon = gridInqXsize(gridID1);
   size_t nlat = gridInqYsize(gridID1);
 
-  double *grid1x = (double *) Malloc(gridsize * sizeof(double));
-  double *grid1y = (double *) Malloc(gridsize * sizeof(double));
-  double *gridux = (double *) Malloc(gridsize * sizeof(double));
-  double *griduy = (double *) Malloc(gridsize * sizeof(double));
-  double *gridvx = (double *) Malloc(gridsize * sizeof(double));
-  double *gridvy = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> grid1x(gridsize);
+  std::vector<double> grid1y(gridsize);
+  std::vector<double> gridux(gridsize);
+  std::vector<double> griduy(gridsize);
+  std::vector<double> gridvx(gridsize);
+  std::vector<double> gridvy(gridsize);
 
   size_t gridsizex = (nlon + 2) * nlat;
 
-  gridInqXvals(gridID1, grid1x);
-  gridInqYvals(gridID1, grid1y);
+  gridInqXvals(gridID1, grid1x.data());
+  gridInqYvals(gridID1, grid1y.data());
 
   /* Convert lat/lon units if required */
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID1, units);
-    grid_to_degree(units, gridsize, grid1x, "grid center lon");
+    grid_to_degree(units, gridsize, grid1x.data(), "grid center lon");
     gridInqYunits(gridID1, units);
-    grid_to_degree(units, gridsize, grid1y, "grid center lat");
+    grid_to_degree(units, gridsize, grid1y.data(), "grid center lat");
   }
 
-  p_to_uv_grid(nlon, nlat, grid1x, grid1y, gridux, griduy, gridvx, gridvy);
+  p_to_uv_grid(nlon, nlat, grid1x.data(), grid1y.data(), gridux.data(), griduy.data(), gridvx.data(), gridvy.data());
 
   int gridIDu = gridCreate(GRID_CURVILINEAR, nlon * nlat);
   gridDefDatatype(gridIDu, gridInqDatatype(gridID1));
   gridDefXsize(gridIDu, nlon);
   gridDefYsize(gridIDu, nlat);
-  gridDefXvals(gridIDu, gridux);
-  gridDefYvals(gridIDu, griduy);
+  gridDefXvals(gridIDu, gridux.data());
+  gridDefYvals(gridIDu, griduy.data());
 
   int gridIDv = gridCreate(GRID_CURVILINEAR, nlon * nlat);
   gridDefDatatype(gridIDv, gridInqDatatype(gridID1));
   gridDefXsize(gridIDv, nlon);
   gridDefYsize(gridIDv, nlat);
-  gridDefXvals(gridIDv, gridvx);
-  gridDefYvals(gridIDv, gridvy);
+  gridDefXvals(gridIDv, gridvx.data());
+  gridDefYvals(gridIDv, gridvy.data());
 
   for (size_t i = 0; i < gridsize; i++)
     {
-      grid1x[i] *= DEG2RAD;
+      grid1x [i] *= DEG2RAD;
       grid1y[i] *= DEG2RAD;
     }
 
@@ -308,19 +306,19 @@ Mrotuv(void *process)
   double missval1 = vlistInqVarMissval(vlistID1, uid);
   double missval2 = vlistInqVarMissval(vlistID1, vid);
 
-  double *ufield = (double *) Malloc(gridsize * sizeof(double));
-  double *vfield = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> ufield(gridsize);
+  std::vector<double> vfield(gridsize);
 
-  double **urfield = (double **) Malloc(nlevs * sizeof(double *));
-  double **vrfield = (double **) Malloc(nlevs * sizeof(double *));
+  std::vector<std::vector<double>> urfield(nlevs);
+  std::vector<std::vector<double>> vrfield(nlevs);
   for (int lid = 0; lid < nlevs; lid++)
     {
-      urfield[lid] = (double *) Malloc(gridsize * sizeof(double));
-      vrfield[lid] = (double *) Malloc(gridsize * sizeof(double));
+      urfield[lid].resize(gridsize);
+      vrfield[lid].resize(gridsize);
     }
 
-  double *uhelp = (double *) Malloc(gridsizex * sizeof(double));
-  double *vhelp = (double *) Malloc(gridsizex * sizeof(double));
+  std::vector<double> uhelp(gridsizex);
+  std::vector<double> vhelp(gridsizex);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -334,8 +332,8 @@ Mrotuv(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          if (varID == uid) pstreamReadRecord(streamID1, urfield[levelID], &nmiss1);
-          if (varID == vid) pstreamReadRecord(streamID1, vrfield[levelID], &nmiss2);
+          if (varID == uid) pstreamReadRecord(streamID1, urfield[levelID].data(), &nmiss1);
+          if (varID == vid) pstreamReadRecord(streamID1, vrfield[levelID].data(), &nmiss2);
         }
 
       for (levelID = 0; levelID < nlevs; levelID++)
@@ -352,7 +350,7 @@ Mrotuv(void *process)
 
           /* rotate*/
 
-          rotate_uv(urfield[levelID], vrfield[levelID], nlon, nlat, grid1x, grid1y, ufield, vfield);
+          rotate_uv(urfield[levelID].data(), vrfield[levelID].data(), nlon, nlat, grid1x.data(), grid1y.data(), ufield.data(), vfield.data());
 
           /* load to a help field */
           for (size_t j = 0; j < nlat; j++)
@@ -390,9 +388,9 @@ Mrotuv(void *process)
             }
 
           pstreamDefRecord(streamID2, 0, levelID);
-          pstreamWriteRecord(streamID2, ufield, nmiss1);
+          pstreamWriteRecord(streamID2, ufield.data(), nmiss1);
           pstreamDefRecord(streamID3, 0, levelID);
-          pstreamWriteRecord(streamID3, vfield, nmiss2);
+          pstreamWriteRecord(streamID3, vfield.data(), nmiss2);
         }
 
       tsID++;
@@ -401,17 +399,6 @@ Mrotuv(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (ufield) Free(ufield);
-  if (vfield) Free(vfield);
-  if (urfield) Free(urfield);
-  if (vrfield) Free(vrfield);
-  if (uhelp) Free(uhelp);
-  if (vhelp) Free(vhelp);
-  if (gridux) Free(gridux);
-  if (griduy) Free(griduy);
-  if (gridvx) Free(gridvx);
-  if (gridvy) Free(gridvy);
 
   cdoFinish();
 

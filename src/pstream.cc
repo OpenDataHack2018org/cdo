@@ -47,7 +47,6 @@
 #include "dmemory.h"
 #include "compare.h"
 #include "cdo_vlist.h"
-#include "functs.h"
 #include "array.h"
 #include "cdoOptions.h"
 #include "cdo_history.h"
@@ -162,17 +161,16 @@ PstreamType::init()
   tsID = -1;
   m_filetype = -1;
   m_name = "";
+  m_mode = 0;
   tsID0 = 0;
-  mfiles = 0;
-  nfiles = 0;
   m_varID = -1;
-  m_varlist = NULL;
 #ifdef HAVE_LIBPTHREAD
   pipe = NULL;
   rthreadID = 0;
   wthreadID = 0;
 #endif
 }
+
 PstreamType::PstreamType(int p_id) : self(p_id) { init(); }
 
 bool
@@ -190,6 +188,7 @@ PstreamType::pstreamOpenReadPipe()
   if (CdoDebug::PSTREAM) MESSAGE("pipe ", pipe->name);
 
   isopen = true;
+
   return self;
 #else
   cdoAbort("Cannot use pipes, pthread support not compiled in!");
@@ -201,15 +200,7 @@ PstreamType::pstreamOpenReadFile(const char *p_args)
 {
   std::string filename;
 
-  if (mfiles)
-    {
-      filename = m_mfnames[0];
-      nfiles = 1;
-    }
-  else
-    {
-      filename = std::string(p_args);
-    }
+  filename = std::string(p_args);
 
   if (CdoDebug::PSTREAM) MESSAGE("Opening (r) file: ", filename.c_str());
 
@@ -220,11 +211,9 @@ PstreamType::pstreamOpenReadFile(const char *p_args)
     pthread_mutex_lock(&streamOpenReadMutex);
 #endif
   int fileID = streamOpenRead(filename.c_str());
-  if (fileID < 0)
-    {
-      cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
-    }
-    isopen = true;
+  if (fileID < 0) cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
+
+  isopen = true;
 
   if (cdoDefaultFileType == CDI_UNDEFID) cdoDefaultFileType = streamInqFiletype(fileID);
 
@@ -236,7 +225,7 @@ PstreamType::pstreamOpenReadFile(const char *p_args)
     pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
 
-  mode = 'r';
+  m_mode = 'r';
   m_name = filename;
   m_fileID = fileID;
 }
@@ -245,12 +234,11 @@ int
 PstreamType::pstreamOpenWritePipe(const char *pipename, int filetype)
 {
 #ifdef HAVE_LIBPTHREAD
-  if (CdoDebug::PSTREAM)
-    {
-      MESSAGE("pipe ", pipename);
-    }
+  if (CdoDebug::PSTREAM) MESSAGE("pipe ", pipename);
+
   wthreadID = pthread_self();
   m_filetype = filetype;
+
   return self;
 #else
   return -1;
@@ -260,10 +248,7 @@ PstreamType::pstreamOpenWritePipe(const char *pipename, int filetype)
 int
 PstreamType::pstreamOpenWriteFile(int filetype)
 {
-  if (CdoDebug::PSTREAM)
-    {
-      MESSAGE("Opening (w) file ", m_name);
-    }
+  if (CdoDebug::PSTREAM) MESSAGE("Opening (w) file ", m_name);
 
   if (filetype == CDI_UNDEFID) filetype = CDI_FILETYPE_GRB;
 
@@ -294,7 +279,7 @@ PstreamType::pstreamOpenWriteFile(int filetype)
 
   set_comp(fileID, filetype);
 
-  mode = 'w';
+  m_mode = 'w';
   m_fileID = fileID;
   m_filetype = filetype;
 
@@ -304,48 +289,35 @@ PstreamType::pstreamOpenWriteFile(int filetype)
 void
 PstreamType::openAppend(const char *p_filename)
 {
-  if (processNum == 1 && Threading::ompNumThreads == 1)
-    {
-      timer_start(timer_write);
-    }
+  if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_write);
+
 #ifdef HAVE_LIBPTHREAD
   if (Threading::cdoLockIO)
-    {
-      pthread_mutex_lock(&streamMutex);
-    }
+    pthread_mutex_lock(&streamMutex);
   else
-    {
-      pthread_mutex_lock(&streamOpenReadMutex);
-    }
+    pthread_mutex_lock(&streamOpenReadMutex);
 #endif
 
   int fileID = streamOpenAppend(p_filename);
 
 #ifdef HAVE_LIBPTHREAD
   if (Threading::cdoLockIO)
-    {
-      pthread_mutex_unlock(&streamMutex);
-    }
+    pthread_mutex_unlock(&streamMutex);
   else
-    {
-      pthread_mutex_unlock(&streamOpenReadMutex);
-    }
+    pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
-  if (processNum == 1 && Threading::ompNumThreads == 1)
-    {
-      timer_stop(timer_write);
-    }
-  if (fileID < 0)
-    {
-      cdiOpenError(fileID, "Open failed on >%s<", p_filename);
-    }
+
+  if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_write);
+
+  if (fileID < 0) cdiOpenError(fileID, "Open failed on >%s<", p_filename);
+
   isopen = true;
 
   int filetype = streamInqFiletype(fileID);
   set_comp(fileID, filetype);
 
+  m_mode = 'a';
   m_name = p_filename;
-  mode = 'a';
   m_fileID = fileID;
 }
 
@@ -397,10 +369,8 @@ PstreamType::close()
 #ifdef HAVE_LIBPTHREAD
       pthread_t threadID = pthread_self();
 
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE("thID: ", threadID, " rthID: ", rthreadID, " wthID: ", wthreadID);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE("thID: ", threadID, " rthID: ", rthreadID, " wthID: ", wthreadID);
+
       if (pthread_equal(threadID, rthreadID))
         {
           closePipe();
@@ -419,10 +389,8 @@ PstreamType::close()
     }
   else
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(m_name.c_str(), " fileID ", m_fileID);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(m_name.c_str(), " fileID ", m_fileID);
+
 #ifdef HAVE_LIBPTHREAD
       if (Threading::cdoLockIO) pthread_mutex_lock(&streamMutex);
 #endif
@@ -432,10 +400,10 @@ PstreamType::close()
       if (Threading::cdoLockIO) pthread_mutex_unlock(&streamMutex);
 #endif
 
-      if (m_varlist)
+      if (m_varlist.size())
         {
-          Free(m_varlist);
-          m_varlist = NULL;
+          m_varlist.clear();
+          m_varlist.shrink_to_fit();
         }
     }
 }
@@ -473,8 +441,7 @@ PstreamType::inqVlist()
 
       int nsubtypes = vlistNsubtypes(vlistID);
       if (nsubtypes > 1)
-        cdoWarning("Subtypes are unsupported, the processing results are "
-                   "possibly wrong!");
+        cdoWarning("Subtypes are unsupported, the processing results are possibly wrong!");
 
       if (cdoDefaultTimeType != CDI_UNDEFID) taxisDefType(vlistInqTaxis(vlistID), cdoDefaultTimeType);
 
@@ -491,27 +458,27 @@ PstreamType::defVarList(int p_vlistID)
 
   if (m_vlistID != -1) cdoAbort("Internal problem, vlist already defined!");
 
-  if (m_varlist != NULL) cdoAbort("Internal problem, varlist already allocated!");
+  if (m_varlist.size() != 0) cdoAbort("Internal problem, varlist already allocated!");
 
   int nvars = vlistNvars(p_vlistID);
   assert(nvars > 0);
 
-  varlist_t *varlist = (varlist_t *) Malloc(nvars * sizeof(varlist_t));
+  m_varlist.resize(nvars);
 
   for (int varID = 0; varID < nvars; ++varID)
     {
-      varlist[varID].gridsize = gridInqSize(vlistInqVarGrid(p_vlistID, varID));
-      varlist[varID].datatype = vlistInqVarDatatype(p_vlistID, varID);
-      varlist[varID].missval = vlistInqVarMissval(p_vlistID, varID);
-      varlist[varID].addoffset = vlistInqVarAddoffset(p_vlistID, varID);
-      varlist[varID].scalefactor = vlistInqVarScalefactor(p_vlistID, varID);
+      m_varlist[varID].gridsize = gridInqSize(vlistInqVarGrid(p_vlistID, varID));
+      m_varlist[varID].datatype = vlistInqVarDatatype(p_vlistID, varID);
+      m_varlist[varID].missval = vlistInqVarMissval(p_vlistID, varID);
+      m_varlist[varID].addoffset = vlistInqVarAddoffset(p_vlistID, varID);
+      m_varlist[varID].scalefactor = vlistInqVarScalefactor(p_vlistID, varID);
 
-      varlist[varID].check_datarange = false;
+      m_varlist[varID].check_datarange = false;
 
-      int laddoffset = IS_NOT_EQUAL(varlist[varID].addoffset, 0);
-      int lscalefactor = IS_NOT_EQUAL(varlist[varID].scalefactor, 1);
+      int laddoffset = IS_NOT_EQUAL(m_varlist[varID].addoffset, 0);
+      int lscalefactor = IS_NOT_EQUAL(m_varlist[varID].scalefactor, 1);
 
-      int datatype = varlist[varID].datatype;
+      int datatype = m_varlist[varID].datatype;
 
       if (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4
           || filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5)
@@ -520,30 +487,29 @@ PstreamType::defVarList(int p_vlistID)
               && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC5))
             {
               datatype = CDI_DATATYPE_INT16;
-              varlist[varID].datatype = datatype;
+              m_varlist[varID].datatype = datatype;
             }
 
           if (datatype == CDI_DATATYPE_UINT16
               && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC5))
             {
               datatype = CDI_DATATYPE_INT32;
-              varlist[varID].datatype = datatype;
+              m_varlist[varID].datatype = datatype;
             }
 
           if (laddoffset || lscalefactor)
             {
               if (datatype == CDI_DATATYPE_INT8 || datatype == CDI_DATATYPE_UINT8 || datatype == CDI_DATATYPE_INT16
                   || datatype == CDI_DATATYPE_UINT16)
-                varlist[varID].check_datarange = true;
+                m_varlist[varID].check_datarange = true;
             }
           else if (cdoCheckDatarange)
             {
-              varlist[varID].check_datarange = true;
+              m_varlist[varID].check_datarange = true;
             }
         }
     }
 
-  m_varlist = varlist;
   m_vlistID = p_vlistID; /* used for -r/-a */
 }
 
@@ -615,10 +581,8 @@ PstreamType::inqRecord(int *varID, int *levelID)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       pipe->pipeInqRecord(varID, levelID);
     }
 
@@ -645,11 +609,8 @@ PstreamType::defRecord(int varID, int levelID)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
+      if (CdoDebug::PSTREAM) MESSAGE(m_name.c_str(), " pstreamid ", self);
 
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(m_name.c_str(), " pstreamid ", self);
-        }
       pipe->pipeDefRecord(varID, levelID);
     }
   else
@@ -698,10 +659,8 @@ PstreamType::readRecord(double *data, size_t *nmiss)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       pipe->pipeReadRecord(m_vlistID, data, nmiss);
     }
   else
@@ -781,10 +740,8 @@ PstreamType::writeRecord(double *data, size_t nmiss)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       pipe->pipeWriteRecord(data, nmiss);
     }
   else
@@ -793,7 +750,7 @@ PstreamType::writeRecord(double *data, size_t nmiss)
       int varID = m_varID;
       if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_write);
 
-      if (m_varlist)
+      if (varID < (int)m_varlist.size())
         if (m_varlist[varID].check_datarange) checkDatarange(varID, data, nmiss);
 
 #ifdef HAVE_LIBPTHREAD
@@ -814,10 +771,8 @@ PstreamType::writeRecordF(float *data, size_t nmiss)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       cdoAbort("pipeWriteRecord not implemented for memtype float!");
     }
   else
@@ -850,59 +805,8 @@ PstreamType::inqTimestep(int p_tsID)
 #endif
   if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_read);
 
-  if (nrecs == 0 && mfiles && (nfiles < mfiles))
-    {
-      int nfile = nfiles;
-      std::string filename;
-      int fileID;
-      int vlistIDold, vlistIDnew;
-
-      tsID0 += p_tsID;
-
-      vlistIDold = vlistDuplicate(streamInqVlist(m_fileID));
-      streamClose(m_fileID);
-
-      filename = m_mfnames[nfile];
-      nfiles++;
-
-#ifdef HAVE_LIBPTHREAD
-      if (Threading::cdoLockIO)
-        pthread_mutex_lock(&streamMutex);
-      else
-        pthread_mutex_lock(&streamOpenReadMutex);
-#endif
-      if (cdoVerbose) cdoPrint("Continuation file: %s", filename.c_str());
-
-      if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_read);
-      fileID = streamOpenRead(filename.c_str());
-      vlistIDnew = streamInqVlist(fileID);
-      if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_read);
-
-      vlistCompare(vlistIDold, vlistIDnew, CMP_HRD);
-      vlistDestroy(vlistIDold);
-#ifdef HAVE_LIBPTHREAD
-      if (Threading::cdoLockIO)
-        pthread_mutex_unlock(&streamMutex);
-      else
-        pthread_mutex_unlock(&streamOpenReadMutex);
-#endif
-      if (fileID < 0) cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
-
-      m_name = filename;
-      m_fileID = fileID;
-
-      if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_read);
-#ifdef HAVE_LIBPTHREAD
-      if (Threading::cdoLockIO) pthread_mutex_lock(&streamMutex);
-#endif
-      nrecs = streamInqTimestep(m_fileID, 0);
-#ifdef HAVE_LIBPTHREAD
-      if (Threading::cdoLockIO) pthread_mutex_unlock(&streamMutex);
-#endif
-      if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_read);
-    }
-
   if (p_tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID) taxisDefType(vlistInqTaxis(m_vlistID), cdoDefaultTimeType);
+
   return nrecs;
 }
 
@@ -912,10 +816,8 @@ PstreamType::defTimestep(int p_tsID)
 #ifdef HAVE_LIBPTHREAD
   if (ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE(pipe->name.c_str(), " pstreamID ", self);
-        }
+      if (CdoDebug::PSTREAM) MESSAGE(pipe->name.c_str(), " pstreamID ", self);
+
       pipe->pipeDefTimestep(m_vlistID, p_tsID);
     }
   else

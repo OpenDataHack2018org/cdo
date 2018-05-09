@@ -59,7 +59,6 @@ Setzaxis(void *process)
   int zaxisID1, zaxisID2 = -1;
   int nzaxis, index;
   size_t nmiss;
-  int found;
   bool lztop = false, lzbot = false;
   double ztop = 0, zbot = 0;
 
@@ -92,9 +91,7 @@ Setzaxis(void *process)
           else if (!lztop && getkeyval_dp(parnames[i], "ztop", &ztop))
             lztop = true;
           else
-            cdoAbort("Parameter >%s< unsupported! Supported parameter are: "
-                     "zbot, ztop",
-                     parnames[i]);
+            cdoAbort("Parameter >%s< unsupported! Supported parameter are: zbot, ztop", parnames[i]);
         }
     }
 
@@ -111,7 +108,7 @@ Setzaxis(void *process)
 
   if (operatorID == SETZAXIS)
     {
-      found = 0;
+      int found = 0;
       nzaxis = vlistNzaxis(vlistID1);
       for (index = 0; index < nzaxis; index++)
         {
@@ -132,28 +129,24 @@ Setzaxis(void *process)
         {
           zaxisID1 = vlistZaxis(vlistID1, index);
           int nlev = zaxisInqSize(zaxisID1);
-          double *levels = (double *) Malloc(nlev * sizeof(double));
-          double *lbounds = (double *) Malloc(nlev * sizeof(double));
-          double *ubounds = (double *) Malloc(nlev * sizeof(double));
-
           if (nlev > 1)
             {
-              cdoZaxisInqLevels(zaxisID1, levels);
-              zaxisID2 = zaxisDuplicate(zaxisID1);
-              if (!zaxisInqLevels(zaxisID1, NULL)) zaxisDefLevels(zaxisID2, levels);
+              std::vector<double> levels(nlev);
+              std::vector<double> lbounds(nlev);
+              std::vector<double> ubounds(nlev);
 
-              genLayerBounds(nlev, levels, lbounds, ubounds);
+              cdoZaxisInqLevels(zaxisID1, levels.data());
+              zaxisID2 = zaxisDuplicate(zaxisID1);
+              if (!zaxisInqLevels(zaxisID1, NULL)) zaxisDefLevels(zaxisID2, levels.data());
+
+              genLayerBounds(nlev, levels.data(), lbounds.data(), ubounds.data());
 
               if (lzbot) lbounds[0] = zbot;
               if (lztop) ubounds[nlev - 1] = ztop;
-              zaxisDefLbounds(zaxisID2, lbounds);
-              zaxisDefUbounds(zaxisID2, ubounds);
+              zaxisDefLbounds(zaxisID2, lbounds.data());
+              zaxisDefUbounds(zaxisID2, ubounds.data());
               vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
             }
-
-          Free(levels);
-          Free(lbounds);
-          Free(ubounds);
         }
     }
 
@@ -161,7 +154,7 @@ Setzaxis(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-  double *array = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array(gridsize);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -174,8 +167,8 @@ Setzaxis(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           pstreamDefRecord(streamID2, varID, levelID);
 
-          pstreamReadRecord(streamID1, array, &nmiss);
-          pstreamWriteRecord(streamID2, array, nmiss);
+          pstreamReadRecord(streamID1, array.data(), &nmiss);
+          pstreamWriteRecord(streamID2, array.data(), nmiss);
         }
 
       tsID++;
@@ -183,8 +176,6 @@ Setzaxis(void *process)
 
   pstreamClose(streamID1);
   pstreamClose(streamID2);
-
-  if (array) Free(array);
 
   cdoFinish();
 

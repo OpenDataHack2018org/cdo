@@ -46,11 +46,10 @@ Setgrid(void *process)
   int number = 0, position = 0;
   int grid2_nvgp;
   int lbounds = TRUE;
-  int *grid2_vgpm = NULL;
   char *gridname = NULL;
   char *griduri = NULL;
-  double *gridmask = NULL;
-  double *areaweight = NULL;
+  std::vector<int> grid2_vgpm;
+  std::vector<double> gridmask, areaweight;
 
   cdoInitialize(process);
 
@@ -107,15 +106,15 @@ Setgrid(void *process)
 
       int gridID = vlistInqVarGrid(vlistID, varID);
       areasize = gridInqSize(gridID);
-      areaweight = (double *) Malloc(areasize * sizeof(double));
+      areaweight.resize(areasize);
 
-      streamReadRecord(streamID, areaweight, &nmiss);
+      streamReadRecord(streamID, areaweight.data(), &nmiss);
       streamClose(streamID);
 
       if (cdoVerbose)
         {
           double arrmean, arrmin, arrmax;
-          arrayMinMaxMean(areasize, areaweight, &arrmin, &arrmax, &arrmean);
+          arrayMinMaxMean(areasize, areaweight.data(), &arrmin, &arrmax, &arrmean);
           cdoPrint("areaweights: %zu %#12.5g%#12.5g%#12.5g", areasize, arrmin, arrmean, arrmax);
         }
     }
@@ -133,9 +132,9 @@ Setgrid(void *process)
       double missval = vlistInqVarMissval(vlistID, varID);
       int gridID = vlistInqVarGrid(vlistID, varID);
       masksize = gridInqSize(gridID);
-      gridmask = (double *) Malloc(masksize * sizeof(double));
+      gridmask.resize(masksize);
 
-      streamReadRecord(streamID, gridmask, &nmiss);
+      streamReadRecord(streamID, gridmask.data(), &nmiss);
       streamClose(streamID);
 
       for (size_t i = 0; i < masksize; i++)
@@ -262,8 +261,8 @@ Setgrid(void *process)
                   if (ligme)
                     {
                       grid2_nvgp = gridInqSize(gridID2);
-                      grid2_vgpm = (int *) Malloc(grid2_nvgp * sizeof(int));
-                      gridInqMaskGME(gridID2, grid2_vgpm);
+                      grid2_vgpm.resize(grid2_nvgp);
+                      gridInqMaskGME(gridID2, grid2_vgpm.data());
                       gridCompress(gridID2);
                     }
                 }
@@ -271,15 +270,13 @@ Setgrid(void *process)
                 {
                   gridID2 = gridCurvilinearToRegular(gridID1);
                   if (gridID2 == -1)
-                    cdoWarning("Conversion of curvilinear grid to regular grid "
-                               "failed!");
+                    cdoWarning("Conversion of curvilinear grid to regular grid failed!");
                 }
               else if (gridtype == GRID_LONLAT && gridtype1 == GRID_UNSTRUCTURED)
                 {
                   gridID2 = -1;
                   if (gridID2 == -1)
-                    cdoWarning("Conversion of unstructured grid to regular "
-                               "grid failed!");
+                    cdoWarning("Conversion of unstructured grid to regular grid failed!");
                 }
               else if (gridtype == GRID_LONLAT && gridtype1 == GRID_GENERIC)
                 {
@@ -318,7 +315,7 @@ Setgrid(void *process)
           if (gridsize == areasize)
             {
               gridID2 = gridDuplicate(gridID1);
-              gridDefArea(gridID2, areaweight);
+              gridDefArea(gridID2, areaweight.data());
               vlistChangeGridIndex(vlistID2, index, gridID2);
             }
         }
@@ -332,7 +329,7 @@ Setgrid(void *process)
           size_t gridsize = gridInqSize(gridID1);
           if (gridsize == masksize)
             {
-              int *mask = (int *) Malloc(masksize * sizeof(int));
+              std::vector<int> mask(masksize);
               for (size_t i = 0; i < masksize; i++)
                 {
                   if (gridmask[i] < 0 || gridmask[i] > 255)
@@ -341,9 +338,8 @@ Setgrid(void *process)
                     mask[i] = (int) lround(gridmask[i]);
                 }
               gridID2 = gridDuplicate(gridID1);
-              gridDefMask(gridID2, mask);
+              gridDefMask(gridID2, mask.data());
               vlistChangeGridIndex(vlistID2, index, gridID2);
-              Free(mask);
             }
         }
     }
@@ -367,7 +363,7 @@ Setgrid(void *process)
   size_t gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2) : vlistGridsizeMax(vlistID1);
 
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
-  double *array = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array(gridsize);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -380,7 +376,7 @@ Setgrid(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           pstreamDefRecord(streamID2, varID, levelID);
 
-          pstreamReadRecord(streamID1, array, &nmiss);
+          pstreamReadRecord(streamID1, array.data(), &nmiss);
 
           int gridID1 = vlistInqVarGrid(vlistID1, varID);
           if (lregular || lregularnn)
@@ -390,7 +386,7 @@ Setgrid(void *process)
                 {
                   double missval = vlistInqVarMissval(vlistID1, varID);
                   int lnearst = lregularnn ? 1 : 0;
-                  field2regular(gridID1, gridID2, missval, array, nmiss, lnearst);
+                  field2regular(gridID1, gridID2, missval, array.data(), nmiss, lnearst);
                 }
             }
           else if (gridInqType(gridID1) == GRID_GME)
@@ -401,7 +397,7 @@ Setgrid(void *process)
                 if (grid2_vgpm[i]) array[j++] = array[i];
             }
 
-          pstreamWriteRecord(streamID2, array, nmiss);
+          pstreamWriteRecord(streamID2, array.data(), nmiss);
         }
 
       tsID++;
@@ -409,11 +405,6 @@ Setgrid(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (gridmask) Free(gridmask);
-  if (areaweight) Free(areaweight);
-  if (array) Free(array);
-  if (grid2_vgpm) Free(grid2_vgpm);
 
   cdoFinish();
 

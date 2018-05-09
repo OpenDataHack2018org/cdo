@@ -68,20 +68,18 @@ public:
 
   int self;  // aka the id of the pstream
   std::pair<int, int> m_id;
-  int mode;
+  int m_mode;
   int m_fileID;
   int m_vlistID;
   int tsID;
   int m_filetype;
   int tsID0;
-  int mfiles;
-  int nfiles;
   int m_varID; /* next varID defined with streamDefVar */
   bool ispipe;
   bool isopen;
   std::string m_name;
   std::vector<std::string> m_mfnames;
-  varlist_t *m_varlist;
+  std::vector<varlist_t> m_varlist;
 #ifdef HAVE_LIBPTHREAD
   std::shared_ptr<pipe_t> pipe;
   pthread_t rthreadID; /* read  thread ID */

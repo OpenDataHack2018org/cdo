@@ -40,10 +40,9 @@ Replace(void *process)
   char varname1[CDI_MAX_NAME], varname2[CDI_MAX_NAME];
   size_t nmiss;
   int varlist1[MAX_VARS], varlist2[MAX_VARS];
-  int **varlevel = NULL;
-  size_t **varnmiss2 = NULL;
-  double **vardata2 = NULL;
-  double *parray;
+  std::vector<std::vector<int>> varlevel;
+  std::vector<std::vector<size_t>> varnmiss2;
+  std::vector<std::vector<double>> vardata2;
 
   cdoInitialize(process);
 
@@ -99,9 +98,9 @@ Replace(void *process)
 
   if (nchvars)
     {
-      vardata2 = (double **) Malloc(nchvars * sizeof(double *));
-      varnmiss2 = (size_t **) Malloc(nchvars * sizeof(size_t *));
-      varlevel = (int **) Malloc(nchvars * sizeof(int *));
+      vardata2.resize(nchvars);
+      varnmiss2.resize(nchvars);
+      varlevel.resize(nchvars);
       for (idx = 0; idx < nchvars; idx++)
         {
           varID1 = varlist1[idx];
@@ -109,19 +108,19 @@ Replace(void *process)
           int nlevel1 = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
           int nlevel2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
-          vardata2[idx] = (double *) Malloc(nlevel2 * gridsize * sizeof(double));
-          varnmiss2[idx] = (size_t *) Malloc(nlevel2 * sizeof(size_t));
-          varlevel[idx] = (int *) Malloc(nlevel1 * sizeof(int));
+          vardata2[idx].resize(nlevel2 * gridsize);
+          varnmiss2[idx].resize(nlevel2);
+          varlevel[idx].resize(nlevel1);
           /*
           for ( levelID = 0; levelID < nlevel1; levelID++ )
             varlevel[idx][levelID] = levelID;
           */
           if (nlevel2 <= nlevel1)
             {
-              double *level1 = (double *) Malloc(nlevel1 * sizeof(double));
-              double *level2 = (double *) Malloc(nlevel2 * sizeof(double));
-              cdoZaxisInqLevels(vlistInqVarZaxis(vlistID1, varID1), level1);
-              cdoZaxisInqLevels(vlistInqVarZaxis(vlistID2, varID2), level2);
+              std::vector<double> level1(nlevel1);
+              std::vector<double> level2(nlevel2);
+              cdoZaxisInqLevels(vlistInqVarZaxis(vlistID1, varID1), level1.data());
+              cdoZaxisInqLevels(vlistInqVarZaxis(vlistID2, varID2), level2.data());
 
               for (levelID = 0; levelID < nlevel1; levelID++) varlevel[idx][levelID] = -1;
 
@@ -137,9 +136,6 @@ Replace(void *process)
 
                   if (l1 == nlevel1) cdoWarning("Level %g not found!", level2[l2]);
                 }
-
-              Free(level1);
-              Free(level2);
             }
         }
     }
@@ -152,7 +148,7 @@ Replace(void *process)
   pstreamDefVlist(streamID3, vlistID3);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array(gridsize);
 
   int nts2 = vlistNtsteps(vlistID2);
 
@@ -175,8 +171,7 @@ Replace(void *process)
                   {
                     size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
                     size_t offset = gridsize * levelID;
-                    parray = vardata2[idx] + offset;
-                    pstreamReadRecord(streamID2, parray, &nmiss);
+                    pstreamReadRecord(streamID2, &vardata2[idx][offset], &nmiss);
                     varnmiss2[idx][levelID] = nmiss;
                     break;
                   }
@@ -189,7 +184,7 @@ Replace(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          parray = array;
+          double *parray = array.data();
 
           for (idx = 0; idx < nchvars; idx++)
             if (varlist1[idx] == varID)
@@ -199,7 +194,7 @@ Replace(void *process)
                   {
                     size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
                     size_t offset = gridsize * levelID2;
-                    parray = vardata2[idx] + offset;
+                    parray = &vardata2[idx][offset];
                     nmiss = varnmiss2[idx][levelID2];
                     break;
                   }
@@ -217,22 +212,6 @@ Replace(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (vardata2)
-    {
-      for (idx = 0; idx < nchvars; idx++)
-        {
-          Free(vardata2[idx]);
-          Free(varnmiss2[idx]);
-          Free(varlevel[idx]);
-        }
-
-      Free(vardata2);
-      Free(varnmiss2);
-      Free(varlevel);
-    }
-
-  if (array) Free(array);
 
   cdoFinish();
 

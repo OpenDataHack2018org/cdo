@@ -32,7 +32,7 @@ pstreamClose(int pstreamID)
   if (pstreamptr == NULL) ERROR("Internal problem, stream ", pstreamID, " not open!");
 
   Cdo_Debug(CdoDebug::PSTREAM, "Adding ", pstreamptr->getNvals(), " to pstream ", pstreamptr->self, " ", pstreamptr->m_name);
-  if (pstreamptr->rthreadID == pthread_self()) processSelf().addNvals(pstreamptr->getNvals());
+  if (pstreamptr->rthreadID == pthread_self() || (!pstreamptr->isPipe() && pstreamptr->m_mode == 'r')) processSelf().addNvals(pstreamptr->getNvals());
   pstreamptr->close();
 }
 
@@ -68,10 +68,6 @@ pstreamInqTimestep(PstreamType *p_pstreamptr, int tsID)
   else
 #endif
     {
-      if (p_pstreamptr->mfiles)
-        {
-          tsID -= p_pstreamptr->tsID0;
-        }
       nrecs = p_pstreamptr->inqTimestep(tsID);
       if (nrecs && tsID != p_pstreamptr->tsID)
         {

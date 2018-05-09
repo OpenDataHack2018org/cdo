@@ -41,28 +41,24 @@ invertLevDes(int vlistID)
 
       if (zaxisInqLevels(zaxisID1, NULL))
         {
-          double *yv1 = (double *) Malloc(nlev * sizeof(double));
-          double *yv2 = (double *) Malloc(nlev * sizeof(double));
-          zaxisInqLevels(zaxisID1, yv1);
+          std::vector<double> yv1(nlev);
+          std::vector<double> yv2(nlev);
+          zaxisInqLevels(zaxisID1, yv1.data());
           for (int ilev = 0; ilev < nlev; ++ilev) yv2[nlev - ilev - 1] = yv1[ilev];
-          zaxisDefLevels(zaxisID2, yv2);
-          Free(yv1);
-          Free(yv2);
+          zaxisDefLevels(zaxisID2, yv2.data());
         }
 
       if (zaxisInqLbounds(zaxisID1, NULL) && zaxisInqUbounds(zaxisID1, NULL))
         {
-          double *yb1 = (double *) Malloc(nlev * sizeof(double));
-          double *yb2 = (double *) Malloc(nlev * sizeof(double));
-          zaxisInqLbounds(zaxisID1, yb1);
+          std::vector<double> yb1(nlev);
+          std::vector<double> yb2(nlev);
+          zaxisInqLbounds(zaxisID1, yb1.data());
           for (int ilev = 0; ilev < nlev; ++ilev) yb2[nlev - ilev - 1] = yb1[ilev];
-          zaxisDefLbounds(zaxisID2, yb2);
+          zaxisDefLbounds(zaxisID2, yb2.data());
 
-          zaxisInqUbounds(zaxisID1, yb1);
+          zaxisInqUbounds(zaxisID1, yb1.data());
           for (int ilev = 0; ilev < nlev; ++ilev) yb2[nlev - ilev - 1] = yb1[ilev];
-          zaxisDefUbounds(zaxisID2, yb2);
-          Free(yb1);
-          Free(yb2);
+          zaxisDefUbounds(zaxisID2, yb2.data());
         }
 
       if (zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF)
@@ -70,17 +66,15 @@ invertLevDes(int vlistID)
           int vctsize = zaxisInqVctSize(zaxisID1);
           if (vctsize && vctsize % 2 == 0)
             {
-              double *vct1 = (double *) Malloc(vctsize * sizeof(double));
-              double *vct2 = (double *) Malloc(vctsize * sizeof(double));
-              zaxisInqVct(zaxisID1, vct1);
+              std::vector<double> vct1(vctsize);
+              std::vector<double> vct2(vctsize);
+              zaxisInqVct(zaxisID1, vct1.data());
               for (int i = 0; i < vctsize / 2; ++i)
                 {
                   vct2[vctsize / 2 - 1 - i] = vct1[i];
                   vct2[vctsize - 1 - i] = vct1[vctsize / 2 + i];
                 }
-              zaxisDefVct(zaxisID2, vctsize, vct2);
-              Free(vct1);
-              Free(vct2);
+              zaxisDefVct(zaxisID2, vctsize, vct2.data());
             }
         }
 
@@ -95,7 +89,7 @@ Invertlev(void *process)
   int varID, levelID;
   size_t nmiss;
   int nlev, nlevel;
-  int gridID, zaxisID, offset;
+  int gridID, zaxisID;
   bool linvert = false;
 
   cdoInitialize(process);
@@ -122,32 +116,26 @@ Invertlev(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-
-  double *array = (double *) Malloc(gridsize * sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  std::vector<double> array(gridsizemax);
 
   int nvars = vlistNvars(vlistID1);
 
-  double **vardata = (double **) Malloc(nvars * sizeof(double *));
-  size_t **varnmiss = (size_t **) Malloc(nvars * sizeof(size_t *));
+  std::vector<std::vector<double>> vardata(nvars);
+  std::vector<std::vector<size_t>> varnmiss(nvars);
 
   for (varID = 0; varID < nvars; varID++)
     {
       gridID = vlistInqVarGrid(vlistID1, varID);
       zaxisID = vlistInqVarZaxis(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
       nlev = zaxisInqSize(zaxisID);
 
-      if (nlev <= 1)
-        {
-          vardata[varID] = NULL;
-          varnmiss[varID] = NULL;
-        }
-      else
+      if (nlev > 1)
         {
           linvert = true;
-          vardata[varID] = (double *) Malloc(gridsize * nlev * sizeof(double));
-          varnmiss[varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+          vardata[varID].resize(gridsize * nlev);
+          varnmiss[varID].resize(nlev);
         }
     }
 
@@ -164,13 +152,13 @@ Invertlev(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          if (vardata[varID])
+          if (vardata[varID].size())
             {
               gridID = vlistInqVarGrid(vlistID1, varID);
-              gridsize = gridInqSize(gridID);
-              offset = gridsize * levelID;
+              size_t gridsize = gridInqSize(gridID);
+              size_t offset = gridsize * levelID;
 
-              pstreamReadRecord(streamID1, vardata[varID] + offset, &nmiss);
+              pstreamReadRecord(streamID1, &vardata[varID][offset], &nmiss);
               varnmiss[varID][levelID] = nmiss;
             }
           else
@@ -182,28 +170,28 @@ Invertlev(void *process)
                 }
               else
                 {
-                  pstreamReadRecord(streamID1, array, &nmiss);
-                  pstreamWriteRecord(streamID2, array, nmiss);
+                  pstreamReadRecord(streamID1, array.data(), &nmiss);
+                  pstreamWriteRecord(streamID2, array.data(), nmiss);
                 }
             }
         }
 
       for (varID = 0; varID < nvars; varID++)
         {
-          if (vardata[varID])
+          if (vardata[varID].size())
             {
               gridID = vlistInqVarGrid(vlistID1, varID);
               zaxisID = vlistInqVarZaxis(vlistID1, varID);
-              gridsize = gridInqSize(gridID);
+              size_t gridsize = gridInqSize(gridID);
               nlevel = zaxisInqSize(zaxisID);
               for (levelID = 0; levelID < nlevel; levelID++)
                 {
                   pstreamDefRecord(streamID2, varID, levelID);
 
-                  offset = gridsize * (nlevel - levelID - 1);
+                  size_t offset = gridsize * (nlevel - levelID - 1);
                   nmiss = varnmiss[varID][nlevel - levelID - 1];
 
-                  pstreamWriteRecord(streamID2, vardata[varID] + offset, nmiss);
+                  pstreamWriteRecord(streamID2, &vardata[varID][offset], nmiss);
                 }
             }
         }
@@ -213,20 +201,6 @@ Invertlev(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array) Free(array);
-
-  for (varID = 0; varID < nvars; varID++)
-    {
-      if (vardata[varID])
-        {
-          Free(varnmiss[varID]);
-          Free(vardata[varID]);
-        }
-    }
-
-  Free(varnmiss);
-  Free(vardata);
 
   cdoFinish();
 
