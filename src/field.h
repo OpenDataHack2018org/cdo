@@ -65,33 +65,34 @@ Field **field_calloc(const int vlistID, const int ptype);
 void field_free(Field **field, const int vlistID);
 
 // field.cc
-double fldfun(Field field, int function);
-double fldrange(Field field);
-double fldmin(Field field);
-double fldmax(Field field);
-double fldsum(Field field);
-double fldavg(Field field);
-double fldmean(Field field);
-double fldstd(Field field);
-double fldstd1(Field field);
-double fldvar(Field field);
-double fldvar1(Field field);
-double fldavgw(Field field);
-double fldmeanw(Field field);
-double fldstdw(Field field);
-double fldstd1w(Field field);
-double fldvarw(Field field);
-double fldvar1w(Field field);
+double fldfun(const Field &field, int function);
+double fldrange(const Field &field);
+double fldmin(const Field &field);
+double fldmax(const Field &field);
+double fldsum(const Field &field);
+double fldmean(const Field &field);
+double fldmeanw(const Field &field);
+double fldavg(const Field &field);
+double fldavgw(const Field &field);
+double fldstd(const Field &field);
+double fldstd1(const Field &field);
+double fldvar(const Field &field);
+double fldvar1(const Field &field);
+double fldstdw(const Field &field);
+double fldstd1w(const Field &field);
+double fldvarw(const Field &field);
+double fldvar1w(const Field &field);
+double fldskew(const Field &field);
+double fldkurt(const Field &field);
+
+// ENS VALIDATION
+double fldbrs(const Field &field);
+double fldrank(const Field &field);
+double fldroc(const Field &field);
+
 double fldpctl(Field field, const double pn);
 void fldunm(Field *field);
 int fldhvs(Field *field, const size_t nlevels);
-double fldskew(Field field);
-double fldkurt(Field field);
-
-// ENS VALIDATION
-double fldbrs(Field field);
-double fldrank(Field field);
-double fldroc(Field field);
 
 // fieldzon.cc
 void zonfun(Field field1, Field *field2, const int function);

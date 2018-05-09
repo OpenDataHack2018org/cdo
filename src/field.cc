@@ -23,7 +23,7 @@
 #include "array.h"
 
 double
-fldfun(Field field, int function)
+fldfun(const Field &field, int function)
 {
   double rval = 0;
 
@@ -59,139 +59,53 @@ fldfun(Field field, int function)
 }
 
 double
-fldrange(Field field)
+fldrange(const Field &field)
 {
-  double range;
-
-  if (field.nmiss)
-    {
-      range = arrayRangeMV(field.size, field.ptr, field.missval);
-    }
-  else
-    {
-      range = arrayRange(field.size, field.ptr);
-    }
-
-  return range;
+  return field.nmiss ? arrayRangeMV(field.size, field.ptr, field.missval) : arrayRange(field.size, field.ptr);;
 }
 
 double
-fldmin(Field field)
+fldmin(const Field &field)
 {
-  double rmin;
-
-  if (field.nmiss)
-    {
-      rmin = arrayMinMV(field.size, field.ptr, field.missval);
-    }
-  else
-    {
-      rmin = arrayMin(field.size, field.ptr);
-    }
-
-  return rmin;
+  return field.nmiss ? arrayMinMV(field.size, field.ptr, field.missval) : arrayMin(field.size, field.ptr);
 }
 
 double
-fldmax(Field field)
+fldmax(const Field &field)
 {
-  double rmax;
-
-  if (field.nmiss)
-    {
-      rmax = arrayMaxMV(field.size, field.ptr, field.missval);
-    }
-  else
-    {
-      rmax = arrayMax(field.size, field.ptr);
-    }
-
-  return rmax;
+  return field.nmiss ? arrayMaxMV(field.size, field.ptr, field.missval) : arrayMax(field.size, field.ptr);
 }
 
 double
-fldsum(Field field)
+fldsum(const Field &field)
 {
-  double rsum = 0;
-
-  if (field.nmiss)
-    {
-      rsum = arraySumMV(field.size, field.ptr, field.missval);
-    }
-  else
-    {
-      rsum = arraySum(field.size, field.ptr);
-    }
-
-  return rsum;
+  return field.nmiss ? arraySumMV(field.size, field.ptr, field.missval) : arraySum(field.size, field.ptr);
 }
 
 double
-fldmean(Field field)
+fldmean(const Field &field)
 {
-  double rmean = 0;
-
-  if (field.nmiss)
-    {
-      rmean = arrayMeanMV(field.size, field.ptr, field.missval);
-    }
-  else
-    {
-      rmean = arrayMean(field.size, field.ptr);
-    }
-
-  return rmean;
+  return field.nmiss ? arrayMeanMV(field.size, field.ptr, field.missval) : arrayMean(field.size, field.ptr);
 }
 
 double
-fldmeanw(Field field)
+fldmeanw(const Field &field)
 {
-  double rmean = 0;
-
-  if (field.nmiss)
-    {
-      rmean = arrayWeightedMeanMV(field.size, field.ptr, field.weight, field.missval);
-    }
-  else
-    {
-      rmean = arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
-    }
-
-  return rmean;
+  return field.nmiss ? arrayWeightedMeanMV(field.size, field.ptr, field.weight, field.missval) :
+    arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
 }
 
 double
-fldavg(Field field)
+fldavg(const Field &field)
 {
-  double ravg = 0;
-
-  if (field.nmiss)
-    {
-      ravg = arrayMeanMV(field.size, field.ptr, field.missval);
-    }
-  else
-    {
-      ravg = arrayMean(field.size, field.ptr);
-    }
-
-  return ravg;
+  return field.nmiss ? arrayMeanMV(field.size, field.ptr, field.missval) : arrayMean(field.size, field.ptr);
 }
 
 double
-fldavgw(Field field)
+fldavgw(const Field &field)
 {
-  double ravg = 0;
-
-  if (field.nmiss)
-    {
-      ravg = arrayWeightedAvgMV(field.size, field.ptr, field.weight, field.missval);
-    }
-  else
-    {
-      ravg = arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
-    }
-
-  return ravg;
+  return field.nmiss ? arrayWeightedAvgMV(field.size, field.ptr, field.weight, field.missval) :
+    arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
 }
 
 static void
@@ -306,7 +220,7 @@ prekurtsum(const double *restrict array, size_t len, size_t nmiss, const double 
 }
 
 double
-fldvar(Field field)
+fldvar(const Field &field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -323,7 +237,7 @@ fldvar(Field field)
 }
 
 double
-fldvar1(Field field)
+fldvar1(const Field &field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -340,7 +254,7 @@ fldvar1(Field field)
 }
 
 double
-fldkurt(Field field)
+fldkurt(const Field &field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -363,7 +277,7 @@ fldkurt(Field field)
 }
 
 double
-fldskew(Field field)
+fldskew(const Field &field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -424,7 +338,7 @@ prevarsumw(const double *restrict array, const double *restrict w, size_t len, s
 }
 
 double
-fldvarw(Field field)
+fldvarw(const Field &field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -441,7 +355,7 @@ fldvarw(Field field)
 }
 
 double
-fldvar1w(Field field)
+fldvar1w(const Field &field)
 {
   const size_t nmiss = field.nmiss > 0;
   const size_t len = field.size;
@@ -475,25 +389,25 @@ varToStd(double rvar, double missval)
 }
 
 double
-fldstd(Field field)
+fldstd(const Field &field)
 {
   return varToStd(fldvar(field), field.missval);
 }
 
 double
-fldstd1(Field field)
+fldstd1(const Field &field)
 {
   return varToStd(fldvar1(field), field.missval);
 }
 
 double
-fldstdw(Field field)
+fldstdw(const Field &field)
 {
   return varToStd(fldvarw(field), field.missval);
 }
 
 double
-fldstd1w(Field field)
+fldstd1w(const Field &field)
 {
   return varToStd(fldvar1w(field), field.missval);
 }
@@ -629,7 +543,7 @@ fldpctl(Field field, const double pn)
 /* QR */
 
 double
-fldrank(Field field)
+fldrank(const Field &field)
 {
   double res = 0;
   // Using first value as reference (observation)
@@ -658,13 +572,13 @@ fldrank(Field field)
 }
 
 double
-fldroc(Field field)
+fldroc(const Field &field)
 {
   return field.missval;
 }
 
 double
-fldbrs(Field field)
+fldbrs(const Field &field)
 {
   const size_t nmiss = field.nmiss;
   const size_t len = field.size;
