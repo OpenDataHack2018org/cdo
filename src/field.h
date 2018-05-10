@@ -112,18 +112,18 @@ void zonpctl(const Field &field1, Field &field2, const int k);
 
 /* fieldmer.cc */
 
-void merfun(Field field1, Field *field2, const int function);
-void mermin(Field field1, Field *field2);
-void mermax(Field field1, Field *field2);
-void merrange(Field field1, Field *field2);
-void mersum(Field field1, Field *field2);
-void meravgw(Field field1, Field *field2);
-void mermeanw(Field field1, Field *field2);
-void merstdw(Field field1, Field *field2);
-void merstd1w(Field field1, Field *field2);
-void mervarw(Field field1, Field *field2);
-void mervar1w(Field field1, Field *field2);
-void merpctl(Field field1, Field *field2, const int k);
+void merfun(const Field &field1, Field &field2, const int function);
+void mermin(const Field &field1, Field &field2);
+void mermax(const Field &field1, Field &field2);
+void merrange(const Field &field1, Field &field2);
+void mersum(const Field &field1, Field &field2);
+void meravgw(const Field &field1, Field &field2);
+void mermeanw(const Field &field1, Field &field2);
+void merstdw(const Field &field1, Field &field2);
+void merstd1w(const Field &field1, Field &field2);
+void mervarw(const Field &field1, Field &field2);
+void mervar1w(const Field &field1, Field &field2);
+void merpctl(const Field &field1, Field &field2, const int k);
 
 void fldrms(Field field1, Field field2, Field *field3);
 

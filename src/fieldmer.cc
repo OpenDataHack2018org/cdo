@@ -20,7 +20,7 @@
 #include "percentiles.h"
 
 void
-merfun(Field field1, Field *field2, int function)
+merfun(const Field &field1, Field &field2, int function)
 {
   // clang-format off
   switch (function)
@@ -41,7 +41,7 @@ merfun(Field field1, Field *field2, int function)
 }
 
 void
-mermin(Field field1, Field *field2)
+mermin(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double rmin;
@@ -65,14 +65,14 @@ mermin(Field field1, Field *field2)
           rmin = arrayMin(ny, &v[0]);
         }
 
-      field2->ptr[i] = rmin;
+      field2.ptr[i] = rmin;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-mermax(Field field1, Field *field2)
+mermax(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double rmax;
@@ -96,14 +96,14 @@ mermax(Field field1, Field *field2)
           rmax = arrayMax(ny, &v[0]);
         }
 
-      field2->ptr[i] = rmax;
+      field2.ptr[i] = rmax;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-merrange(Field field1, Field *field2)
+merrange(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double range;
@@ -127,14 +127,14 @@ merrange(Field field1, Field *field2)
           range = arrayRange(ny, &v[0]);
         }
 
-      field2->ptr[i] = range;
+      field2.ptr[i] = range;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-mersum(Field field1, Field *field2)
+mersum(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double rsum = 0;
@@ -158,14 +158,14 @@ mersum(Field field1, Field *field2)
           rsum = arraySum(ny, &v[0]);
         }
 
-      field2->ptr[i] = rsum;
+      field2.ptr[i] = rsum;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-mermeanw(Field field1, Field *field2)
+mermeanw(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double rmean = 0;
@@ -192,14 +192,14 @@ mermeanw(Field field1, Field *field2)
 
       if (DBL_IS_EQUAL(rmean, field1.missval)) rnmiss++;
 
-      field2->ptr[i] = rmean;
+      field2.ptr[i] = rmean;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-meravgw(Field field1, Field *field2)
+meravgw(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double ravg = 0;
@@ -226,10 +226,10 @@ meravgw(Field field1, Field *field2)
 
       if (DBL_IS_EQUAL(ravg, field1.missval)) rnmiss++;
 
-      field2->ptr[i] = ravg;
+      field2.ptr[i] = ravg;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 static void
@@ -265,7 +265,7 @@ prevarsum_merw(const double *restrict array, const double *restrict w, size_t nx
 }
 
 void
-mervarw(Field field1, Field *field2)
+mervarw(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -288,14 +288,14 @@ mervarw(Field field1, Field *field2)
 
       if (DBL_IS_EQUAL(rvar, missval)) rnmiss++;
 
-      field2->ptr[i] = rvar;
+      field2.ptr[i] = rvar;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-mervar1w(Field field1, Field *field2)
+mervar1w(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -318,14 +318,14 @@ mervar1w(Field field1, Field *field2)
 
       if (DBL_IS_EQUAL(rvar, missval)) rnmiss++;
 
-      field2->ptr[i] = rvar;
+      field2.ptr[i] = rvar;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-merstdw(Field field1, Field *field2)
+merstdw(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -338,18 +338,18 @@ merstdw(Field field1, Field *field2)
 
   for (size_t i = 0; i < nx; i++)
     {
-      rstd = varToStd(field2->ptr[i], missval);
+      rstd = varToStd(field2.ptr[i], missval);
 
       if (DBL_IS_EQUAL(rstd, missval)) rnmiss++;
 
-      field2->ptr[i] = rstd;
+      field2.ptr[i] = rstd;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-merstd1w(Field field1, Field *field2)
+merstd1w(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -362,19 +362,19 @@ merstd1w(Field field1, Field *field2)
 
   for (size_t i = 0; i < nx; i++)
     {
-      rstd = varToStd(field2->ptr[i], missval);
+      rstd = varToStd(field2.ptr[i], missval);
 
       if (DBL_IS_EQUAL(rstd, missval)) rnmiss++;
 
-      field2->ptr[i] = rstd;
+      field2.ptr[i] = rstd;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 /* RQ */
 void
-merpctl(Field field1, Field *field2, int p)
+merpctl(const Field &field1, Field &field2, int p)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -397,11 +397,11 @@ merpctl(Field field1, Field *field2, int p)
 
           if (l > 0)
             {
-              field2->ptr[i] = percentile(array2, l, p);
+              field2.ptr[i] = percentile(array2, l, p);
             }
           else
             {
-              field2->ptr[i] = missval;
+              field2.ptr[i] = missval;
               rnmiss++;
             }
         }
@@ -413,11 +413,11 @@ merpctl(Field field1, Field *field2, int p)
           if (ny > 0)
             {
               for (size_t j = 0; j < ny; j++) array2[j] = array[j * nx + i];
-              field2->ptr[i] = percentile(array2, ny, p);
+              field2.ptr[i] = percentile(array2, ny, p);
             }
           else
             {
-              field2->ptr[i] = missval;
+              field2.ptr[i] = missval;
               rnmiss++;
             }
         }
@@ -425,6 +425,6 @@ merpctl(Field field1, Field *field2, int p)
 
   Free(array2);
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 /* QR */

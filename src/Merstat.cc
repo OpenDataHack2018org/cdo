@@ -154,9 +154,9 @@ Merstat(void *process)
           field2.missval = vlistInqVarMissval(vlistID1, varID);
 
           if (operfunc == func_pctl)
-            merpctl(field1, &field2, pn);
+            merpctl(field1, field2, pn);
           else
-            merfun(field1, &field2, operfunc);
+            merfun(field1, field2, operfunc);
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, field2.ptr, field2.nmiss);
