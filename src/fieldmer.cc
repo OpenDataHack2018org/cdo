@@ -20,7 +20,7 @@
 #include "percentiles.h"
 
 void
-merfun(field_type field1, field_type *field2, int function)
+merfun(Field field1, Field *field2, int function)
 {
   // clang-format off
   switch (function)
@@ -41,7 +41,7 @@ merfun(field_type field1, field_type *field2, int function)
 }
 
 void
-mermin(field_type field1, field_type *field2)
+mermin(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double rmin;
@@ -72,7 +72,7 @@ mermin(field_type field1, field_type *field2)
 }
 
 void
-mermax(field_type field1, field_type *field2)
+mermax(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double rmax;
@@ -103,7 +103,7 @@ mermax(field_type field1, field_type *field2)
 }
 
 void
-merrange(field_type field1, field_type *field2)
+merrange(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double range;
@@ -134,7 +134,7 @@ merrange(field_type field1, field_type *field2)
 }
 
 void
-mersum(field_type field1, field_type *field2)
+mersum(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double rsum = 0;
@@ -165,7 +165,7 @@ mersum(field_type field1, field_type *field2)
 }
 
 void
-mermeanw(field_type field1, field_type *field2)
+mermeanw(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double rmean = 0;
@@ -199,7 +199,7 @@ mermeanw(field_type field1, field_type *field2)
 }
 
 void
-meravgw(field_type field1, field_type *field2)
+meravgw(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double ravg = 0;
@@ -265,7 +265,7 @@ prevarsum_merw(const double *restrict array, const double *restrict w, size_t nx
 }
 
 void
-mervarw(field_type field1, field_type *field2)
+mervarw(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -295,7 +295,7 @@ mervarw(field_type field1, field_type *field2)
 }
 
 void
-mervar1w(field_type field1, field_type *field2)
+mervar1w(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -325,7 +325,7 @@ mervar1w(field_type field1, field_type *field2)
 }
 
 void
-merstdw(field_type field1, field_type *field2)
+merstdw(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -349,7 +349,7 @@ merstdw(field_type field1, field_type *field2)
 }
 
 void
-merstd1w(field_type field1, field_type *field2)
+merstd1w(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -374,7 +374,7 @@ merstd1w(field_type field1, field_type *field2)
 
 /* RQ */
 void
-merpctl(field_type field1, field_type *field2, int p)
+merpctl(Field field1, Field *field2, int p)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;

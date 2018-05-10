@@ -50,11 +50,11 @@ Timcumsum(void *process)
   size_t gridsize = vlistGridsizeMax(vlistID1);
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars1 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -66,7 +66,7 @@ Timcumsum(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          field_type *pvars1 = &vars1[varID][levelID];
+          Field *pvars1 = &vars1[varID][levelID];
 
           gridsize = gridInqSize(pvars1->grid);
 

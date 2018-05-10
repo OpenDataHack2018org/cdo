@@ -43,7 +43,7 @@ enum
 #define SWITCHWARN "Hit default case!This should never happen (%s).\n"
 
 static void
-selEndOfPeriod(field_type *periods, field_type history, field_type current, int isLastTimestep)
+selEndOfPeriod(Field *periods, Field history, Field current, int isLastTimestep)
 {
   size_t i;
   double pmissval = periods->missval;
@@ -148,13 +148,13 @@ Consecstat(void *process)
   int otaxisID = taxisDuplicate(itaxisID);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(vlistGridsizeMax(ovlistID) * sizeof(double));
 
   int nvars = vlistNvars(ivlistID);
-  field_type **vars = field_calloc(ivlistID, FIELD_PTR);
-  field_type **hist = NULL, **periods = NULL;
+  Field **vars = field_calloc(ivlistID, FIELD_PTR);
+  Field **hist = NULL, **periods = NULL;
   if (operatorID == CONSECTS)
     {
       hist = field_malloc(ivlistID, FIELD_PTR);

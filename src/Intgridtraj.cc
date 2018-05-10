@@ -73,14 +73,14 @@ Intgridtraj(void *process)
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
-  field_type field1, field2;
+  Field field1, field2;
   field_init(&field1);
   field_init(&field2);
 
   int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   std::vector<double> array(gridsizemax);

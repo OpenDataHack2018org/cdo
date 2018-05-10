@@ -20,9 +20,9 @@
 
 typedef enum { NONE, MEAN, PERCENT_OF_TIME, PERCENT_OF_TOTAL_AMOUNT } ECA_EPILOG;
 
-typedef void (*ECA_FUNC_1)(field_type *, double);
-typedef void (*ECA_FUNC_2)(field_type *, field_type);
-typedef void (*ECA_FUNC_3)(field_type *, field_type, double);
+typedef void (*ECA_FUNC_1)(Field *, double);
+typedef void (*ECA_FUNC_2)(Field *, Field);
+typedef void (*ECA_FUNC_3)(Field *, Field, double);
 
 /**
  * Structure describing a processing request of the form

@@ -27,7 +27,7 @@
 #include "grid.h"
 
 void
-trms(field_type field1, field_type field2, double *dp, field_type *field3)
+trms(Field field1, Field field2, double *dp, Field *field3)
 {
   int k, nlev;
   size_t rnmiss = 0;
@@ -167,7 +167,7 @@ Trms(void *process)
       vardata2[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
     }
 
-  field_type field1, field2, field3;
+  Field field1, field2, field3;
   field_init(&field1);
   field_init(&field2);
   field_init(&field3);

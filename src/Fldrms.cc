@@ -80,7 +80,7 @@ Fldrms(void *process)
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  field_type field1, field2, field3;
+  Field field1, field2, field3;
   field_init(&field1);
   field_init(&field2);
   field_init(&field3);

@@ -34,8 +34,8 @@ Eofcoeff(void *process)
 {
   char eof_name[16], oname[1024], filesuffix[32];
   double missval1 = -999, missval2;
-  field_type in;
-  field_type out;
+  Field in;
+  Field out;
   int i, varID, levelID;
   int nrecs;
   size_t nmiss;
@@ -78,8 +78,8 @@ Eofcoeff(void *process)
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
-  field_type ***eof = (field_type ***) Malloc(nvars * sizeof(field_type **));
-  for (varID = 0; varID < nvars; varID++) eof[varID] = (field_type **) Malloc(nlevs * sizeof(field_type *));
+  Field ***eof = (Field ***) Malloc(nvars * sizeof(Field **));
+  for (varID = 0; varID < nvars; varID++) eof[varID] = (Field **) Malloc(nlevs * sizeof(Field *));
 
   int eofID = 0;
   while (1)
@@ -92,9 +92,9 @@ Eofcoeff(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           missval1 = vlistInqVarMissval(vlistID1, varID);
           if (eofID == 0)
-            eof[varID][levelID] = (field_type *) Malloc(1 * sizeof(field_type));
+            eof[varID][levelID] = (Field *) Malloc(1 * sizeof(Field));
           else
-            eof[varID][levelID] = (field_type *) Realloc(eof[varID][levelID], (eofID + 1) * sizeof(field_type));
+            eof[varID][levelID] = (Field *) Realloc(eof[varID][levelID], (eofID + 1) * sizeof(Field));
           eof[varID][levelID][eofID].grid = gridID1;
           eof[varID][levelID][eofID].nmiss = 0;
           eof[varID][levelID][eofID].missval = missval1;

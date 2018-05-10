@@ -122,7 +122,7 @@ r[i]-x[i]);
 */
 
 static void
-calc_rhopot(long gridsize, long nlevel, double *pressure, field_type to, field_type sao, field_type rho)
+calc_rhopot(long gridsize, long nlevel, double *pressure, Field to, Field sao, Field rho)
 {
   /* pressure units: hPa     */
   /* to units:       Celsius */
@@ -161,7 +161,7 @@ Rhopot(void *process)
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double pin = -1;
   double *single;
-  field_type to, sao, rho;
+  Field to, sao, rho;
 
   cdoInitialize(process);
 

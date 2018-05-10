@@ -78,7 +78,7 @@ timpctl(int operatorID)
   int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -86,11 +86,11 @@ timpctl(int operatorID)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars1 = field_malloc(vlistID1, FIELD_PTR);
   HISTOGRAM_SET *hset = hsetCreate(nvars);
 
   for (varID = 0; varID < nvars; varID++)

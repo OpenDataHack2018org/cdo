@@ -20,7 +20,7 @@
 #include "percentiles.h"
 
 void
-zonfun(field_type field1, field_type *field2, int function)
+zonfun(Field field1, Field *field2, int function)
 {
   // clang-format off
   switch (function)
@@ -41,7 +41,7 @@ zonfun(field_type field1, field_type *field2, int function)
 }
 
 void
-zonmin(field_type field1, field_type *field2)
+zonmin(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double rmin;
@@ -68,7 +68,7 @@ zonmin(field_type field1, field_type *field2)
 }
 
 void
-zonmax(field_type field1, field_type *field2)
+zonmax(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double rmax;
@@ -95,7 +95,7 @@ zonmax(field_type field1, field_type *field2)
 }
 
 void
-zonrange(field_type field1, field_type *field2)
+zonrange(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double range;
@@ -122,7 +122,7 @@ zonrange(field_type field1, field_type *field2)
 }
 
 void
-zonsum(field_type field1, field_type *field2)
+zonsum(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double rsum = 0;
@@ -149,7 +149,7 @@ zonsum(field_type field1, field_type *field2)
 }
 
 void
-zonmean(field_type field1, field_type *field2)
+zonmean(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double rmean = 0;
@@ -177,7 +177,7 @@ zonmean(field_type field1, field_type *field2)
 }
 
 void
-zonavg(field_type field1, field_type *field2)
+zonavg(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   double ravg = 0;
@@ -239,7 +239,7 @@ prevarsum_zon(const double *restrict array, size_t nx, size_t nmiss, double miss
 }
 
 void
-zonvar(field_type field1, field_type *field2)
+zonvar(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -268,7 +268,7 @@ zonvar(field_type field1, field_type *field2)
 }
 
 void
-zonvar1(field_type field1, field_type *field2)
+zonvar1(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -297,7 +297,7 @@ zonvar1(field_type field1, field_type *field2)
 }
 
 void
-zonstd(field_type field1, field_type *field2)
+zonstd(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -321,7 +321,7 @@ zonstd(field_type field1, field_type *field2)
 }
 
 void
-zonstd1(field_type field1, field_type *field2)
+zonstd1(Field field1, Field *field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -346,7 +346,7 @@ zonstd1(field_type field1, field_type *field2)
 
 /* RQ */
 void
-zonpctl(field_type field1, field_type *field2, int p)
+zonpctl(Field field1, Field *field2, int p)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;

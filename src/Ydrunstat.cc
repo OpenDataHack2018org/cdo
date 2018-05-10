@@ -42,15 +42,15 @@ typedef struct
 {
   int vdate[NDAY];
   int vtime[NDAY];
-  field_type **vars1[NDAY];
-  field_type **vars2[NDAY];
+  Field **vars1[NDAY];
+  Field **vars2[NDAY];
   int nsets[NDAY];
   int vlist;
 } YDAY_STATS;
 
 static YDAY_STATS *ydstatCreate(int vlistID);
 static void ydstatDestroy(YDAY_STATS *stats);
-static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, field_type **vars1, field_type **vars2, int nsets,
+static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, Field **vars1, Field **vars2, int nsets,
                          int operfunc);
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
@@ -103,14 +103,14 @@ Ydrunstat(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   cdo_datetime_t *datetime = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
 
   YDAY_STATS *stats = ydstatCreate(vlistID1);
-  field_type ***vars1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
-  field_type ***vars2 = NULL;
-  if (lvarstd) vars2 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  Field ***vars1 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
+  Field ***vars2 = NULL;
+  if (lvarstd) vars2 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
 
   for (its = 0; its < ndates; its++)
     {
@@ -137,8 +137,8 @@ Ydrunstat(void *process)
               recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
-          field_type *pvars1 = &vars1[tsID][varID][levelID];
-          field_type *pvars2 = (vars2 && vars2[tsID]) ? &vars2[tsID][varID][levelID] : NULL;
+          Field *pvars1 = &vars1[tsID][varID][levelID];
+          Field *pvars2 = (vars2 && vars2[tsID]) ? &vars2[tsID][varID][levelID] : NULL;
 
           pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
           pvars1->nmiss = nmiss;
@@ -195,8 +195,8 @@ Ydrunstat(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          field_type *pvars1 = &vars1[ndates - 1][varID][levelID];
-          field_type *pvars2 = (vars2 && vars2[ndates - 1]) ? &vars2[ndates - 1][varID][levelID] : NULL;
+          Field *pvars1 = &vars1[ndates - 1][varID][levelID];
+          Field *pvars2 = (vars2 && vars2[ndates - 1]) ? &vars2[ndates - 1][varID][levelID] : NULL;
 
           pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
           pvars1->nmiss = nmiss;
@@ -258,7 +258,7 @@ Ydrunstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &stats->vars1[dayoy][varID][levelID];
+            Field *pvars1 = &stats->vars1[dayoy][varID][levelID];
 
             pstreamDefRecord(streamID2, varID, levelID);
             pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
@@ -343,7 +343,7 @@ ydstatDestroy(YDAY_STATS *stats)
 }
 
 static void
-ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, field_type **vars1, field_type **vars2, int nsets, int operfunc)
+ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, Field **vars1, Field **vars2, int nsets, int operfunc)
 {
   int varID, levelID, nlevels;
   size_t gridsize;

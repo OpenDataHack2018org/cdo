@@ -55,14 +55,14 @@ Subtrend(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field1, field4;
+  Field field1, field4;
   field_init(&field1);
   field_init(&field4);
   field1.ptr = (double *) Malloc(gridsize * sizeof(double));
   field4.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  field_type **vars2 = field_malloc(vlistID1, FIELD_PTR);
-  field_type **vars3 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars2 = field_malloc(vlistID1, FIELD_PTR);
+  Field **vars3 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
   int nrecs = cdoStreamInqTimestep(streamID2, tsID);

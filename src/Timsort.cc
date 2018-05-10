@@ -60,7 +60,7 @@ Timsort(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
-  std::vector<field_type **> vars;
+  std::vector<Field **> vars;
   std::vector<int> vdate, vtime;
 
   int tsID = 0;

@@ -444,7 +444,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
 }
 
 static void
-gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yinc, int statfunc)
+gridboxstat(Field *field1, Field *field2, size_t xinc, size_t yinc, int statfunc)
 {
   bool useWeight = (field1->weight != NULL);
   /*
@@ -454,7 +454,7 @@ gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yinc, in
   */
 
   size_t gridsize = xinc * yinc;
-  field_type *field = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
+  Field *field = (Field *) Malloc(Threading::ompNumThreads * sizeof(Field));
   for (int i = 0; i < Threading::ompNumThreads; i++)
     {
       field[i].size = gridsize;
@@ -582,7 +582,7 @@ Gridboxstat(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  field_type field1, field2;
+  Field field1, field2;
   field_init(&field1);
   field_init(&field2);
 

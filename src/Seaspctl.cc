@@ -79,7 +79,7 @@ Seaspctl(void *process)
   int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -87,11 +87,11 @@ Seaspctl(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  field_type **vars1 = (field_type **) Malloc(nvars * sizeof(field_type *));
+  Field **vars1 = (Field **) Malloc(nvars * sizeof(Field *));
   HISTOGRAM_SET *hset = hsetCreate(nvars);
 
   for (varID = 0; varID < nvars; varID++)
@@ -101,7 +101,7 @@ Seaspctl(void *process)
       nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval = vlistInqVarMissval(vlistID1, varID);
 
-      vars1[varID] = (field_type *) Malloc(nlevels * sizeof(field_type));
+      vars1[varID] = (Field *) Malloc(nlevels * sizeof(Field));
       hsetCreateVarLevels(hset, varID, nlevels, gridID);
 
       for (levelID = 0; levelID < nlevels; levelID++)

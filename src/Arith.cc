@@ -78,9 +78,9 @@ Arith(void *process)
   int streamIDx1 = streamID1;
   int streamIDx2 = streamID2;
 
-  field_type field1, field2;
-  field_type *fieldx1 = &field1;
-  field_type *fieldx2 = &field2;
+  Field field1, field2;
+  Field *fieldx1 = &field1;
+  Field *fieldx2 = &field2;
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = cdoStreamInqVlist(streamID2);

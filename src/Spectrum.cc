@@ -169,7 +169,7 @@ Spectrum(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
-  std::vector<field_type **> vars;
+  std::vector<Field **> vars;
   std::vector<int> vdate, vtime;
 
   int tsID = 0;
@@ -232,7 +232,7 @@ Spectrum(void *process)
 
   int nfreq = seg_l / 2 + 1;
 
-  std::vector<field_type **> vars2(nfreq);
+  std::vector<Field **> vars2(nfreq);
   for (freq = 0; freq < nfreq; freq++) vars2[freq] = field_malloc(vlistID1, FIELD_PTR);
 
   double *array1 = (double *) Malloc(nts * sizeof(double));

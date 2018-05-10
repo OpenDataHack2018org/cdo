@@ -1259,7 +1259,7 @@ TransformUV(int operatorID)
   int nvars = vlistNvars(vlistID1);
   int nrecs = vlistNrecs(vlistID1);
 
-  std::vector<recinfo_type> recinfo(nrecs);
+  std::vector<RecordInfo> recinfo(nrecs);
 
   size_t **varnmiss = (size_t **) Malloc(nvars * sizeof(size_t *));
   double **vardata = (double **) Malloc(nvars * sizeof(double *));

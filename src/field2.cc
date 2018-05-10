@@ -21,7 +21,7 @@
 #include "array.h"
 
 void
-farfun(field_type *field1, field_type field2, int function)
+farfun(Field *field1, Field field2, int function)
 {
   // clang-format off
   switch (function)
@@ -70,7 +70,7 @@ farsetnmiss(size_t len, double *restrict array, double missval)
 }
 
 void
-farcpy(field_type *field1, field_type field2)
+farcpy(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   size_t gridsize1 = field1->size;
@@ -94,7 +94,7 @@ farcpy(field_type *field1, field_type field2)
 }
 
 void
-faradd(field_type *field1, field_type field2)
+faradd(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -132,7 +132,7 @@ faradd(field_type *field1, field_type field2)
 }
 
 void
-farsum(field_type *field1, field_type field2)
+farsum(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   size_t gridsize1 = field1->size;
@@ -173,7 +173,7 @@ farsum(field_type *field1, field_type field2)
 }
 
 void
-farsumw(field_type *field1, field_type field2, double w)
+farsumw(Field *field1, Field field2, double w)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -221,7 +221,7 @@ farsumw(field_type *field1, field_type field2, double w)
  * occurrence to zero).
  */
 void
-farsumtr(field_type *occur, field_type field, const double refval)
+farsumtr(Field *occur, Field field, const double refval)
 {
   double omissval = occur->missval;
   double fmissval = field.missval;
@@ -261,7 +261,7 @@ farsumtr(field_type *occur, field_type field, const double refval)
 }
 
 void
-farsumq(field_type *field1, field_type field2)
+farsumq(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -306,7 +306,7 @@ farsumq(field_type *field1, field_type field2)
 }
 
 void
-farsumqw(field_type *field1, field_type field2, double w)
+farsumqw(Field *field1, Field field2, double w)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -343,7 +343,7 @@ farsumqw(field_type *field1, field_type field2, double w)
 }
 
 void
-farsub(field_type *field1, field_type field2)
+farsub(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -373,7 +373,7 @@ farsub(field_type *field1, field_type field2)
 }
 
 void
-farmul(field_type *field1, field_type field2)
+farmul(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -403,7 +403,7 @@ farmul(field_type *field1, field_type field2)
 }
 
 void
-fardiv(field_type *field1, field_type field2)
+fardiv(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -424,7 +424,7 @@ fardiv(field_type *field1, field_type field2)
 }
 
 void
-faratan2(field_type *field1, field_type field2)
+faratan2(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -446,7 +446,7 @@ faratan2(field_type *field1, field_type field2)
 }
 
 void
-farsetmiss(field_type *field1, field_type field2)
+farsetmiss(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -470,7 +470,7 @@ farsetmiss(field_type *field1, field_type field2)
 }
 
 void
-farmin(field_type *field1, field_type field2)
+farmin(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -505,7 +505,7 @@ farmin(field_type *field1, field_type field2)
 }
 
 void
-farmax(field_type *field1, field_type field2)
+farmax(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -540,7 +540,7 @@ farmax(field_type *field1, field_type field2)
 }
 
 void
-farminidx(field_type *field1, field_type *field2, field_type field3, int idx)
+farminidx(Field *field1, Field *field2, Field field3, int idx)
 {
   int nwpv = field2->nwpv;
   int grid2 = field2->grid;
@@ -599,7 +599,7 @@ farminidx(field_type *field1, field_type *field2, field_type field3, int idx)
 }
 
 void
-farmaxidx(field_type *field1, field_type *field2, field_type field3, int idx)
+farmaxidx(Field *field1, Field *field2, Field field3, int idx)
 {
   int nwpv = field2->nwpv;
   int grid2 = field2->grid;
@@ -658,7 +658,7 @@ farmaxidx(field_type *field1, field_type *field2, field_type field3, int idx)
 }
 
 void
-farvar(field_type *field1, field_type field2, field_type field3, int divisor)
+farvar(Field *field1, Field field2, Field field3, int divisor)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -700,7 +700,7 @@ farvar(field_type *field1, field_type field2, field_type field3, int divisor)
 }
 
 void
-farstd(field_type *field1, field_type field2, field_type field3, int divisor)
+farstd(Field *field1, Field field2, Field field3, int divisor)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -730,7 +730,7 @@ farstd(field_type *field1, field_type field2, field_type field3, int divisor)
 }
 
 void
-farcvar(field_type *field1, field_type field2, int nsets, int divisor)
+farcvar(Field *field1, Field field2, int nsets, int divisor)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -776,7 +776,7 @@ farcvar(field_type *field1, field_type field2, int nsets, int divisor)
 }
 
 void
-farcstd(field_type *field1, field_type field2, int nsets, int divisor)
+farcstd(Field *field1, Field field2, int nsets, int divisor)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -806,7 +806,7 @@ farcstd(field_type *field1, field_type field2, int nsets, int divisor)
 }
 
 void
-farmoq(field_type *field1, field_type field2)
+farmoq(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -839,7 +839,7 @@ farmoq(field_type *field1, field_type field2)
 }
 
 void
-farmoqw(field_type *field1, field_type field2, double w)
+farmoqw(Field *field1, Field field2, double w)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;
@@ -885,7 +885,7 @@ farmoqw(field_type *field1, field_type field2, double w)
  * @param field2 the 2nd input field
  */
 void
-farcount(field_type *field1, field_type field2)
+farcount(Field *field1, Field field2)
 {
   int nwpv = field1->nwpv;
   int grid1 = field1->grid;

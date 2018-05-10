@@ -38,7 +38,7 @@ Trend(void *process)
   {
     nwork = 5
   };
-  field_type **work[5];
+  Field **work[5];
 
   cdoInitialize(process);
 
@@ -56,7 +56,7 @@ Trend(void *process)
   int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   for (varID = 0; varID < nvars; varID++) vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
 
@@ -68,7 +68,7 @@ Trend(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field1, field2;
+  Field field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double *) Malloc(gridsize * sizeof(double));

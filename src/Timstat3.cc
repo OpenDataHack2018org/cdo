@@ -46,8 +46,8 @@ Timstat3(void *process)
   double missval, missval1, missval2;
   double fractil_1, fractil_2, statistic;
   int ***iwork[NIWORK];
-  field_type **fwork[NFWORK];
-  field_type in[NIN], out[NOUT];
+  Field **fwork[NFWORK];
+  Field in[NIN], out[NOUT];
   int reached_eof[NIN];
   int n_in = NIN;
 
@@ -90,7 +90,7 @@ Timstat3(void *process)
   int nvars = vlistNvars(vlistID[0]);
 
   int maxrecs = vlistNrecs(vlistID[0]);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   int taxisID1 = vlistInqTaxis(vlistID[0]);
   int taxisID3 = taxisDuplicate(taxisID1);
@@ -113,7 +113,7 @@ Timstat3(void *process)
       out[i].ptr = (double *) Malloc(gridsize * sizeof(double));
     }
 
-  for (int iw = 0; iw < NFWORK; ++iw) fwork[iw] = (field_type **) Malloc(nvars * sizeof(field_type *));
+  for (int iw = 0; iw < NFWORK; ++iw) fwork[iw] = (Field **) Malloc(nvars * sizeof(Field *));
   for (int iw = 0; iw < NIWORK; ++iw) iwork[iw] = (int ***) Malloc(nvars * sizeof(int **));
 
   for (varID = 0; varID < nvars; ++varID)
@@ -124,7 +124,7 @@ Timstat3(void *process)
       missval = missval1 = vlistInqVarMissval(vlistID[0], varID);
       // missval2 = vlistInqVarMissval(vlistID[1], varID);
 
-      for (int iw = 0; iw < NFWORK; ++iw) fwork[iw][varID] = (field_type *) Malloc(nlevs * sizeof(field_type));
+      for (int iw = 0; iw < NFWORK; ++iw) fwork[iw][varID] = (Field *) Malloc(nlevs * sizeof(Field));
       for (int iw = 0; iw < NIWORK; ++iw) iwork[iw][varID] = (int **) Malloc(nlevs * sizeof(int *));
 
       for (levelID = 0; levelID < nlevs; ++levelID)

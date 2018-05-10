@@ -119,7 +119,7 @@ Pack(void *process)
   std::vector<bool> varIsConst(nvars);
   for (int varID = 0; varID < nvars; ++varID) varIsConst[varID] = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 
-  std::vector<field_type **> vars;
+  std::vector<Field **> vars;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))

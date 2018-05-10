@@ -199,7 +199,7 @@ Seltime(void *process)
   std::vector<int> vdate_list, vtime_list;
   ListArray<int> listArrayInt;
   ListArray<double> listArrayFlt;
-  field_type ***vars = NULL;
+  Field ***vars = NULL;
 
   cdoInitialize(process);
 
@@ -339,7 +339,7 @@ Seltime(void *process)
           nts1 = 1;
         }
 
-      vars = (field_type ***) Malloc(nts1 * sizeof(field_type **));
+      vars = (Field ***) Malloc(nts1 * sizeof(Field **));
 
       for (int tsID = 0; tsID < nts1; tsID++)
         {

@@ -106,7 +106,7 @@ Arithc(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
   field.weight = NULL;

@@ -125,7 +125,7 @@ Rotuv(void *process)
   int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   size_t **varnmiss = (size_t **) Malloc(nvars * sizeof(size_t *));
   double **vardata = (double **) Malloc(nvars * sizeof(double *));

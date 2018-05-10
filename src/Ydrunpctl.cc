@@ -55,7 +55,7 @@ Ydrunpctl(void *process)
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY] /*, vtimes2[NDAY]*/;
   int nsets[NDAY];
-  field_type **vars2[NDAY];
+  Field **vars2[NDAY];
   HISTOGRAM_SET *hsets[NDAY];
 
   cdoInitialize(process);
@@ -104,17 +104,17 @@ Ydrunpctl(void *process)
   int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
-  std::vector<recinfo_type> recinfo(maxrecs);
+  std::vector<RecordInfo> recinfo(maxrecs);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field;
+  Field field;
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   cdo_datetime_t *datetime = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
 
-  field_type ***vars1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  Field ***vars1 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
 
   for (its = 0; its < ndates; its++)
     {

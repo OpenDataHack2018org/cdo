@@ -81,7 +81,7 @@ Tstepcount(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  std::vector<field_type **> vars;
+  std::vector<Field **> vars;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))

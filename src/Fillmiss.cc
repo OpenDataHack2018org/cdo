@@ -30,7 +30,7 @@
 #include "cdoOptions.h"
 
 void
-fillmiss(field_type *field1, field_type *field2, int nfill)
+fillmiss(Field *field1, Field *field2, int nfill)
 {
   int nx, ny, i, j;
   size_t nmiss2 = 0;
@@ -205,7 +205,7 @@ fillmiss(field_type *field1, field_type *field2, int nfill)
 }
 
 void
-fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
+fillmiss_one_step(Field *field1, Field *field2, int maxfill)
 {
   int gridID, nx, ny, i, j;
   size_t nmiss2 = 0;
@@ -376,7 +376,7 @@ fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
 }
 
 static void
-setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
+setmisstodis(Field *field1, Field *field2, int numNeighbors)
 {
   int gridID = field1->grid;
   int gridID0 = gridID;
@@ -501,7 +501,7 @@ Fillmiss(void *process)
 {
   size_t nmiss;
   int nrecs, varID, levelID;
-  void (*fill_method)(field_type * fin, field_type * fout, int) = NULL;
+  void (*fill_method)(Field * fin, Field * fout, int) = NULL;
 
   cdoInitialize(process);
 
@@ -565,7 +565,7 @@ Fillmiss(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  field_type field1, field2;
+  Field field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double *) Malloc(gridsize * sizeof(double));

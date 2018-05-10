@@ -114,7 +114,7 @@ Merstat(void *process)
   int nlonmax = gridInqXsize(gridID1); /* max nlon ? */
   size_t lim = vlistGridsizeMax(vlistID1);
 
-  field_type field1, field2;
+  Field field1, field2;
   field_init(&field1);
   field_init(&field2);
 

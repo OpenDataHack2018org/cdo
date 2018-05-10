@@ -310,7 +310,7 @@ intlinarr(long nxm, double *ym, double *xm, int nx, double *y, double *x)
 }
 
 void
-intgridbil(field_type *field1, field_type *field2)
+intgridbil(Field *field1, Field *field2)
 {
   char xunits[CDI_MAX_NAME];
   int gridID1 = field1->grid;
@@ -461,7 +461,7 @@ intgridbil(field_type *field1, field_type *field2)
 
 /* source code from pingo */
 void
-interpolate(field_type *field1, field_type *field2)
+interpolate(Field *field1, Field *field2)
 {
   int i;
   double *lono_array, *lato_array, *lono, *lato;

@@ -182,7 +182,7 @@ Fldstat(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  field_type field;
+  Field field;
   field_init(&field);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
