@@ -330,9 +330,56 @@ checkSingleBracketOnly(const char *p_argvEntry, char p_bracketType)
       CdoError::Abort(Cdo::progname, "Only single ", p_bracketType, " allowed");
     }
 }
-
+/* comment FOR DEVELOPERS ONLY (do not include in docu)
+ *
+ * This is the so to speak parser for cdo console inputs.
+ * For future reference I will explain how it works here.
+ *
+ *  This parser runs over every argv that comes after the cdo options.
+ *  The fist thing that is done is processing the first operator, since this operator
+ *  is the only one that has output files we can remove the output file from out argv
+ *  by limiting the argc. Obase operators are treated as if they have a single output
+ *  since the operator itself takes care of writing and creating the files it needs for its
+ *  output. We also create the first process for the operator and push it on out stack.
+ *  Our stack will contain every operator that does not have everything it needs.
+ *  After the first operator is handled the parser will go over each other element in argv.
+ *  Here we have 4 cases that can happen. Only one of the 4 will happen in one iteration.
+ *
+ *  If an operator is found we create a new process and add this process as child to
+ *  the process on top of the stack. Likewise we add the top process
+ *  as parent to the new process. Then the new Process is added to the stack.
+ *
+ *  Does the argv element represent a file (indicated by the missing '-' in argv[i][0])
+ *  we create a file stream and add it to the process at the top of the stack.
+ *
+ *  In case of a '[' or ']' we check if there is only one bracket since we decided to not
+ *  allow multiple brackets in the same argv.Then we add ('[') or remove (']') the top of
+ *  the process stack to a set (named bracketOperators) which will keep track of
+ *  which operators used a bracket. This stack allows to 'mark' an operator so that it is
+ *  only removed in case of a ']'.
+ *  The ']' indicates that the top process should be removed.and that it SHOULD
+ *  have all it's inputs.
+ *
+ *  At the end of each iteration we remove all operators that have all their inputs AND
+ *  are not contained in out bracket operators set. So a not closed bracket will cause a wanted miss function
+ *  of the parser as the operator will not be removed and more inputs will be added. This will
+ *  be found later by our routine that checks if everything has all it needs (or too much)
+ *  and will throw an error.
+ *  */
 void
 createProcesses(int argc, const char **argv)
+{
+  ParseStatus parseStatus = createProcessesFromInput(argc, argv);
+  if (parseStatus != ParseStatus::Ok)
+    {
+      // Program Exits here
+      handleParseError(parseStatus);
+    }
+  validateProcesses();
+}
+
+ParseStatus
+createProcessesFromInput(int argc, const char **argv)
 {
   Cdo_Debug(CdoDebug::PROCESS, "== Process Creation Start ==");
   Cdo_Debug(CdoDebug::PROCESS, "operators:  ", CdoDebug::argvToString(argc, argv));
@@ -353,90 +400,107 @@ createProcesses(int argc, const char **argv)
     }
 
   ProcessType *currentProcess;
-  std::stack<ProcessType *> call_stack;
+  std::stack<ProcessType *> processStack;
   std::set<ProcessType *> bracketOperators;
-
+  const char *argvEntry;
   int unclosedBrackets = 0;
   unsigned int idx = 1;
 
-  if (idx < maxIdx)
+  processStack.push(root_process);
+  while (!processStack.empty() && idx < maxIdx)
     {
-      call_stack.push(root_process);
-      const char *argvEntry;
+      currentProcess = processStack.top();
+      Cdo_Debug(CdoDebug::PROCESS, "iteration ", idx, ", current argv: ", argv[idx],
+                ",  currentProcess: ", currentProcess->m_operatorCommand);
 
-      do
+      argvEntry = argv[idx];
+      //------------------------------------------------------
+      // case: operator
+      if (argvEntry[0] == '-')
         {
-          currentProcess = call_stack.top();
-          Cdo_Debug(CdoDebug::PROCESS, "iteration ", idx, ", current argv: ", argv[idx],
-                    ",  currentProcess: ", currentProcess->m_operatorCommand);
-
-          argvEntry = argv[idx];
-          //------------------------------------------------------
-          // case: operator
-          if (argvEntry[0] == '-')
-            {
-              Cdo_Debug(CdoDebug::PROCESS, "Found new Operator: ", argvEntry);
-              currentProcess = createNewProcess(currentProcess, argvEntry);
-              call_stack.push(currentProcess);
-            }
-          // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-          // case: bracket start
-          else if (argvEntry[0] == '[')
-            {
-              checkSingleBracketOnly(argvEntry, '[');
-              bracketOperators.insert(currentProcess);
-              unclosedBrackets++;
-            }
-          // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-          // case: bracket end
-          else if (argvEntry[0] == ']')
-            {
-              checkSingleBracketOnly(argvEntry, ']');
-              unclosedBrackets--;
-              bracketOperators.erase(call_stack.top());
-              call_stack.pop();
-            }
-          // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-          // case: file
-          else if (currentProcess->m_module.streamInCnt != 0)
-            {
-              Cdo_Debug(CdoDebug::PROCESS, "adding in file to ", currentProcess->operatorName);
-              currentProcess->addFileInStream(argvEntry);
-            }
-          // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-          // remove finished
-          while (!call_stack.empty() && call_stack.top()->hasAllInputs()
-                 && bracketOperators.find(call_stack.top()) == bracketOperators.end())
-            {
-              Cdo_Debug(CdoDebug::PROCESS, "Removing ", call_stack.top()->operatorName, " from stack");
-              call_stack.pop();
-            }
-          //------------------------------------------------------
-          idx++;
+          Cdo_Debug(CdoDebug::PROCESS, "Found new Operator: ", argvEntry);
+          currentProcess = createNewProcess(currentProcess, argvEntry);
+          processStack.push(currentProcess);
         }
-      while (!call_stack.empty() && idx < maxIdx);
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // case: bracket start
+      else if (argvEntry[0] == '[')
+        {
+          checkSingleBracketOnly(argvEntry, '[');
+          bracketOperators.insert(currentProcess);
+          unclosedBrackets++;
+        }
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // case: bracket end
+      else if (argvEntry[0] == ']')
+        {
+          checkSingleBracketOnly(argvEntry, ']');
+          unclosedBrackets--;
+          bracketOperators.erase(processStack.top());
+          processStack.pop();
+        }
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // case: file
+      else if (currentProcess->m_module.streamInCnt != 0)
+        {
+          Cdo_Debug(CdoDebug::PROCESS, "adding in file to ", currentProcess->operatorName);
+          currentProcess->addFileInStream(argvEntry);
+        }
+      // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+      // remove finished
+      while (!processStack.empty() && processStack.top()->hasAllInputs()
+             && bracketOperators.find(processStack.top()) == bracketOperators.end())
+        {
+          Cdo_Debug(CdoDebug::PROCESS, "Removing ", processStack.top()->operatorName, " from stack");
+          processStack.pop();
+        }
+      //------------------------------------------------------
+      idx++;
     }
   //---------------------------------------------------------------
   if (unclosedBrackets > 0)
     {
-      CdoError::Abort(Cdo::progname, "Missing ']'.");
+      return ParseStatus::ClosingBracketMissing;
     }
-  else if (unclosedBrackets < 0)
+  if (unclosedBrackets < 0)
     {
-      CdoError::Abort(Cdo::progname, "Missing '['.");
+      return ParseStatus::ClosingBracketMissing;
+    }
+  if (idx < maxIdx)
+    {
+      return ParseStatus::UnprocessedInput;
     }
 
-  while (!call_stack.empty())
-    {
-      call_stack.pop();
-    }
   Cdo_Debug(CdoDebug::PROCESS, "== Process Creation End ==");
 
   setProcessNum(Process.size());
+  return ParseStatus::Ok;
 }
 
 void
-cdoValidateProcesses()
+handleParseError(ParseStatus p_errCode)
+{
+  switch (p_errCode)
+    {
+    case ParseStatus::ClosingBracketMissing:
+      {
+        CdoError::Abort(Cdo::progname, "Missing ']'.");
+        break;
+      }
+    case ParseStatus::OpenBracketMissing:
+      {
+        CdoError::Abort(Cdo::progname, "Missing '['.");
+        break;
+      }
+    case ParseStatus::UnprocessedInput:
+      {
+        CdoError::Abort(Cdo::progname, "Unprocessed Input, could not process all Operators/Files");
+        break;
+      }
+    }
+}
+void
+validateProcesses()
 {
   for (auto &process : Process)
     {

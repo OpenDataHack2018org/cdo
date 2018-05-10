@@ -36,7 +36,7 @@ go_bandit([]() {
     //                                           num    out
     /*clang-format on*/
 
-    createProcesses(test_argv.size(), &test_argv[0]);
+    createProcessesFromInput(test_argv.size(), &test_argv[0]);
 
     int i;
     for (i = 0; i < processNums(); i++) {
@@ -61,7 +61,7 @@ go_bandit([]() {
   clearProcesses();
 
   // this test checks if multiple operators can be chained if the first operator
-  // is part of a module with variable number ob input streams
+  // is part of a module with variable number of input streams
   bandit::describe(
       "Process creation containing operators with variable number of input "
       "streams",
@@ -79,7 +79,7 @@ go_bandit([]() {
         std::vector<unsigned int> expectedInputs{3, 2, 1, 1, 1, 1};
         std::vector<unsigned int> expectedOutputs{0, 1, 1, 1, 1, 1};
 
-        createProcesses(test_argv.size(), &test_argv[0]);
+        createProcessesFromInput(test_argv.size(), &test_argv[0]);
 
         int i;
         for (i = 0; i < processNums(); i++) {

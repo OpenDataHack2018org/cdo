@@ -99,15 +99,15 @@ static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 const char *CDO_username;
 
-extern "C" {
-void streamGrbDefDataScanningMode(int scanmode);
+extern "C"
+{
+  void streamGrbDefDataScanningMode(int scanmode);
 }
 
 void cdoConfig(const char *option);
 void setCellSearchMethod(const char *methodstr);
 void setPointSearchMethod(const char *methodstr);
 void setTimestatDate(const char *optarg);
-
 
 #define PRINT_RLIMIT(resource)                                                           \
   {                                                                                      \
@@ -1740,9 +1740,10 @@ void init_aliases()
   add_alias("selseas"         , "selseason");
   add_alias("selmon"          , "selmonth");
 }
+/* clang-format on */
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   bool lstop = false;
   int noff = 0;
@@ -1760,8 +1761,8 @@ int main(int argc, char *argv[])
   setCommandLine(argc, argv);
 
   Cdo::progname = getProgname(argv[0]);
-  if ( strncmp(Cdo::progname, "cdo", 3) == 0 && strlen(Cdo::progname) > 3 ) noff = 3;
-  if ( noff ) setDefaultFileType(Cdo::progname+noff, 0);
+  if (strncmp(Cdo::progname, "cdo", 3) == 0 && strlen(Cdo::progname) > 3) noff = 3;
+  if (noff) setDefaultFileType(Cdo::progname + noff, 0);
 
   get_env_vars();
   init_modules();
@@ -1771,12 +1772,12 @@ int main(int argc, char *argv[])
 
   cdo_set_options();
 #ifdef DEBUG
-    CdoDebug::CdoStartMessage();
-    MESSAGE(CdoDebug::argvToString(argc,(const char**) argv));
+  CdoDebug::CdoStartMessage();
+  MESSAGE(CdoDebug::argvToString(argc, (const char **) argv));
 #endif
-  if ( Debug || Version ) cdo_version();
+  if (Debug || Version) cdo_version();
 
-  if ( Debug )
+  if (Debug)
     {
       fprintf(stderr, "stdin_is_tty:   %d\n", stdin_is_tty);
       fprintf(stderr, "stdout_is_tty:  %d\n", stdout_is_tty);
@@ -1786,17 +1787,17 @@ int main(int argc, char *argv[])
 
   check_stacksize();
 
-  if ( Debug ) 
-  { 
+  if (Debug)
+    {
       print_pthread_info();
       //      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
-  }
+    }
 
-#ifdef  _OPENMP
-  if ( numThreads <= 0 ) numThreads = 1;
+#ifdef _OPENMP
+  if (numThreads <= 0) numThreads = 1;
   omp_set_num_threads(numThreads);
 
-  if ( Debug )
+  if (Debug)
     {
       fprintf(stderr, "OMP num procs       = %d\n", omp_get_num_procs());
       fprintf(stderr, "OMP max threads     = %d\n", omp_get_max_threads());
@@ -1808,7 +1809,7 @@ int main(int argc, char *argv[])
       omp_get_schedule(&kind, &modifer);
       fprintf(stderr, "OMP schedule        = %d (1:static; 2:dynamic; 3:guided; 4:auto)\n", (int) kind);
 #endif
-#ifdef  HAVE_OPENMP4
+#ifdef HAVE_OPENMP4
       fprintf(stderr, "OMP proc bind       = %d (0:false; 1:true; 2:master; 3:close; 4:spread)\n", (int) omp_get_proc_bind());
 #if !defined(__ICC)
       fprintf(stderr, "OMP num devices     = %d\n", omp_get_num_devices());
@@ -1817,14 +1818,14 @@ int main(int argc, char *argv[])
     }
 
   Threading::ompNumThreads = omp_get_max_threads();
-  if ( omp_get_max_threads() > omp_get_num_procs() )
+  if (omp_get_max_threads() > omp_get_num_procs())
     fprintf(stderr, "Warning: Number of OMP threads is greater than number of Cores=%d!\n", omp_get_num_procs());
-  if ( Threading::ompNumThreads < numThreads )
+  if (Threading::ompNumThreads < numThreads)
     fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", Threading::ompNumThreads);
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
       fprintf(stderr, " OpenMP:  num_procs=%d  max_threads=%d", omp_get_num_procs(), omp_get_max_threads());
-#ifdef  HAVE_OPENMP4
+#ifdef HAVE_OPENMP4
 #if !defined(__ICC)
       fprintf(stderr, "  num_devices=%d", omp_get_num_devices());
 #endif
@@ -1832,58 +1833,58 @@ int main(int argc, char *argv[])
       fprintf(stderr, "\n");
     }
 #else
-  if ( numThreads > 0 )
+  if (numThreads > 0)
     {
       fprintf(stderr, "Option -P failed, OpenMP support not compiled in!\n");
       return -1;
     }
 #endif
-      std::vector<std::string> new_argv(&argv[CDO_optind], argv + argc);
-      new_argv = expandWildCards(new_argv);
+  std::vector<std::string> new_argv(&argv[CDO_optind], argv + argc);
+  new_argv = expandWildCards(new_argv);
 
-      ///*TEMP*/ // should not be needed when std::string is standart string 
-      std::vector<char*> new_cargv(new_argv.size());
-      for(unsigned long i = 0; i < new_argv.size(); i++)
-      {
-          new_cargv[i] = strdup(new_argv[i].c_str());
-      }
-      //temprorary end
+  ///*TEMP*/ // should not be needed when std::string is standart string
+  std::vector<char *> new_cargv(new_argv.size());
+  for (unsigned long i = 0; i < new_argv.size(); i++)
+    {
+      new_cargv[i] = strdup(new_argv[i].c_str());
+    }
+  // temprorary end
 
-  if ( CDO_optind >= argc )
-      {
-      if ( ! Version && ! Help )
+  if (CDO_optind >= argc)
+    {
+      if (!Version && !Help)
         {
           fprintf(stderr, "\nNo operator given!\n\n");
           cdo_usage();
           status = 1;
         }
 
-      if ( Help ) cdo_usage();
+      if (Help) cdo_usage();
       lstop = true;
     }
 
-  if ( lstop ) return status;
+  if (lstop) return status;
 
-  if ( cdoDefaultTableID != CDI_UNDEFID ) cdiDefTableID(cdoDefaultTableID);
-  
+  if (cdoDefaultTableID != CDI_UNDEFID) cdiDefTableID(cdoDefaultTableID);
+
   const char *operatorName = get_original(getOperatorName(argv[CDO_optind]));
 
-  if ( Help )
+  if (Help)
     {
       cdoPrintHelp(operatorHelp(operatorName));
     }
   else
     {
-      if ( Debug )
+      if (Debug)
         {
-          if ( DebugLevel == 0 ) DebugLevel = 1;
+          if (DebugLevel == 0) DebugLevel = 1;
           cdiDebug(DebugLevel);
           CdoDebug::SetDebug(DebugLevel);
         }
 
-      timer_total  = timer_new("total");
-      timer_read   = timer_new("read");
-      timer_write  = timer_new("write");
+      timer_total = timer_new("total");
+      timer_read = timer_new("read");
+      timer_write = timer_new("write");
 
       timer_start(timer_total);
 
@@ -1892,30 +1893,29 @@ int main(int argc, char *argv[])
       getProcess(0)->m_module.func(getProcess(0));
       close_library_handles();
 #else
-      createProcesses(new_argv.size(),(const char**) &new_cargv[0] );
-      cdoValidateProcesses();
+      createProcesses(new_argv.size(), (const char **) &new_cargv[0]);
       runProcesses();
 #endif
       clearProcesses();
 
       timer_stop(timer_total);
 
-      if ( cdoTimer ) timer_report();
+      if (cdoTimer) timer_report();
     }
 
-  if ( cdoVarnames )
+  if (cdoVarnames)
     {
-      if ( cdoNumVarnames ) Free(cdoVarnames[0]);
+      if (cdoNumVarnames) Free(cdoVarnames[0]);
       Free(cdoVarnames);
     }
 
   // malloc_stats();
 
-  if ( cdoGridSearchDir ) Free(cdoGridSearchDir);
+  if (cdoGridSearchDir) Free(cdoGridSearchDir);
 
-  if ( CDO_Rusage ) cdo_rusage();
+  if (CDO_Rusage) cdo_rusage();
 #ifdef DEBUG
-    CdoDebug::CdoEndMessage();
+  CdoDebug::CdoEndMessage();
 #endif
   return status;
 }

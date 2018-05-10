@@ -33,7 +33,7 @@ go_bandit([]() {
 
     unsigned int i;
     for (i = 0; i < numberOfRuns; i++) {
-        createProcesses(test_argvs[i].size(),&test_argvs[i][0]);
+        createProcessesFromInput(test_argvs[i].size(),&test_argvs[i][0]);
         auto process = getProcess(0);
         std::string runInfo = std::string(getProcess(0)->operatorName) + " in run " + std::to_string(i + 1);
       bandit::it(
