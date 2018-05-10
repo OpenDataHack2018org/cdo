@@ -143,16 +143,73 @@ ProcessType::inqPrompt()
   return newPrompt;
 }
 
-int
-ProcessType::checkStreamCnt(void)
+void
+ProcessType::handleProcessErr(ProcessStatus p_proErr)
+{
+  switch (p_proErr)
+    {
+    case ProcessStatus::UnlimitedIOCounts:
+      {
+        CdoError::Abort(Cdo::progname, "I/O stream counts unlimited no allowed!");
+        break;
+      }
+    case ProcessStatus::MissInput:
+      {
+        CdoError::Abort(Cdo::progname, "Input streams missing!");
+        break;
+      }
+    case ProcessStatus::MissOutput:
+      {
+        CdoError::Abort(Cdo::progname, "Output streams missing!");
+        break;
+      }
+    case ProcessStatus::TooManyStreams:
+      {
+        CdoError::Abort(Cdo::progname,
+                        "Too many streams specified!"
+                        " Operator ",
+                        m_operatorCommand, " needs ", m_module.streamInCnt, " input and ", m_module.streamOutCnt,
+                        " output streams.");
+        break;
+      }
+    case ProcessStatus::TooFewStreams:
+      {
+        CdoError::Abort(Cdo::progname,
+                        "Too few streams specified!"
+                        " Operator ",
+                        m_operatorCommand, " needs ", m_module.streamInCnt, " input and ", m_module.streamOutCnt,
+                        " output streams.");
+        break;
+      }
+    }
+}
+
+void
+ProcessType::validate()
+{
+
+  ProcessStatus processStatus = checkStreamCnt();
+  if (processStatus != ProcessStatus::Ok)
+    {
+      handleProcessErr(processStatus);
+    }
+  int errorIdx = checkInFileStreams();
+  if (errorIdx != -1)
+    {
+      CdoError::Abort(Cdo::progname, "Input file ", inputStreams[errorIdx]->m_mfnames[0].c_str(), " of process ", operatorName,
+                      " does not exists");
+    }
+}
+ProcessStatus
+ProcessType::checkStreamCnt()
 {
   int wantedStreamInCnt, wantedStreamOutCnt;
   int streamInCnt0;
   int streamCnt = 0;
   int obase = FALSE;
 
-  wantedStreamInCnt = operatorStreamInCnt(operatorName);
-  wantedStreamOutCnt = operatorStreamOutCnt(operatorName);
+  wantedStreamInCnt = m_module.streamInCnt;
+  wantedStreamOutCnt = m_module.streamOutCnt;
 
   streamInCnt0 = wantedStreamInCnt;
 
@@ -162,21 +219,20 @@ ProcessType::checkStreamCnt(void)
       obase = TRUE;
     }
 
-  if (wantedStreamInCnt == -1 && wantedStreamOutCnt == -1)
-    CdoError::Abort(Cdo::progname, "I/O stream counts unlimited no allowed!");
+  if (wantedStreamInCnt == -1 && wantedStreamOutCnt == -1) return ProcessStatus::UnlimitedIOCounts;
 
   // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n",
   // wantedStreamInCnt,wantedStreamOutCnt);
   if (wantedStreamInCnt == -1)
     {
       wantedStreamInCnt = m_streamCnt - wantedStreamOutCnt;
-      if (wantedStreamInCnt < 1) CdoError::Abort(Cdo::progname, "Input streams missing!");
+      if (wantedStreamInCnt < 1) return ProcessStatus::MissInput;
     }
 
   if (wantedStreamOutCnt == -1)
     {
       wantedStreamOutCnt = m_streamCnt - wantedStreamInCnt;
-      if (wantedStreamOutCnt < 1) CdoError::Abort(Cdo::progname, "Output streams missing!");
+      if (wantedStreamOutCnt < 1) return ProcessStatus::MissOutput;
     }
   // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n",
   // wantedStreamInCnt,wantedStreamOutCnt);
@@ -184,28 +240,26 @@ ProcessType::checkStreamCnt(void)
   streamCnt = wantedStreamInCnt + wantedStreamOutCnt;
   // printf(" streamCnt %d %d\n", m_streamCnt, streamCnt);
 
-  if (m_streamCnt > streamCnt)
-    CdoError::Abort(Cdo::progname, "Too many streams specified!"
-                                   " Operator ",
-                    m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt, " output streams.");
+  if (m_streamCnt > streamCnt) return ProcessStatus::TooManyStreams;
 
-  if (m_streamCnt < streamCnt && !obase)
-    CdoError::Abort(Cdo::progname, "Too few streams specified!"
-                                   " Operator ",
-                    m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt, " output streams.");
+  if (m_streamCnt < streamCnt && !obase) return ProcessStatus::TooFewStreams;
 
-  if (wantedStreamInCnt == 1 && streamInCnt0 == -1) return 1;
+  if (wantedStreamInCnt == 1 && streamInCnt0 == -1) return ProcessStatus::Ok;
 
-  for (auto inStream : inputStreams)
+  return ProcessStatus::Ok;
+}
+
+int
+ProcessType::checkInFileStreams()
+{
+  for (unsigned int i = 0; i < inputStreams.size(); i++)
     {
-      if (!inStream->isPipe() && !fileExists(inStream->m_mfnames[0].c_str()))
+      if (!inputStreams[i]->isPipe() && !fileExists(inputStreams[i]->m_mfnames[0].c_str()))
         {
-          CdoError::Abort(Cdo::progname, "Input file ", inStream->m_mfnames[0].c_str(), " of process ", operatorName,
-                          " does not exists");
+          return i;
         }
     }
-
-  return 0;
+  return -1;
 }
 
 bool
@@ -447,15 +501,17 @@ ProcessType::query_user_exit(const char *argument)
     {
       if (nbr_itr++ > USR_RPL_MAX_NBR)
         {
-          (void) fprintf(stdout, "\n%s: ERROR %d failed attempts to obtain valid "
-                                 "interactive input.\n",
+          (void) fprintf(stdout,
+                         "\n%s: ERROR %d failed attempts to obtain valid "
+                         "interactive input.\n",
                          prompt, nbr_itr - 1);
           exit(EXIT_FAILURE);
         }
 
       if (nbr_itr > 1) (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
-      (void) fprintf(stdout, "%s: %s exists ---`e'xit, or `o'verwrite (delete existing "
-                             "file) (e/o)? ",
+      (void) fprintf(stdout,
+                     "%s: %s exists ---`e'xit, or `o'verwrite (delete existing "
+                     "file) (e/o)? ",
                      prompt, argument);
       (void) fflush(stdout);
       if (fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL) continue;
@@ -518,7 +574,7 @@ void
 ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
 {
 #if defined(HAVE_SYS_TIMES_H)
-  if ( m_ID == 0 )
+  if (m_ID == 0)
     {
       if (cdoBenchmark)
         fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime, p_times.c_systime, p_times.c_cputime, p_memstring);

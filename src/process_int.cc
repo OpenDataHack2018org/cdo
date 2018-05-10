@@ -504,7 +504,7 @@ validateProcesses()
 {
   for (auto &process : Process)
     {
-      process.second.checkStreamCnt();
+      process.second.validate();
     }
 }
 
