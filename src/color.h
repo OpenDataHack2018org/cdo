@@ -14,8 +14,8 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef _COLOR_H
-#define _COLOR_H
+#ifndef COLOR_H
+#define COLOR_H
 
 typedef struct
 {
@@ -42,4 +42,4 @@ int cptRead(FILE *fp, CPT *cpt);
 int cptWrite(FILE *fp, CPT cpt);
 int cptWriteC(FILE *fp, CPT cpt, const char *name);
 
-#endif /* _COLOR_H */
+#endif /* COLOR_H */
