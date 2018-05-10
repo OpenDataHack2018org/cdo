@@ -97,18 +97,18 @@ void fldunm(Field *field);
 int fldhvs(Field *field, const size_t nlevels);
 
 // fieldzon.cc
-void zonfun(Field field1, Field *field2, const int function);
-void zonmin(Field field1, Field *field2);
-void zonmax(Field field1, Field *field2);
-void zonrange(Field field1, Field *field2);
-void zonsum(Field field1, Field *field2);
-void zonavg(Field field1, Field *field2);
-void zonmean(Field field1, Field *field2);
-void zonstd(Field field1, Field *field2);
-void zonstd1(Field field1, Field *field2);
-void zonvar(Field field1, Field *field2);
-void zonvar1(Field field1, Field *field2);
-void zonpctl(Field field1, Field *field2, const int k);
+void zonfun(const Field &field1, Field &field2, const int function);
+void zonmin(const Field &field1, Field &field2);
+void zonmax(const Field &field1, Field &field2);
+void zonrange(const Field &field1, Field &field2);
+void zonsum(const Field &field1, Field &field2);
+void zonavg(const Field &field1, Field &field2);
+void zonmean(const Field &field1, Field &field2);
+void zonstd(const Field &field1, Field &field2);
+void zonstd1(const Field &field1, Field &field2);
+void zonvar(const Field &field1, Field &field2);
+void zonvar1(const Field &field1, Field &field2);
+void zonpctl(const Field &field1, Field &field2, const int k);
 
 /* fieldmer.cc */
 

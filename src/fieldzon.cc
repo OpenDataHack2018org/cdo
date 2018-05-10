@@ -20,7 +20,7 @@
 #include "percentiles.h"
 
 void
-zonfun(Field field1, Field *field2, int function)
+zonfun(const Field &field1, Field &field2, int function)
 {
   // clang-format off
   switch (function)
@@ -41,7 +41,7 @@ zonfun(Field field1, Field *field2, int function)
 }
 
 void
-zonmin(Field field1, Field *field2)
+zonmin(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double rmin;
@@ -61,14 +61,14 @@ zonmin(Field field1, Field *field2)
           rmin = arrayMin(nx, &field1.ptr[j * nx]);
         }
 
-      field2->ptr[j] = rmin;
+      field2.ptr[j] = rmin;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-zonmax(Field field1, Field *field2)
+zonmax(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double rmax;
@@ -88,14 +88,14 @@ zonmax(Field field1, Field *field2)
           rmax = arrayMax(nx, &field1.ptr[j * nx]);
         }
 
-      field2->ptr[j] = rmax;
+      field2.ptr[j] = rmax;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-zonrange(Field field1, Field *field2)
+zonrange(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double range;
@@ -115,14 +115,14 @@ zonrange(Field field1, Field *field2)
           range = arrayRange(nx, &field1.ptr[j * nx]);
         }
 
-      field2->ptr[j] = range;
+      field2.ptr[j] = range;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-zonsum(Field field1, Field *field2)
+zonsum(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double rsum = 0;
@@ -142,14 +142,14 @@ zonsum(Field field1, Field *field2)
           rsum = arraySum(nx, &field1.ptr[j * nx]);
         }
 
-      field2->ptr[j] = rsum;
+      field2.ptr[j] = rsum;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-zonmean(Field field1, Field *field2)
+zonmean(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double rmean = 0;
@@ -170,14 +170,14 @@ zonmean(Field field1, Field *field2)
 
       if (DBL_IS_EQUAL(rmean, field1.missval)) rnmiss++;
 
-      field2->ptr[j] = rmean;
+      field2.ptr[j] = rmean;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-zonavg(Field field1, Field *field2)
+zonavg(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   double ravg = 0;
@@ -198,10 +198,10 @@ zonavg(Field field1, Field *field2)
 
       if (DBL_IS_EQUAL(ravg, field1.missval)) rnmiss++;
 
-      field2->ptr[j] = ravg;
+      field2.ptr[j] = ravg;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 static void
@@ -239,7 +239,7 @@ prevarsum_zon(const double *restrict array, size_t nx, size_t nmiss, double miss
 }
 
 void
-zonvar(Field field1, Field *field2)
+zonvar(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -261,14 +261,14 @@ zonvar(Field field1, Field *field2)
 
       if (DBL_IS_EQUAL(rvar, missval1)) rnmiss++;
 
-      field2->ptr[j] = rvar;
+      field2.ptr[j] = rvar;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-zonvar1(Field field1, Field *field2)
+zonvar1(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -290,14 +290,14 @@ zonvar1(Field field1, Field *field2)
 
       if (DBL_IS_EQUAL(rvar, missval1)) rnmiss++;
 
-      field2->ptr[j] = rvar;
+      field2.ptr[j] = rvar;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-zonstd(Field field1, Field *field2)
+zonstd(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -310,18 +310,18 @@ zonstd(Field field1, Field *field2)
 
   for (size_t j = 0; j < ny; j++)
     {
-      rstd = varToStd(field2->ptr[j], missval);
+      rstd = varToStd(field2.ptr[j], missval);
 
       if (DBL_IS_EQUAL(rstd, missval)) rnmiss++;
 
-      field2->ptr[j] = rstd;
+      field2.ptr[j] = rstd;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 void
-zonstd1(Field field1, Field *field2)
+zonstd1(const Field &field1, Field &field2)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -334,19 +334,19 @@ zonstd1(Field field1, Field *field2)
 
   for (size_t j = 0; j < ny; j++)
     {
-      rstd = varToStd(field2->ptr[j], missval);
+      rstd = varToStd(field2.ptr[j], missval);
 
       if (DBL_IS_EQUAL(rstd, missval)) rnmiss++;
 
-      field2->ptr[j] = rstd;
+      field2.ptr[j] = rstd;
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 
 /* RQ */
 void
-zonpctl(Field field1, Field *field2, int p)
+zonpctl(const Field &field1, Field &field2, int p)
 {
   size_t rnmiss = 0;
   int grid = field1.grid;
@@ -369,11 +369,11 @@ zonpctl(Field field1, Field *field2, int p)
 
           if (l > 0)
             {
-              field2->ptr[j] = percentile(array2, l, p);
+              field2.ptr[j] = percentile(array2, l, p);
             }
           else
             {
-              field2->ptr[j] = missval;
+              field2.ptr[j] = missval;
               rnmiss++;
             }
         }
@@ -386,16 +386,16 @@ zonpctl(Field field1, Field *field2, int p)
         {
           if (nx > 0)
             {
-              field2->ptr[j] = percentile(&array[j * nx], nx, p);
+              field2.ptr[j] = percentile(&array[j * nx], nx, p);
             }
           else
             {
-              field2->ptr[j] = missval;
+              field2.ptr[j] = missval;
               rnmiss++;
             }
         }
     }
 
-  field2->nmiss = rnmiss;
+  field2.nmiss = rnmiss;
 }
 /* QR */
