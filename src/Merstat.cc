@@ -25,10 +25,10 @@
       Merstat    mermean         Meridional mean
       Merstat    meravg          Meridional average
       Merstat    merstd          Meridional standard deviation
-      Merstat    merstd          Meridional standard deviation [Normalize by
-   (n-1)] Merstat    mervar          Meridional variance Merstat    mervar
-   Meridional variance [Normalize by (n-1)] Merstat    merpctl
-   Meridional percentiles
+      Merstat    merstd          Meridional standard deviation [Normalize by (n-1)]
+      Merstat    mervar          Meridional variance
+      Merstat    mervar          Meridional variance [Normalize by (n-1)]
+      Merstat    merpctl         Meridional percentiles
 */
 
 #include <cdi.h>
@@ -137,16 +137,19 @@ Merstat(void *process)
           pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = nmiss;
           field1.grid = vlistInqVarGrid(vlistID1, varID);
+
           if (needWeights && field1.grid != lastgrid)
             {
               lastgrid = field1.grid;
               wstatus = gridWeights(field1.grid, field1.weight);
             }
+
           if (wstatus != 0 && tsID == 0 && levelID == 0)
             {
               vlistInqVarName(vlistID1, varID, varname);
               cdoWarning("Using constant grid cell area weights for variable %s!", varname);
             }
+
           field1.missval = vlistInqVarMissval(vlistID1, varID);
           field2.missval = vlistInqVarMissval(vlistID1, varID);
 

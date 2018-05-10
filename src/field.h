@@ -33,8 +33,9 @@ enum field_flag
   FIELD_ALL = FIELD_PTR | FIELD_WGT
 };
 
-struct Field
+class Field
 {
+ public:
   int fpeRaised;
   int nwpv;  // number of words per value; real:1  complex:2
   int memtype;
@@ -48,7 +49,8 @@ struct Field
   double *weight;
   double *ptr;
   float *ptrf;
-  void *ptr2;
+  double *ptr2;
+  float *ptr2f;
 };
 
 struct RecordInfo

@@ -61,7 +61,9 @@ field_allocate(int vlistID, int ptype, int init)
           if (ptype & FIELD_FLT) field[varID][levelID].memtype = MEMTYPE_FLOAT;
           field[varID][levelID].missval = missval;
           field[varID][levelID].ptr = NULL;
+          field[varID][levelID].ptrf = NULL;
           field[varID][levelID].ptr2 = NULL;
+          field[varID][levelID].ptr2f = NULL;
           field[varID][levelID].weight = NULL;
 
           if (ptype & FIELD_PTR)
@@ -82,12 +84,12 @@ field_allocate(int vlistID, int ptype, int init)
             {
               if (ptype & FIELD_FLT)
                 {
-                  field[varID][levelID].ptr2 = Malloc(nwpv * gridsize * sizeof(float));
-                  if (init) arrayFill(nwpv * gridsize, (float *) field[varID][levelID].ptr2, 0.0f);
+                  field[varID][levelID].ptr2f = (float *) Malloc(nwpv * gridsize * sizeof(float));
+                  if (init) arrayFill(nwpv * gridsize, (float *) field[varID][levelID].ptr2f, 0.0f);
                 }
               else
                 {
-                  field[varID][levelID].ptr2 = Malloc(nwpv * gridsize * sizeof(double));
+                  field[varID][levelID].ptr2 = (double *) Malloc(nwpv * gridsize * sizeof(double));
                   if (init) arrayFill(nwpv * gridsize, (double *) field[varID][levelID].ptr2, 0.0);
                 }
             }
@@ -127,6 +129,7 @@ field_free(Field **field, int vlistID)
           if (field[varID][levelID].ptr) Free(field[varID][levelID].ptr);
           if (field[varID][levelID].ptrf) Free(field[varID][levelID].ptrf);
           if (field[varID][levelID].ptr2) Free(field[varID][levelID].ptr2);
+          if (field[varID][levelID].ptr2f) Free(field[varID][levelID].ptr2f);
           if (field[varID][levelID].weight) Free(field[varID][levelID].weight);
         }
 
