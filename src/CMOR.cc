@@ -4131,7 +4131,7 @@ get_cmor_time_val(list_t *kvl, int taxisID, juldate_t ref_date, int tunitsec, in
             }
           if (addseconds == 0)
             {
-              int vdate = cdiEncodeDate(year, month, 1);
+              int64_t vdate = cdiEncodeDate(year, month, 1);
               int vtime = 0;
               juldate = juldate_encode(calendar, vdate, vtime);
             }
@@ -4146,7 +4146,8 @@ get_time_bounds(list_t *kvl, int taxisID, char *frequency, juldate_t ref_date, j
                 double *time_bnds, int time_axis, int vlistID)
 {
   double time_val = juldate_to_seconds(juldate_sub(jtime_val, ref_date)) / tunitsec;
-  int vdate0b, vdate1b, vtime0b, vtime1b, vdatecorr, vtimecorr;
+  int64_t vdate0b, vdate1b, vdatecorr;
+  int vtime0b, vtime1b,vtimecorr;
   int year, month, day;
   int hour, min, sec;
   cdiDecodeDate(taxisInqVdate(taxisID), &year, &month, &day);

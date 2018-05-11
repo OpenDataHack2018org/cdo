@@ -219,7 +219,7 @@ Input(void *process)
           pstreamDefVlist(streamID, vlistID);
         }
 
-      int vdate = date;
+      int64_t vdate = date;
       int vtime = time;
       taxisDefVdate(taxisID, vdate);
       taxisDefVtime(taxisID, vtime);

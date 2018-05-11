@@ -433,7 +433,7 @@ EOF3d(void *process)
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID3);
 
-  int vdate = 10101;
+  int64_t vdate = 10101;
   int vtime = 0;
   juldate_t juldate = juldate_encode(calendar, vdate, vtime);
   for (tsID = 0; tsID < n; tsID++)

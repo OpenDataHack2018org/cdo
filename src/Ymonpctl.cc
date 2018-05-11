@@ -31,7 +31,7 @@
 #define NMONTH 17
 
 static int
-getmonth(int date)
+getmonth(int64_t date)
 {
   int year, month, day;
   cdiDecodeDate(date, &year, &month, &day);
@@ -43,13 +43,14 @@ Ymonpctl(void *process)
 {
   int varID;
   int gridID;
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
   int year, month, day;
   int levelID;
   size_t nmiss;
   int nrecs, nlevels;
-  int vdates1[NMONTH], vtimes1[NMONTH];
-  int vdates2[NMONTH];
+  int64_t vdates1[NMONTH], vdates2[NMONTH];
+  int vtimes1[NMONTH];
   long nsets[NMONTH];
   Field **vars1[NMONTH];
   HISTOGRAM_SET *hsets[NMONTH];

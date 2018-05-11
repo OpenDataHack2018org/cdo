@@ -177,13 +177,13 @@ CDIwrite(void *process)
       datatype = vlistInqVarDatatype(vlistID, 0);
       if (datatype == CDI_UNDEFID) datatype = CDI_DATATYPE_FLT32;
 
-      int julday = date_to_julday(CALENDAR_PROLEPTIC, 19870101);
+      int64_t julday = date_to_julday(CALENDAR_PROLEPTIC, 19870101);
 
       t0 = timer_val(timer_write);
 
       for (tsID = 0; tsID < ntimesteps; tsID++)
         {
-          int vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
+          int64_t vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
           int vtime = 0;
           taxisDefVdate(taxisID, vdate);
           taxisDefVtime(taxisID, vtime);

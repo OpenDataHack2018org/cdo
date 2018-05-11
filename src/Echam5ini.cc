@@ -286,7 +286,7 @@ import_e5ml(const char *filename, VAR **vars)
 }
 
 static void
-export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
+export_e5ml(const char *filename, VAR *vars, int nvars, int64_t vdate, int vtime, int ntr)
 {
 #ifdef HAVE_LIBNETCDF
   int nc_var_id;
@@ -435,10 +435,11 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, in
   attlen = strlen(atttext);
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_8", attlen, atttext));
 
-  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "fdate", NC_INT, 1, &vdate));
+  int ivdate = vdate;
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "fdate", NC_INT, 1, &ivdate));
   nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "ftime", NC_INT, 1, &vtime));
 
-  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "vdate", NC_INT, 1, &vdate));
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "vdate", NC_INT, 1, &ivdate));
   nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "vtime", NC_INT, 1, &vtime));
 
   // attint = 31;
@@ -1588,7 +1589,8 @@ Echam5ini(void *process)
       VAR *vars = NULL;
       int code, gridID, zaxisID, gridtype, zaxistype, gridsize, nlev;
       char name[CDI_MAX_NAME], longname[CDI_MAX_NAME], units[CDI_MAX_NAME];
-      int taxisID, vdate, vtime;
+      int64_t vdate;
+      int taxisID, vtime;
       int ntr = 0;
 
       streamID1 = cdoStreamOpenRead(cdoStreamName(0));

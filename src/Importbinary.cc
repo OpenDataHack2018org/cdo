@@ -191,7 +191,8 @@ Importbinary(void *process)
   size_t gridsize;
   int datatype;
   dsets_t pfi;
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
   int tcur, told, fnum;
   int tmin = 0, tmax = 0;
   char *ch = NULL;

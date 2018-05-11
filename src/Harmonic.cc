@@ -35,7 +35,8 @@ Harmonic(void *process)
   size_t nmiss;
   size_t offset;
   int nlevel;
-  int vdate = 0, vtime = 0;
+  int64_t vdate = 0;
+  int vtime = 0;
   char filesuffix[32];
   char filename[8192];
   const char *refname;

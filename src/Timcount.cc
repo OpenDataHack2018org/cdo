@@ -34,7 +34,8 @@ void *
 Timcount(void *process)
 {
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
-  int vdate0 = 0, vtime0 = 0;
+  int64_t vdate0 = 0;
+  int vtime0 = 0;
   int nrecs;
   int varID, levelID;
   size_t nmiss;
@@ -90,7 +91,7 @@ Timcount(void *process)
       int nsets = 0;
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
-          int vdate = taxisInqVdate(taxisID1);
+          int64_t vdate = taxisInqVdate(taxisID1);
           int vtime = taxisInqVtime(taxisID1);
 
           if (nsets == 0) SET_DATE(indate2, vdate, vtime);

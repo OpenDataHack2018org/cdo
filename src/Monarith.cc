@@ -90,7 +90,7 @@ Monarith(void *process)
   int tsID2 = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int yearmon1 = vdate / 100;
 
       if (yearmon1 != yearmon2)

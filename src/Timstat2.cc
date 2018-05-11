@@ -133,7 +133,8 @@ covariance(size_t gridsize, double missval1, double missval2, size_t *nofvals, d
 void *
 Timstat2(void *process)
 {
-  int vdate = 0, vtime = 0;
+  int64_t vdate = 0;
+  int vtime = 0;
   int varID, levelID;
   size_t nmiss;
 

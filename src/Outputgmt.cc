@@ -404,7 +404,7 @@ Outputgmt(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID);
+      int64_t vdate = taxisInqVdate(taxisID);
       int vtime = taxisInqVtime(taxisID);
 
       date2str(vdate, vdatestr, sizeof(vdatestr));

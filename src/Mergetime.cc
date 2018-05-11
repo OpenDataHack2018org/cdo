@@ -41,7 +41,7 @@ Mergetime(void *process)
     int vlistID;
     int taxisID;
     int tsID;
-    int vdate;
+    int64_t vdate;
     int vtime;
     int nrecs;
   } sfile_t;
@@ -112,7 +112,7 @@ Mergetime(void *process)
       bool process_timestep = true;
 
       int next_fileID = -1;
-      int vdate = 0;
+      int64_t vdate = 0;
       int vtime = 0;
       for (int fileID = 0; fileID < nfiles; fileID++)
         {

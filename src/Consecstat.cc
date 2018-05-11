@@ -124,8 +124,8 @@ selEndOfPeriod(Field *periods, Field history, Field current, int isLastTimestep)
 void *
 Consecstat(void *process)
 {
-  int vdate = 0, vtime = 0;
-  int histvdate = 0, histvtime = 0;
+  int64_t vdate = 0, histvdate = 0;
+  int vtime = 0, histvtime = 0;
   int nrecs;
   int varID;
   int levelID, nlevels;

@@ -39,8 +39,8 @@ eca1(const ECA_REQUEST_1 *request)
   size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
-  int ivdate = 0, ivtime = 0;
-  int ovdate = 0, ovtime = 0;
+  int64_t ivdate = 0, ovdate = 0;
+  int ivtime = 0, ovtime = 0;
   int nrecs, nrecords;
   int gridID, zaxisID, varID, levelID;
   int itsID;
@@ -383,8 +383,8 @@ eca2(const ECA_REQUEST_2 *request)
   size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
-  int ivdate = 0, ivtime = 0;
-  int ovdate = 0, ovtime = 0;
+  int64_t ivdate = 0, ovdate = 0;
+  int ivtime = 0, ovtime = 0;
   int nrecs, nrecords;
   int gridID, zaxisID, varID, levelID;
   int itsID;
@@ -742,8 +742,8 @@ eca3(const ECA_REQUEST_3 *request)
   size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
-  int ivdate1 = 0, ivtime1 = 0;
-  int ivdate2 = 0, ivtime2 = 0;
+  int64_t ivdate1 = 0, ivdate2 = 0;
+  int ivtime1 = 0, ivtime2 = 0;
   int ovdate = 0, ovtime = 0;
   int nrecs, nrecords;
   int gridID, zaxisID, varID, levelID;
@@ -949,8 +949,8 @@ eca4(const ECA_REQUEST_4 *request)
   int varID, levelID;
   int resetAtJan = FALSE, resetAtJul = FALSE;
   int isFirstYear = TRUE;
-  int ivdate = 0, ivtime = 0;
-  int ovdate = 0, ovtime = 0;
+  int64_t ivdate = 0, ovdate = 0;
+  int ivtime = 0, ovtime = 0;
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
   Field *startDateWithHist[2], *endDateWithHist[2];
 

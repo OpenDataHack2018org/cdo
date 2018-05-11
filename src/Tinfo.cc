@@ -45,17 +45,17 @@ const char *tunits[] = { "second", "minute", "hour", "day", "month", "year" };
 int iunits[] = { 1, 60, 3600, 86400, 1, 12 };
 
 void
-getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit)
+getTimeInc(double jdelta, int64_t vdate0, int64_t vdate1, int64_t *incperiod, int *incunit)
 {
   *incperiod = 0;
   *incunit = 0;
 
-  int lperiod = (jdelta < 0) ? (int) (jdelta - 0.5) : (int) (jdelta + 0.5);
+  int64_t lperiod = (jdelta < 0) ? (int64_t) (jdelta - 0.5) : (int64_t) (jdelta + 0.5);
 
   int sign = 1;
   if (lperiod < 0)
     {
-      int tmp = vdate1;
+      int64_t tmp = vdate1;
       vdate1 = vdate0;
       vdate0 = tmp;
       lperiod = -lperiod;
@@ -116,7 +116,7 @@ getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit)
 static void
 printBounds(int taxisID, int calendar)
 {
-  int vdate0, vdate1;
+  int64_t vdate0, vdate1;
   taxisInqVdateBounds(taxisID, &vdate0, &vdate1);
   int vtime0, vtime1;
   taxisInqVtimeBounds(taxisID, &vtime0, &vtime1);
@@ -134,24 +134,25 @@ printBounds(int taxisID, int calendar)
   juldate_t juldate1 = juldate_encode(calendar, vdate1, vtime1);
   double jdelta = juldate_to_seconds(juldate_sub(juldate1, juldate0));
 
-  int incperiod = 0, incunit = 0;
+  int64_t incperiod = 0;
+  int incunit = 0;
   getTimeInc(jdelta, vdate0, vdate1, &incperiod, &incunit);
 
-  /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600),
-   * incperiod%3600);*/
-  int len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], abs(incperiod) != 1 ? "s" : "");
+  /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600), incperiod%3600);*/
+  int len = fprintf(stdout, " %3lld %s%s", incperiod, tunits[incunit], labs(incperiod) != 1 ? "s" : "");
   for (int i = 0; i < 11 - len; ++i) fprintf(stdout, " ");
 }
 
 static int
-fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2], int vdatem[MAX_GAPS][MAX_NTSM],
-         int vtimem[MAX_GAPS][MAX_NTSM], int tsID, int incperiod0, int incunit0, int vdate, int vdate0, int vtime0,
+fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2], int64_t vdatem[MAX_GAPS][MAX_NTSM],
+         int vtimem[MAX_GAPS][MAX_NTSM], int tsID, int64_t incperiod0, int incunit0, int64_t vdate, int vdate0, int vtime0,
          int calendar, int day0, juldate_t juldate, juldate_t juldate0)
 {
   int its = 0;
   int year, month, day;
-  int ndate, ntime;
-  int ijulinc = incperiod0 * iunits[incunit0];
+  int64_t ndate;
+  int ntime;
+  int64_t ijulinc = incperiod0 * iunits[incunit0];
 
   if (ijulinc > 0 && ngaps < MAX_GAPS)
     {
@@ -167,7 +168,7 @@ fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2], int vdatem[MA
             {
               cdiDecodeDate(ndate, &year, &month, &day);
 
-              month += ijulinc;
+              month += (int)ijulinc;
 
               while (month > 12)
                 {
@@ -225,20 +226,19 @@ fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2], int vdatem[MA
 void *
 Tinfo(void *process)
 {
-  int vdate_first = 0, vtime_first = 0;
-  int vdate0 = 0, vtime0 = 0;
-  int vdate = 0, vtime = 0;
+  int64_t vdate_first = 0, vdate0 = 0, vdate = 0;
+  int vtime_first = 0, vtime0 = 0, vtime = 0;
   int tsID = 0, ntimeout;
   int year0, month0, day0;
   int year, month, day;
   bool lforecast = false;
-  int incperiod0 = 0, incunit0 = 0;
-  int incperiod = 0, incunit = 0;
+  int64_t incperiod0 = 0, incperiod = 0;
+  int incunit0 = 0, incunit = 0;
   int its = 0, igap;
   int ngaps = 0;
   int ntsm[MAX_GAPS];
   int rangetsm[MAX_GAPS][2];
-  int vdatem[MAX_GAPS][MAX_NTSM];
+  int64_t vdatem[MAX_GAPS][MAX_NTSM];
   int vtimem[MAX_GAPS][MAX_NTSM];
   juldate_t juldate, juldate0;
   double jdelta = 0, jdelta0 = 0;
@@ -288,7 +288,7 @@ Tinfo(void *process)
 
               if (taxisInqType(taxisID) == TAXIS_FORECAST)
                 {
-                  int fdate = taxisInqFdate(taxisID);
+                  int64_t fdate = taxisInqFdate(taxisID);
                   int ftime = taxisInqFtime(taxisID);
 
                   date2str(fdate, vdatestr, sizeof(vdatestr));
@@ -342,9 +342,8 @@ Tinfo(void *process)
 
               getTimeInc(jdelta, vdate0, vdate, &incperiod, &incunit);
 
-              /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600,
-               * fmod(jdelta,3600), incperiod%3600);*/
-              len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], abs(incperiod) != 1 ? "s" : "");
+              /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600), incperiod%3600);*/
+              len = fprintf(stdout, " %3lld %s%s", incperiod, tunits[incunit], labs(incperiod) != 1 ? "s" : "");
               for (i = 0; i < 11 - len; ++i) fprintf(stdout, " ");
             }
           else
@@ -356,7 +355,7 @@ Tinfo(void *process)
 
           if (lforecast)
             {
-              int fdate = taxisInqFdate(taxisID);
+              int64_t fdate = taxisInqFdate(taxisID);
               int ftime = taxisInqFtime(taxisID);
 
               date2str(fdate, vdatestr, sizeof(vdatestr));
@@ -408,9 +407,7 @@ Tinfo(void *process)
               else if (its < 0)
                 {
                   if (cdoVerbose)
-                    fprintf(stdout, "  %c--- Wrong date/time information, negative "
-                                    "increment!",
-                            arrow);
+                    fprintf(stdout, "  %c--- Wrong date/time information, negative increment!", arrow);
                 }
             }
 
@@ -442,7 +439,7 @@ Tinfo(void *process)
   time2str(vtime, vtimestr, sizeof(vtimestr));
   fprintf(stdout, " End date            : %s %s\n", vdatestr, vtimestr);
 
-  fprintf(stdout, " Increment           : %3d %s%s\n", incperiod0, tunits[incunit0], incperiod0 != 1 ? "s" : "");
+  fprintf(stdout, " Increment           : %3lld %s%s\n", incperiod0, tunits[incunit0], incperiod0 != 1 ? "s" : "");
   fprintf(stdout, " Number of timesteps : %d\n", tsID);
   fprintf(stdout, " Gaps identified     : %d\n", ngaps);
 

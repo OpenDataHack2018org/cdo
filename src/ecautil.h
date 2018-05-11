@@ -326,11 +326,11 @@ void computeGsl(int nlevels, size_t gridsize, double *yvals, double missval, Fie
  * should be the last day of the corresponding year for norther and June, 30th
  * for southern hemisphere
  */
-void adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int ovdate, Field *startDateWithHist[2],
+void adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int64_t ovdate, Field *startDateWithHist[2],
                    Field *endDateWithHist[2]);
 /*
  * Write GSL related fields to an output stream
  */
 void writeGslStream(int ostreamID, int otaxisID, int otsID, int ovarID1, int ovarID2, int ivlistID1, int first_var_id,
-                    Field *gslDuration, Field *gslFirstDay, int vdate, int vtime, int nlevels);
+                    Field *gslDuration, Field *gslFirstDay, int64_t vdate, int vtime, int nlevels);
 #endif /*ECAUTIL_H_*/

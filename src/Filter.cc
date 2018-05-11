@@ -42,7 +42,7 @@
 #define NALLOC_INC 1024
 
 /* include from Tinfo.c */
-void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit);
+void getTimeInc(double jdelta, int64_t vdate0, int64_t vdate1, int64_t *incperiod, int *incunit);
 
 static void
 create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
@@ -121,7 +121,8 @@ Filter(void *process)
   int varID, levelID;
   int nalloc = 0;
   size_t nmiss;
-  int incperiod0, incunit0, incunit;
+  int64_t incperiod0;
+  int incunit0, incunit;
   int year0, month0, day0;
   bool use_fftw = false;
   double fmin = 0, fmax = 0;
@@ -201,10 +202,10 @@ Filter(void *process)
       /* get and check time increment */
       if (tsID > 0)
         {
-          int incperiod = 0;
+          int64_t incperiod = 0;
           int year, month, day;
-          int vdate0 = dtlist_get_vdate(dtlist, tsID - 1);
-          int vdate = dtlist_get_vdate(dtlist, tsID);
+          int64_t vdate0 = dtlist_get_vdate(dtlist, tsID - 1);
+          int64_t vdate = dtlist_get_vdate(dtlist, tsID);
           int vtime0 = dtlist_get_vtime(dtlist, tsID - 1);
           int vtime = dtlist_get_vtime(dtlist, tsID);
 
@@ -221,7 +222,7 @@ Filter(void *process)
               incperiod = incperiod0;
               if (incperiod == 0) cdoAbort("Time step must be different from zero!");
               incunit = incunit0;
-              if (cdoVerbose) cdoPrint("Time step %i %s", incperiod, tunits[incunit]);
+              if (cdoVerbose) cdoPrint("Time step %lld %s", incperiod, tunits[incunit]);
               fdata = 1. * iunits[incunit] / incperiod;
             }
           else
@@ -235,7 +236,7 @@ Filter(void *process)
             }
 
           if (!(incperiod == incperiod0 && incunit == incunit0))
-            cdoWarning("Time increment in step %i (%d%s) differs from step 1 (%d%s)!", tsID, incperiod, tunits[incunit],
+            cdoWarning("Time increment in step %d (%lld%s) differs from step 1 (%lld%s)!", tsID, incperiod, tunits[incunit],
                        incperiod0, tunits[incunit0]);
         }
       tsID++;

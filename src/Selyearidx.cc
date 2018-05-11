@@ -93,7 +93,7 @@ Selyearidx(void *process)
       int nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if (nrecs == 0) break;
 
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       //int vtime = taxisInqVtime(taxisID1);
       cdiDecodeDate(vdate, &year, &month, &day);
       int year1 = year;

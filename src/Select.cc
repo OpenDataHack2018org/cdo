@@ -538,7 +538,7 @@ Select(void *process)
                 }
 
               dtlist_taxisInqTimestep(dtlist, taxisID1, 0);
-              int vdate = dtlist_get_vdate(dtlist, 0);
+              int64_t vdate = dtlist_get_vdate(dtlist, 0);
               int vtime = dtlist_get_vtime(dtlist, 0);
               int second;
               cdiDecodeDate(vdate, &year, &month, &day);

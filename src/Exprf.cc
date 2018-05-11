@@ -581,14 +581,15 @@ Expr(void *process)
   int streamID2 = cdoStreamOpenWrite(1, cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int vdate0 = 0, vtime0 = 0;
+  int64_t vdate0 = 0;
+  int vtime0 = 0;
   int calendar = taxisInqCalendar(taxisID1);
 
   int nrecs;
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       double jdelta = 0;

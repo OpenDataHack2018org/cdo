@@ -69,7 +69,7 @@
 
 /* sxxxYYYYMMDDhhmm0 */
 #define DATE_LEN 31 /* YYYYMMDDhhmmss allocate DTLEN+1 !!!! */
-#define SET_DATE(dtstr, date, time) (sprintf(dtstr, "%*d%*d", DATE_LEN - 6, date, 6, time))
+#define SET_DATE(dtstr, date, time) (sprintf(dtstr, "%*lld%*d", DATE_LEN - 6, date, 6, time))
 #define DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
 
 enum T_WEIGHT_MODE
@@ -137,8 +137,8 @@ int zaxis2ltype(int zaxisID);
 
 double radius_str_to_deg(const char *string);
 
-void datetime2str(int date, int time, char *datetimestr, int maxlen);
-void date2str(int date, char *datestr, int maxlen);
+void datetime2str(int64_t date, int time, char *datetimestr, int maxlen);
+void date2str(int64_t date, char *datestr, int maxlen);
 void time2str(int time, char *timestr, int maxlen);
 
 const char *tunit2str(int tunits);
@@ -164,6 +164,7 @@ const char *parameter2word(const char *string);
 double parameter2double(const char *string);
 bool parameter2bool(const char *string);
 int parameter2int(const char *string);
+long parameter2long(const char *string);
 size_t parameter2sizet(const char *string);
 int parameter2intlist(const char *string);
 

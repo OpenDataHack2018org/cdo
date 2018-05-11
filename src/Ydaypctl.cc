@@ -30,21 +30,22 @@
 
 #define NDAY 373
 
-int getmonthday(int date);
+int getmonthday(int64_t date);
 
 void *
 Ydaypctl(void *process)
 {
   int varID;
   int gridID;
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
   int year, month, day, dayoy;
   int nrecs;
   int levelID;
   size_t nmiss;
   int nlevels;
-  int vdates1[NDAY], vtimes1[NDAY];
-  int vdates2[NDAY];
+  int64_t vdates1[NDAY], vdates2[NDAY];
+  int vtimes1[NDAY];
   long nsets[NDAY];
   Field **vars1[NDAY];
   HISTOGRAM_SET *hsets[NDAY];

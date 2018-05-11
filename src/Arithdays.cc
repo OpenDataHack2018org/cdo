@@ -32,7 +32,7 @@
 #include "pstream_int.h"
 
 static double
-dayofyear(int calendar, int vdate, int vtime)
+dayofyear(int calendar, int64_t vdate, int vtime)
 {
   int month_360[12] = { 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30 };
   int month_365[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -114,7 +114,7 @@ Arithdays(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       taxisCopyTimestep(taxisID2, taxisID1);
