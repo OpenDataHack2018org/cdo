@@ -330,42 +330,7 @@ checkSingleBracketOnly(const char *p_argvEntry, char p_bracketType)
       CdoError::Abort(Cdo::progname, "Only single ", p_bracketType, " allowed");
     }
 }
-/* comment FOR DEVELOPERS ONLY (do not include in docu)
- *
- * This is the so to speak parser for cdo console inputs.
- * For future reference I will explain how it works here.
- *
- *  This parser runs over every argv that comes after the cdo options.
- *  The fist thing that is done is processing the first operator, since this operator
- *  is the only one that has output files we can remove the output file from out argv
- *  by limiting the argc. Obase operators are treated as if they have a single output
- *  since the operator itself takes care of writing and creating the files it needs for its
- *  output. We also create the first process for the operator and push it on out stack.
- *  Our stack will contain every operator that does not have everything it needs.
- *  After the first operator is handled the parser will go over each other element in argv.
- *  Here we have 4 cases that can happen. Only one of the 4 will happen in one iteration.
- *
- *  If an operator is found we create a new process and add this process as child to
- *  the process on top of the stack. Likewise we add the top process
- *  as parent to the new process. Then the new Process is added to the stack.
- *
- *  Does the argv element represent a file (indicated by the missing '-' in argv[i][0])
- *  we create a file stream and add it to the process at the top of the stack.
- *
- *  In case of a '[' or ']' we check if there is only one bracket since we decided to not
- *  allow multiple brackets in the same argv.Then we add ('[') or remove (']') the top of
- *  the process stack to a set (named bracketOperators) which will keep track of
- *  which operators used a bracket. This stack allows to 'mark' an operator so that it is
- *  only removed in case of a ']'.
- *  The ']' indicates that the top process should be removed.and that it SHOULD
- *  have all it's inputs.
- *
- *  At the end of each iteration we remove all operators that have all their inputs AND
- *  are not contained in out bracket operators set. So a not closed bracket will cause a wanted miss function
- *  of the parser as the operator will not be removed and more inputs will be added. This will
- *  be found later by our routine that checks if everything has all it needs (or too much)
- *  and will throw an error.
- *  */
+
 void
 createProcesses(int argc, const char **argv)
 {
@@ -377,6 +342,46 @@ createProcesses(int argc, const char **argv)
     }
   validateProcesses();
 }
+
+/* comment FOR DEVELOPERS ONLY (do not include in docu)
+ *
+ * This is the so to speak parser for cdo console inputs.
+ *
+ *  This parser runs over every argv that comes after the cdo options.  The
+ *  fist thing that is done is processing the first operator, since this
+ *  operator is the only one that has output files we can remove the output
+ *  file from out argv by limiting the argc. Obase operators are treated as if
+ *  they have a single output since the operator itself takes care of writing
+ *  and creating the files it needs for its output. We also create the first
+ *  process for the operator and push it on out stack.  Our stack will contain
+ *  every operator that does not have everything it needs.  After the first
+ *  operator is handled the parser will go over each other element in argv.
+ *  Here we have 4 cases that can happen. Only one of the 4 will happen in one
+ *  iteration.
+ *
+ *  If an operator is found we create a new process and add this process as
+ *  child to the process on top of the stack. Likewise we add the top process
+ *  as parent to the new process. Then the new Process is added to the stack.
+ *
+ *  Does the argv element represent a file (indicated by the missing '-' in
+ *  argv[i][0]) we create a file stream and add it to the process at the top of
+ *  the stack.
+ *
+ *  In case of a '[' or ']' we check if there is only one bracket since we
+ *  decided to not allow multiple brackets in the same argv.Then we add ('[')
+ *  or remove (']') the top of the process stack to a set (named
+ *  bracketOperators) which will keep track of which operators used a bracket.
+ *  This stack allows to 'mark' an operator so that it is only removed in case
+ *  of a ']'.  The ']' indicates that the top process should be removed.and
+ *  that it SHOULD have all it's inputs.
+ *
+ *  At the end of each iteration we remove all operators that have all their
+ *  inputs AND are not contained in out bracket operators set. So a not closed
+ *  bracket will cause a wanted miss function of the parser as the operator
+ *  will not be removed and more inputs will be added. This will be found later
+ *  by our routine (Process::validate) that checks if everything has all it
+ *  needs (or too much) and will throw an error.
+ */
 
 ParseStatus
 createProcessesFromInput(int argc, const char **argv)
@@ -464,10 +469,14 @@ createProcessesFromInput(int argc, const char **argv)
     }
   if (unclosedBrackets < 0)
     {
-      return ParseStatus::ClosingBracketMissing;
+      return ParseStatus::OpenBracketMissing;
     }
   if (idx < maxIdx)
     {
+      if (argv[idx][0] == ']')
+        {
+          return ParseStatus::OpenBracketMissing;
+        }
       return ParseStatus::UnprocessedInput;
     }
 
