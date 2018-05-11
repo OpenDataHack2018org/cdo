@@ -32,6 +32,16 @@ constexpr int MAX_OPERATOR = 128;
 constexpr int MAX_OARGC = 4096;
 constexpr int MAX_FILES = 65536;
 
+enum class ProcessStatus
+{
+  Ok = 0,
+  UnlimitedIOCounts = -1,
+  MissInput = -2,
+  MissOutput = -3,
+  TooManyStreams = -4,
+  TooFewStreams = -5,
+};
+
 struct cdoTimes
 {
   double s_utime, s_stime;
@@ -154,7 +164,10 @@ public:
   cdoTimes getTimes(int p_processNums);
   void printProcessedValues();
   void printBenchmarks(cdoTimes p_times, char *p_memstring);
-  int checkStreamCnt();
+  ProcessStatus checkStreamCnt();
+  int checkInFileStreams();
+  void validate();
+  void handleProcessErr(ProcessStatus p_proErr);
 
 private:
   void initProcess();

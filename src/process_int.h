@@ -20,6 +20,13 @@
 
 #include "process.h"
 
+enum class ParseStatus
+{
+  Ok = 0,
+  OpenBracketMissing = -1,
+  ClosingBracketMissing = -2,
+  UnprocessedInput = -3
+};
 /**
  * Sets the underlying Process threadID and calls omp_set_num_threads
  */
@@ -181,6 +188,9 @@ void processStartTime(double *utime, double *stime);
  * @param argv standard argv after option processing starting with the first
  * operator
  */
+
+void handleParseError(ParseStatus p_errCode);
+ParseStatus createProcessesFromInput(int argc, const char **argv);
 void createProcesses(int argc, const char **argv);
 
 /**
@@ -206,6 +216,6 @@ void killProcesses();
 
 int cdoStreamInqTimestep(int pstreamID, int tsID);
 
-void cdoValidateProcesses();
+void validateProcesses();
 
 #endif
