@@ -1,30 +1,14 @@
-/*
-  This file is part of CDO. CDO is a collection of Operators to
-  manipulate and analyse Climate model Data.
-
-  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
-  See COPYING file for copying and redistribution conditions.
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; version 2 of the License.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
 // This file is used in CDI and CDO !!!
 
-#if defined(HAVE_CONFIG_H)
+#ifdef HAVE_CONFIG_H
 #include "../src/config.h"
 #endif
 
 #include <stdio.h>
-#include "text.h"
-#include "datetime.h"
 
 #ifdef CDO
+#include "text.h"
+#include "datetime.h"
 #define streamInqFiletype pstreamInqFiletype
 #define streamInqByteorder pstreamInqByteorder
 #define streamInqTimestep cdoStreamInqTimestep
@@ -43,7 +27,7 @@ my_reset_text_color(FILE *fp)
 }
 
 void
-datetime2str(int date, int time, char *datetimestr, int maxlen)
+datetime2str(int64_t date, int time, char *datetimestr, int maxlen)
 {
   int year, month, day;
   cdiDecodeDate(date, &year, &month, &day);
@@ -55,7 +39,7 @@ datetime2str(int date, int time, char *datetimestr, int maxlen)
 }
 
 void
-date2str(int date, char *datestr, int maxlen)
+date2str(int64_t date, char *datestr, int maxlen)
 {
   int year, month, day;
   cdiDecodeDate(date, &year, &month, &day);
@@ -639,7 +623,7 @@ printSubtypeInfo(int vlistID)
 }
 
 static int
-printDateTime(int ntimeout, int vdate, int vtime)
+printDateTime(int ntimeout, int64_t vdate, int vtime)
 {
   char vdatestr[32], vtimestr[32];
 
@@ -690,7 +674,7 @@ printTimesteps(int streamID, int taxisID, int verbose)
   int nrecs;
   struct datetime
   {
-    int vdate;
+    int64_t vdate;
     int vtime;
     struct datetime *next;
   };
@@ -714,10 +698,10 @@ printTimesteps(int streamID, int taxisID, int verbose)
     {
 #ifdef CDO
       dtlist_taxisInqTimestep(dtlist, taxisID, 0);
-      int vdate = dtlist_get_vdate(dtlist, 0);
+      int64_t vdate = dtlist_get_vdate(dtlist, 0);
       int vtime = dtlist_get_vtime(dtlist, 0);
 #else
-      int vdate = taxisInqVdate(taxisID);
+      int64_t vdate = taxisInqVdate(taxisID);
       int vtime = taxisInqVtime(taxisID);
 #endif
 
@@ -764,7 +748,7 @@ printTimesteps(int streamID, int taxisID, int verbose)
         }
       for (int i = toff; i < nvdatetime; ++i)
         {
-          int vdate = next_vdatetime->vdate;
+          int64_t vdate = next_vdatetime->vdate;
           int vtime = next_vdatetime->vtime;
           ntimeout = printDateTime(ntimeout, vdate, vtime);
           next_vdatetime = next_vdatetime->next;
