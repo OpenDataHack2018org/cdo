@@ -109,9 +109,9 @@ cdoReadTimestep(void *rarg)
         }
 
       if (CDO_Memtype == MEMTYPE_FLOAT)
-        pstreamReadRecordF(streamID, (float *) input_vars[varID][levelID].ptr2, &nmiss);
+        pstreamReadRecordF(streamID, input_vars[varID][levelID].ptr2f, &nmiss);
       else
-        pstreamReadRecord(streamID, (double *) input_vars[varID][levelID].ptr2, &nmiss);
+        pstreamReadRecord(streamID, input_vars[varID][levelID].ptr2, &nmiss);
 
       input_vars[varID][levelID].nmiss2 = nmiss;
     }
@@ -126,8 +126,6 @@ cdoReadTimestep(void *rarg)
 static void
 cdoUpdateVars(int nvars, int vlistID, Field **vars)
 {
-  void *tmp = NULL;
-
   for (int varID = 0; varID < nvars; varID++)
     {
       int nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
@@ -135,15 +133,16 @@ cdoUpdateVars(int nvars, int vlistID, Field **vars)
         {
           if (CDO_Memtype == MEMTYPE_FLOAT)
             {
-              tmp = vars[varID][levelID].ptrf;
-              vars[varID][levelID].ptrf = (float *) vars[varID][levelID].ptr2;
+              float *tmp = vars[varID][levelID].ptrf;
+              vars[varID][levelID].ptrf = vars[varID][levelID].ptr2f;
+              vars[varID][levelID].ptr2f = tmp;
             }
           else
             {
-              tmp = vars[varID][levelID].ptr;
-              vars[varID][levelID].ptr = (double *) vars[varID][levelID].ptr2;
+              double *tmp = vars[varID][levelID].ptr;
+              vars[varID][levelID].ptr = vars[varID][levelID].ptr2;
+              vars[varID][levelID].ptr2 = tmp;
             }
-          vars[varID][levelID].ptr2 = tmp;
           vars[varID][levelID].nmiss = vars[varID][levelID].nmiss2;
         }
     }

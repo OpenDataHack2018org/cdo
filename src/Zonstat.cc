@@ -166,9 +166,9 @@ Zonstat(void *process)
           else
             {
               if (operfunc == func_pctl)
-                zonpctl(field1, &field2, pn);
+                zonpctl(field1, field2, pn);
               else
-                zonfun(field1, &field2, operfunc);
+                zonfun(field1, field2, operfunc);
             }
 
           pstreamDefRecord(streamID2, varID, levelID);
