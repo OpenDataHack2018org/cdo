@@ -69,7 +69,7 @@ Detrend(void *process)
   size_t nmiss;
   int nlevel;
   double missval;
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList *dtlist = dtlist_new();
 
   cdoInitialize(process);
 

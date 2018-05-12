@@ -180,7 +180,7 @@ Select(void *process)
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
 
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList *dtlist = dtlist_new();
 
   if (!cdoVerbose && nfiles > 1) progressInit();
 

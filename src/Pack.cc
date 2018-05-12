@@ -102,7 +102,7 @@ Pack(void *process)
   int varID, levelID;
   int nalloc = 0;
   int datatype = CDI_DATATYPE_INT16;
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList *dtlist = dtlist_new();
 
   cdoInitialize(process);
 

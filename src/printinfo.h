@@ -692,7 +692,7 @@ printTimesteps(int streamID, int taxisID, int verbose)
   int tsID = 0;
 
 #ifdef CDO
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList *dtlist = dtlist_new();
 #endif
   while ((nrecs = streamInqTimestep(streamID, tsID)))
     {

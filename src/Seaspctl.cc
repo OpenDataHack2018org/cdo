@@ -81,7 +81,7 @@ Seaspctl(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 

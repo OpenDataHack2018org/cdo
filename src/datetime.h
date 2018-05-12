@@ -40,14 +40,14 @@ struct CdoDateTime
   int time;
 };
 
-struct dtinfo_type
+struct DateTimeInfo
 {
   CdoDateTime c;     // corrected verification time
   CdoDateTime v;     // verification time
   CdoDateTime b[2];  // time bounds
 };
 
-struct dtlist_type
+struct DateTimeList
 {
   size_t nalloc;
   size_t size;
@@ -55,8 +55,8 @@ struct dtlist_type
   int calendar;
   TimeStat stat;
   int timestat_date;
-  dtinfo_type timestat;
-  dtinfo_type *dtinfo;
+  DateTimeInfo timestat;
+  DateTimeInfo *dtinfo;
 };
 
 juldate_t juldate_encode(int calendar, int64_t date, int time);
@@ -67,15 +67,15 @@ double juldate_to_seconds(juldate_t juldate);
 
 void datetime_avg(int dpy, int ndates, CdoDateTime *datetime);
 
-dtlist_type *dtlist_new(void);
-void dtlist_delete(dtlist_type *dtlist);
-void dtlist_shift(dtlist_type *dtlist);
-void dtlist_set_stat(dtlist_type *dtlist, TimeStat stat);
-void dtlist_set_calendar(dtlist_type *dtlist, int calendar);
-int64_t dtlist_get_vdate(dtlist_type *dtlist, int tsID);
-int dtlist_get_vtime(dtlist_type *dtlist, int tsID);
-void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID);
-void dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID);
-void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps);
+DateTimeList *dtlist_new(void);
+void dtlist_delete(DateTimeList *dtlist);
+void dtlist_shift(DateTimeList *dtlist);
+void dtlist_set_stat(DateTimeList *dtlist, TimeStat stat);
+void dtlist_set_calendar(DateTimeList *dtlist, int calendar);
+int64_t dtlist_get_vdate(DateTimeList *dtlist, int tsID);
+int dtlist_get_vtime(DateTimeList *dtlist, int tsID);
+void dtlist_taxisInqTimestep(DateTimeList *dtlist, int taxisID, int tsID);
+void dtlist_taxisDefTimestep(DateTimeList *dtlist, int taxisID, int tsID);
+void dtlist_stat_taxisDefTimestep(DateTimeList *dtlist, int taxisID, int nsteps);
 
 #endif /* DATETIME_H */

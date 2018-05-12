@@ -325,7 +325,7 @@ Info(void *process)
 
   int operfunc = cdoOperatorF1(operatorID);
 
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList *dtlist = dtlist_new();
 
   for (int indf = 0; indf < cdoStreamCnt(); indf++)
     {

@@ -69,7 +69,7 @@ getTimestatDate(TimeStat *tstat_date)
 }
 
 void
-dtlist_init(dtlist_type *dtlist)
+dtlist_init(DateTimeList *dtlist)
 {
   dtlist->nalloc = 0;
   dtlist->size = 0;
@@ -83,30 +83,30 @@ dtlist_init(dtlist_type *dtlist)
   init = true;
 }
 
-dtlist_type *
+DateTimeList *
 dtlist_new(void)
 {
-  dtlist_type *dtlist = (dtlist_type *) Malloc(sizeof(dtlist_type));
+  DateTimeList *dtlist = (DateTimeList *) Malloc(sizeof(DateTimeList));
   dtlist_init(dtlist);
   return dtlist;
 }
 
 void
-dtlist_delete(dtlist_type *dtlist)
+dtlist_delete(DateTimeList *dtlist)
 {
   if (dtlist->nalloc > 0 && dtlist->dtinfo) Free(dtlist->dtinfo);
   Free(dtlist);
 }
 
 void
-dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
+dtlist_taxisInqTimestep(DateTimeList *dtlist, int taxisID, int tsID)
 {
   size_t NALLOC = 128;
 
   if ((size_t) tsID >= dtlist->nalloc)
     {
       dtlist->nalloc += NALLOC;
-      dtlist->dtinfo = (dtinfo_type *) Realloc(dtlist->dtinfo, dtlist->nalloc * sizeof(dtinfo_type));
+      dtlist->dtinfo = (DateTimeInfo *) Realloc(dtlist->dtinfo, dtlist->nalloc * sizeof(DateTimeInfo));
     }
 
   if ((size_t) tsID >= dtlist->size) dtlist->size = (size_t) tsID + 1;
@@ -172,7 +172,7 @@ dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 }
 
 void
-dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID)
+dtlist_taxisDefTimestep(DateTimeList *dtlist, int taxisID, int tsID)
 {
   if (tsID < 0 || (size_t) tsID >= dtlist->size) cdoAbort("Internal error; tsID out of bounds!");
 
@@ -186,7 +186,7 @@ dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 }
 
 void
-dtlist_mean(dtlist_type *dtlist, int nsteps)
+dtlist_mean(DateTimeList *dtlist, int nsteps)
 {
   int64_t vdate;
   int vtime;
@@ -239,14 +239,14 @@ dtlist_mean(dtlist_type *dtlist, int nsteps)
 }
 
 void
-dtlist_midhigh(dtlist_type *dtlist, int nsteps)
+dtlist_midhigh(DateTimeList *dtlist, int nsteps)
 {
   dtlist->timestat.v.date = dtlist->dtinfo[nsteps / 2].v.date;
   dtlist->timestat.v.time = dtlist->dtinfo[nsteps / 2].v.time;
 }
 
 void
-dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
+dtlist_stat_taxisDefTimestep(DateTimeList *dtlist, int taxisID, int nsteps)
 {
   if ((size_t) nsteps > dtlist->size) cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps, dtlist->size);
 
@@ -282,7 +282,7 @@ dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
 }
 
 void
-dtlist_shift(dtlist_type *dtlist)
+dtlist_shift(DateTimeList *dtlist)
 {
   for (size_t inp = 0; inp < dtlist->size - 1; inp++)
     {
@@ -291,19 +291,19 @@ dtlist_shift(dtlist_type *dtlist)
 }
 
 void
-dtlist_set_stat(dtlist_type *dtlist, TimeStat stat)
+dtlist_set_stat(DateTimeList *dtlist, TimeStat stat)
 {
   dtlist->stat = stat;
 }
 
 void
-dtlist_set_calendar(dtlist_type *dtlist, int calendar)
+dtlist_set_calendar(DateTimeList *dtlist, int calendar)
 {
   dtlist->calendar = calendar;
 }
 
 int64_t
-dtlist_get_vdate(dtlist_type *dtlist, int tsID)
+dtlist_get_vdate(DateTimeList *dtlist, int tsID)
 {
   if (tsID < 0 || (size_t) tsID >= dtlist->size) cdoAbort("Internal error; tsID out of bounds!");
 
@@ -311,7 +311,7 @@ dtlist_get_vdate(dtlist_type *dtlist, int tsID)
 }
 
 int
-dtlist_get_vtime(dtlist_type *dtlist, int tsID)
+dtlist_get_vtime(DateTimeList *dtlist, int tsID)
 {
   if (tsID < 0 || (size_t) tsID >= dtlist->size) cdoAbort("Internal error; tsID out of bounds!");
 

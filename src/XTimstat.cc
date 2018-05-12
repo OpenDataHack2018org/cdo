@@ -282,7 +282,7 @@ XTimstat(void *process)
       pstreamDefVlist(streamID3, vlistID3);
     }
 
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 

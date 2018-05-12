@@ -127,7 +127,7 @@ Filter(void *process)
   bool use_fftw = false;
   double fmin = 0, fmax = 0;
   double fdata = 0;
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList *dtlist = dtlist_new();
   struct FftMemory
   {
     std::vector<double> array1;
