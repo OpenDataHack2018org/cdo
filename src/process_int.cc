@@ -354,9 +354,9 @@ createProcesses(int argc, const char **argv)
  *  they have a single output since the operator itself takes care of writing
  *  and creating the files it needs for its output. We also create the first
  *  process for the operator and push it on out stack.  Our stack will contain
- *  every operator that does not have everything it needs.  After the first
- *  operator is handled the parser will go over each other element in argv.
- *  Here we have 4 cases that can happen. Only one of the 4 will happen in one
+ *  all operators that do not have all in- or output they need.  After the
+ *  first operator is handled the parser will go over each other element in
+ *  argv.  Here 4 cases can happen. Only one of the 4 will happen in one
  *  iteration.
  *
  *  If an operator is found we create a new process and add this process as
@@ -368,19 +368,19 @@ createProcesses(int argc, const char **argv)
  *  the stack.
  *
  *  In case of a '[' or ']' we check if there is only one bracket since we
- *  decided to not allow multiple brackets in the same argv.Then we add ('[')
- *  or remove (']') the top of the process stack to a set (named
+ *  decided to not allow multiple brackets in the same argv entry.Then we add
+ *  ('[') or remove (']') the top of the process stack to a set (named
  *  bracketOperators) which will keep track of which operators used a bracket.
  *  This stack allows to 'mark' an operator so that it is only removed in case
  *  of a ']'.  The ']' indicates that the top process should be removed.and
- *  that it SHOULD have all it's inputs.
+ *  that it SHOULD have the correct number of inputs.
  *
  *  At the end of each iteration we remove all operators that have all their
  *  inputs AND are not contained in out bracket operators set. So a not closed
  *  bracket will cause a wanted miss function of the parser as the operator
  *  will not be removed and more inputs will be added. This will be found later
- *  by our routine (Process::validate) that checks if everything has all it
- *  needs (or too much) and will throw an error.
+ *  by our routine (Process::validate) that checks if every process has the
+ *  correct number of inputs and outputs and will throw an error.
  */
 
 ParseStatus
