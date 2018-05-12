@@ -692,14 +692,14 @@ printTimesteps(int streamID, int taxisID, int verbose)
   int tsID = 0;
 
 #ifdef CDO
-  DateTimeList *dtlist = dtlist_new();
+  DateTimeList dtlist;
 #endif
   while ((nrecs = streamInqTimestep(streamID, tsID)))
     {
 #ifdef CDO
-      dtlist_taxisInqTimestep(dtlist, taxisID, 0);
-      int64_t vdate = dtlist_get_vdate(dtlist, 0);
-      int vtime = dtlist_get_vtime(dtlist, 0);
+      dtlist.taxisInqTimestep(taxisID, 0);
+      int64_t vdate = dtlist.getVdate(0);
+      int vtime = dtlist.getVtime(0);
 #else
       int64_t vdate = taxisInqVdate(taxisID);
       int vtime = taxisInqVtime(taxisID);
@@ -731,9 +731,6 @@ printTimesteps(int streamID, int taxisID, int verbose)
       tsID++;
     }
 
-#ifdef CDO
-  dtlist_delete(dtlist);
-#endif
   if (nvdatetime)
     {
       fprintf(stdout, "\n");

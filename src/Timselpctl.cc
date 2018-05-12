@@ -86,9 +86,9 @@ Timselpctl(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  DateTimeList *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
+  DateTimeList dtlist;
+  dtlist.setStat(timestat_date);
+  dtlist.setCalendar(taxisInqCalendar(taxisID1));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
@@ -172,7 +172,7 @@ Timselpctl(void *process)
             nrecs = cdoStreamInqTimestep(streamID1, tsID);
             if (nrecs == 0) break;
 
-            dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
+            dtlist.taxisInqTimestep(taxisID1, nsets);
 
             for (int recID = 0; recID < nrecs; recID++)
               {
@@ -205,7 +205,7 @@ Timselpctl(void *process)
             hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID, levelID, pn);
         }
 
-      dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
+      dtlist.statTaxisDefTimestep(taxisID4, nsets);
       pstreamDefTimestep(streamID4, otsID);
 
       for (int recID = 0; recID < maxrecs; recID++)
@@ -235,8 +235,6 @@ LABEL_END:
 
   field_free(vars1, vlistID1);
   hsetDestroy(hset);
-
-  dtlist_delete(dtlist);
 
   if (field.ptr) Free(field.ptr);
 

@@ -25,10 +25,9 @@
       Timselstat    timselmean         Time selection mean
       Timselstat    timselavg          Time selection average
       Timselstat    timselvar          Time selection variance
-      Timselstat    timselvar1         Time selection variance [Normalize by
-   (n-1)] Timselstat    timselstd          Time selection standard deviation
-      Timselstat    timselstd1         Time selection standard deviation
-   [Normalize by (n-1)]
+      Timselstat    timselvar1         Time selection variance [Normalize by (n-1)]
+      Timselstat    timselstd          Time selection standard deviation
+      Timselstat    timselstd1         Time selection standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>
@@ -96,9 +95,9 @@ Timselstat(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  DateTimeList *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
+  DateTimeList dtlist;
+  dtlist.setStat(timestat_date);
+  dtlist.setCalendar(taxisInqCalendar(taxisID1));
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
@@ -143,7 +142,7 @@ Timselstat(void *process)
           nrecs = cdoStreamInqTimestep(streamID1, tsID);
           if (nrecs == 0) break;
 
-          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
+          dtlist.taxisInqTimestep(taxisID1, nsets);
 
           for (int recID = 0; recID < nrecs; recID++)
             {
@@ -273,7 +272,7 @@ Timselstat(void *process)
             }
         }
 
-      dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
+      dtlist.statTaxisDefTimestep(taxisID2, nsets);
       pstreamDefTimestep(streamID2, otsID);
 
       for (int recID = 0; recID < maxrecs; recID++)
@@ -306,8 +305,6 @@ LABEL_END:
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
   if (lvarstd) field_free(vars2, vlistID1);
-
-  dtlist_delete(dtlist);
 
   if (field.ptr) Free(field.ptr);
 

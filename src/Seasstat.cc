@@ -94,9 +94,9 @@ Seasstat(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  DateTimeList *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
+  DateTimeList dtlist;
+  dtlist.setStat(timestat_date);
+  dtlist.setCalendar(taxisInqCalendar(taxisID1));
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
@@ -117,9 +117,9 @@ Seasstat(void *process)
       bool newseas = false;
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
-          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-          int64_t vdate = dtlist_get_vdate(dtlist, nsets);
-          int vtime = dtlist_get_vtime(dtlist, nsets);
+          dtlist.taxisInqTimestep(taxisID1, nsets);
+          int64_t vdate = dtlist.getVdate(nsets);
+          int vtime = dtlist.getVtime(nsets);
 
           cdiDecodeDate(vdate, &year, &month, &day);
 
@@ -287,7 +287,7 @@ Seasstat(void *process)
                    vdatestr1, vtimestr1, nsets);
         }
 
-      dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
+      dtlist.statTaxisDefTimestep(taxisID2, nsets);
       pstreamDefTimestep(streamID2, otsID);
 
       if (nsets < 3)
@@ -316,8 +316,6 @@ Seasstat(void *process)
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
   if (lvarstd) field_free(vars2, vlistID1);
-
-  dtlist_delete(dtlist);
 
   if (field.ptr) Free(field.ptr);
 

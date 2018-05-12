@@ -250,9 +250,9 @@ void *Timstat(void *argument)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  DateTimeList *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
+  DateTimeList dtlist;
+  dtlist.setStat(timestat_date);
+  dtlist.setCalendar(taxisInqCalendar(taxisID1));
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
@@ -280,9 +280,9 @@ void *Timstat(void *argument)
       int nsets = 0;
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
-          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-          int64_t vdate = dtlist_get_vdate(dtlist, nsets);
-          int vtime = dtlist_get_vtime(dtlist, nsets);
+          dtlist.taxisInqTimestep(taxisID1, nsets);
+          int64_t vdate = dtlist.getVdate(nsets);
+          int vtime = dtlist.getVtime(nsets);
 
           if (nsets == 0) SET_DATE(indate2, vdate, vtime);
           SET_DATE(indate1, vdate, vtime);
@@ -476,12 +476,12 @@ void *Timstat(void *argument)
               }
           }
 
-      dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
+      dtlist.statTaxisDefTimestep(taxisID2, nsets);
       pstreamDefTimestep(streamID2, otsID);
 
       if (cdoDiag)
         {
-          dtlist_stat_taxisDefTimestep(dtlist, taxisID3, nsets);
+          dtlist.statTaxisDefTimestep(taxisID3, nsets);
           pstreamDefTimestep(streamID3, otsID);
         }
 
@@ -520,8 +520,6 @@ void *Timstat(void *argument)
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
   if (lvarstd || lrange || lminidx || lmaxidx) field_free(vars2, vlistID1);
-
-  dtlist_delete(dtlist);
 
   if (cdoDiag) pstreamClose(streamID3);
   pstreamClose(streamID2);
