@@ -34,7 +34,7 @@ struct juldate_t
   int secofday;
 };
 
-struct cdo_datetime_t
+struct CdoDateTime
 {
   int64_t date;
   int time;
@@ -42,9 +42,9 @@ struct cdo_datetime_t
 
 struct dtinfo_type
 {
-  cdo_datetime_t c;     // corrected verification time
-  cdo_datetime_t v;     // verification time
-  cdo_datetime_t b[2];  // time bounds
+  CdoDateTime c;     // corrected verification time
+  CdoDateTime v;     // verification time
+  CdoDateTime b[2];  // time bounds
 };
 
 struct dtlist_type
@@ -65,7 +65,7 @@ juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1);
 juldate_t juldate_add_seconds(int64_t seconds, juldate_t juldate);
 double juldate_to_seconds(juldate_t juldate);
 
-void datetime_avg(int dpy, int ndates, cdo_datetime_t *datetime);
+void datetime_avg(int dpy, int ndates, CdoDateTime *datetime);
 
 dtlist_type *dtlist_new(void);
 void dtlist_delete(dtlist_type *dtlist);

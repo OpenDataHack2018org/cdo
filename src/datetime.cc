@@ -319,7 +319,7 @@ dtlist_get_vtime(dtlist_type *dtlist, int tsID)
 }
 
 void
-datetime_avg(int calendar, int ndates, cdo_datetime_t *datetime)
+datetime_avg(int calendar, int ndates, CdoDateTime *datetime)
 {
   int64_t vdate;
   int vtime;

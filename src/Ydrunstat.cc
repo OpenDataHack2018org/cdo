@@ -105,7 +105,7 @@ Ydrunstat(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  cdo_datetime_t *datetime = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
+  std::vector<CdoDateTime> datetime(ndates + 1);
 
   YDAY_STATS *stats = ydstatCreate(vlistID1);
   Field ***vars1 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
@@ -164,7 +164,7 @@ Ydrunstat(void *process)
 
   while (TRUE)
     {
-      datetime_avg(dpy, ndates, datetime);
+      datetime_avg(dpy, ndates, datetime.data());
 
       int64_t vdate = datetime[ndates].date;
       int vtime = datetime[ndates].time;
@@ -276,8 +276,6 @@ Ydrunstat(void *process)
   ydstatDestroy(stats);
   Free(vars1);
   if (lvarstd) Free(vars2);
-
-  if (datetime) Free(datetime);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
