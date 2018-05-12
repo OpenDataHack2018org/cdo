@@ -1264,7 +1264,7 @@ get_global_att(hid_t file_id, const char *obj_path, int vlistID)
 static int
 get_vdate(int vlistID)
 {
-  int vdate = 0;
+  int64_t vdate = 0;
   int natts;
   int i, len, type;
   char name[CDI_MAX_NAME];
@@ -1336,7 +1336,8 @@ Importcmsaf(void *process)
   hid_t file_id; /* HDF5 File ID	        	*/
   herr_t status; /* Generic return value		*/
   datasets_t dsets;
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
   int *vtimes = NULL;
 #endif
 

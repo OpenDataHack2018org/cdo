@@ -340,6 +340,17 @@ parameter2int(const char *string)
   return ival;
 }
 
+long
+parameter2long(const char *string)
+{
+  char *endptr = NULL;
+  long ival = strtol(string, &endptr, 10);
+  if (*endptr != 0)
+    cdoAbort("Integer parameter >%s< contains invalid character at position %d!", string, (int) (endptr - string + 1));
+
+  return ival;
+}
+
 size_t
 parameter2sizet(const char *string)
 {

@@ -366,7 +366,7 @@ Seltime(void *process)
   int tsID2 = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       bool copytimestep = false;

@@ -91,16 +91,16 @@ Intyear(void *process)
       if (nrecs == 0) cdoAbort("Too few timesteps in second inputfile!");
 
       int vtime = taxisInqVtime(taxisID1);
-      int vdate1 = taxisInqVdate(taxisID1);
+      int64_t vdate1 = taxisInqVdate(taxisID1);
       int year1 = vdate1 / 10000;
-      int vdate2 = taxisInqVdate(taxisID2);
+      int64_t vdate2 = taxisInqVdate(taxisID2);
       int year2 = vdate2 / 10000;
 
       for (int iy = 0; iy < nyears; iy++)
         {
           if (iyears[iy] < year1 || iyears[iy] > year2)
             cdoAbort("Year %d out of bounds (first year %d; last year %d)!", iyears[iy], year1, year2);
-          int vdate3 = vdate1 - year1 * 10000 + iyears[iy] * 10000;
+          int64_t vdate3 = vdate1 - year1 * 10000 + iyears[iy] * 10000;
           taxisDefVdate(taxisID3, vdate3);
           taxisDefVtime(taxisID3, vtime);
           pstreamDefTimestep(streamIDs[iy], tsID);

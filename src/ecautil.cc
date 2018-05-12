@@ -467,7 +467,7 @@ updateHist(Field *field[2], int nlevels, size_t gridsize, double *yvals, int onl
 }
 
 void
-adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int ovdate, Field *startDateWithHist[2],
+adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int64_t ovdate, Field *startDateWithHist[2],
               Field *endDateWithHist[2])
 {
   int levelID, ovdateSouth;
@@ -582,7 +582,7 @@ computeGsl(int nlevels, size_t gridsize, double *yvals, double missval, Field *s
 
 void
 writeGslStream(int ostreamID, int otaxisID, int otsID, int ovarID1, int ovarID2, int ivlistID1, int first_var_id,
-               Field *gslDuration, Field *gslFirstDay, int vdate, int vtime, int nlevels)
+               Field *gslDuration, Field *gslFirstDay, int64_t vdate, int vtime, int nlevels)
 {
   (void) ivlistID1;
   (void) first_var_id;

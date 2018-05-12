@@ -72,7 +72,8 @@ Regres(void *process)
 
   for (int w = 0; w < nwork; w++) work[w] = field_calloc(vlistID1, FIELD_PTR);
 
-  int vdate = 0, vtime = 0;
+  int64_t vdate = 0;
+  int vtime = 0;
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {

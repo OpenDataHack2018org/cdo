@@ -40,8 +40,8 @@ void *
 Seasstat(void *process)
 {
   TimeStat timestat_date = TimeStat::MEAN;
-  int vdate0 = 0, vtime0 = 0;
-  int vdate1 = 0, vtime1 = 0;
+  int64_t vdate0 = 0, vdate1 = 0;
+  int vtime0 = 0, vtime1 = 0;
   int nrecs;
   int varID, levelID;
   int year, month, day, seas0 = 0;
@@ -118,7 +118,7 @@ Seasstat(void *process)
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
           dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-          int vdate = dtlist_get_vdate(dtlist, nsets);
+          int64_t vdate = dtlist_get_vdate(dtlist, nsets);
           int vtime = dtlist_get_vtime(dtlist, nsets);
 
           cdiDecodeDate(vdate, &year, &month, &day);

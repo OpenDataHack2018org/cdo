@@ -32,20 +32,21 @@
 
 typedef struct
 {
-  int vdate;
+  int64_t vdate;
   int vtime;
 } date_time_t;
 
-void set_date(int vdate_new, int vtime_new, date_time_t *datetime);
+void set_date(int64_t vdate_new, int vtime_new, date_time_t *datetime);
 
-int getmonthday(int date);
+int getmonthday(int64_t date);
 
 void *
 Yseaspctl(void *process)
 {
   int varID;
   int gridID;
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
   int year, month, day, seas;
   int nrecs;
   int levelID;

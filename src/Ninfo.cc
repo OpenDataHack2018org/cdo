@@ -85,7 +85,7 @@ Ninfo(void *process)
         if (ntsteps != 0)
           while (cdoStreamInqTimestep(streamID, tsID))
             {
-              int vdate = taxisInqVdate(taxisID);
+              int64_t vdate = taxisInqVdate(taxisID);
               cdiDecodeDate(vdate, &year, &mon, &day);
 
               if (tsID == 0 || year0 != year)
@@ -106,7 +106,7 @@ Ninfo(void *process)
         if (ntsteps != 0)
           while (cdoStreamInqTimestep(streamID, tsID))
             {
-              int vdate = taxisInqVdate(taxisID);
+              int64_t vdate = taxisInqVdate(taxisID);
               cdiDecodeDate(vdate, &year, &mon, &day);
 
               if (tsID == 0 || mon0 != mon)
@@ -127,7 +127,7 @@ Ninfo(void *process)
         if (ntsteps != 0)
           while (cdoStreamInqTimestep(streamID, tsID))
             {
-              int vdate = taxisInqVdate(taxisID);
+              int64_t vdate = taxisInqVdate(taxisID);
 
               if (tsID == 0 || date0 != vdate)
                 {

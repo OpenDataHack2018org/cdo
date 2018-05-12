@@ -396,14 +396,14 @@ Vargen(void *process)
       ntimesteps = 1;
     }
 
-  int julday = date_to_julday(CALENDAR_PROLEPTIC, 10101);
+  int64_t julday = date_to_julday(CALENDAR_PROLEPTIC, 10101);
 
   int nvars = vlistNvars(vlistID);
 
   for (int tsID = 0; tsID < ntimesteps; tsID++)
     {
       double rval = rstart + rinc * tsID;
-      int vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
+      int64_t vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
       int vtime = 0;
       taxisDefVdate(taxisID, vdate);
       taxisDefVtime(taxisID, vtime);

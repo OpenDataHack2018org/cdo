@@ -82,7 +82,7 @@ Ydayarith(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID2);
+      int64_t vdate = taxisInqVdate(taxisID2);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
@@ -119,7 +119,7 @@ Ydayarith(void *process)
   tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 

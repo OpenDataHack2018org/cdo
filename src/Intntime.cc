@@ -32,7 +32,8 @@ Intntime(void *process)
 {
   int nlevel;
   int varID, levelID;
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
   size_t gridsize;
   size_t offset;
   double *single1, *single2;
@@ -88,7 +89,7 @@ Intntime(void *process)
   int tsID = 0;
   int tsIDo = 0;
   int nrecs = cdoStreamInqTimestep(streamID1, tsID++);
-  int vdate1 = taxisInqVdate(taxisID1);
+  int64_t vdate1 = taxisInqVdate(taxisID1);
   int vtime1 = taxisInqVtime(taxisID1);
   juldate_t juldate1 = juldate_encode(calendar, vdate1, vtime1);
 
@@ -108,7 +109,7 @@ Intntime(void *process)
 
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID++)))
     {
-      int vdate2 = taxisInqVdate(taxisID1);
+      int64_t vdate2 = taxisInqVdate(taxisID1);
       int vtime2 = taxisInqVtime(taxisID1);
       juldate_t juldate2 = juldate_encode(calendar, vdate2, vtime2);
 
@@ -128,7 +129,7 @@ Intntime(void *process)
       for (int it = 1; it < numts; it++)
         {
           double seconds = it * juldate_to_seconds(juldate_sub(juldate2, juldate1)) / numts;
-          juldate_t juldate = juldate_add_seconds((int) lround(seconds), juldate1);
+          juldate_t juldate = juldate_add_seconds(lround(seconds), juldate1);
 
           juldate_decode(calendar, juldate, &vdate, &vtime);
 

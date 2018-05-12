@@ -56,7 +56,8 @@ Ymonstat(void *process)
   int levelID;
   int month_nsets[NMONTH];
   size_t nmiss;
-  int vdates[NMONTH], vtimes[NMONTH];
+  int64_t vdates[NMONTH];
+  int vtimes[NMONTH];
   int mon[NMONTH];
   int nmon = 0;
   Field **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
@@ -118,7 +119,7 @@ Ymonstat(void *process)
   int otsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);

@@ -33,7 +33,7 @@
 #define NDAY 373
 
 int
-getmonthday(int date)
+getmonthday(int64_t date)
 {
   int year, month, day;
   cdiDecodeDate(date, &year, &month, &day);
@@ -51,9 +51,10 @@ Ydrunpctl(void *process)
   size_t nmiss;
   int nlevels;
   int year, month, day, dayoy;
-  int vdate, vtime;
-  int vdates1[NDAY], vtimes1[NDAY];
-  int vdates2[NDAY] /*, vtimes2[NDAY]*/;
+  int64_t vdate;
+  int vtime;
+  int64_t vdates1[NDAY], vdates2[NDAY];
+  int vtimes1[NDAY] /*, vtimes2[NDAY]*/;
   int nsets[NDAY];
   Field **vars2[NDAY];
   HISTOGRAM_SET *hsets[NDAY];

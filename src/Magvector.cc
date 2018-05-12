@@ -402,7 +402,7 @@ Magvector(void *process)
             }
         }
 
-      int vdate = taxisInqVdate(taxisID);
+      int64_t vdate = taxisInqVdate(taxisID);
       int vtime = taxisInqVtime(taxisID);
 
       date2str(vdate, vdatestr, sizeof(vdatestr));

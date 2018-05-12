@@ -319,7 +319,7 @@ Sinfo(void *process)
             {
               if (taxisInqType(taxisID) != TAXIS_ABSOLUTE)
                 {
-                  int vdate = taxisInqRdate(taxisID);
+                  int64_t vdate = taxisInqRdate(taxisID);
                   int vtime = taxisInqRtime(taxisID);
 
                   date2str(vdate, vdatestr, sizeof(vdatestr));

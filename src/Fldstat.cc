@@ -39,7 +39,7 @@
 #include "percentiles.h"
 
 static void
-print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr, int vdate,
+print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr, int64_t vdate,
                   int vtime)
 {
   static bool showHeader = true;
@@ -205,7 +205,8 @@ Fldstat(void *process)
       pstreamDefTimestep(streamID2, tsID);
 
       /* Precompute date + time for later representation in verbose mode */
-      int vdate = 0, vtime = 0;
+      int64_t vdate = 0;
+      int vtime = 0;
       if (cdoVerbose)
         {
           if (operfunc == func_min || operfunc == func_max)

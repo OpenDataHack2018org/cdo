@@ -338,7 +338,7 @@ after_SwitchFile(struct Control *globs)
   globs->taxisID = vlistInqTaxis(globs->ivlistID);
 }
 
-static int
+static int64_t
 after_getDate(struct Date datetime)
 {
   return cdiEncodeDate(datetime.yr, datetime.mo, datetime.dy);
@@ -351,7 +351,7 @@ after_getTime(struct Date datetime)
 }
 
 static void
-after_setDateTime(struct Date *datetime, int date, int time)
+after_setDateTime(struct Date *datetime, int64_t date, int time)
 {
   int sec;
   cdiDecodeDate(date, &datetime->yr, &datetime->mo, &datetime->dy);
@@ -413,7 +413,7 @@ after_setNextDate(struct Control *globs)
         }
       if (nrecs == 0) break;
 
-      int vdate = taxisInqVdate(globs->taxisID);
+      int64_t vdate = taxisInqVdate(globs->taxisID);
       int vtime = taxisInqVtime(globs->taxisID);
       after_setDateTime(&globs->NextDate, vdate, vtime);
 
@@ -525,7 +525,7 @@ static void
 after_defineNextTimestep(struct Control *globs)
 {
   static int otsID = 0;
-  int vdate = after_getDate(globs->OldDate);
+  int64_t vdate = after_getDate(globs->OldDate);
   int vtime = after_getTime(globs->OldDate);
   taxisDefVdate(globs->taxisID2, vdate);
   taxisDefVtime(globs->taxisID2, vtime);
@@ -672,8 +672,8 @@ after_control(struct Control *globs, struct Variable *vars)
 {
   int i;
   int nrecs;
-  int rdate, rtime;
-  int vdate, vtime;
+  int64_t rdate, vdate;
+  int rtime, vtime;
   int code;
   RARG rarg;
   void *statusp = NULL;

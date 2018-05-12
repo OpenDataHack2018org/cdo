@@ -32,7 +32,7 @@
 #define MAX_HOUR 9301 /* 31*12*25 + 1 */
 
 static int
-hour_of_year(int vdate, int vtime)
+hour_of_year(int64_t vdate, int vtime)
 {
   int year, month, day, houroy;
   int hour, minute, second;
@@ -106,7 +106,7 @@ Yhourarith(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID2);
+      int64_t vdate = taxisInqVdate(taxisID2);
       int vtime = taxisInqVtime(taxisID2);
 
       int houroy = hour_of_year(vdate, vtime);
@@ -138,7 +138,7 @@ Yhourarith(void *process)
   tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       int houroy = hour_of_year(vdate, vtime);

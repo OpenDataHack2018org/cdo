@@ -38,7 +38,8 @@ Timstat3(void *process)
 {
   int streamID[NIN];
   int vlistID[NIN], vlistID2 = -1;
-  int vdate = 0, vtime = 0;
+  int64_t vdate = 0;
+  int vtime = 0;
   int nlevs;
   int is;
   int varID, levelID, gridID;

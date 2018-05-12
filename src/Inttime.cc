@@ -35,12 +35,12 @@ Inttime(void *process)
   int streamID2 = -1;
   int nlevel;
   int varID, levelID;
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
   size_t gridsize;
   size_t offset;
   int incperiod = 0, incunit = 3600, tunit = TUNIT_HOUR;
   int year, month, day, hour, minute, second;
-  char *rstr;
   double *single1, *single2;
   double *vardatap;
 
@@ -62,8 +62,7 @@ Inttime(void *process)
     }
   else
     {
-      vdate = (int) strtol(datestr, &rstr, 10);
-      if (*rstr != 0) cdoAbort("Parameter string contains invalid characters: %s", datestr);
+      vdate = parameter2long(datestr);
     }
 
   if (strchr(timestr, ':'))
@@ -76,8 +75,7 @@ Inttime(void *process)
     }
   else
     {
-      vtime = (int) strtol(timestr, &rstr, 10);
-      if (*rstr != 0) cdoAbort("Parameter string contains invalid characters: %s", timestr);
+      vtime = parameter2int(timestr);
     }
 
   if (operatorArgc() == 3)
@@ -90,7 +88,7 @@ Inttime(void *process)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
     }
   /* increment in seconds */
-  int ijulinc = incperiod * incunit;
+  int64_t ijulinc = (int64_t)incperiod * incunit;
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -133,9 +131,9 @@ Inttime(void *process)
 
   if (cdoVerbose)
     {
-      cdoPrint("date %d  time %d", vdate, vtime);
+      cdoPrint("date %ld  time %d", vdate, vtime);
       cdoPrint("juldate  = %f", juldate_to_seconds(juldate));
-      cdoPrint("ijulinc = %d", ijulinc);
+      cdoPrint("ijulinc = %lld", ijulinc);
     }
 
   int tsID = 0;
@@ -152,11 +150,11 @@ Inttime(void *process)
 
   if (cdoVerbose)
     {
-      cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+      cdoPrint("date %ld  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
       cdoPrint("juldate1  = %f", juldate_to_seconds(juldate1));
     }
 
-  if (juldate_to_seconds(juldate1) > juldate_to_seconds(juldate)) cdoWarning("start time %d %d out of range!", vdate, vtime);
+  if (juldate_to_seconds(juldate1) > juldate_to_seconds(juldate)) cdoWarning("start time %ld %d out of range!", vdate, vtime);
 
   int tsIDo = 0;
   while (juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate))
@@ -167,7 +165,7 @@ Inttime(void *process)
       juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
       if (cdoVerbose)
         {
-          cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+          cdoPrint("date %ld  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
           cdoPrint("juldate2  = %f", juldate_to_seconds(juldate2));
         }
 
@@ -269,7 +267,7 @@ Inttime(void *process)
 
               cdiDecodeDate(vdate, &year, &month, &day);
 
-              month += ijulinc;
+              month += (int)ijulinc;
 
               while (month > 12)
                 {

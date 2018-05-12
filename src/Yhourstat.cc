@@ -38,7 +38,7 @@
 #define MAX_HOUR 9301 /* 31*12*25 + 1 */
 
 static int
-hour_of_year(int vdate, int vtime)
+hour_of_year(int64_t vdate, int vtime)
 {
   int year, month, day, houroy;
   int hour, minute, second;
@@ -70,7 +70,8 @@ Yhourstat(void *process)
   int levelID;
   int houroy_nsets[MAX_HOUR];
   size_t nmiss;
-  int vdates[MAX_HOUR], vtimes[MAX_HOUR];
+  int64_t vdates[MAX_HOUR];
+  int vtimes[MAX_HOUR];
   Field **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
 
   cdoInitialize(process);
@@ -131,7 +132,7 @@ Yhourstat(void *process)
   int otsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);

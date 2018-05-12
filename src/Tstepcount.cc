@@ -53,7 +53,8 @@ Tstepcount(void *process)
   int gridID, varID, levelID;
   int nalloc = 0;
   size_t nmiss;
-  int vdate = 0, vtime = 0;
+  int64_t vdate = 0;
+  int vtime = 0;
   double refval = 0;
   typedef struct
   {

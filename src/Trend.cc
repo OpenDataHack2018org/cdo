@@ -29,7 +29,8 @@
 void *
 Trend(void *process)
 {
-  int vdate = 0, vtime = 0;
+  int64_t vdate = 0;
+  int vtime = 0;
   int varID, levelID;
   size_t nmiss;
   int nrecs;

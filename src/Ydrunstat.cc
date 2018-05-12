@@ -40,7 +40,7 @@
 
 typedef struct
 {
-  int vdate[NDAY];
+  int64_t vdate[NDAY];
   int vtime[NDAY];
   Field **vars1[NDAY];
   Field **vars2[NDAY];
@@ -50,7 +50,7 @@ typedef struct
 
 static YDAY_STATS *ydstatCreate(int vlistID);
 static void ydstatDestroy(YDAY_STATS *stats);
-static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, Field **vars1, Field **vars2, int nsets,
+static void ydstatUpdate(YDAY_STATS *stats, int64_t vdate, int vtime, Field **vars1, Field **vars2, int nsets,
                          int operfunc);
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
@@ -166,7 +166,7 @@ Ydrunstat(void *process)
     {
       datetime_avg(dpy, ndates, datetime);
 
-      int vdate = datetime[ndates].date;
+      int64_t vdate = datetime[ndates].date;
       int vtime = datetime[ndates].time;
 
       if (lvarstd)
@@ -343,7 +343,7 @@ ydstatDestroy(YDAY_STATS *stats)
 }
 
 static void
-ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, Field **vars1, Field **vars2, int nsets, int operfunc)
+ydstatUpdate(YDAY_STATS *stats, int64_t vdate, int vtime, Field **vars1, Field **vars2, int nsets, int operfunc)
 {
   int varID, levelID, nlevels;
   size_t gridsize;

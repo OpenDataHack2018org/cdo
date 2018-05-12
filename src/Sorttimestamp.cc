@@ -125,7 +125,7 @@ Sorttimestamp(void *process)
   for (tsID = 0; tsID < nts; tsID++)
     {
       int calendar = taxisInqCalendar(taxisID2);
-      int julday = date_to_julday(calendar, vdate[tsID]);
+      int64_t julday = date_to_julday(calendar, vdate[tsID]);
       int secofday = time_to_sec(vtime[tsID]);
       double vdatetime = julday + secofday / 86400.;
       timeinfo[tsID].index = tsID;

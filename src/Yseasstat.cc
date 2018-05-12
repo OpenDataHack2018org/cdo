@@ -39,12 +39,12 @@
 
 typedef struct
 {
-  int vdate;
+  int64_t vdate;
   int vtime;
 } date_time_t;
 
 void
-set_date(int vdate_new, int vtime_new, date_time_t *datetime)
+set_date(int64_t vdate_new, int vtime_new, date_time_t *datetime)
 {
   int year, month, day;
   cdiDecodeDate(vdate_new, &year, &month, &day);
@@ -129,7 +129,7 @@ Yseasstat(void *process)
   int otsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
       cdiDecodeDate(vdate, &year, &month, &day);
 

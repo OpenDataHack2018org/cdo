@@ -159,8 +159,8 @@ XTimstat(void *process)
     YEAR_LEN = 10
   };
   TimeStat timestat_date = TimeStat::MEAN;
-  int vdate = 0, vtime = 0;
-  int vdate0 = 0, vtime0 = 0;
+  int64_t vdate = 0, vdate0 = 0;
+  int vtime = 0, vtime0 = 0;
   int varID;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;

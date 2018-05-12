@@ -20,7 +20,7 @@
 #include "calendar.h"
 
 juldate_t
-juldate_encode(int calendar, int date, int time)
+juldate_encode(int calendar, int64_t date, int time)
 {
   int year, month, day, hour, minute, second;
   juldate_t juldate;
@@ -34,7 +34,7 @@ juldate_encode(int calendar, int date, int time)
 }
 
 void
-juldate_decode(int calendar, juldate_t juldate, int *date, int *time)
+juldate_decode(int calendar, juldate_t juldate, int64_t *date, int *time)
 {
   int year, month, day, hour, minute, second;
 
@@ -55,7 +55,7 @@ juldate_sub(juldate_t juldate2, juldate_t juldate1)
 }
 
 juldate_t
-juldate_add_seconds(int seconds, juldate_t juldate)
+juldate_add_seconds(int64_t seconds, juldate_t juldate)
 {
   juldate_t juldate_new = juldate;
 
@@ -67,7 +67,5 @@ juldate_add_seconds(int seconds, juldate_t juldate)
 double
 juldate_to_seconds(juldate_t juldate)
 {
-  double seconds = juldate.julday * 86400. + juldate.secofday;
-
-  return seconds;
+  return juldate.julday * 86400. + juldate.secofday;;
 }

@@ -147,7 +147,8 @@ timstatAddOperators(void)
 void *Timstat(void *argument)
 {
   TimeStat timestat_date = TimeStat::MEAN;
-  int vdate0 = 0, vtime0 = 0;
+  int64_t vdate0 = 0;
+  int vtime0 = 0;
   int nrecs;
   int varID, levelID;
   int streamID3 = -1;
@@ -280,7 +281,7 @@ void *Timstat(void *argument)
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
           dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-          int vdate = dtlist_get_vdate(dtlist, nsets);
+          int64_t vdate = dtlist_get_vdate(dtlist, nsets);
           int vtime = dtlist_get_vtime(dtlist, nsets);
 
           if (nsets == 0) SET_DATE(indate2, vdate, vtime);

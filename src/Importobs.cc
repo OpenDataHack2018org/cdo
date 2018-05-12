@@ -132,7 +132,7 @@ Importobs(void *process)
       exit(EXIT_FAILURE);
     }
 
-  int vdate = getDate(cdoGetStreamName(0).c_str());
+  int64_t vdate = getDate(cdoGetStreamName(0).c_str());
   if (vdate <= 999999) vdate = vdate * 100 + 1;
 
   int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -150,7 +150,7 @@ Importobs(void *process)
 
   pstreamDefVlist(streamID, vlistID);
 
-  int vdate0 = 0;
+  int64_t vdate0 = 0;
   int vtime0 = 0;
   // ntime = 0;
   int tsID = 0;
@@ -158,7 +158,7 @@ Importobs(void *process)
     {
       sscanf(line, "%s %s %s %g %g %g %d %g %g %g", dummy, station, datetime, &lat, &lon, &height1, &code, &pressure, &height2,
              &value);
-      sscanf(datetime, "%d_%d", &vdate, &vtime);
+      sscanf(datetime, "%lld_%d", &vdate, &vtime);
 
       if (vdate != vdate0 || vtime != vtime0)
         {
@@ -213,9 +213,7 @@ Importobs(void *process)
         }
 
       /*
-        printf("%s %d %d %g %g %g %d %g %g %g\n",
-        station, vdate, vtime, lat, lon, height1, code, pressure, height2,
-        value);
+        printf("%s %d %d %g %g %g %d %g %g %g\n", station, vdate, vtime, lat, lon, height1, code, pressure, height2, value);
       */
     }
 

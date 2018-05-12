@@ -77,7 +77,8 @@ Ydaystat(void *process)
   int nrecs;
   int dayoy_nsets[MAX_DOY];
   size_t nmiss;
-  int vdates[MAX_DOY], vtimes[MAX_DOY];
+  int64_t vdates[MAX_DOY];
+  int vtimes[MAX_DOY];
   Field **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
   cdoInitialize(process);
@@ -140,7 +141,7 @@ Ydaystat(void *process)
   int otsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);

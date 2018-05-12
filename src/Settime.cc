@@ -117,9 +117,9 @@ get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
 }
 
 static void
-shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
+shifttime(int calendar, int tunit, int64_t ijulinc, int64_t *pdate, int *ptime)
 {
-  int vdate = *pdate;
+  int64_t vdate = *pdate;
   int vtime = *ptime;
 
   if (tunit == TUNIT_MONTH || tunit == TUNIT_YEAR)
@@ -127,7 +127,7 @@ shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
       int year, month, day;
       cdiDecodeDate(vdate, &year, &month, &day);
 
-      month += ijulinc;
+      month += (int)ijulinc;
 
       while (month > 12)
         {
@@ -155,12 +155,12 @@ shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
       *ptime = vtime;
 
       if (cdoVerbose)
-        cdoPrint("juldate, ijulinc, vdate, vtime: %g %d %d %d", juldate_to_seconds(juldate), ijulinc, vdate, vtime);
+        cdoPrint("juldate, ijulinc, vdate, vtime: %g %lld %lld %d", juldate_to_seconds(juldate), ijulinc, vdate, vtime);
     }
 }
 
 static void
-gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, int *vdateb, int *vtimeb)
+time_gen_bounds(int calendar, int tunit, int incperiod, int64_t vdate, int vtime, int64_t *vdateb, int *vtimeb)
 {
   juldate_t juldate;
 
@@ -227,14 +227,17 @@ gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, int *vd
 void *
 Settime(void *process)
 {
-  int nrecs, newval = 0;
+  int nrecs;
+  int64_t newval = 0;
   int varID, levelID;
-  int vdateb[2], vtimeb[2];
+  int64_t vdateb[2];
+  int vtimeb[2];
   int sdate = 0, stime = 0;
   int taxisID2 = CDI_UNDEFID;
   size_t nmiss;
   int tunit = TUNIT_DAY;
-  int ijulinc = 0, incperiod = 1, incunit = 86400;
+  int64_t ijulinc = 0;
+  int incperiod = 1, incunit = 86400;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   int day0;
   bool copy_timestep = false;
@@ -310,7 +313,7 @@ Settime(void *process)
         }
 
       /* increment in seconds */
-      ijulinc = incperiod * incunit;
+      ijulinc = (int64_t)incperiod * incunit;
     }
   else if (operatorID == SETDATE)
     {
@@ -323,7 +326,7 @@ Settime(void *process)
         }
       else
         {
-          newval = parameter2int(datestr);
+          newval = parameter2long(datestr);
         }
     }
   else if (operatorID == SETTIME)
@@ -352,7 +355,7 @@ Settime(void *process)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       /* increment in seconds */
-      ijulinc = incperiod * incunit;
+      ijulinc = (int64_t)incperiod * incunit;
     }
   else if (operatorID == SETTUNITS || operatorID == SETTBOUNDS)
     {
@@ -367,9 +370,7 @@ Settime(void *process)
       if (operatorID == SETTBOUNDS
           && !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS
                || tunit == TUNIT_DAY || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR))
-        cdoAbort("Unsupported frequency %s! Use hour, 3hours, 6hours, day, "
-                 "month or year.",
-                 timeunits);
+        cdoAbort("Unsupported frequency %s! Use hour, 3hours, 6hours, day, month or year.", timeunits);
     }
   else if (operatorID == SETCALENDAR)
     {
@@ -378,28 +379,19 @@ Settime(void *process)
       strtolower(cname);
       size_t len = strlen(cname);
       if (len < 3) len = 7;
-      if (strcmp(cname, "standard") == 0)
-        newcalendar = CALENDAR_STANDARD;
-      else if (strcmp(cname, "gregorian") == 0)
-        newcalendar = CALENDAR_GREGORIAN;
-      else if (strcmp(cname, "proleptic") == 0)
-        newcalendar = CALENDAR_PROLEPTIC;
-      else if (strcmp(cname, "proleptic_gregorian") == 0)
-        newcalendar = CALENDAR_PROLEPTIC;
-      else if (strncmp(cname, "360days", len) == 0)
-        newcalendar = CALENDAR_360DAYS;
-      else if (strncmp(cname, "360_day", len) == 0)
-        newcalendar = CALENDAR_360DAYS;
-      else if (strncmp(cname, "365days", len) == 0)
-        newcalendar = CALENDAR_365DAYS;
-      else if (strncmp(cname, "365_day", len) == 0)
-        newcalendar = CALENDAR_365DAYS;
-      else if (strncmp(cname, "366days", len) == 0)
-        newcalendar = CALENDAR_366DAYS;
-      else if (strncmp(cname, "366_day", len) == 0)
-        newcalendar = CALENDAR_366DAYS;
-      else
-        cdoAbort("Calendar >%s< unsupported! Available %s", cname, cdoOperatorEnter(operatorID));
+      // clang-format off
+      if      (strcmp(cname, "standard") == 0) newcalendar = CALENDAR_STANDARD;
+      else if (strcmp(cname, "gregorian") == 0) newcalendar = CALENDAR_GREGORIAN;
+      else if (strcmp(cname, "proleptic") == 0) newcalendar = CALENDAR_PROLEPTIC;
+      else if (strcmp(cname, "proleptic_gregorian") == 0) newcalendar = CALENDAR_PROLEPTIC;
+      else if (strncmp(cname, "360days", len) == 0) newcalendar = CALENDAR_360DAYS;
+      else if (strncmp(cname, "360_day", len) == 0) newcalendar = CALENDAR_360DAYS;
+      else if (strncmp(cname, "365days", len) == 0) newcalendar = CALENDAR_365DAYS;
+      else if (strncmp(cname, "365_day", len) == 0) newcalendar = CALENDAR_365DAYS;
+      else if (strncmp(cname, "366days", len) == 0) newcalendar = CALENDAR_366DAYS;
+      else if (strncmp(cname, "366_day", len) == 0) newcalendar = CALENDAR_366DAYS;
+      else cdoAbort("Calendar >%s< unsupported! Available %s", cname, cdoOperatorEnter(operatorID));
+      // clang-format on
     }
   else
     {
@@ -524,7 +516,7 @@ Settime(void *process)
   int tsID1 = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
     {
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       if (operatorID == SETTAXIS)
@@ -539,7 +531,7 @@ Settime(void *process)
                 }
               else
                 {
-                  month += ijulinc;
+                  month += (int)ijulinc;
 
                   while (month > 12)
                     {
@@ -565,14 +557,14 @@ Settime(void *process)
         }
       else if (operatorID == SETTBOUNDS)
         {
-          gen_bounds(calendar, tunit, incperiod, vdate, vtime, vdateb, vtimeb);
+          time_gen_bounds(calendar, tunit, incperiod, vdate, vtime, vdateb, vtimeb);
 
           if (CDO_CMOR_Mode)
             {
               juldate_t juldate1 = juldate_encode(calendar, vdateb[0], vtimeb[0]);
               juldate_t juldate2 = juldate_encode(calendar, vdateb[1], vtimeb[1]);
               double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-              juldate_t juldatem = juldate_add_seconds((int) lround(seconds), juldate1);
+              juldate_t juldatem = juldate_add_seconds(lround(seconds), juldate1);
               juldate_decode(calendar, juldatem, &vdate, &vtime);
             }
         }

@@ -122,9 +122,9 @@ Seaspctl(void *process)
         cdoAbort("Number of records at time step %d of %s and %s differ!", otsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
-      int vdate2 = taxisInqVdate(taxisID2);
+      int64_t vdate2 = taxisInqVdate(taxisID2);
       int vtime2 = taxisInqVtime(taxisID2);
-      int vdate3 = taxisInqVdate(taxisID3);
+      int64_t vdate3 = taxisInqVdate(taxisID3);
       int vtime3 = taxisInqVtime(taxisID3);
       if (vdate2 != vdate3 || vtime2 != vtime3)
         cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID + 1, cdoGetStreamName(1).c_str(),
@@ -153,7 +153,7 @@ Seaspctl(void *process)
       while (nrecs && (nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
           dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-          int vdate1 = dtlist_get_vdate(dtlist, nsets);
+          int64_t vdate1 = dtlist_get_vdate(dtlist, nsets);
 
           cdiDecodeDate(vdate1, &year, &month, &day);
 

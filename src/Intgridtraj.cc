@@ -51,7 +51,8 @@ void *
 Intgridtraj(void *process)
 {
   int varID, levelID;
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
   size_t nmiss;
   double point;
   double xpos, ypos;

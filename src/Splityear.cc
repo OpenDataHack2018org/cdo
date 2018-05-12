@@ -125,7 +125,7 @@ Splityear(void *process)
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      int vdate = taxisInqVdate(taxisID1);
+      int64_t vdate = taxisInqVdate(taxisID1);
       cdiDecodeDate(vdate, &year2, &mon2, &day);
 
       if (operatorID == SPLITYEAR)

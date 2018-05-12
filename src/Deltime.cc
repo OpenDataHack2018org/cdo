@@ -26,7 +26,7 @@ Deltime(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int vdate /*, vtime */;
+  int64_t vdate;
   int copytimestep;
   size_t gridsize;
   size_t nmiss;

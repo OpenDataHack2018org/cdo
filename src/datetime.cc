@@ -141,7 +141,7 @@ dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
         {
           int calendar = dtlist->calendar;
 
-          int vdate = dtlist->dtinfo[tsID].b[0].date;
+          int64_t vdate = dtlist->dtinfo[tsID].b[0].date;
           int vtime = dtlist->dtinfo[tsID].b[0].time;
           juldate_t juldate1 = juldate_encode(calendar, vdate, vtime);
 
@@ -188,7 +188,8 @@ dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 void
 dtlist_mean(dtlist_type *dtlist, int nsteps)
 {
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
 
   if (nsteps % 2 == 0)
     {
@@ -211,7 +212,7 @@ dtlist_mean(dtlist_type *dtlist, int nsteps)
           seconds += juldate_to_seconds(juldate_sub(juldate, juldate0));
         }
 
-      juldate = juldate_add_seconds((int) lround(seconds / nsteps), juldate0);
+      juldate = juldate_add_seconds(lround(seconds / nsteps), juldate0);
       juldate_decode(calendar, juldate, &vdate, &vtime);
 #else
       vdate = dtlist->dtinfo[nsteps / 2 - 1].v.date;
@@ -223,7 +224,7 @@ dtlist_mean(dtlist_type *dtlist, int nsteps)
       juldate_t juldate2 = juldate_encode(calendar, vdate, vtime);
 
       double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-      juldate_t juldatem = juldate_add_seconds((int) lround(seconds), juldate1);
+      juldate_t juldatem = juldate_add_seconds(lround(seconds), juldate1);
       juldate_decode(calendar, juldatem, &vdate, &vtime);
 #endif
     }
@@ -240,11 +241,8 @@ dtlist_mean(dtlist_type *dtlist, int nsteps)
 void
 dtlist_midhigh(dtlist_type *dtlist, int nsteps)
 {
-  int vdate = dtlist->dtinfo[nsteps / 2].v.date;
-  int vtime = dtlist->dtinfo[nsteps / 2].v.time;
-
-  dtlist->timestat.v.date = vdate;
-  dtlist->timestat.v.time = vtime;
+  dtlist->timestat.v.date = dtlist->dtinfo[nsteps / 2].v.date;
+  dtlist->timestat.v.time = dtlist->dtinfo[nsteps / 2].v.time;
 }
 
 void
@@ -304,7 +302,7 @@ dtlist_set_calendar(dtlist_type *dtlist, int calendar)
   dtlist->calendar = calendar;
 }
 
-int
+int64_t
 dtlist_get_vdate(dtlist_type *dtlist, int tsID)
 {
   if (tsID < 0 || (size_t) tsID >= dtlist->size) cdoAbort("Internal error; tsID out of bounds!");
@@ -323,7 +321,8 @@ dtlist_get_vtime(dtlist_type *dtlist, int tsID)
 void
 datetime_avg(int calendar, int ndates, cdo_datetime_t *datetime)
 {
-  int vdate, vtime;
+  int64_t vdate;
+  int vtime;
 
   if (ndates % 2 == 0)
     {
@@ -336,7 +335,7 @@ datetime_avg(int calendar, int ndates, cdo_datetime_t *datetime)
       juldate_t juldate2 = juldate_encode(calendar, vdate, vtime);
 
       double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-      juldate_t juldatem = juldate_add_seconds((int) lround(seconds), juldate1);
+      juldate_t juldatem = juldate_add_seconds(lround(seconds), juldate1);
       juldate_decode(calendar, juldatem, &vdate, &vtime);
     }
   else

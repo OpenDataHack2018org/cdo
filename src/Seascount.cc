@@ -29,7 +29,8 @@
 void *
 Seascount(void *process)
 {
-  int vdate0 = 0, vtime0 = 0;
+  int64_t vdate0 = 0;
+  int vtime0 = 0;
   int nrecs;
   int varID, levelID;
   size_t nmiss;
@@ -74,7 +75,7 @@ Seascount(void *process)
       bool newseas = false;
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
-          int vdate = taxisInqVdate(taxisID1);
+          int64_t vdate = taxisInqVdate(taxisID1);
           int vtime = taxisInqVtime(taxisID1);
           cdiDecodeDate(vdate, &year, &month, &day);
 

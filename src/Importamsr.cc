@@ -188,7 +188,7 @@ Importamsr(void *process)
   size_t fsize = (size_t) ftell(fp);
   fseek(fp, 0L, SEEK_SET);
 
-  int vdate = getDate(cdoGetStreamName(0).c_str());
+  int64_t vdate = getDate(cdoGetStreamName(0).c_str());
   if (vdate <= 999999) vdate = vdate * 100 + 1;
 
   int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());

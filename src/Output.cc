@@ -194,7 +194,7 @@ Output(void *process)
       int taxisID = vlistInqTaxis(vlistID);
       while ((nrecs = cdoStreamInqTimestep(streamID, tsID)))
         {
-          int vdate = taxisInqVdate(taxisID);
+          int64_t vdate = taxisInqVdate(taxisID);
           int vtime = taxisInqVtime(taxisID);
           date2str(vdate, vdatestr, sizeof(vdatestr));
           time2str(vtime, vtimestr, sizeof(vtimestr));
@@ -227,9 +227,9 @@ Output(void *process)
               pstreamReadRecord(streamID, array, &nmiss);
 
               if (operatorID == OUTPUTSRV)
-                fprintf(stdout, "%4d %8g %8d %4d %8zu %8zu %d %d\n", code, level, vdate, vtime, nlon, nlat, 0, 0);
+                fprintf(stdout, "%4d %8g %8lld %4d %8zu %8zu %d %d\n", code, level, vdate, vtime, nlon, nlat, 0, 0);
 
-              if (operatorID == OUTPUTEXT) fprintf(stdout, "%8d %4d %8g %8zu\n", vdate, code, level, gridsize);
+              if (operatorID == OUTPUTEXT) fprintf(stdout, "%8lld %4d %8g %8zu\n", vdate, code, level, gridsize);
 
               if (operatorID == OUTPUTINT)
                 {
