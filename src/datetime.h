@@ -50,16 +50,55 @@ struct DateTimeInfo
 class DateTimeList
 {
  public:
-  DateTimeList();
-  ~DateTimeList();
-  void setStat(TimeStat stat);
-  void setCalendar(int calendar);
-  int64_t getVdate(int tsID);
-  int getVtime(int tsID);
+  void init();
+
+  DateTimeList()
+    {
+      nalloc = 0;
+      size = 0;
+      calendar = -1;
+      has_bounds = -1;
+      stat = TimeStat::LAST;
+
+      init();
+    }
+
+  ~DateTimeList()
+    {
+    }
+
+  void setStat(TimeStat stat)
+  {
+    this->stat = stat;
+  }
+
+  void setCalendar(int calendar)
+  {
+    this->calendar = calendar;
+  }
+
+  int64_t getVdate(int tsID)
+  {
+    if (tsID < 0 || (size_t) tsID >= this->size) cdoAbort("Internal error; tsID out of bounds!");
+  
+    return this->dtinfo[tsID].c.date;
+  }
+
+  int getVtime(int tsID)
+  {
+    if (tsID < 0 || (size_t) tsID >= this->size) cdoAbort("Internal error; tsID out of bounds!");
+    
+    return this->dtinfo[tsID].c.time;
+  }
+
+  void shift()
+  {
+    for (size_t inp = 0; inp < this->size - 1; inp++) this->dtinfo[inp] = this->dtinfo[inp + 1];
+  }
+
   void taxisInqTimestep(int taxisID, int tsID);
   void taxisDefTimestep(int taxisID, int tsID);
   void statTaxisDefTimestep(int taxisID, int nsteps);
-  void shift();
 
  private:
   size_t nalloc;

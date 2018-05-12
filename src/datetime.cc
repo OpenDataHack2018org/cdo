@@ -69,20 +69,11 @@ getTimestatDate(TimeStat *tstat_date)
     }
 }
 
-DateTimeList::DateTimeList()
+void
+DateTimeList::init()
 {
-  nalloc = 0;
-  size = 0;
-  calendar = -1;
-  has_bounds = -1;
-  stat = TimeStat::LAST;
-
   if (!dateTimeInit) getTimestatDate(&CDO_Timestat_Date);
   dateTimeInit = true;
-}
-
-DateTimeList::~DateTimeList()
-{
 }
 
 void
@@ -266,43 +257,6 @@ DateTimeList::statTaxisDefTimestep(int taxisID, int nsteps)
     taxisDefVdateBounds(taxisID, this->timestat.b[0].date, this->timestat.b[1].date);
     taxisDefVtimeBounds(taxisID, this->timestat.b[0].time, this->timestat.b[1].time);
   }
-}
-
-void
-DateTimeList::shift()
-{
-  for (size_t inp = 0; inp < this->size - 1; inp++)
-    {
-      this->dtinfo[inp] = this->dtinfo[inp + 1];
-    }
-}
-
-void
-DateTimeList::setStat(TimeStat stat)
-{
-  this->stat = stat;
-}
-
-void
-DateTimeList::setCalendar(int calendar)
-{
-  this->calendar = calendar;
-}
-
-int64_t
-DateTimeList::getVdate(int tsID)
-{
-  if (tsID < 0 || (size_t) tsID >= this->size) cdoAbort("Internal error; tsID out of bounds!");
-
-  return this->dtinfo[tsID].c.date;
-}
-
-int
-DateTimeList::getVtime(int tsID)
-{
-  if (tsID < 0 || (size_t) tsID >= this->size) cdoAbort("Internal error; tsID out of bounds!");
-
-  return this->dtinfo[tsID].c.time;
 }
 
 void
