@@ -35,7 +35,6 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-#define MAX_HOUR 9301 /* 31*12*25 + 1 */
 
 static int
 hour_of_year(int64_t vdate, int vtime)
@@ -51,13 +50,22 @@ hour_of_year(int64_t vdate, int vtime)
   else
     houroy = 0;
 
-  if (houroy < 0 || houroy >= MAX_HOUR)
-    {
-      char vdatestr[32], vtimestr[32];
-      date2str(vdate, vdatestr, sizeof(vdatestr));
-      time2str(vtime, vtimestr, sizeof(vtimestr));
-      cdoAbort("Hour of year %d out of range (%s %s)!", houroy, vdatestr, vtimestr);
-    }
+  return houroy;
+}
+
+static int
+hour_of_day(int64_t vdate, int vtime)
+{
+  int year, month, day, houroy;
+  int hour, minute, second;
+
+  cdiDecodeDate(vdate, &year, &month, &day);
+  cdiDecodeTime(vtime, &hour, &minute, &second);
+
+  if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && hour >= 0 && hour < 24)
+    houroy = hour + 1;
+  else
+    houroy = 0;
 
   return houroy;
 }
@@ -68,11 +76,7 @@ Yhourstat(void *process)
   int varID;
   int nrecs;
   int levelID;
-  int houroy_nsets[MAX_HOUR];
   size_t nmiss;
-  int64_t vdates[MAX_HOUR];
-  int vtimes[MAX_HOUR];
-  Field **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
 
   cdoInitialize(process);
 
@@ -87,9 +91,21 @@ Yhourstat(void *process)
   cdoOperatorAdd("yhourvar1",  func_var1,  0, NULL);
   cdoOperatorAdd("yhourstd",   func_std,   0, NULL);
   cdoOperatorAdd("yhourstd1",  func_std1,  0, NULL);
+  cdoOperatorAdd("dhourrange", func_range, 0, NULL);
+  cdoOperatorAdd("dhourmin",   func_min,   1, NULL);
+  cdoOperatorAdd("dhourmax",   func_max,   1, NULL);
+  cdoOperatorAdd("dhoursum",   func_sum,   1, NULL);
+  cdoOperatorAdd("dhourmean",  func_mean,  1, NULL);
+  cdoOperatorAdd("dhouravg",   func_avg,   1, NULL);
+  cdoOperatorAdd("dhourvar",   func_var,   1, NULL);
+  cdoOperatorAdd("dhourvar1",  func_var1,  1, NULL);
+  cdoOperatorAdd("dhourstd",   func_std,   1, NULL);
+  cdoOperatorAdd("dhourstd1",  func_std1,  1, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
+
+  bool ldaily  = cdoOperatorF2(operatorID) == 1;
 
   bool lrange  = operfunc == func_range;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
@@ -98,12 +114,18 @@ Yhourstat(void *process)
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
   // clang-format on
 
-  for (int houroy = 0; houroy < MAX_HOUR; ++houroy)
+  int maxHours = ldaily ? 25 : 9301; // 31*12*25 + 1
+  std::vector<int> hourot_nsets(maxHours); // hour of time
+  std::vector<int> vtimes(maxHours);
+  std::vector<int64_t> vdates(maxHours);
+  std::vector<Field **> vars1(maxHours), vars2(maxHours), samp1(maxHours);
+
+  for (int hourot = 0; hourot < maxHours; ++hourot)
     {
-      vars1[houroy] = NULL;
-      vars2[houroy] = NULL;
-      samp1[houroy] = NULL;
-      houroy_nsets[houroy] = 0;
+      vars1[hourot] = NULL;
+      vars2[hourot] = NULL;
+      samp1[hourot] = NULL;
+      hourot_nsets[hourot] = 0;
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -137,16 +159,23 @@ Yhourstat(void *process)
 
       if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
-      int houroy = hour_of_year(vdate, vtime);
-
-      vdates[houroy] = vdate;
-      vtimes[houroy] = vtime;
-
-      if (vars1[houroy] == NULL)
+      int hourot = ldaily ? hour_of_day(vdate, vtime) : hour_of_year(vdate, vtime);
+      if (hourot < 0 || hourot >= maxHours)
         {
-          vars1[houroy] = field_malloc(vlistID1, FIELD_PTR);
-          samp1[houroy] = field_malloc(vlistID1, FIELD_NONE);
-          if (lvarstd || lrange) vars2[houroy] = field_malloc(vlistID1, FIELD_PTR);
+          char vdatestr[32], vtimestr[32];
+          date2str(vdate, vdatestr, sizeof(vdatestr));
+          time2str(vtime, vtimestr, sizeof(vtimestr));
+          cdoAbort("Hour of year %d out of range (%s %s)!", hourot, vdatestr, vtimestr);
+        }
+
+      vdates[hourot] = vdate;
+      vtimes[hourot] = vtime;
+
+      if (vars1[hourot] == NULL)
+        {
+          vars1[hourot] = field_malloc(vlistID1, FIELD_PTR);
+          samp1[hourot] = field_malloc(vlistID1, FIELD_NONE);
+          if (lvarstd || lrange) vars2[hourot] = field_malloc(vlistID1, FIELD_PTR);
         }
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -160,10 +189,10 @@ Yhourstat(void *process)
               recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
-          Field *psamp1 = &samp1[houroy][varID][levelID];
-          Field *pvars1 = &vars1[houroy][varID][levelID];
-          Field *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
-          int nsets = houroy_nsets[houroy];
+          Field *psamp1 = &samp1[hourot][varID][levelID];
+          Field *pvars1 = &vars1[hourot][varID][levelID];
+          Field *pvars2 = vars2[hourot] ? &vars2[hourot][varID][levelID] : NULL;
+          int nsets = hourot_nsets[hourot];
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
@@ -220,36 +249,36 @@ Yhourstat(void *process)
             }
         }
 
-      if (houroy_nsets[houroy] == 0 && lvarstd)
+      if (hourot_nsets[hourot] == 0 && lvarstd)
         for (int recID = 0; recID < maxrecs; recID++)
           {
             if (recinfo[recID].lconst) continue;
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            Field *pvars1 = &vars1[houroy][varID][levelID];
-            Field *pvars2 = &vars2[houroy][varID][levelID];
+            Field *pvars1 = &vars1[hourot][varID][levelID];
+            Field *pvars2 = &vars2[hourot][varID][levelID];
 
             farmoq(pvars2, *pvars1);
           }
 
-      houroy_nsets[houroy]++;
+      hourot_nsets[hourot]++;
       tsID++;
     }
 
-  for (int houroy = 0; houroy < MAX_HOUR; ++houroy)
-    if (houroy_nsets[houroy])
+  for (int hourot = 0; hourot < maxHours; ++hourot)
+    if (hourot_nsets[hourot])
       {
-        int nsets = houroy_nsets[houroy];
+        int nsets = hourot_nsets[hourot];
         for (int recID = 0; recID < maxrecs; recID++)
           {
             if (recinfo[recID].lconst) continue;
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            Field *psamp1 = &samp1[houroy][varID][levelID];
-            Field *pvars1 = &vars1[houroy][varID][levelID];
-            Field *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
+            Field *psamp1 = &samp1[hourot][varID][levelID];
+            Field *pvars1 = &vars1[hourot][varID][levelID];
+            Field *pvars2 = vars2[hourot] ? &vars2[hourot][varID][levelID] : NULL;
 
             if (lmean)
               {
@@ -281,8 +310,8 @@ Yhourstat(void *process)
               }
           }
 
-        taxisDefVdate(taxisID2, vdates[houroy]);
-        taxisDefVtime(taxisID2, vtimes[houroy]);
+        taxisDefVdate(taxisID2, vdates[hourot]);
+        taxisDefVtime(taxisID2, vtimes[hourot]);
         pstreamDefTimestep(streamID2, otsID);
 
         for (int recID = 0; recID < maxrecs; recID++)
@@ -291,7 +320,7 @@ Yhourstat(void *process)
 
             int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            Field *pvars1 = &vars1[houroy][varID][levelID];
+            Field *pvars1 = &vars1[hourot][varID][levelID];
 
             pstreamDefRecord(streamID2, varID, levelID);
             pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
@@ -300,13 +329,13 @@ Yhourstat(void *process)
         otsID++;
       }
 
-  for (int houroy = 0; houroy < MAX_HOUR; ++houroy)
+  for (int hourot = 0; hourot < maxHours; ++hourot)
     {
-      if (vars1[houroy] != NULL)
+      if (vars1[hourot] != NULL)
         {
-          field_free(samp1[houroy], vlistID1);
-          field_free(vars1[houroy], vlistID1);
-          if (lvarstd) field_free(vars2[houroy], vlistID1);
+          field_free(samp1[hourot], vlistID1);
+          field_free(vars1[hourot], vlistID1);
+          if (lvarstd) field_free(vars2[hourot], vlistID1);
         }
     }
 
