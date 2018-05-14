@@ -119,10 +119,8 @@ Math(void *process)
       int nvars = vlistNvars(vlistID2);
       for (int varID = 0; varID < nvars; ++varID)
         {
-          if (vlistInqVarDatatype(vlistID2, varID) == CDI_DATATYPE_CPX32)
-            vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT32);
-          if (vlistInqVarDatatype(vlistID2, varID) == CDI_DATATYPE_CPX64)
-            vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
+          if (vlistInqVarDatatype(vlistID2, varID) == CDI_DATATYPE_CPX32) vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT32);
+          if (vlistInqVarDatatype(vlistID2, varID) == CDI_DATATYPE_CPX64) vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
         }
     }
 
@@ -169,8 +167,7 @@ Math(void *process)
                   for (i = 0; i < gridsize; i++) array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : round(array1[i]);
                   break;
                 case SQR:
-                  for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : array1[i] * array1[i];
+                  for (i = 0; i < gridsize; i++) array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : array1[i] * array1[i];
                   break;
                 case SQRT:
                   for (i = 0; i < gridsize; i++) array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : SQRTMN(array1[i]);
@@ -197,13 +194,11 @@ Math(void *process)
                   break;
                 case ASIN:
                   for (i = 0; i < gridsize; i++)
-                    array2[i]
-                        = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < -1 || array1[i] > 1 ? missval1 : asin(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < -1 || array1[i] > 1 ? missval1 : asin(array1[i]);
                   break;
                 case ACOS:
                   for (i = 0; i < gridsize; i++)
-                    array2[i]
-                        = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < -1 || array1[i] > 1 ? missval1 : acos(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < -1 || array1[i] > 1 ? missval1 : acos(array1[i]);
                   break;
                 case ATAN:
                   for (i = 0; i < gridsize; i++) array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : atan(array1[i]);
@@ -216,8 +211,7 @@ Math(void *process)
                     array2[i] = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array1[i], 0.) ? missval1 : 1 / array1[i];
                   break;
                 case NOT:
-                  for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : IS_EQUAL(array1[i], 0);
+                  for (i = 0; i < gridsize; i++) array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : IS_EQUAL(array1[i], 0);
                   break;
                 case RE:
                 case ARG:
@@ -242,8 +236,7 @@ Math(void *process)
                 case SQRT:
                   for (i = 0; i < gridsize; i++)
                     {
-                      double abs
-                          = SQRTMN(ADDMN(MULMN(array1[2 * i], array1[2 * i]), MULMN(array1[2 * i + 1], array1[2 * i + 1])));
+                      double abs = SQRTMN(ADDMN(MULMN(array1[2 * i], array1[2 * i]), MULMN(array1[2 * i + 1], array1[2 * i + 1])));
                       array2[i * 2] = MULMN(1 / sqrt(2.), SQRTMN(ADDMN(array1[i * 2], abs)));
                       array2[i * 2 + 1] = MULMN(1 / sqrt(2.), DIVMN(array1[2 * i + 1], SQRTMN(ADDMN(array1[2 * i], abs))));
                       ;

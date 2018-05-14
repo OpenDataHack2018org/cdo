@@ -176,8 +176,7 @@ Vertcum(void *process)
                 add_vars_mv(gridsize, missval, vardata1[varID][levelID - 1], vardata2[varID][levelID - 1],
                             vardata2[varID][levelID]);
               else
-                add_vars_mv(gridsize, missval, vardata1[varID][levelID], vardata2[varID][levelID - 1],
-                            vardata2[varID][levelID]);
+                add_vars_mv(gridsize, missval, vardata1[varID][levelID], vardata2[varID][levelID - 1], vardata2[varID][levelID]);
             }
 
           if (operatorID == VERTCUMHL && nlevs2 == nlevshl)

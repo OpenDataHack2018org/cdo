@@ -212,10 +212,10 @@ printLibraries(void)
   fprintf(stderr, "\n");
 }
 
-
-void cdoConfig(const char *option)
+void
+cdoConfig(const char *option)
 {
-  static const char *YN[] = {"no", "yes"};
+  static const char *YN[] = { "no", "yes" };
   const char *has_srv = YN[cdiHaveFiletype(CDI_FILETYPE_SRV)];
   const char *has_ext = YN[cdiHaveFiletype(CDI_FILETYPE_EXT)];
   const char *has_ieg = YN[cdiHaveFiletype(CDI_FILETYPE_IEG)];
@@ -257,7 +257,7 @@ void cdoConfig(const char *option)
   has_openmp = YN[1];
 #endif
 
-  if ( STR_IS_EQ("all-json", option) || STR_IS_EQ("all", option) )
+  if (STR_IS_EQ("all-json", option) || STR_IS_EQ("all", option))
     {
       fprintf(stdout, "{");
       fprintf(stdout, "\"has-srv\":\"%s\"", has_srv);
@@ -281,23 +281,40 @@ void cdoConfig(const char *option)
     }
   else
     {
-      if      ( STR_IS_EQ("has-srv", option) ) fprintf(stdout, "%s\n", has_srv);
-      else if ( STR_IS_EQ("has-ext", option) ) fprintf(stdout, "%s\n", has_ext);
-      else if ( STR_IS_EQ("has-ieg", option) ) fprintf(stdout, "%s\n", has_ieg);
-      else if ( STR_IS_EQ("has-grb", option) ) fprintf(stdout, "%s\n", has_grb);
-      else if ( STR_IS_EQ("has-grb1", option) ) fprintf(stdout, "%s\n", has_grb);
-      else if ( STR_IS_EQ("has-grb2", option) ) fprintf(stdout, "%s\n", has_grb2);
-      else if ( STR_IS_EQ("has-nc", option) ) fprintf(stdout, "%s\n", has_nc);
-      else if ( STR_IS_EQ("has-nc2", option) ) fprintf(stdout, "%s\n", has_nc2);
-      else if ( STR_IS_EQ("has-nc4", option) ) fprintf(stdout, "%s\n", has_nc4);
-      else if ( STR_IS_EQ("has-nc4c", option) ) fprintf(stdout, "%s\n", has_nc4c);
-      else if ( STR_IS_EQ("has-nc5", option) ) fprintf(stdout, "%s\n", has_nc5);
-      else if ( STR_IS_EQ("has-hdf5", option) ) fprintf(stdout, "%s\n", has_hdf5);
-      else if ( STR_IS_EQ("has-cgribex", option) ) fprintf(stdout, "%s\n", has_cgribex);
-      else if ( STR_IS_EQ("has-cmor", option) ) fprintf(stdout, "%s\n", has_cmor);
-      else if ( STR_IS_EQ("has-proj", option) ) fprintf(stdout, "%s\n", has_proj);
-      else if ( STR_IS_EQ("has-threads", option) ) fprintf(stdout, "%s\n", has_threads);
-      else if ( STR_IS_EQ("has-openmp", option) ) fprintf(stdout, "%s\n", has_openmp);
+      if (STR_IS_EQ("has-srv", option))
+        fprintf(stdout, "%s\n", has_srv);
+      else if (STR_IS_EQ("has-ext", option))
+        fprintf(stdout, "%s\n", has_ext);
+      else if (STR_IS_EQ("has-ieg", option))
+        fprintf(stdout, "%s\n", has_ieg);
+      else if (STR_IS_EQ("has-grb", option))
+        fprintf(stdout, "%s\n", has_grb);
+      else if (STR_IS_EQ("has-grb1", option))
+        fprintf(stdout, "%s\n", has_grb);
+      else if (STR_IS_EQ("has-grb2", option))
+        fprintf(stdout, "%s\n", has_grb2);
+      else if (STR_IS_EQ("has-nc", option))
+        fprintf(stdout, "%s\n", has_nc);
+      else if (STR_IS_EQ("has-nc2", option))
+        fprintf(stdout, "%s\n", has_nc2);
+      else if (STR_IS_EQ("has-nc4", option))
+        fprintf(stdout, "%s\n", has_nc4);
+      else if (STR_IS_EQ("has-nc4c", option))
+        fprintf(stdout, "%s\n", has_nc4c);
+      else if (STR_IS_EQ("has-nc5", option))
+        fprintf(stdout, "%s\n", has_nc5);
+      else if (STR_IS_EQ("has-hdf5", option))
+        fprintf(stdout, "%s\n", has_hdf5);
+      else if (STR_IS_EQ("has-cgribex", option))
+        fprintf(stdout, "%s\n", has_cgribex);
+      else if (STR_IS_EQ("has-cmor", option))
+        fprintf(stdout, "%s\n", has_cmor);
+      else if (STR_IS_EQ("has-proj", option))
+        fprintf(stdout, "%s\n", has_proj);
+      else if (STR_IS_EQ("has-threads", option))
+        fprintf(stdout, "%s\n", has_threads);
+      else if (STR_IS_EQ("has-openmp", option))
+        fprintf(stdout, "%s\n", has_openmp);
       else
         {
           fprintf(stdout, "unknown config option: %s\n", option);
@@ -321,10 +338,10 @@ void cdoConfig(const char *option)
           fprintf(stdout, "  has-proj    whether PROJ is enabled\n");
           fprintf(stdout, "  has-threads whether PTHREADS is enabled\n");
           fprintf(stdout, "  has-openmp  whether OPENMP is enabled\n");
-          
+
           exit(EXIT_FAILURE);
         }
     }
-  
+
   exit(EXIT_SUCCESS);
 }

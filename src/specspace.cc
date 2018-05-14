@@ -291,8 +291,7 @@ trans_uv2dv(SPTRANS *sptrans, int nlev, int gridID1, double *gu, double *gv, int
 }
 
 void
-trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev, int gridID1, double *sd, double *svo, int gridID2, double *gu,
-            double *gv)
+trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev, int gridID1, double *sd, double *svo, int gridID2, double *gu, double *gv)
 {
   if (gridInqType(gridID1) != GRID_SPECTRAL) Warning("unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
 

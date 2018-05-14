@@ -72,8 +72,7 @@ ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
           linep++;
           i++;
         }
-      if ((i >= 63) && (number != 0))
-        cdoAbort("Wrong value format in file %s at line %d", polyfile, (number + jumpedlines + 1));
+      if ((i >= 63) && (number != 0)) cdoAbort("Wrong value format in file %s at line %d", polyfile, (number + jumpedlines + 1));
 
       double ycoord = strtod(linep, NULL);
 
@@ -284,8 +283,7 @@ Maskbox(void *process)
       if (operatorID == MASKINDEXBOX && gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0) break;
     }
 
-  if (gridtype == GRID_GAUSSIAN_REDUCED)
-    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
+  if (gridtype == GRID_GAUSSIAN_REDUCED) cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
   if (index == ngrids) cdoAbort("No regular lon/lat grid found!");
   if (ndiffgrids > 0) cdoAbort("Too many different grids!");

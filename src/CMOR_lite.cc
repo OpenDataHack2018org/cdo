@@ -140,40 +140,34 @@ cmor_check_eval(int vlistID, int nvars, var_t *vars)
           vlistInqVarName(vlistID, varID, varname);
 
           if (n_lower_min > 0)
-            cdoWarning("Invalid value(s) detected for variable '%s': %ld "
-                       "values were lower than minimum valid value (%.4g).",
+            cdoWarning("Invalid value(s) detected for variable '%s': %ld values were lower than minimum valid value (%.4g).",
                        varname, n_lower_min, var->valid_min);
           if (n_greater_max > 0)
-            cdoWarning("Invalid value(s) detected for variable '%s': %ld "
-                       "values were greater than maximum valid value (%.4g).",
+            cdoWarning("Invalid value(s) detected for variable '%s': %ld values were greater than maximum valid value (%.4g).",
                        varname, n_greater_max, var->valid_max);
 
           if (var->check_min_mean_abs)
             {
               if (amean < .1 * var->ok_min_mean_abs)
-                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is "
-                           "lower by more than an order of magnitude than "
+                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than "
                            "minimum allowed: %.4g",
                            varname, amean, var->ok_min_mean_abs);
 
               if (amean < var->ok_min_mean_abs)
-                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is "
-                           "lower than minimum allowed: %.4g",
-                           varname, amean, var->ok_min_mean_abs);
+                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower than minimum allowed: %.4g", varname, amean,
+                           var->ok_min_mean_abs);
             }
 
           if (var->check_max_mean_abs)
             {
               if (amean > 10. * var->ok_max_mean_abs)
-                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is "
-                           "greater by more than an order of magnitude than "
+                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than "
                            "maximum allowed: %.4g",
                            varname, amean, var->ok_max_mean_abs);
 
               if (amean > var->ok_max_mean_abs)
-                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is "
-                           "greater than maximum allowed: %.4g",
-                           varname, amean, var->ok_max_mean_abs);
+                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater than maximum allowed: %.4g", varname, amean,
+                           var->ok_max_mean_abs);
             }
         }
     }
@@ -555,9 +549,8 @@ CMOR_lite(void *process)
                 }
               if (nerr)
                 {
-                  cdoWarning("Udunits: Error converting units from [%s] to "
-                             "[%s], parameter: %s",
-                             var->units_old, var->units, var->name);
+                  cdoWarning("Udunits: Error converting units from [%s] to [%s], parameter: %s", var->units_old, var->units,
+                             var->name);
                   var->changeunits = false;
                 }
             }

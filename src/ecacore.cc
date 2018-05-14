@@ -1407,8 +1407,8 @@ eca4(const ECA_REQUEST_4 *request)
                   computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay,
                              FALSE);
                   {
-                    writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration,
-                                   gslFirstDay, cdiEncodeDate(ovdate / 10000 - 1, 12, 31), ovtime, nlevels);
+                    writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration, gslFirstDay,
+                                   cdiEncodeDate(ovdate / 10000 - 1, 12, 31), ovtime, nlevels);
                     otsID++;
                   }
                 }
@@ -1430,8 +1430,8 @@ eca4(const ECA_REQUEST_4 *request)
         {
           computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay, TRUE);
           {
-            writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration, gslFirstDay,
-                           ovdate, ovtime, nlevels);
+            writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration, gslFirstDay, ovdate,
+                           ovtime, nlevels);
             otsID++;
           }
         }

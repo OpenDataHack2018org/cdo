@@ -205,8 +205,8 @@ uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2, double *pol3
   nfc = (nt + 1) * 2;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(jmm, jfc, lat, po2, po3, ful, fvl, sdl, svl, ufr, ufi, vfr, vfi, dir, dii, \
-                                                 vor, voi)
+#pragma omp parallel for default(shared) private(jmm, jfc, lat, po2, po3, ful, fvl, sdl, svl, ufr, ufi, vfr, vfi, dir, dii, vor, \
+                                                 voi)
 #endif
   for (lev = 0; lev < klev; lev++)
     {

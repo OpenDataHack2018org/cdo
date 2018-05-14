@@ -181,8 +181,7 @@ Cloudlayer(void *process)
   if (aclcacID == -1)
     {
       if (aclcac_code_found)
-        cdoAbort("Cloud cover (parameter 223) not found on pressure or hybrid "
-                 "levels!");
+        cdoAbort("Cloud cover (parameter 223) not found on pressure or hybrid levels!");
       else
         cdoAbort("Cloud cover (parameter 223) not found!");
     }

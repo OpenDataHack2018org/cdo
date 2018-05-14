@@ -274,9 +274,8 @@ interp_X(const double *restrict gt, double *pt, const double *restrict hyb_press
             {
               nl = nxl[i] * ngp + i;
               nh = nl + ngp;
-              ptl[i] = (nh >= ngp * nhlev)
-                           ? gt[nl]
-                           : gt[nl] + (pres - hyb_press[nl]) * (gt[nh] - gt[nl]) / (hyb_press[nh] - hyb_press[nl]);
+              ptl[i] = (nh >= ngp * nhlev) ? gt[nl]
+                                           : gt[nl] + (pres - hyb_press[nl]) * (gt[nh] - gt[nl]) / (hyb_press[nh] - hyb_press[nl]);
             }
         }
     }
@@ -284,8 +283,7 @@ interp_X(const double *restrict gt, double *pt, const double *restrict hyb_press
 
 void
 interp_T(const double *restrict geop, const double *restrict gt, double *pt, const double *restrict fullp,
-         const double *restrict halfp, const int *nx, const double *restrict plev, long nplev, long ngp, long nhlev,
-         double missval)
+         const double *restrict halfp, const int *nx, const double *restrict plev, long nplev, long ngp, long nhlev, double missval)
 {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(geop, gt, pt, fullp, halfp, nx, plev, nplev, ngp, nhlev, missval, Mars)
@@ -314,8 +312,8 @@ interp_T(const double *restrict geop, const double *restrict gt, double *pt, con
 #if defined(SX)
 #pragma cdir inline
 #endif
-                    ptl[i] = extra_T(pres, halfp[nhlev * ngp + i], fullp[(nhlev - 1) * ngp + i], geop[i],
-                                     gt[(nhlev - 1) * ngp + i]);
+                    ptl[i]
+                        = extra_T(pres, halfp[nhlev * ngp + i], fullp[(nhlev - 1) * ngp + i], geop[i], gt[(nhlev - 1) * ngp + i]);
                 }
               else
                 {
@@ -331,8 +329,8 @@ interp_T(const double *restrict geop, const double *restrict gt, double *pt, con
 
 void
 interp_Z(const double *restrict geop, const double *restrict gz, double *pz, const double *restrict fullp,
-         const double *restrict halfp, const int *nx, const double *restrict gt, const double *restrict plev, long nplev,
-         long ngp, long nhlev, double missval)
+         const double *restrict halfp, const int *nx, const double *restrict gt, const double *restrict plev, long nplev, long ngp,
+         long nhlev, double missval)
 {
   assert(geop != NULL);
   assert(gz != NULL);
@@ -369,8 +367,8 @@ interp_Z(const double *restrict geop, const double *restrict gz, double *pz, con
 #if defined(SX)
 #pragma cdir inline
 #endif
-                    pzl[i] = extra_Z(pres, halfp[nhlev * ngp + i], fullp[(nhlev - 1) * ngp + i], geop[i],
-                                     gt[(nhlev - 1) * ngp + i]);
+                    pzl[i]
+                        = extra_Z(pres, halfp[nhlev * ngp + i], fullp[(nhlev - 1) * ngp + i], geop[i], gt[(nhlev - 1) * ngp + i]);
                 }
               else
                 {

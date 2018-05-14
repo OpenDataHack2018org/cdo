@@ -146,9 +146,8 @@ gridDefine(griddes_t grid)
         if (grid.size == 0) grid.size = grid.xsize * grid.ysize;
 
         if (grid.xsize && grid.size != grid.xsize * grid.ysize)
-          Error("Inconsistent grid declaration: xsize*ysize!=gridsize "
-                "(xsize=%zu ysize=%zu gridsize=%zu)",
-                grid.xsize, grid.ysize, grid.size);
+          Error("Inconsistent grid declaration: xsize*ysize!=gridsize (xsize=%zu ysize=%zu gridsize=%zu)", grid.xsize, grid.ysize,
+                grid.size);
 
         // if ( grid.size < 0 || grid.size > INT_MAX ) Error("grid size (%ld)
         // out of bounds (0 - %d)!", grid.size, INT_MAX);

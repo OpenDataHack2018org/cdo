@@ -440,8 +440,7 @@ PstreamType::inqVlist()
       if (processNum == 1 && Threading::ompNumThreads == 1) timer_stop(timer_read);
 
       int nsubtypes = vlistNsubtypes(vlistID);
-      if (nsubtypes > 1)
-        cdoWarning("Subtypes are unsupported, the processing results are possibly wrong!");
+      if (nsubtypes > 1) cdoWarning("Subtypes are unsupported, the processing results are possibly wrong!");
 
       if (cdoDefaultTimeType != CDI_UNDEFID) taxisDefType(vlistInqTaxis(vlistID), cdoDefaultTimeType);
 
@@ -750,7 +749,7 @@ PstreamType::writeRecord(double *data, size_t nmiss)
       int varID = m_varID;
       if (processNum == 1 && Threading::ompNumThreads == 1) timer_start(timer_write);
 
-      if (varID < (int)m_varlist.size())
+      if (varID < (int) m_varlist.size())
         if (m_varlist[varID].check_datarange) checkDatarange(varID, data, nmiss);
 
 #ifdef HAVE_LIBPTHREAD
@@ -964,9 +963,8 @@ set_comp(int fileID, int filetype)
       streamDefCompType(fileID, Options::cdoCompType);
       streamDefCompLevel(fileID, Options::cdoCompLevel);
 
-      if (Options::cdoCompType == CDI_COMPRESS_SZIP
-          && (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2 && filetype != CDI_FILETYPE_NC4
-              && filetype != CDI_FILETYPE_NC4C))
+      if (Options::cdoCompType == CDI_COMPRESS_SZIP && (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2
+                                                        && filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C))
         cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
 
       if (Options::cdoCompType == CDI_COMPRESS_JPEG && filetype != CDI_FILETYPE_GRB2)

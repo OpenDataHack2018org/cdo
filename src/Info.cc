@@ -362,8 +362,9 @@ Info(void *process)
               if ((tsID == 0 && recID == 0) || operatorID == MAP)
                 {
                   set_text_color(stdout, BRIGHT, BLACK);
-                  fprintf(stdout, "%6d :       Date     Time   %s Gridsize    Miss :     Minimum        Mean     Maximum : ",
-                          -(indf + 1), operatorID == XINFON ? "Nlevs" : "Level");
+                  fprintf(stdout,
+                          "%6d :       Date     Time   %s Gridsize    Miss :     Minimum        Mean     Maximum : ", -(indf + 1),
+                          operatorID == XINFON ? "Nlevs" : "Level");
 
                   if (operfunc == E_NAME)
                     fprintf(stdout, "Parameter name");

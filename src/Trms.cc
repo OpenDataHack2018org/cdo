@@ -242,8 +242,7 @@ Trms(void *process)
               wstatus = gridWeights(field1.grid, field1.weight);
             }
           code = vlistInqVarCode(vlistID1, varID);
-          if (wstatus != 0 && tsID == 0 && code != oldcode)
-            cdoWarning("Using constant area weights for code %d!", oldcode = code);
+          if (wstatus != 0 && tsID == 0 && code != oldcode) cdoWarning("Using constant area weights for code %d!", oldcode = code);
 
           field1.missval = vlistInqVarMissval(vlistID1, varID);
           field2.missval = vlistInqVarMissval(vlistID2, varID);

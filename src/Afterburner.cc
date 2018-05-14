@@ -179,8 +179,7 @@ after_PostProcess(struct Control *globs)
       if (lstdout)
         {
           if (globs->OutputInterval == DAILY_INTERVAL)
-            fprintf(stdout, " Processed Day %2d  Month %2d  Year %04d", globs->OldDate.dy, globs->OldDate.mo,
-                    globs->OldDate.yr);
+            fprintf(stdout, " Processed Day %2d  Month %2d  Year %04d", globs->OldDate.dy, globs->OldDate.mo, globs->OldDate.yr);
           else if (globs->OutputInterval == MONTHLY_INTERVAL)
             fprintf(stdout, " Processed Month %2d  Year %04d", globs->OldDate.mo, globs->OldDate.yr);
           else if (globs->OutputInterval == UNLIM_INTERVAL)
@@ -493,8 +492,8 @@ after_readTimestep(void *arg)
           fprintf(stderr, "T%d", globs->Truncation);
 
           fprintf(stderr, "  Code %3d   Level%6d   %6.4d-%2.2d-%2.2d  %2.2d:%2.2d:00\n", code,
-                  (int) zaxisInqLevel(zaxisID, levelID), globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy,
-                  globs->OldDate.hr, globs->OldDate.mn);
+                  (int) zaxisInqLevel(zaxisID, levelID), globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy, globs->OldDate.hr,
+                  globs->OldDate.mn);
         }
 
       if (analysisData)
@@ -1493,8 +1492,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
         }
     }
 
-  if (globs->Truncation == 0 && globs->Latitudes == 0)
-    Error("Unsupported file structure (no spectral or Gaussian data found)!");
+  if (globs->Truncation == 0 && globs->Latitudes == 0) Error("Unsupported file structure (no spectral or Gaussian data found)!");
 
   if (globs->Truncation == 0)
     {
@@ -1537,10 +1535,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
                     {
                       if (nvct == 0)
                         {
-                          if (numlevel != 191)
-                            Warning("VCT missing for hybrid level data with %d "
-                                    "levels!",
-                                    numlevel);
+                          if (numlevel != 191) Warning("VCT missing for hybrid level data with %d levels!", numlevel);
                         }
                       else
                         {
@@ -1671,8 +1666,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
   if (globs->Debug)
     for (code = 0; code < MaxCodes; code++)
       {
-        if (vars[code].detected)
-          fprintf(stderr, " Detected Code %3d with %3d level\n", code, zaxisInqSize(vars[code].izaxisID));
+        if (vars[code].detected) fprintf(stderr, " Detected Code %3d with %3d level\n", code, zaxisInqSize(vars[code].izaxisID));
       }
 }
 
@@ -1996,9 +1990,8 @@ after_procstat(char *procpath, int truncation)
       if ((hostname = getenv("HOST")) == NULL) hostname = unknown;
 
       setvbuf(sf, (char *) NULL, _IONBF, 0);
-      fprintf(sf, "%.7s %4.4ld.%2.2ld.%2.2ld %2.2ld:%2.2ld %s "
-                  "%-9.9s %7.1f %7.1f T%3.3d %s\n",
-              name, yy, mm, dd, hh, mi, VERSION, proc, MaxMBytes, CPUTime, truncation, hostname);
+      fprintf(sf, "%.7s %4.4ld.%2.2ld.%2.2ld %2.2ld:%2.2ld %s %-9.9s %7.1f %7.1f T%3.3d %s\n", name, yy, mm, dd, hh, mi, VERSION,
+              proc, MaxMBytes, CPUTime, truncation, hostname);
 
       fclose(sf);
     }

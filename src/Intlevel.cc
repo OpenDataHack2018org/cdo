@@ -188,8 +188,8 @@ vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2, in
 }
 
 static void
-vert_gen_weights3d1d(bool expol, int nlev1, size_t gridsize, double *xlev1, int nlev2, double *lev2, int *xlev_idx1,
-                     int *xlev_idx2, double *xlev_wgt1, double *xlev_wgt2)
+vert_gen_weights3d1d(bool expol, int nlev1, size_t gridsize, double *xlev1, int nlev2, double *lev2, int *xlev_idx1, int *xlev_idx2,
+                     double *xlev_wgt1, double *xlev_wgt2)
 {
   std::vector<double> lev1(nlev1);
   std::vector<int> lev_idx1(nlev2);
@@ -512,8 +512,7 @@ Intlevel(void *process)
                 vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2, lev_wgt1,
                                   lev_wgt2);
               else
-                vert_interp_lev(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2, lev_wgt1,
-                                lev_wgt2);
+                vert_interp_lev(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
               for (levelID = 0; levelID < nlev2; levelID++)
                 {

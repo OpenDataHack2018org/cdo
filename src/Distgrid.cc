@@ -232,9 +232,7 @@ Distgrid(void *process)
     }
 
   if (index == ngrids)
-    cdoAbort("No Lon/Lat, Gaussian, curvilinear or generic grid found (%s data "
-             "unsupported)!",
-             gridNamePtr(gridtype));
+    cdoAbort("No Lon/Lat, Gaussian, curvilinear or generic grid found (%s data unsupported)!", gridNamePtr(gridtype));
 
   gridID1 = vlistGrid(vlistID1, 0);
   size_t gridsize = gridInqSize(gridID1);

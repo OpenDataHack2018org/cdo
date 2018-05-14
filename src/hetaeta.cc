@@ -414,8 +414,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
         }
 
       /* correct surface pressure */
-      dfi = fiadj
-            - (fi2[jlev + 1] + (fi2[jlev] - fi2[jlev + 1]) * log(ph2[jlev + 1] / p_firef) / log(ph2[jlev + 1] / ph2[jlev]));
+      dfi = fiadj - (fi2[jlev + 1] + (fi2[jlev] - fi2[jlev + 1]) * log(ph2[jlev + 1] / p_firef) / log(ph2[jlev + 1] / ph2[jlev]));
       double ztv = (1.0 + epsm1i * zq2[nlev2 - 1]) * zt2[nlev2 - 1];
       ps2[ij] = ps2[ij] * exp(dfi / (rair * ztv));
     }
@@ -458,8 +457,8 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
       pscor[ij] = pow(ps2[ij] / ps1[ij], rair_d_cpair);
 
       /* correction term of static energy of lowest layer */
-      secor[ij] = tv1[nlev1 - 1]
-                  * (cpair + rair * (1.0 - ph1[nlev1 - 1] / (ps1[ij] - ph1[nlev1 - 1]) * log(ps1[ij] / ph1[nlev1 - 1])));
+      secor[ij]
+          = tv1[nlev1 - 1] * (cpair + rair * (1.0 - ph1[nlev1 - 1] / (ps1[ij] - ph1[nlev1 - 1]) * log(ps1[ij] / ph1[nlev1 - 1])));
     }
 
   if (ltq)
@@ -472,10 +471,9 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long
 }
 
 void
-hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const double *bh1, const double *fis1,
-        const double *ps1, const double *t1, const double *q1, int nlev2, const double *ah2, const double *bh2,
-        const double *fis2, double *ps2, double *t2, double *q2, int nvars, double **vars1, double **vars2, double *tscor,
-        double *pscor, double *secor)
+hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const double *bh1, const double *fis1, const double *ps1,
+        const double *t1, const double *q1, int nlev2, const double *ah2, const double *bh2, const double *fis2, double *ps2,
+        double *t2, double *q2, int nvars, double **vars1, double **vars2, double *tscor, double *pscor, double *secor)
 {
   long jblt;
   long jlev = 0;
@@ -619,10 +617,10 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
   double epsm1i = 1.0 / epsilon - 1.0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) firstprivate(lpsmod) private(vars_pbl) schedule(dynamic, 1) shared(                 \
-    ngp, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, zt2, zq2, theta_pbl, rh2, wgt, \
-    idx, vars_pbl_2, af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2, ltq, nvars, imiss, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, \
-    fis1, fis2, ps2, ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt)
+#pragma omp parallel for default(none) firstprivate(lpsmod) private(vars_pbl) schedule(dynamic, 1) shared(                        \
+    ngp, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, zt2, zq2, theta_pbl, rh2, wgt, idx,   \
+    vars_pbl_2, af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2, ltq, nvars, imiss, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, fis1, fis2, \
+    ps2, ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt)
 #endif
   for (int ij = 0; ij < ngp; ++ij)
     {
@@ -632,12 +630,12 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
 
       if (imiss && imiss[ij]) continue;
 
-      hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars, &af1[0], &bf1[0], &etah2[0], &af2[0], &bf2[0], &w1[0], &w2[0],
-                 &jl1[0], &jl2[0], ah1, bh1, ps1, epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, vars1, vars2, t2, q2, tscor, pscor,
-                 secor, jblt, &ph1[ompthID][0], &lnph1[ompthID][0], &fi1[ompthID][0], &pf1[ompthID][0], &lnpf1[ompthID][0],
-                 &tv1[ompthID][0], &theta1[ompthID][0], &rh1[ompthID][0], &zvar[ompthID][0], &ph2[ompthID][0],
-                 &lnph2[ompthID][0], &fi2[ompthID][0], &pf2[ompthID][0], &rh2[ompthID][0], &wgt[ompthID][0], &idx[ompthID][0],
-                 &rh_pbl[ompthID][0], &theta_pbl[ompthID][0], vars_pbl, &zt2[ompthID][0], &zq2[ompthID][0]);
+      hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars, &af1[0], &bf1[0], &etah2[0], &af2[0], &bf2[0], &w1[0], &w2[0], &jl1[0],
+                 &jl2[0], ah1, bh1, ps1, epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt,
+                 &ph1[ompthID][0], &lnph1[ompthID][0], &fi1[ompthID][0], &pf1[ompthID][0], &lnpf1[ompthID][0], &tv1[ompthID][0],
+                 &theta1[ompthID][0], &rh1[ompthID][0], &zvar[ompthID][0], &ph2[ompthID][0], &lnph2[ompthID][0], &fi2[ompthID][0],
+                 &pf2[ompthID][0], &rh2[ompthID][0], &wgt[ompthID][0], &idx[ompthID][0], &rh_pbl[ompthID][0],
+                 &theta_pbl[ompthID][0], vars_pbl, &zt2[ompthID][0], &zq2[ompthID][0]);
 
     } /* end for ij */
 
@@ -710,8 +708,7 @@ main(int argc, char *argv[])
                       -1.958764e-21, -8.735027e-22, -2.779327e-22, -2.117582e-21, -1.323489e-21, -8.470329e-22, -4.102816e-22,
                       -1.429368e-21, -2.646978e-21, -5.029258e-22, -8.205632e-22, -1.588187e-21 };
 
-  double icc1[19]
-      = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4445496, 0.0, 0.0, 0.001098633 };
+  double icc1[19] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4445496, 0.0, 0.0, 0.001098633 };
 
   double ifis1 = 9.121094, ips1 = 102511.8;
 

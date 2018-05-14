@@ -509,8 +509,8 @@ adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int64
 }
 
 void
-computeGsl(int nlevels, size_t gridsize, double *yvals, double missval, Field *startDateWithHist[2],
-           Field *endDateWithHist[2], Field *gslDuration, Field *gslFirstDay, int useCurrentYear)
+computeGsl(int nlevels, size_t gridsize, double *yvals, double missval, Field *startDateWithHist[2], Field *endDateWithHist[2],
+           Field *gslDuration, Field *gslFirstDay, int useCurrentYear)
 {
   int levelID;
   double firstDay, duration;

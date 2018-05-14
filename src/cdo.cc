@@ -99,9 +99,8 @@ static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 const char *CDO_username;
 
-extern "C"
-{
-  void streamGrbDefDataScanningMode(int scanmode);
+extern "C" {
+void streamGrbDefDataScanningMode(int scanmode);
 }
 
 void cdoConfig(const char *option);
@@ -189,8 +188,7 @@ cdo_set_digits(const char *optarg)
   char *ptr1 = 0;
   if (optarg != 0 && (int) strlen(optarg) > 0 && optarg[0] != ',') CDO_flt_digits = (int) strtol(optarg, &ptr1, 10);
 
-  if (CDO_flt_digits < 1 || CDO_flt_digits > 20)
-    cdoAbort("Unreasonable value for float significant digits: %d", CDO_flt_digits);
+  if (CDO_flt_digits < 1 || CDO_flt_digits > 20) cdoAbort("Unreasonable value for float significant digits: %d", CDO_flt_digits);
 
   if (ptr1 && *ptr1 == ',')
     {
@@ -269,8 +267,7 @@ cdo_usage(void)
   fprintf(stderr, "    -f, --format <format>\n");
   fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
-  fprintf(stderr,
-          "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
+  fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h, --help     Help information for the operators\n");
   fprintf(stderr, "    --history      Do not append to NetCDF \"history\" global attribute\n");
   fprintf(stderr, "    --netcdf_hdr_pad, --hdr_pad, --header_pad <nbr>\n");
@@ -374,11 +371,10 @@ cdoPrintHelp(std::vector<std::string> help /*, char *xoperator*/)
             {
               if (COLOR_STDOUT)
                 {
-                  if ((help[i].compare("NAME") == 0) || (help[i].compare("SYNOPSIS") == 0)
-                      || (help[i].compare("DESCRIPTION") == 0) || (help[i].compare("OPERATORS") == 0)
-                      || (help[i].compare("NAMELIST") == 0) || (help[i].compare("PARAMETER") == 0)
-                      || (help[i].compare("ENVIRONMENT") == 0) || (help[i].compare("NOTE") == 0)
-                      || (help[i].compare("EXAMPLES") == 0))
+                  if ((help[i].compare("NAME") == 0) || (help[i].compare("SYNOPSIS") == 0) || (help[i].compare("DESCRIPTION") == 0)
+                      || (help[i].compare("OPERATORS") == 0) || (help[i].compare("NAMELIST") == 0)
+                      || (help[i].compare("PARAMETER") == 0) || (help[i].compare("ENVIRONMENT") == 0)
+                      || (help[i].compare("NOTE") == 0) || (help[i].compare("EXAMPLES") == 0))
                     {
                       set_text_color(stdout, BRIGHT, BLACK);
                       fprintf(stdout, "%s", help[i].c_str());

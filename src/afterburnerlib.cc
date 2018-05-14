@@ -439,8 +439,8 @@ after_SPuv2SPdv(struct Control *globs, struct Variable *vars)
         globs->Truncation);
   sp2fc(vars[V_WIND].spectral, vars[V_WIND].fourier, globs->poli, globs->NumLevelRequest, globs->Latitudes, globs->Fouriers,
         globs->Truncation);
-  uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, Div, Vor, globs->pol2, globs->pol3, globs->NumLevelRequest,
-        globs->Latitudes, globs->Truncation);
+  uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, Div, Vor, globs->pol2, globs->pol3, globs->NumLevelRequest, globs->Latitudes,
+        globs->Truncation);
 
   vars[U_WIND].fourier = (double *) FreeMemory(vars[U_WIND].fourier);
   vars[V_WIND].fourier = (double *) FreeMemory(vars[V_WIND].fourier);
@@ -539,8 +539,7 @@ after_processPL(struct Control *globs, struct Variable *vars)
     {
       if (vars[GEOPOTHEIGHT].spectral == NULL)
         vars[GEOPOTHEIGHT].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "GEOPOTHEIGHT.spectral");
-      MultVectorScalar(vars[GEOPOTHEIGHT].spectral, vars[GEOPOTENTIAL].spectral, C_RG, globs->DimSP * globs->NumLevelRequest, 0,
-                       0);
+      MultVectorScalar(vars[GEOPOTHEIGHT].spectral, vars[GEOPOTENTIAL].spectral, C_RG, globs->DimSP * globs->NumLevelRequest, 0, 0);
       vars[GEOPOTENTIAL].needed = vars[GEOPOTENTIAL].selected;
     }
 
@@ -746,8 +745,7 @@ after_processPL(struct Control *globs, struct Variable *vars)
                 vars[code].grid = alloc_dp(fieldSize, FieldName(code, "grid"));
               }
 
-            after_FC2GP(vars[code].fourier, vars[code].grid, globs->Latitudes, globs->Longitudes, vars[code].plev,
-                        globs->Fouriers);
+            after_FC2GP(vars[code].fourier, vars[code].grid, globs->Latitudes, globs->Longitudes, vars[code].plev, globs->Fouriers);
           }
     }
 
@@ -998,8 +996,8 @@ Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind, doub
               else
                 Pterm = 0.0;
 
-              omega[i] += fullp[i] * (uwind[i] * dpsdx[i] + vwind[i] * dpsdy[i]) / (halfp[i + dimgp] - halfp[i])
-                          * (DeltaHybrid + Pterm);
+              omega[i]
+                  += fullp[i] * (uwind[i] * dpsdx[i] + vwind[i] * dpsdy[i]) / (halfp[i + dimgp] - halfp[i]) * (DeltaHybrid + Pterm);
             }
         }
     }
@@ -1185,8 +1183,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
     {
       vars[GEOPOTHEIGHT].hlev = globs->NumLevel + 1;
       vars[GEOPOTHEIGHT].sfit = TRUE;
-      vars[GEOPOTHEIGHT].hybrid
-          = (double *) Realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP + globs->DimGP) * sizeof(double));
+      vars[GEOPOTHEIGHT].hybrid = (double *) Realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP + globs->DimGP) * sizeof(double));
       arrayCopy(globs->DimGP, globs->Orography, vars[GEOPOTHEIGHT].hybrid + globs->Dim3GP);
       for (int i = 0; i < globs->DimGP; i++) vars[GEOPOTHEIGHT].hybrid[globs->Dim3GP + i] /= PlanetGrav;
     }
@@ -1306,8 +1303,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       else
       */
       {
-        MultVectorScalar(vars[NET_HEAT].hybrid, vars[218].hybrid, C_TIMES_RHOH2O, globs->DimGP, vars[218].nmiss,
-                         vars[218].missval);
+        MultVectorScalar(vars[NET_HEAT].hybrid, vars[218].hybrid, C_TIMES_RHOH2O, globs->DimGP, vars[218].nmiss, vars[218].missval);
         Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid, vars[176].hybrid, globs->DimGP);
         Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid, vars[177].hybrid, globs->DimGP);
         Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid, vars[146].hybrid, globs->DimGP);
@@ -1795,8 +1791,8 @@ after_processML(struct Control *globs, struct Variable *vars)
                   if (globs->EndOfInterval)
                     {
                       if (vars[code].samp == NULL)
-                        MultVectorScalar(vars[code].hybrid, vars[code].mean, 1.0 / globs->MeanCount, fieldSize,
-                                         vars[code].nmiss, vars[code].missval);
+                        MultVectorScalar(vars[code].hybrid, vars[code].mean, 1.0 / globs->MeanCount, fieldSize, vars[code].nmiss,
+                                         vars[code].missval);
                       else
                         DivVectorIvector(vars[code].hybrid, vars[code].mean, vars[code].samp, fieldSize, &vars[code].nmiss,
                                          vars[code].missval);
@@ -1867,8 +1863,7 @@ after_processML(struct Control *globs, struct Variable *vars)
       if (!globs->Extrapolate)
         {
           if (globs->pnmiss == NULL) globs->pnmiss = (size_t *) Malloc(globs->NumLevelRequest * sizeof(size_t));
-          genindmiss(globs->vert_index, pressureLevel, globs->DimGP, globs->NumLevelRequest, vars[PS_PROG].hybrid,
-                     globs->pnmiss);
+          genindmiss(globs->vert_index, pressureLevel, globs->DimGP, globs->NumLevelRequest, vars[PS_PROG].hybrid, globs->pnmiss);
           for (i = 0; i < globs->NumLevelRequest; i++) nmiss += globs->pnmiss[i];
         }
 
@@ -2066,11 +2061,9 @@ after_processML(struct Control *globs, struct Variable *vars)
                 vars[code].fourier = alloc_dp(fieldSize, FieldName(code, "fourier"));
               }
 
-            after_GP2FC(vars[code].grid, vars[code].fourier, globs->Latitudes, globs->Longitudes, vars[code].plev,
-                        globs->Fouriers);
+            after_GP2FC(vars[code].grid, vars[code].fourier, globs->Latitudes, globs->Longitudes, vars[code].plev, globs->Fouriers);
 
-            if (vars[code].grid && (vars[code].sfit || globs->Type < 70))
-              vars[code].grid = (double *) FreeMemory(vars[code].grid);
+            if (vars[code].grid && (vars[code].sfit || globs->Type < 70)) vars[code].grid = (double *) FreeMemory(vars[code].grid);
           }
     }
 
@@ -2155,8 +2148,7 @@ after_processML(struct Control *globs, struct Variable *vars)
             vars[DIVERGENCE].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[DIVERGENCE].spectral");
           if (vars[VORTICITY].spectral == NULL)
             vars[VORTICITY].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[VORTICITY].spectral");
-          if ((vars[U_WIND].fourier == 0 || vars[V_WIND].fourier == 0) && globs->NumLevelRequest)
-            Error("uwind or vwind missing!");
+          if ((vars[U_WIND].fourier == 0 || vars[V_WIND].fourier == 0) && globs->NumLevelRequest) Error("uwind or vwind missing!");
           uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, vars[DIVERGENCE].spectral, vars[VORTICITY].spectral, globs->pol2,
                 globs->pol3, globs->NumLevelRequest, globs->Latitudes, globs->Truncation);
         }
@@ -2183,8 +2175,7 @@ after_processML(struct Control *globs, struct Variable *vars)
     }
 
   for (code = 0; code < MaxCodes; code++)
-    if (vars[code].fourier && (vars[code].sfit || globs->Type < 61))
-      vars[code].fourier = (double *) FreeMemory(vars[code].fourier);
+    if (vars[code].fourier && (vars[code].sfit || globs->Type < 61)) vars[code].fourier = (double *) FreeMemory(vars[code].fourier);
 
   /* --------------------------- */
   /*  Output of spectral fields  */
@@ -2293,8 +2284,7 @@ after_processML(struct Control *globs, struct Variable *vars)
             fieldSize = vars[code].plev * globs->DimGP;
             if (vars[code].grid == NULL) vars[code].grid = alloc_dp(fieldSize, FieldName(code, "grid"));
 
-            after_FC2GP(vars[code].fourier, vars[code].grid, globs->Latitudes, globs->Longitudes, vars[code].plev,
-                        globs->Fouriers);
+            after_FC2GP(vars[code].fourier, vars[code].grid, globs->Latitudes, globs->Longitudes, vars[code].plev, globs->Fouriers);
           }
     }
 
@@ -2325,8 +2315,7 @@ after_processML(struct Control *globs, struct Variable *vars)
 }
 
 void
-after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID,
-                        size_t nmiss)
+after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
 {
   size_t fieldSize;
   int truncation;

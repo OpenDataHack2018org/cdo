@@ -84,12 +84,10 @@ Pinfo(void *process)
           if (tsID == 0 && recID == 0)
             {
               if (operatorID == PINFOV)
-                fprintf(stdout, "   Rec :       Date  Time    Varname     "
-                                "Level    Size    Miss :"
-                                "     Minimum        Mean     Maximum\n");
+                fprintf(stdout,
+                        "   Rec :       Date  Time    Varname     Level    Size    Miss :     Minimum        Mean     Maximum\n");
               else
-                fprintf(stdout, "   Rec :       Date  Time    Code  Level    Size    Miss :"
-                                "     Minimum        Mean     Maximum\n");
+                fprintf(stdout, "   Rec :       Date  Time    Code  Level    Size    Miss :     Minimum        Mean     Maximum\n");
             }
 
           pstreamInqRecord(streamID1, &varID, &levelID);

@@ -225,8 +225,7 @@ cdo_getopt_long(int argc, char *const *argv, const char *optstring, const struct
         }
       else
         { /* No matching argument */
-          if ((CDO_opterr) && (*optstring != ':'))
-            fprintf(stderr, "%s: illegal option -- %s\n", __progname(argv[0]), current_argv);
+          if ((CDO_opterr) && (*optstring != ':')) fprintf(stderr, "%s: illegal option -- %s\n", __progname(argv[0]), current_argv);
 
           return (BADCH);
         }

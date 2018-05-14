@@ -350,9 +350,9 @@ testFdns()
 static void
 testEcaGsl()
 {
-  const double array1[] = { TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),
-                            TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0),
-                            TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0) };
+  const double array1[]
+      = { TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),
+          TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0) };
   const double array2[] = { 0.5 };
 
   int nvars = 2;

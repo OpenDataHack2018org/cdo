@@ -157,9 +157,7 @@ set_parameter(void)
               else if (STR_IS_EQ(value, "replace"))
                 outMode = OutMode::REPLACE;
               else
-                cdoAbort("Invalid parameter key value: outMode=%s (valid are: "
-                         "new/append/replace)",
-                         value);
+                cdoAbort("Invalid parameter key value: outMode=%s (valid are: new/append/replace)", value);
             }
           else
             cdoAbort("Invalid parameter key >%s<!", key);

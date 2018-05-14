@@ -263,8 +263,7 @@ mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell_corner
 
   for (int i = 1; i < num_corners; i++)
     {
-      if (IS_EQUAL(cell_corner_lon[i], cell_corner_lon[i - 1]) && IS_EQUAL(cell_corner_lat[i], cell_corner_lat[i - 1]))
-        continue;
+      if (IS_EQUAL(cell_corner_lon[i], cell_corner_lon[i - 1]) && IS_EQUAL(cell_corner_lat[i], cell_corner_lat[i - 1])) continue;
 
       // points that make up a side of cell
       lonlat_to_xyz(cell_corner_lon[i], cell_corner_lat[i], pnt3);
@@ -409,8 +408,8 @@ gridGenArea(int gridID, double *area)
   progressInit();
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat, \
-                                              grid_center_lon, grid_center_lat)
+#pragma omp parallel for default(none) shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat, grid_center_lon, \
+                                              grid_center_lat)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -427,8 +426,8 @@ gridGenArea(int gridID, double *area)
       if (nv <= 4)
         area[i] = mod_huiliers_area(nv, &grid_corner_lon[i * nv], &grid_corner_lat[i * nv]);
       else
-        area[i] = mod_huiliers_area2(nv, &grid_corner_lon[i * nv], &grid_corner_lat[i * nv],
-                                     grid_center_lon[i], grid_center_lat[i]);
+        area[i]
+            = mod_huiliers_area2(nv, &grid_corner_lon[i * nv], &grid_corner_lat[i * nv], grid_center_lon[i], grid_center_lat[i]);
     }
 
   progressStatus(0, 1, 1);

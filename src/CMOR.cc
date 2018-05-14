@@ -65,8 +65,7 @@ maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *miptab, c
               if (kvcn && kvcn->nvalues > 0 && *(kvcn->values[0]) == *cmorname && strcmp(kvcn->values[0], cmorname) == 0)
                 {
                   keyValues_t *kvmt = kvlist_search(kvlist, "project_mip_table");
-                  if ((kvmt && kvmt->nvalues > 0 && *(kvmt->values[0]) == *miptab && strcmp(kvmt->values[0], miptab) == 0)
-                      || !kvmt)
+                  if ((kvmt && kvmt->nvalues > 0 && *(kvmt->values[0]) == *miptab && strcmp(kvmt->values[0], miptab) == 0) || !kvmt)
                     return kvlist;
                   else
                     listlatest = kvlist;
@@ -637,11 +636,10 @@ check_short_key(char *key)
 {
   const char *short_keys[]
       = { "cn", "n", "c", "u", "cm", "vc", "p", "i", "ca", "za", "gi", "rtu", "mt", "om", "ms", "dr", "d", "lc", "dj", NULL };
-  const char *long_keys[]
-      = { "cmor_name",     "name",        "code",           "units",    "cell_methods", "variable_comment",
-          "positive",      "info",        "character_axis", "z_axis",   "grid_info",    "required_time_units",
-          "mapping_table", "output_mode", "max_size",       "drs_root", "drs",          "last_chunk",
-          "dataset_json",  NULL };
+  const char *long_keys[] = { "cmor_name",     "name",        "code",           "units",    "cell_methods", "variable_comment",
+                              "positive",      "info",        "character_axis", "z_axis",   "grid_info",    "required_time_units",
+                              "mapping_table", "output_mode", "max_size",       "drs_root", "drs",          "last_chunk",
+                              "dataset_json",  NULL };
 
   for (int i = 0; short_keys[i]; i++)
     if (strcmp(key, short_keys[i]) == 0 || strcmp(key, long_keys[i]) == 0) return short_keys[i];
@@ -1132,8 +1130,8 @@ addcharvar(keyValues_t *charvars, int vlistID, const char *key, struct mapping v
                     if (oldgridsize == axissize[0] * axissize[1])
                       newIndex = tsID * axissize[2] * axissize[0] * axissize[1] + i * axissize[0] * axissize[1] + j;
                     else if (axissize[0] == charvars->nvalues)
-                      newIndex = tsID * axissize[2] * axissize[0] * axissize[1] + i * axissize[1] * axissize[2]
-                                 + j * axissize[2] + levelIDrw;
+                      newIndex = tsID * axissize[2] * axissize[0] * axissize[1] + i * axissize[1] * axissize[2] + j * axissize[2]
+                                 + levelIDrw;
                     else
                       newIndex = tsID * axissize[2] * axissize[0] * axissize[1] + levelIDrw * axissize[0] * axissize[1]
                                  + i * axissize[0] * axissize[1] / oldgridsize + j;
@@ -1419,8 +1417,7 @@ check_attr(list_t *kvl, char *project_id, int vlistID)
   const char *reqAttCMOR2[] = { "contact", "model_id", NULL };
   const char *reqAttCMIP5[] = { "institute_id", "product", "member", NULL };
   const char *reqAttCMIP5CMOR3[] = { "modeling_realm", NULL };
-  const char *reqAttCORDEX[]
-      = { "institute_id", "product", "member", "CORDEX_domain", "driving_model_id", "rcm_version_id", NULL };
+  const char *reqAttCORDEX[] = { "institute_id", "product", "member", "CORDEX_domain", "driving_model_id", "rcm_version_id", NULL };
   /*  const char *reqAttCMIP6CMOR3[] = {"outpath", "output_path_template", "output_file_template", "tracking_prefix",
   NULL};
   "further_info_url", "variant_label",*/
@@ -1756,8 +1753,7 @@ read_config_files(list_t *kvl)
               cdoPrint("1.3. Try to parse file: '%s' configured with key 'info' in file '.cdocmorinfo'.", info2->values[i]);
             if (parse_kv_file(kvl, info2->values[i]) == 0) cdoAbort("ERROR! File '%s' does not exist.", info2->values[i]);
             if (cdoVerbose)
-              cdoPrint("1.3. Successfully parsed file: '%s' configured with key 'info' in file '.cdocmorinfo'.",
-                       info2->values[i]);
+              cdoPrint("1.3. Successfully parsed file: '%s' configured with key 'info' in file '.cdocmorinfo'.", info2->values[i]);
             i++;
           }
     }
@@ -1919,8 +1915,8 @@ check_time_units(char *time_units)
   /* Required attribute in check_att */
   int attyear, attmonth, attday, atthour, attminute, attsecond;
   char time_step[CMOR_MAX_STRING];
-  if (sscanf(time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s", time_step, &attyear, &attmonth, &attday, &atthour,
-             &attminute, &attsecond)
+  if (sscanf(time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s", time_step, &attyear, &attmonth, &attday, &atthour, &attminute,
+             &attsecond)
       != 7)
     {
       cdoWarning("You set required_time_units = '%s'\n          but it requires the form 'timestep since "
@@ -2160,10 +2156,10 @@ setup_dataset(list_t *kvl, int streamID, int *calendar, char *project_id)
       char cordexDir[CDI_MAX_NAME];
       char cordexFileTem[CDI_MAX_NAME];
       sprintf(cordexDir, "%s/%s/%s/%s/%s/%s/%s/%s/%s/%s/%s", kv_get_a_val(kvl, "dr", "./"), project_id,
-              kv_get_a_val(kvl, "product", NULL), kv_get_a_val(kvl, "CORDEX_domain", NULL),
-              kv_get_a_val(kvl, "institute_id", NULL), kv_get_a_val(kvl, "driving_model_id", NULL),
-              kv_get_a_val(kvl, "experiment_id", NULL), kv_get_a_val(kvl, "member", NULL), kv_get_a_val(kvl, "model_id", NULL),
-              kv_get_a_val(kvl, "rcm_version_id", NULL), freq);
+              kv_get_a_val(kvl, "product", NULL), kv_get_a_val(kvl, "CORDEX_domain", NULL), kv_get_a_val(kvl, "institute_id", NULL),
+              kv_get_a_val(kvl, "driving_model_id", NULL), kv_get_a_val(kvl, "experiment_id", NULL),
+              kv_get_a_val(kvl, "member", NULL), kv_get_a_val(kvl, "model_id", NULL), kv_get_a_val(kvl, "rcm_version_id", NULL),
+              freq);
       sprintf(cordexFileTem, "%s_%s_%s_%s_%s_%s_%s", kv_get_a_val(kvl, "CORDEX_domain", NULL),
               kv_get_a_val(kvl, "driving_model_id", NULL), kv_get_a_val(kvl, "experiment_id", NULL),
               kv_get_a_val(kvl, "member", NULL), kv_get_a_val(kvl, "model_id", NULL), kv_get_a_val(kvl, "rcm_version_id", NULL),
@@ -2192,8 +2188,7 @@ setup_dataset(list_t *kvl, int streamID, int *calendar, char *project_id)
      Then check the required time units from config and retrieve
      Then compute branch_time_in_parent and branch_time_in_child */
 
-  if (cdoVerbose)
-    cdoPrint("6.1. Start to check model calendar as well as 'required_time_units' and 'branch_times' attributes.");
+  if (cdoVerbose) cdoPrint("6.1. Start to check model calendar as well as 'required_time_units' and 'branch_times' attributes.");
   char *calendarptr = check_calendar(kvl, taxisID, calendar);
   char *time_units = check_required_time_units(kvl, taxisID);
   double *branch_times = get_branch_times(kvl, *calendar, time_units);
@@ -2201,15 +2196,14 @@ setup_dataset(list_t *kvl, int streamID, int *calendar, char *project_id)
 #if defined(CMOR_VERSION_MAJOR)
 #if (CMOR_VERSION_MAJOR == 2)
   {
-    cmf = cmor_dataset(kv_get_a_val(kvl, "dr", "./"), kv_get_a_val(kvl, "experiment_id", ""),
-                       kv_get_a_val(kvl, "institution", ""), kv_get_a_val(kvl, "source", ""), calendarptr,
-                       atoi(kv_get_a_val(kvl, "realization", "")), kv_get_a_val(kvl, "contact", ""),
-                       kv_get_a_val(kvl, "history", ""), kv_get_a_val(kvl, "comment", ""), kv_get_a_val(kvl, "references", ""),
-                       atoi(kv_get_a_val(kvl, "leap_year", "")), atoi(kv_get_a_val(kvl, "leap_month", "")), NULL,
-                       kv_get_a_val(kvl, "model_id", ""), kv_get_a_val(kvl, "forcing", ""),
-                       atoi(kv_get_a_val(kvl, "initialization_method", "")), atoi(kv_get_a_val(kvl, "physics_version", "")),
-                       kv_get_a_val(kvl, "institute_id", ""), kv_get_a_val(kvl, "parent_experiment_id", ""), &(branch_times[0]),
-                       kv_get_a_val(kvl, "parent_experiment_rip", ""));
+    cmf = cmor_dataset(
+        kv_get_a_val(kvl, "dr", "./"), kv_get_a_val(kvl, "experiment_id", ""), kv_get_a_val(kvl, "institution", ""),
+        kv_get_a_val(kvl, "source", ""), calendarptr, atoi(kv_get_a_val(kvl, "realization", "")), kv_get_a_val(kvl, "contact", ""),
+        kv_get_a_val(kvl, "history", ""), kv_get_a_val(kvl, "comment", ""), kv_get_a_val(kvl, "references", ""),
+        atoi(kv_get_a_val(kvl, "leap_year", "")), atoi(kv_get_a_val(kvl, "leap_month", "")), NULL,
+        kv_get_a_val(kvl, "model_id", ""), kv_get_a_val(kvl, "forcing", ""), atoi(kv_get_a_val(kvl, "initialization_method", "")),
+        atoi(kv_get_a_val(kvl, "physics_version", "")), kv_get_a_val(kvl, "institute_id", ""),
+        kv_get_a_val(kvl, "parent_experiment_id", ""), &(branch_times[0]), kv_get_a_val(kvl, "parent_experiment_rip", ""));
     if (cmf != 0) cdoAbort("ERROR! Function cmor_dataset failed!");
   }
   const char *allneeded2[] = { "CORDEX_domain",
@@ -2249,8 +2243,7 @@ setup_dataset(list_t *kvl, int streamID, int *calendar, char *project_id)
     sprintf(dataset_path, "%s/dataset%d.json", cwd, procID);
     dataset_json = fopen(dataset_path, "w+");
     if (!dataset_json)
-      cdoAbort("ERROR! In preparing cmor_dataset:\n          Could not open a dataset file '%s' for cmor_dataset.",
-               dataset_path);
+      cdoAbort("ERROR! In preparing cmor_dataset:\n          Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
     fputs("{\n", dataset_json);
 
     int i = 0;
@@ -2316,9 +2309,9 @@ setup_dataset(list_t *kvl, int streamID, int *calendar, char *project_id)
     else
       {
         const char *allneeded[]
-            = /*CMIP5*/ { "project_id", "experiment_id", "institution", "source", "realization", "contact", "history",
-                          "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing",
-                          "initialization_method", "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip",
+            = /*CMIP5*/ { "project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment",
+                          "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method",
+                          "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip",
                           /*CORDEX */
                           "CORDEX_domain", "driving_experiment", "driving_model_id", "driving_model_ensemble_member",
                           "driving_experiment_name", "rcm_version_id",
@@ -2361,9 +2354,8 @@ setup_dataset(list_t *kvl, int streamID, int *calendar, char *project_id)
     fputs(kv_get_a_val(kvl, "v_date", "<version>"), dataset_json);
     fputs("\",\n", dataset_json);
     fputs("\"output_file_template\" : \"", dataset_json);
-    fputs(
-        kv_get_a_val(kvl, "output_file_template", "<variable_id><table><source_id><experiment_id><variant_label><grid_label>"),
-        dataset_json);
+    fputs(kv_get_a_val(kvl, "output_file_template", "<variable_id><table><source_id><experiment_id><variant_label><grid_label>"),
+          dataset_json);
     fputs("\",\n", dataset_json);
     fputs("\"tracking_prefix\" : \"", dataset_json);
     fputs(kv_get_a_val(kvl, "tracking_prefix", "hdl:21.14100"), dataset_json);
@@ -2487,8 +2479,8 @@ get_strmaxlen(char **array, int len)
 }
 
 static void
-register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname, int *axis_ids, int *zfactor_id,
-                char *project_id, int miptab_freq)
+register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname, int *axis_ids, int *zfactor_id, char *project_id,
+                int miptab_freq)
 {
   char zaxisunits[CDI_MAX_NAME];
   zaxisInqUnits(zaxisID, zaxisunits);
@@ -2561,8 +2553,8 @@ register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname,
               if (strcmp(zaxis, "notSet") != 0)
                 cmf = cmor_axis(new_axis_id(axis_ids), zaxis, (char *) zaxisunits, zsize, (void *) levels, 'd', NULL, 0, NULL);
               else if (strcmp(project_id, "CMIP5") != 0 && strcmp(project_id, "CMIP6") != 0)
-                cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plevs", (char *) zaxisunits, zsize, (void *) levels, 'd', NULL,
-                                0, NULL);
+                cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plevs", (char *) zaxisunits, zsize, (void *) levels, 'd', NULL, 0,
+                                NULL);
               else
                 {
                   if (strcmp(project_id, "CMIP6") == 0)
@@ -2570,16 +2562,16 @@ register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname,
                       switch (miptab_freq)
                         {
                         case 4:
-                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plev8", (char *) zaxisunits, zsize, (void *) levels,
-                                          'd', NULL, 0, NULL);
+                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plev8", (char *) zaxisunits, zsize, (void *) levels, 'd',
+                                          NULL, 0, NULL);
                           break;
                         default:
                           cdoWarning("CMIP6 requires a zaxis name for zaxis type PRESSURE.\n          The operator "
                                      "tries to use a zaxis name matching the number of levels found in infile.");
                           char *zaxisname = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
                           sprintf(zaxisname, "plev%d", zsize);
-                          cmf = cmor_axis(new_axis_id(axis_ids), zaxisname, (char *) zaxisunits, zsize, (void *) levels, 'd',
-                                          NULL, 0, NULL);
+                          cmf = cmor_axis(new_axis_id(axis_ids), zaxisname, (char *) zaxisunits, zsize, (void *) levels, 'd', NULL,
+                                          0, NULL);
                           Free(zaxisname);
                           break;
                         }
@@ -2589,20 +2581,20 @@ register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname,
                       switch (miptab_freq)
                         {
                         case 3:
-                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plev7", (char *) zaxisunits, zsize, (void *) levels,
-                                          'd', NULL, 0, NULL);
+                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plev7", (char *) zaxisunits, zsize, (void *) levels, 'd',
+                                          NULL, 0, NULL);
                           break;
                         case 4:
-                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plev8", (char *) zaxisunits, zsize, (void *) levels,
-                                          'd', NULL, 0, NULL);
+                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plev8", (char *) zaxisunits, zsize, (void *) levels, 'd',
+                                          NULL, 0, NULL);
                           break;
                         case 5:
-                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plev3", (char *) zaxisunits, zsize, (void *) levels,
-                                          'd', NULL, 0, NULL);
+                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plev3", (char *) zaxisunits, zsize, (void *) levels, 'd',
+                                          NULL, 0, NULL);
                           break;
                         default:
-                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plevs", (char *) zaxisunits, zsize, (void *) levels,
-                                          'd', NULL, 0, NULL);
+                          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "plevs", (char *) zaxisunits, zsize, (void *) levels, 'd',
+                                          NULL, 0, NULL);
                           break;
                         }
                     }
@@ -2642,8 +2634,8 @@ register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname,
               get_zhybrid(zaxisID, p0, alev_val, alev_bnds, b_val, b_bnds, ap_val, ap_bnds);
               /*cmor_zfactor (int *zfactor_id,int zaxis_id, char *zfactor_name, char *units, int ndims, int axis_ids[],
                * char type, void *zfactor_values, void *zfactor_bounds)*/
-              cmf = cmor_axis(new_axis_id(axis_ids), (char *) "alternate_hybrid_sigma", (char *) "", zsize, (void *) alev_val,
-                              'd', alev_bnds, 1, NULL);
+              cmf = cmor_axis(new_axis_id(axis_ids), (char *) "alternate_hybrid_sigma", (char *) "", zsize, (void *) alev_val, 'd',
+                              alev_bnds, 1, NULL);
               int lev_id = axis_ids[count_axis_ids(axis_ids) - 1];
               int lev_id_array[2];
               lev_id_array[0] = lev_id;
@@ -2723,8 +2715,7 @@ register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname,
               levels = (double *) Malloc(sizeof(double));
               levels[0] = (double) atof(szc_value);
               if (cdoVerbose)
-                cdoPrint("Scalar z coordinate name is: '%s'\n          Scalar z coordinate value is: '%f' meter", zaxis,
-                         levels[0]);
+                cdoPrint("Scalar z coordinate name is: '%s'\n          Scalar z coordinate value is: '%f' meter", zaxis, levels[0]);
               cmf = cmor_axis(new_axis_id(axis_ids), zaxis, (char *) "m", zsize, (void *) levels, 'd', NULL, 0, NULL);
               Free(levels);
             }
@@ -2878,8 +2869,8 @@ move_lons(double *xcoord_vals, double *xcell_bounds, int xsize, int xboundsize, 
 }
 
 static void
-inquire_vals_and_bounds(int gridID, int *xnbounds, int *ynbounds, double *xcoord_vals, double *ycoord_vals,
-                        double *xcell_bounds, double *ycell_bounds)
+inquire_vals_and_bounds(int gridID, int *xnbounds, int *ynbounds, double *xcoord_vals, double *ycoord_vals, double *xcell_bounds,
+                        double *ycell_bounds)
 {
   gridInqYvals(gridID, ycoord_vals);
   gridInqXvals(gridID, xcoord_vals);
@@ -3010,8 +3001,7 @@ check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, int xlength, 
             }
           /*upper and lower boundary: */
           halflonsOnhalflats[i][0] = lonbnds_bnds_trans_check(halflons[i][0], halflonsOnhalflats[i][1]);
-          halflonsOnhalflats[i][ylength]
-              = lonbnds_bnds_trans_check(halflons[i][ylength - 1], halflonsOnhalflats[i][ylength - 1]);
+          halflonsOnhalflats[i][ylength] = lonbnds_bnds_trans_check(halflons[i][ylength - 1], halflonsOnhalflats[i][ylength - 1]);
           halflatsOnhalflons[i][0] = (halflats[i - 1][0] + halflats[i][0]) * 0.5;
           halflatsOnhalflons[i][ylength] = (halflats[i - 1][ylength] + halflats[i][ylength]) * 0.5;
         }
@@ -3274,8 +3264,8 @@ register_lon_axis(int gridID, int xlength, int *axis_ids)
       double *xcell_bounds = (double *) Malloc(2 * xlength * sizeof(double));
       int xnbounds = gridInqXbounds(gridID, xcell_bounds);
       check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
-      int cmf = cmor_axis(new_axis_id(axis_ids), (char *) "longitude", (char *) "degrees_east", xlength, (void *) xcoord_vals,
-                          'd', (void *) xcell_bounds, 2, NULL);
+      int cmf = cmor_axis(new_axis_id(axis_ids), (char *) "longitude", (char *) "degrees_east", xlength, (void *) xcoord_vals, 'd',
+                          (void *) xcell_bounds, 2, NULL);
       if (cmf != 0) cdoAbort("ERROR! Function cmor_axis failed!");
       if (xcell_bounds) Free(xcell_bounds);
       if (xcoord_vals) Free(xcoord_vals);
@@ -3293,8 +3283,8 @@ register_lat_axis(int gridID, int ylength, int *axis_ids)
       double *ycell_bounds = (double *) Malloc(2 * ylength * sizeof(double));
       int ynbounds = gridInqYbounds(gridID, ycell_bounds);
       check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
-      int cmf = cmor_axis(new_axis_id(axis_ids), (char *) "latitude", (char *) "degrees_north", ylength, (void *) ycoord_vals,
-                          'd', (void *) ycell_bounds, 2, NULL);
+      int cmf = cmor_axis(new_axis_id(axis_ids), (char *) "latitude", (char *) "degrees_north", ylength, (void *) ycoord_vals, 'd',
+                          (void *) ycell_bounds, 2, NULL);
       if (cmf != 0) cdoAbort("ERROR! Function cmor_axis failed!");
       if (ycell_bounds) Free(ycell_bounds);
       if (ycoord_vals) Free(ycoord_vals);
@@ -3321,8 +3311,8 @@ register_char_axis(int numchar, char **charvals, int *axis_ids, char *chardim)
 }
 
 static void
-register_projection(int *grid_ids, int projID, double *ycoord_vals, double *xcoord_vals, double *ycell_bounds,
-                    double *xcell_bounds, int xlength, int ylength)
+register_projection(int *grid_ids, int projID, double *ycoord_vals, double *xcoord_vals, double *ycell_bounds, double *xcell_bounds,
+                    int xlength, int ylength)
 {
   int cmf = 0;
   int pxnbounds;
@@ -3435,18 +3425,18 @@ register_projection(int *grid_ids, int projID, double *ycoord_vals, double *xcoo
   int grid_axis[2];
   if (projtype == CDI_PROJ_RLL)
     {
-      cmf = cmor_axis(&grid_axis[0], (char *) "grid_latitude", (char *) "degrees_north", pylength, (void *) pycoord_vals, 'd',
-                      0, 0, NULL);
-      cmf = cmor_axis(&grid_axis[1], (char *) "grid_longitude", (char *) "degrees_east", pxlength, (void *) pxcoord_vals, 'd',
-                      0, 0, NULL);
+      cmf = cmor_axis(&grid_axis[0], (char *) "grid_latitude", (char *) "degrees_north", pylength, (void *) pycoord_vals, 'd', 0, 0,
+                      NULL);
+      cmf = cmor_axis(&grid_axis[1], (char *) "grid_longitude", (char *) "degrees_east", pxlength, (void *) pxcoord_vals, 'd', 0, 0,
+                      NULL);
       cmf = cmor_grid(&grid_ids[0], 2, grid_axis, 'd', (void *) ycoord_vals, (void *) xcoord_vals, 4, (void *) ycell_bounds,
                       (void *) xcell_bounds);
 #if (CMOR_VERSION_MAJOR == 2)
-      cmf = cmor_set_grid_mapping(grid_ids[0], "rotated_latitude_longitude", p_len, (char **) p_rll_cmor, l_p_rll,
-                                  parameter_values, (char **) u_rll_cmor, l_u_rll);
+      cmf = cmor_set_grid_mapping(grid_ids[0], "rotated_latitude_longitude", p_len, (char **) p_rll_cmor, l_p_rll, parameter_values,
+                                  (char **) u_rll_cmor, l_u_rll);
 #elif (CMOR_VERSION_MAJOR == 3)
-      cmf = cmor_set_grid_mapping(grid_ids[0], (char *) "rotated_latitude_longitude", p_len, p_rll_cmor, l_p_rll,
-                                  parameter_values, u_rll_cmor, l_u_rll);
+      cmf = cmor_set_grid_mapping(grid_ids[0], (char *) "rotated_latitude_longitude", p_len, p_rll_cmor, l_p_rll, parameter_values,
+                                  u_rll_cmor, l_u_rll);
 #endif
     }
   else if (projtype == CDI_PROJ_LCC)
@@ -3515,10 +3505,10 @@ register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids,
           check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
           check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
 
-          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "latitude", (char *) "degrees_north", ylength, (void *) ycoord_vals,
-                          'd', (void *) ycell_bounds, 2, NULL);
-          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "longitude", (char *) "degrees_east", xlength, (void *) xcoord_vals,
-                          'd', (void *) xcell_bounds, 2, NULL);
+          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "latitude", (char *) "degrees_north", ylength, (void *) ycoord_vals, 'd',
+                          (void *) ycell_bounds, 2, NULL);
+          cmf = cmor_axis(new_axis_id(axis_ids), (char *) "longitude", (char *) "degrees_east", xlength, (void *) xcoord_vals, 'd',
+                          (void *) xcell_bounds, 2, NULL);
 
           Free(xcell_bounds);
           Free(ycell_bounds);
@@ -3537,8 +3527,8 @@ register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids,
           move_lons(xcoord_vals, xcell_bounds, totalsize, 4 * totalsize, xnbounds);
           get_cmor_table(kvl, project_id);
           int grid_axis[2];
-          check_and_gen_bounds_curv(gridID, totalsize, xnbounds, xlength, xcoord_vals, xcell_bounds, ynbounds, ylength,
-                                    ycoord_vals, ycell_bounds);
+          check_and_gen_bounds_curv(gridID, totalsize, xnbounds, xlength, xcoord_vals, xcell_bounds, ynbounds, ylength, ycoord_vals,
+                                    ycell_bounds);
           if (type == GRID_CURVILINEAR && projID == CDI_UNDEFID)
             {
               double *xncoord_vals;
@@ -3549,8 +3539,8 @@ register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids,
               for (int j = 0; j < xlength; j++) xncoord_vals[j] = (double) j;
               cmf = cmor_axis(&grid_axis[0], (char *) "j_index", (char *) "1", ylength, (void *) yncoord_vals, 'd', 0, 0, NULL);
               cmf = cmor_axis(&grid_axis[1], (char *) "i_index", (char *) "1", xlength, (void *) xncoord_vals, 'd', 0, 0, NULL);
-              cmf = cmor_grid(&grid_ids[0], 2, grid_axis, 'd', (void *) ycoord_vals, (void *) xcoord_vals, 4,
-                              (void *) ycell_bounds, (void *) xcell_bounds);
+              cmf = cmor_grid(&grid_ids[0], 2, grid_axis, 'd', (void *) ycoord_vals, (void *) xcoord_vals, 4, (void *) ycell_bounds,
+                              (void *) xcell_bounds);
               Free(xncoord_vals);
               Free(yncoord_vals);
               Free(xcoord_vals);
@@ -3772,8 +3762,8 @@ register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids, struct map
     }
   else
     {
-      cmf = cmor_variable(&var->cmor_varID, name, units, count_axis_ids(axis_ids), axis_ids, var->datatype,
-                          (void *) missing_value, &tolerance, positive, origname, history, kv_get_a_val(kvl, "vc", NULL));
+      cmf = cmor_variable(&var->cmor_varID, name, units, count_axis_ids(axis_ids), axis_ids, var->datatype, (void *) missing_value,
+                          &tolerance, positive, origname, history, kv_get_a_val(kvl, "vc", NULL));
     }
   if (cmf != 0) cdoAbort("ERROR! Function cmor_variable failed!");
   if (cdoVerbose) cdoPrint("8.4.2. Successfully called cmor_variable.");
@@ -4147,7 +4137,7 @@ get_time_bounds(list_t *kvl, int taxisID, char *frequency, juldate_t ref_date, j
 {
   double time_val = juldate_to_seconds(juldate_sub(jtime_val, ref_date)) / tunitsec;
   int64_t vdate0b, vdate1b, vdatecorr;
-  int vtime0b, vtime1b,vtimecorr;
+  int vtime0b, vtime1b, vtimecorr;
   int year, month, day;
   int hour, min, sec;
   cdiDecodeDate(taxisInqVdate(taxisID), &year, &month, &day);
@@ -4367,8 +4357,8 @@ check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifreq, int cal
     cdoPrint("Successfully retrieved start date: '%s' and end date: '%s' chunk string.\n", old_start_date, old_end_date);
   /* Check frequency of chunk with frequency of file */
 
-  if ((j == 8 && ifreq != 3) || (ifreq == 3 && j != 8) || (j == 6 && ifreq != 2) || (ifreq == 2 && j != 6)
-      || (j == 4 && ifreq != 1) || (ifreq == 1 && j != 4))
+  if ((j == 8 && ifreq != 3) || (ifreq == 3 && j != 8) || (j == 6 && ifreq != 2) || (ifreq == 2 && j != 6) || (j == 4 && ifreq != 1)
+      || (ifreq == 1 && j != 4))
     {
       cdoWarning("In checking last chunk:\n          Frequency of chunk file does not agree with frequency of the "
                  "working file.\n          Switched to replace mode for this variable.");
@@ -4634,8 +4624,7 @@ get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, int ifreq, int 
       else
         {
           if (cdoVerbose)
-            cdoPrint("It is tried to open a chunk description file for varID: '%d': '%s'.", vars[j].cdi_varID,
-                     chunk_des_files[j]);
+            cdoPrint("It is tried to open a chunk description file for varID: '%d': '%s'.", vars[j].cdi_varID, chunk_des_files[j]);
           chunk_files[j] = use_chunk_des_files(kvl, vlistID, vars[j].cdi_varID, chunk_des_files[j], ifreq, calendar);
         }
       if (cdoVerbose && strcmp(chunk_files[j], " ") != 0)
@@ -4744,8 +4733,8 @@ write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_fr
                       cmf = cmor_write(vars[i].cmor_varID, dataslice, vars[i].datatype, 1, &time_val, time_bndsp, NULL);
                       Free(dataslice);
 #else
-                      cmf = cmor_write(vars[i].cmor_varID, dataslice, vars[i].datatype, chunk_files[i], 1, &time_val,
-                                       time_bndsp, NULL);
+                      cmf = cmor_write(vars[i].cmor_varID, dataslice, vars[i].datatype, chunk_files[i], 1, &time_val, time_bndsp,
+                                       NULL);
 #endif
                       Free(dataslice);
                     }
@@ -4754,15 +4743,15 @@ write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_fr
 #if (CMOR_VERSION_MAJOR == 3 && CMOR_VERSION_MINOR <= 2 && CMOR_VERSION_PATCH <= 7)
                       cmf = cmor_write(vars[i].cmor_varID, vars[i].data, vars[i].datatype, 1, &time_val, time_bndsp, NULL);
 #else
-                      cmf = cmor_write(vars[i].cmor_varID, vars[i].data, vars[i].datatype, chunk_files[i], 1, &time_val,
-                                       time_bndsp, NULL);
+                      cmf = cmor_write(vars[i].cmor_varID, vars[i].data, vars[i].datatype, chunk_files[i], 1, &time_val, time_bndsp,
+                                       NULL);
 #endif
                     }
                   if (vars[i].zfactor_id > 0)
                     {
 #if (CMOR_VERSION_MAJOR == 3 && CMOR_VERSION_MINOR <= 2 && CMOR_VERSION_PATCH <= 7)
-                      cmf = cmor_write(vars[i].zfactor_id, vars[ps_index].data, vars[ps_index].datatype, 1, &time_val,
-                                       time_bndsp, &vars[i].cmor_varID);
+                      cmf = cmor_write(vars[i].zfactor_id, vars[ps_index].data, vars[ps_index].datatype, 1, &time_val, time_bndsp,
+                                       &vars[i].cmor_varID);
 #else
                       cmf = cmor_write(vars[i].zfactor_id, vars[ps_index].data, vars[ps_index].datatype, chunk_files[i], 1,
                                        &time_val, time_bndsp, &vars[i].cmor_varID);
@@ -4796,8 +4785,7 @@ write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_fr
         {
           cmf = cmor_close_variable(vars[i].cmor_varID, file_name, NULL);
           if (strcmp(file_name, "") == 0) cdoAbort("ERROR! Function cmor_write failed!");
-          if (strcmp(project_id, "CORDEX") == 0 && kv_get_a_val(kvl, "cordexDir", NULL)
-              && kv_get_a_val(kvl, "cordexFileTem", NULL))
+          if (strcmp(project_id, "CORDEX") == 0 && kv_get_a_val(kvl, "cordexDir", NULL) && kv_get_a_val(kvl, "cordexFileTem", NULL))
             {
               char varname[CMOR_MAX_STRING], timename[CMOR_MAX_STRING];
               char *dummy = file_name;
@@ -5110,8 +5098,7 @@ read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapping vars[])
                   if (cdoVerbose) cdoPrint("5.1. Successfully mapped varID '%d' via cmor_name.", varID);
                   continue;
                 }
-              cdoWarning("5.1. In applying the mapping table '%s':\n          Could not map variable with id '%d'.", maptab,
-                         varID);
+              cdoWarning("5.1. In applying the mapping table '%s':\n          Could not map variable with id '%d'.", maptab, varID);
             }
         }
       /***/
@@ -5318,8 +5305,7 @@ check_cmdline_mapping(list_t *kvl)
   char *cn = kv_get_a_val(kvl, "cn", NULL);
   if ((name && code))
     cdoAbort("ERROR! Mapping via command line failed. Only one variable selector of 'name' and 'code' is allowed.");
-  if ((name && !cn) || (code && !cn))
-    cdoAbort("ERROR! Mapping via command line failed. A corresponding 'cmor_name' is needed.");
+  if ((name && !cn) || (code && !cn)) cdoAbort("ERROR! Mapping via command line failed. A corresponding 'cmor_name' is needed.");
 }
 
 static char *

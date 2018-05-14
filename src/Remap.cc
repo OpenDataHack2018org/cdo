@@ -1063,7 +1063,8 @@ Remap(void *argument)
                       if (gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == false)
                         {
                           remap_num_srch_bins = (!remap_extrapolate && mapType == RemapMethod::DISTWGT)
-                                                    ? 1 : remapGenNumBins(gridInqYsize(gridID1));
+                                                    ? 1
+                                                    : remapGenNumBins(gridInqYsize(gridID1));
                         }
 
                       remap_set_int(REMAP_NUM_SRCH_BINS, remap_num_srch_bins);

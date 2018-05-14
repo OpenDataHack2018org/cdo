@@ -50,8 +50,7 @@ typedef struct
 
 static YDAY_STATS *ydstatCreate(int vlistID);
 static void ydstatDestroy(YDAY_STATS *stats);
-static void ydstatUpdate(YDAY_STATS *stats, int64_t vdate, int vtime, Field **vars1, Field **vars2, int nsets,
-                         int operfunc);
+static void ydstatUpdate(YDAY_STATS *stats, int64_t vdate, int vtime, Field **vars1, Field **vars2, int nsets, int operfunc);
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
 void *
@@ -439,8 +438,7 @@ ydstatFinalize(YDAY_STATS *stats, int operfunc)
                 if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT) continue;
                 nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
                 for (levelID = 0; levelID < nlevels; levelID++)
-                  farcstd(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID], stats->nsets[dayoy],
-                          divisor);
+                  farcstd(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID], stats->nsets[dayoy], divisor);
               }
             break;
 
@@ -451,8 +449,7 @@ ydstatFinalize(YDAY_STATS *stats, int operfunc)
                 if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT) continue;
                 nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
                 for (levelID = 0; levelID < nlevels; levelID++)
-                  farcvar(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID], stats->nsets[dayoy],
-                          divisor);
+                  farcvar(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID], stats->nsets[dayoy], divisor);
               }
             break;
           }

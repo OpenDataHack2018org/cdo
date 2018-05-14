@@ -556,8 +556,7 @@ Select(void *process)
               if (SELLIST_CHECK(timestep)) copytimestep = true;
               if (SELLIST_CHECK(timestep_of_year)) copytimestep = true;
 
-              if (!copytimestep && SELLIST_NVAL(date) == 0 && SELLIST_NVAL(timestep) == 0
-                  && SELLIST_NVAL(timestep_of_year) == 0)
+              if (!copytimestep && SELLIST_NVAL(date) == 0 && SELLIST_NVAL(timestep) == 0 && SELLIST_NVAL(timestep_of_year) == 0)
                 {
                   bool lseason = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
 

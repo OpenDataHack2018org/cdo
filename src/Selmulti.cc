@@ -276,8 +276,8 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype,
+                                         (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
                                          "OFFSET=%f",
@@ -289,8 +289,8 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype,
+                                         (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
                                          "OFFSET=%f",
@@ -302,8 +302,8 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code,
+                                         ltype, (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   "
                                          "[varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f",
@@ -321,8 +321,8 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code,
+                                         ltype, (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   "
                                          "[varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f",
@@ -334,8 +334,8 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype,
+                                         (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
                                          "OFFSET=%f",
@@ -347,8 +347,8 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code,
+                                         ltype, (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   "
                                          "[varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f",
@@ -424,8 +424,7 @@ Selmulti(void *process)
                                      "%d, sellevel %d) => change (%d,%d,%d)",
                                      code, ltype, (int) level, nvars, varID, selcode, selltype, sellevel, tuplerec->changedCode,
                                      tuplerec->changedLevelType, tuplerec->changedLevel);
-                          if ((tuplerec->changedCode == -1) && (tuplerec->changedLevelType == -1)
-                              && (tuplerec->changedLevel == -1))
+                          if ((tuplerec->changedCode == -1) && (tuplerec->changedLevelType == -1) && (tuplerec->changedLevel == -1))
                             cdoPrint(" WARNING: Cannot CHANGE identification!");
                           else
                             streamGrbChangeParameterIdentification(tuplerec->changedCode, tuplerec->changedLevelType,
@@ -473,8 +472,8 @@ Selmulti(void *process)
               if (lcopy)
                 {
                   if (CdoDebug::cdoDebugExt)
-                    cdoPrint(" Copying record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",
-                             recID, code, ltype, (int) (level), varID, levelID);
+                    cdoPrint(" Copying record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", recID, code,
+                             ltype, (int) (level), varID, levelID);
                   pstreamCopyRecord(streamID2, streamID1);
                 }
               else
@@ -484,8 +483,8 @@ Selmulti(void *process)
                   if (!simpleMath)
                     {
                       if (CdoDebug::cdoDebugExt)
-                        cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",
-                                 recID, code, ltype, (int) (level), varID, levelID);
+                        cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", recID,
+                                 code, ltype, (int) (level), varID, levelID);
                       pstreamWriteRecord(streamID2, array, nmiss);
                     }
                   else  // 1:  simple array arithmetics ( *,+)
@@ -694,8 +693,7 @@ strContains(char *str, const char *substr)
   if (lensub > lenstr)
     {
       if (CdoDebug::cdoDebugExt >= 100)
-        cdoPrint("strContains():  substr('%s') NOT found in str('%s');  lensub(%zu)>lenstr(%zu) ",
-                 substr, str, lensub, lenstr);
+        cdoPrint("strContains():  substr('%s') NOT found in str('%s');  lensub(%zu)>lenstr(%zu) ", substr, str, lensub, lenstr);
       return NULL;
     }
   char *rv = strstr(str, substr);
@@ -1035,8 +1033,7 @@ multiSelectionParser(const char *filenameOrString)
       if (strpos != NULL)
         {
           if (CdoDebug::cdoDebugExt)
-            cdoPrint(" Parsing notation (code(s),..; levelType(s),..; level(s),..) : %s; [selectionRec =%d]",
-                     strpos, selectionRec);
+            cdoPrint(" Parsing notation (code(s),..; levelType(s),..; level(s),..) : %s; [selectionRec =%d]", strpos, selectionRec);
           if (selectionRec == 3) strpos = strContains(pline, "(");
           pline = strpos;
           tuplerec = TUPLERECNew();

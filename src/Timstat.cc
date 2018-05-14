@@ -143,8 +143,8 @@ timstatAddOperators(void)
   // clang-format on
 }
 
-
-void *Timstat(void *argument)
+void *
+Timstat(void *argument)
 {
   TimeStat timestat_date = TimeStat::MEAN;
   int64_t vdate0 = 0;
@@ -155,8 +155,8 @@ void *Timstat(void *argument)
   int vlistID3, taxisID3 = -1;
   size_t nmiss;
   bool lvfrac = false;
-  int nwpv; // number of words per value; real:1  complex:2
-  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
+  int nwpv;  // number of words per value; real:1  complex:2
+  char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
   double vfrac = 1;
 
   cdoInitialize(argument);
@@ -164,16 +164,16 @@ void *Timstat(void *argument)
   timstatAddOperators();
 
   int operatorID = cdoOperatorID();
-  int operfunc   = cdoOperatorF1(operatorID);
+  int operfunc = cdoOperatorF1(operatorID);
   int comparelen = cdoOperatorF2(operatorID);
 
-  bool lrange  = operfunc == func_range;
+  bool lrange = operfunc == func_range;
   bool lminidx = operfunc == func_minidx;
   bool lmaxidx = operfunc == func_maxidx;
-  bool lmean   = operfunc == func_mean || operfunc == func_avg;
-  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lmean = operfunc == func_mean || operfunc == func_avg;
+  bool lstd = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int  divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   if (operfunc == func_mean)
     {
@@ -327,8 +327,7 @@ void *Timstat(void *argument)
                     {
                       if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(nwpv * gridsize * sizeof(double));
 
-                      for (size_t i = 0; i < nwpv * gridsize; i++)
-                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                      for (size_t i = 0; i < nwpv * gridsize; i++) psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
               else

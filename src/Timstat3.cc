@@ -266,8 +266,7 @@ Timstat3(void *process)
               for (int j = 0; j < n_in; j++)
                 {
                   double fnvals = iwork[j][varID][levelID][i];
-                  mean_estimator
-                      = ADDMN(mean_estimator, MULMN(mean_factor[j], DIVMN(fwork[2 * j][varID][levelID].ptr[i], fnvals)));
+                  mean_estimator = ADDMN(mean_estimator, MULMN(mean_factor[j], DIVMN(fwork[2 * j][varID][levelID].ptr[i], fnvals)));
                 }
 
               double temp1 = 0;
@@ -282,8 +281,7 @@ Timstat3(void *process)
               double temp2 = DIVMN(DIVMN(mean_estimator, norm), stddev_estimator);
               fractil = deg_of_freedom < 1 ? missval1 : student_t_inv(deg_of_freedom, 1 - risk / 2, __func__);
 
-              out[0].ptr[i]
-                  = DBL_IS_EQUAL(temp2, missval1) || DBL_IS_EQUAL(fractil, missval1) ? missval1 : fabs(temp2) >= fractil;
+              out[0].ptr[i] = DBL_IS_EQUAL(temp2, missval1) || DBL_IS_EQUAL(fractil, missval1) ? missval1 : fabs(temp2) >= fractil;
             }
         }
 

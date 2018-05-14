@@ -32,10 +32,10 @@
 
 bool levelDirUp(int nlev, double *lev);
 bool levelDirDown(int nlev, double *lev);
-void vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1,
-                       int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
-void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2, int *lev_idx1, int *lev_idx2,
-                      double *lev_wgt1, double *lev_wgt2);
+void vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1, int *lev_idx2,
+                       double *lev_wgt1, double *lev_wgt2);
+void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1,
+                      double *lev_wgt2);
 void vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels);
 
 /*
@@ -48,8 +48,8 @@ void vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels);
  * 3d version of vert_gen_weights() (src/Intlevel.cc)
  */
 static void
-vert_gen_weights3d(bool expol, int nlev1, size_t gridsize, double *xlev1, int nlev2, double *xlev2, int *xlev_idx1,
-                   int *xlev_idx2, double *xlev_wgt1, double *xlev_wgt2)
+vert_gen_weights3d(bool expol, int nlev1, size_t gridsize, double *xlev1, int nlev2, double *xlev2, int *xlev_idx1, int *xlev_idx2,
+                   double *xlev_wgt1, double *xlev_wgt2)
 {
   std::vector<double> lev1(nlev1);
   std::vector<double> lev2(nlev2);
@@ -376,8 +376,7 @@ Intlevel3d(void *process)
               size_t gridsize = gridInqSize(gridID);
               double missval = vlistInqVarMissval(vlistID1, varID);
 
-              vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID], nlevo, lev_idx1, lev_idx2, lev_wgt1,
-                                lev_wgt2);
+              vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID], nlevo, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
               for (levelID = 0; levelID < nlevo; levelID++)
                 {

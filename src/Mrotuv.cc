@@ -275,7 +275,7 @@ Mrotuv(void *process)
 
   for (size_t i = 0; i < gridsize; i++)
     {
-      grid1x [i] *= DEG2RAD;
+      grid1x[i] *= DEG2RAD;
       grid1y[i] *= DEG2RAD;
     }
 
@@ -350,7 +350,8 @@ Mrotuv(void *process)
 
           /* rotate*/
 
-          rotate_uv(urfield[levelID].data(), vrfield[levelID].data(), nlon, nlat, grid1x.data(), grid1y.data(), ufield.data(), vfield.data());
+          rotate_uv(urfield[levelID].data(), vrfield[levelID].data(), nlon, nlat, grid1x.data(), grid1y.data(), ufield.data(),
+                    vfield.data());
 
           /* load to a help field */
           for (size_t j = 0; j < nlat; j++)

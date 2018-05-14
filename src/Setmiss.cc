@@ -148,8 +148,8 @@ Setmiss(void *process)
             {
               nmiss = 0;
               for (size_t i = 0; i < gridsize; i++)
-                if (DBL_IS_EQUAL(array[i], missval) || DBL_IS_EQUAL(array[i], (float) missval)
-                    || DBL_IS_EQUAL(array[i], missval2) || DBL_IS_EQUAL(array[i], (float) missval2))
+                if (DBL_IS_EQUAL(array[i], missval) || DBL_IS_EQUAL(array[i], (float) missval) || DBL_IS_EQUAL(array[i], missval2)
+                    || DBL_IS_EQUAL(array[i], (float) missval2))
                   {
                     array[i] = missval2;
                     nmiss++;

@@ -36,7 +36,7 @@ get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
           break;
         }
     }
-  
+
   *ilast = i;
 
   return ival;

@@ -469,8 +469,8 @@ Expr(void *process)
         {
           size_t ngp = params[varID].ngp;
           size_t nlev = params[varID].nlev;
-          size_t nItems = MAX(4, ngp*nlev);
-          params[varID].data = (double*) Malloc(nItems*sizeof(double));
+          size_t nItems = MAX(4, ngp * nlev);
+          params[varID].data = (double *) Malloc(nItems * sizeof(double));
         }
     }
 
@@ -478,8 +478,8 @@ Expr(void *process)
     {
       size_t ngp = params[varID].ngp;
       size_t nlev = params[varID].nlev;
-      size_t nItems = MAX(4, ngp*nlev);
-      params[varID].data = (double*) Malloc(nItems*sizeof(double));
+      size_t nItems = MAX(4, ngp * nlev);
+      params[varID].data = (double *) Malloc(nItems * sizeof(double));
     }
 
   for (int i = 0; i < parse_arg.ncoords; i++)
@@ -517,9 +517,7 @@ Expr(void *process)
                   if (ngp > 1)
                     {
                       int wstatus = gridWeights(gridID, data);
-                      if (wstatus)
-                        cdoWarning("Grid cell bounds not available, using "
-                                   "constant grid cell area weights!");
+                      if (wstatus) cdoWarning("Grid cell bounds not available, using constant grid cell area weights!");
                     }
                 }
             }

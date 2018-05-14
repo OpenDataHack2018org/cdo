@@ -165,20 +165,14 @@ ProcessType::handleProcessErr(ProcessStatus p_proErr)
       }
     case ProcessStatus::TooManyStreams:
       {
-        CdoError::Abort(Cdo::progname,
-                        "Too many streams specified!"
-                        " Operator ",
-                        m_operatorCommand, " needs ", m_module.streamInCnt, " input and ", m_module.streamOutCnt,
-                        " output streams.");
+        CdoError::Abort(Cdo::progname, "Too many streams specified! Operator ", m_operatorCommand, " needs ", m_module.streamInCnt,
+                        " input and ", m_module.streamOutCnt, " output streams.");
         break;
       }
     case ProcessStatus::TooFewStreams:
       {
-        CdoError::Abort(Cdo::progname,
-                        "Too few streams specified!"
-                        " Operator ",
-                        m_operatorCommand, " needs ", m_module.streamInCnt, " input and ", m_module.streamOutCnt,
-                        " output streams.");
+        CdoError::Abort(Cdo::progname, "Too few streams specified! Operator ", m_operatorCommand, " needs ", m_module.streamInCnt,
+                        " input and ", m_module.streamOutCnt, " output streams.");
         break;
       }
     }
@@ -501,18 +495,12 @@ ProcessType::query_user_exit(const char *argument)
     {
       if (nbr_itr++ > USR_RPL_MAX_NBR)
         {
-          (void) fprintf(stdout,
-                         "\n%s: ERROR %d failed attempts to obtain valid "
-                         "interactive input.\n",
-                         prompt, nbr_itr - 1);
+          (void) fprintf(stdout, "\n%s: ERROR %d failed attempts to obtain valid interactive input.\n", prompt, nbr_itr - 1);
           exit(EXIT_FAILURE);
         }
 
       if (nbr_itr > 1) (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
-      (void) fprintf(stdout,
-                     "%s: %s exists ---`e'xit, or `o'verwrite (delete existing "
-                     "file) (e/o)? ",
-                     prompt, argument);
+      (void) fprintf(stdout, "%s: %s exists ---`e'xit, or `o'verwrite (delete existing file) (e/o)? ", prompt, argument);
       (void) fflush(stdout);
       if (fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL) continue;
 
@@ -592,8 +580,8 @@ ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
       p_times.p_systime = a_stime;
 
       p_times.p_cputime = p_times.p_usertime + p_times.p_systime;
-      fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_times.p_usertime, p_times.p_systime,
-              p_times.p_cputime, p_memstring);
+      fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_times.p_usertime, p_times.p_systime, p_times.p_cputime,
+              p_memstring);
     }
 #else
   fprintf(stderr, "\n");
@@ -619,8 +607,7 @@ ProcessType::printProcessedValues()
 #endif
                 (intmax_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
       else
-        fprintf(stderr, "Processed %zu value%s from %d variable%s", (size_t) nvals, ADD_PLURAL(nvals), nvars,
-                ADD_PLURAL(nvars));
+        fprintf(stderr, "Processed %zu value%s from %d variable%s", (size_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
     }
   else if (nvars > 0)
     {

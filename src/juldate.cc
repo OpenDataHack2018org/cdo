@@ -67,5 +67,6 @@ juldate_add_seconds(int64_t seconds, juldate_t juldate)
 double
 juldate_to_seconds(juldate_t juldate)
 {
-  return juldate.julday * 86400. + juldate.secofday;;
+  return juldate.julday * 86400. + juldate.secofday;
+  ;
 }

@@ -95,7 +95,7 @@ nlat_to_nlon(int nlat)
   while (1)
     {
       int n = nlon;
-      if (n % 8 == 0)  n /= 8;
+      if (n % 8 == 0) n /= 8;
       while (n % 6 == 0) n /= 6;
       while (n % 5 == 0) n /= 5;
       while (n % 4 == 0) n /= 4;
@@ -616,8 +616,8 @@ grib_get_reduced_row(long pl, double lon_first, double lon_last, long *npoints, 
 }
 
 static int
-qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast, double *array, int *rowlon, int ny, double missval,
-               int *iret, int lmiss, int lperio, int lveggy)
+qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast, double *array, int *rowlon, int ny, double missval, int *iret,
+               int lmiss, int lperio, int lveggy)
 {
   /* sub area (longitudes) */
   long ilon_firstx;
@@ -731,7 +731,8 @@ field2regular(int gridID1, int gridID2, double missval, double *array, size_t nm
   size_t nx = 0;
   if (fabs(xfirst) > 0 || (np > 0 && fabs(xlast - (360.0 - 90.0 / np)) > 90.0 / np))
     {
-      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon.data(), ny, missval, &iret, lmiss, lperio, lnearest);
+      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon.data(), ny, missval, &iret, lmiss, lperio,
+                          lnearest);
     }
   else
     {
@@ -1064,7 +1065,7 @@ gridToCurvilinear(int gridID1, int lbounds)
               xbounds.resize(2 * nx);
               grid_gen_bounds(nx, xvals.data(), xbounds.data());
             }
-            
+
           if (nvertex == 2 && gridInqYbounds(gridID1, NULL))
             {
               ybounds.resize(2 * ny);
@@ -1337,7 +1338,8 @@ gridToUnstructured(int gridID1, int lbounds)
 
                 if (lproj_rll)
                   {
-                    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds.data(), ybounds.data(), xbounds2D.data(), ybounds2D.data());
+                    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds.data(), ybounds.data(), xbounds2D.data(),
+                                     ybounds2D.data());
                   }
                 else
                   {

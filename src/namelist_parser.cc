@@ -125,16 +125,13 @@ namelistbuf_to_pmlist(listbuf_t *listbuf)
       switch (status)
         {
         case NAMELIST_ERROR_INVAL:
-          fprintf(stderr, "Namelist error: Invalid character in %s (line=%d "
-                          "character='%c')!\n",
-                  name, p->lineno, listbuf->buffer[p->pos]);
+          fprintf(stderr, "Namelist error: Invalid character in %s (line=%d character='%c')!\n", name, p->lineno,
+                  listbuf->buffer[p->pos]);
           break;
         case NAMELIST_ERROR_PART:
           fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", name, p->lineno);
           break;
-        case NAMELIST_ERROR_INKEY:
-          fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", name, p->lineno);
-          break;
+        case NAMELIST_ERROR_INKEY: fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", name, p->lineno); break;
         case NAMELIST_ERROR_INTYP:
           fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", name, p->lineno);
           break;

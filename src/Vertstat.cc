@@ -260,8 +260,8 @@ Vertstat(void *process)
             vert[index].numlevel = nlev;
             vert[index].thickness.resize(nlev);
             vert[index].weights.resize(nlev);
-            vert[index].status
-              = getLayerThickness(useweights, genbounds, index, zaxisID, nlev, vert[index].thickness.data(), vert[index].weights.data());
+            vert[index].status = getLayerThickness(useweights, genbounds, index, zaxisID, nlev, vert[index].thickness.data(),
+                                                   vert[index].weights.data());
           }
           if (!useweights) vert[index].status = 3;
         }

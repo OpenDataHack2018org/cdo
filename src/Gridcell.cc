@@ -66,9 +66,7 @@ grid_cell_area(int gridID, double *array)
   else
     {
       if (gridtype == GRID_GAUSSIAN_REDUCED)
-        cdoAbort("Unsupported grid type: %s, use CDO option -R to convert "
-                 "reduced to regular grid!",
-                 gridNamePtr(gridtype));
+        cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!", gridNamePtr(gridtype));
       else
         cdoAbort("%s: Unsupported grid type: %s", __func__, gridNamePtr(gridtype));
     }
@@ -244,22 +242,18 @@ Gridcell(void *process)
                   {
                     if (j == 0)
                       {
-                        len2 = orthodrome(xv[j * xsize + i], yv[j * xsize + i], xv[(j + 1) * xsize + i],
-                                          yv[(j + 1) * xsize + i]);
+                        len2 = orthodrome(xv[j * xsize + i], yv[j * xsize + i], xv[(j + 1) * xsize + i], yv[(j + 1) * xsize + i]);
                         len1 = len2;
                       }
                     else if (j == (ysize - 1))
                       {
-                        len1 = orthodrome(xv[(j - 1) * xsize + i], yv[(j - 1) * xsize + i], xv[j * xsize + i],
-                                          yv[j * xsize + i]);
+                        len1 = orthodrome(xv[(j - 1) * xsize + i], yv[(j - 1) * xsize + i], xv[j * xsize + i], yv[j * xsize + i]);
                         len2 = len1;
                       }
                     else
                       {
-                        len1 = orthodrome(xv[(j - 1) * xsize + i], yv[(j - 1) * xsize + i], xv[j * xsize + i],
-                                          yv[j * xsize + i]);
-                        len2 = orthodrome(xv[j * xsize + i], yv[j * xsize + i], xv[(j + 1) * xsize + i],
-                                          yv[(j + 1) * xsize + i]);
+                        len1 = orthodrome(xv[(j - 1) * xsize + i], yv[(j - 1) * xsize + i], xv[j * xsize + i], yv[j * xsize + i]);
+                        len2 = orthodrome(xv[j * xsize + i], yv[j * xsize + i], xv[(j + 1) * xsize + i], yv[(j + 1) * xsize + i]);
                       }
 
                     array[j * xsize + i] = 0.5 * (len1 + len2) * PlanetRadius;
@@ -269,9 +263,7 @@ Gridcell(void *process)
       else
         {
           if (gridtype == GRID_GAUSSIAN_REDUCED)
-            cdoAbort("Unsupported grid type: %s, use CDO option -R to convert "
-                     "reduced to regular grid!",
-                     gridNamePtr(gridtype));
+            cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!", gridNamePtr(gridtype));
           else
             cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
         }

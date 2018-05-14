@@ -64,8 +64,7 @@ gridSearchSquareReg2dNN(size_t nx, size_t ny, size_t *restrict nbr_add, double *
 
   std::vector<double> sincoslon(nx);
 
-  for (size_t ii = 0; ii < nx; ++ii)
-    sincoslon[ii] = coslon_dst * cos(src_center_lon[ii]) + sinlon_dst * sin(src_center_lon[ii]);
+  for (size_t ii = 0; ii < nx; ++ii) sincoslon[ii] = coslon_dst * cos(src_center_lon[ii]) + sinlon_dst * sin(src_center_lon[ii]);
 
   for (size_t jj = jjf; jj <= jjl; ++jj)
     {

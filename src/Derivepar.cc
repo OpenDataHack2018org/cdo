@@ -217,8 +217,7 @@ Derivepar(void *process)
   if (operatorID == GHEIGHT)
     {
       if (humID == -1)
-        cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity),
-                   var_stdname(specific_humidity));
+        cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity), var_stdname(specific_humidity));
       else
         hum.resize(gridsize * nhlevf);
 

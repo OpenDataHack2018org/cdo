@@ -1031,12 +1031,10 @@ Gradsdes(void *process)
   int filetype = pstreamInqFiletype(streamID);
   int byteorder = pstreamInqByteorder(streamID);
 
-  if (filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C
-      || filetype == CDI_FILETYPE_NC5)
+  if (filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5)
     filetype = CDI_FILETYPE_NC;
 
-  if (filetype != CDI_FILETYPE_SRV && filetype != CDI_FILETYPE_EXT && filetype != CDI_FILETYPE_IEG
-      && filetype != CDI_FILETYPE_GRB)
+  if (filetype != CDI_FILETYPE_SRV && filetype != CDI_FILETYPE_EXT && filetype != CDI_FILETYPE_IEG && filetype != CDI_FILETYPE_GRB)
     {
       if (filetype == CDI_FILETYPE_NC)
         //        cdoAbort("Unsupported file format: NetCDF");
@@ -1054,8 +1052,7 @@ Gradsdes(void *process)
       gridID = vlistGrid(vlistID, index);
       gridtype = gridInqType(gridID);
       int projtype = gridInqProjType(gridID);
-      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || (gridtype == GRID_PROJECTION && projtype == CDI_PROJ_LCC))
-        break;
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || (gridtype == GRID_PROJECTION && projtype == CDI_PROJ_LCC)) break;
     }
 
   if (index == ngrids) cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!", gridNamePtr(gridtype));
@@ -1086,8 +1083,8 @@ Gradsdes(void *process)
       else
         {
           vlistInqVarName(vlistID, varID, varname);
-          cdoPrint("Unsupported grid type >%s<, skipped variable %s!",
-                   gridNamePtr(gridInqType(vlistInqVarGrid(vlistID, varID))), varname);
+          cdoPrint("Unsupported grid type >%s<, skipped variable %s!", gridNamePtr(gridInqType(vlistInqVarGrid(vlistID, varID))),
+                   varname);
           vars[varID] = FALSE;
         }
     }

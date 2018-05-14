@@ -31,8 +31,8 @@
 #define NALLOC_INC 1024
 
 static void
-spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, double *window, double wssum, int detrend,
-         int seg_n, int seg_l)
+spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, double *window, double wssum, int detrend, int seg_n,
+         int seg_l)
 {
   int k;
   double sumx, sumkx;

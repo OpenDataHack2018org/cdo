@@ -207,9 +207,7 @@ remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType sub
             else
               writemode |= NC_CLASSIC_MODEL;
 #else
-            cdoPrint("Number of remap links %zu exceeds maximum of %zu and "
-                     "NetCDF 4 is not available!",
-                     nlinks, maxlinks);
+            cdoPrint("Number of remap links %zu exceeds maximum of %zu and NetCDF 4 is not available!", nlinks, maxlinks);
 #endif
           }
         else
@@ -271,10 +269,8 @@ remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType sub
   nce(nc_def_dim(nc_file_id, "dst_grid_size", tgt_grid.size, &nc_dstgrdsize_id));
 
   // Define grid corner dimension
-  if (src_grid.lneed_cell_corners)
-    nce(nc_def_dim(nc_file_id, "src_grid_corners", src_grid.num_cell_corners, &nc_srcgrdcorn_id));
-  if (tgt_grid.lneed_cell_corners)
-    nce(nc_def_dim(nc_file_id, "dst_grid_corners", tgt_grid.num_cell_corners, &nc_dstgrdcorn_id));
+  if (src_grid.lneed_cell_corners) nce(nc_def_dim(nc_file_id, "src_grid_corners", src_grid.num_cell_corners, &nc_srcgrdcorn_id));
+  if (tgt_grid.lneed_cell_corners) nce(nc_def_dim(nc_file_id, "dst_grid_corners", tgt_grid.num_cell_corners, &nc_dstgrdcorn_id));
 
   // Define grid rank dimension
   nce(nc_def_dim(nc_file_id, "src_grid_rank", src_grid.rank, &nc_srcgrdrank_id));
@@ -767,10 +763,8 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMetho
       nce(nc_inq_attlen(nc_file_id, nc_srcgrdcrnrlat_id, "units", &attlen));
       src_grid_units[attlen] = 0;
 
-      grid_to_radian(src_grid_units, src_grid.num_cell_corners * src_grid.size, src_grid.cell_corner_lon,
-                     "source grid corner lon");
-      grid_to_radian(src_grid_units, src_grid.num_cell_corners * src_grid.size, src_grid.cell_corner_lat,
-                     "source grid corner lat");
+      grid_to_radian(src_grid_units, src_grid.num_cell_corners * src_grid.size, src_grid.cell_corner_lon, "source grid corner lon");
+      grid_to_radian(src_grid_units, src_grid.num_cell_corners * src_grid.size, src_grid.cell_corner_lat, "source grid corner lat");
     }
 
   if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_srcgrdarea_id, &src_grid.cell_area[0]));
@@ -802,10 +796,8 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMetho
       nce(nc_inq_attlen(nc_file_id, nc_dstgrdcrnrlat_id, "units", &attlen));
       tgt_grid_units[attlen] = 0;
 
-      grid_to_radian(tgt_grid_units, tgt_grid.num_cell_corners * tgt_grid.size, tgt_grid.cell_corner_lon,
-                     "target grid corner lon");
-      grid_to_radian(tgt_grid_units, tgt_grid.num_cell_corners * tgt_grid.size, tgt_grid.cell_corner_lat,
-                     "target grid corner lat");
+      grid_to_radian(tgt_grid_units, tgt_grid.num_cell_corners * tgt_grid.size, tgt_grid.cell_corner_lon, "target grid corner lon");
+      grid_to_radian(tgt_grid_units, tgt_grid.num_cell_corners * tgt_grid.size, tgt_grid.cell_corner_lat, "target grid corner lat");
     }
 
   if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_dstgrdarea_id, &tgt_grid.cell_area[0]));

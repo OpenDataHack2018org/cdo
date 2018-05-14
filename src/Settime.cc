@@ -127,7 +127,7 @@ shifttime(int calendar, int tunit, int64_t ijulinc, int64_t *pdate, int *ptime)
       int year, month, day;
       cdiDecodeDate(vdate, &year, &month, &day);
 
-      month += (int)ijulinc;
+      month += (int) ijulinc;
 
       while (month > 12)
         {
@@ -313,7 +313,7 @@ Settime(void *process)
         }
 
       /* increment in seconds */
-      ijulinc = (int64_t)incperiod * incunit;
+      ijulinc = (int64_t) incperiod * incunit;
     }
   else if (operatorID == SETDATE)
     {
@@ -355,7 +355,7 @@ Settime(void *process)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       /* increment in seconds */
-      ijulinc = (int64_t)incperiod * incunit;
+      ijulinc = (int64_t) incperiod * incunit;
     }
   else if (operatorID == SETTUNITS || operatorID == SETTBOUNDS)
     {
@@ -368,8 +368,8 @@ Settime(void *process)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       if (operatorID == SETTBOUNDS
-          && !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS
-               || tunit == TUNIT_DAY || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR))
+          && !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS || tunit == TUNIT_DAY
+               || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR))
         cdoAbort("Unsupported frequency %s! Use hour, 3hours, 6hours, day, month or year.", timeunits);
     }
   else if (operatorID == SETCALENDAR)
@@ -531,7 +531,7 @@ Settime(void *process)
                 }
               else
                 {
-                  month += (int)ijulinc;
+                  month += (int) ijulinc;
 
                   while (month > 12)
                     {

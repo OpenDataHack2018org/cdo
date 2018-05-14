@@ -93,8 +93,7 @@ Setgatt(void *process)
             {
               *attstring = '\0';
               attstring++;
-              while (isspace((int) *attstring) || (int) *attstring == '=' || (int) *attstring == '"'
-                     || (int) *attstring == '\'')
+              while (isspace((int) *attstring) || (int) *attstring == '=' || (int) *attstring == '"' || (int) *attstring == '\'')
                 attstring++;
               attlen = strlen(attstring);
               if (attstring[attlen - 1] == '"' || attstring[attlen - 1] == '\'') attstring[--attlen] = 0;

@@ -184,8 +184,7 @@ Vertintap(void *process)
       cdoPrint("Found:");
       if (psID != -1) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
       if (apressID != -1) cdoPrint("  %s -> %s", var_stdname(air_pressure), cdoVlistInqVarName(vlistID1, apressID, varname));
-      if (dpressID != -1)
-        cdoPrint("  %s -> %s", var_stdname(pressure_thickness), cdoVlistInqVarName(vlistID1, dpressID, varname));
+      if (dpressID != -1) cdoPrint("  %s -> %s", var_stdname(pressure_thickness), cdoVlistInqVarName(vlistID1, dpressID, varname));
       if (tempID != -1) cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
     }
 
@@ -396,8 +395,7 @@ Vertintap(void *process)
           for (int k = 1; k < nhlevf; k++)
             for (size_t i = 0; i < gridsize; i++)
               half_press[k * gridsize + i] = 0.5 * (full_press[(k - 1) * gridsize + i] + full_press[k * gridsize + i]);
-          for (size_t i = 0; i < gridsize; i++)
-            half_press[(nhlevh - 1) * gridsize + i] = full_press[(nhlevf - 1) * gridsize + i];
+          for (size_t i = 0; i < gridsize; i++) half_press[(nhlevh - 1) * gridsize + i] = full_press[(nhlevf - 1) * gridsize + i];
 
           if (useLogType)
             {

@@ -253,8 +253,8 @@ Sort(void *process)
               {
                 nlevs = varInfo[vindex].nlevs;
                 for (lindex = 0; lindex < nlevs; ++lindex)
-                  printf("sort out: %d %s %d %d %g\n", vindex, varInfo[vindex].name, varInfo[vindex].code,
-                         varInfo[vindex].nlevs, varInfo[vindex].levInfo[lindex].level);
+                  printf("sort out: %d %s %d %d %g\n", vindex, varInfo[vindex].name, varInfo[vindex].code, varInfo[vindex].nlevs,
+                         varInfo[vindex].levInfo[lindex].level);
               }
         }
 

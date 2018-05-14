@@ -73,8 +73,7 @@ calcLatBins(GridSearchBins &searchBins)
 }
 
 size_t
-get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &srcBins, float *tgt_cell_bound_box,
-               size_t *srch_add)
+get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &srcBins, float *tgt_cell_bound_box, size_t *srch_add)
 {
   const size_t nbins = srcBins.nbins;
   const size_t src_grid_size = srcBins.ncells;
@@ -109,11 +108,9 @@ get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &sr
   for (size_t src_cell_add = min_add; src_cell_add <= max_add; ++src_cell_add)
     {
       src_cell_addm4 = src_cell_add << 2;
-      if ((src_cell_bound_box[src_cell_addm4 + 2] <= bound_box_lon2)
-          && (src_cell_bound_box[src_cell_addm4 + 3] >= bound_box_lon1))
+      if ((src_cell_bound_box[src_cell_addm4 + 2] <= bound_box_lon2) && (src_cell_bound_box[src_cell_addm4 + 3] >= bound_box_lon1))
         {
-          if ((src_cell_bound_box[src_cell_addm4] <= bound_box_lat2)
-              && (src_cell_bound_box[src_cell_addm4 + 1] >= bound_box_lat1))
+          if ((src_cell_bound_box[src_cell_addm4] <= bound_box_lat2) && (src_cell_bound_box[src_cell_addm4 + 1] >= bound_box_lat1))
             {
               srch_add[num_srch_cells] = src_cell_add;
               num_srch_cells++;
@@ -178,7 +175,7 @@ gridSearchSquareCurv2dNNScrip(size_t min_add, size_t max_add, size_t *restrict n
   for (size_t srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
       distance = acos(coslat_dst * cos(src_center_lat[srch_add])
-                      * (coslon_dst * cos(src_center_lon[srch_add]) + sinlon_dst * sin(src_center_lon[srch_add]))
+                          * (coslon_dst * cos(src_center_lon[srch_add]) + sinlon_dst * sin(src_center_lon[srch_add]))
                       + sinlat_dst * sin(src_center_lat[srch_add]));
 
       if (distance < dist_min)
@@ -283,8 +280,8 @@ quadCrossProducts(double plon, double plat, double *restrict lons, double *restr
 }
 
 bool
-pointInQuad(bool isCyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
-            double plon, double plat, const double *restrict centerLon, const double *restrict centerLat)
+pointInQuad(bool isCyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4], double plon,
+            double plat, const double *restrict centerLon, const double *restrict centerLat)
 {
   bool search_result = false;
   size_t ip1 = (i < (nx - 1)) ? i + 1 : isCyclic ? 0 : i;
@@ -384,8 +381,8 @@ gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, doubl
           size_t j = srch_add / nx;
           size_t i = srch_add - j * nx;
 
-          if (pointInQuad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat,
-                          src_grid->cell_center_lon, src_grid->cell_center_lat))
+          if (pointInQuad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_grid->cell_center_lon,
+                          src_grid->cell_center_lat))
             {
               search_result = 1;
               return search_result;
@@ -407,8 +404,8 @@ gridSearchSquareCurv2dScrip(RemapGrid *src_grid, size_t *restrict src_add, doubl
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-  search_result = gridSearchSquareCurv2dNNScrip(min_add, max_add, src_add, src_lats, plat, plon,
-                                                src_grid->cell_center_lat, src_grid->cell_center_lon);
+  search_result = gridSearchSquareCurv2dNNScrip(min_add, max_add, src_add, src_lats, plat, plon, src_grid->cell_center_lat,
+                                                src_grid->cell_center_lon);
 
   return search_result;
 }

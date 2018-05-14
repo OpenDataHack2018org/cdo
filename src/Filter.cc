@@ -327,8 +327,7 @@ Filter(void *process)
 
                   filter_fftw(nts, fmasc, ompmem[ompthID].out_fft, &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
 
-                  for (int tsID = 0; tsID < nts; tsID++)
-                    vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;
+                  for (int tsID = 0; tsID < nts; tsID++) vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;
                 }
 #endif
             }

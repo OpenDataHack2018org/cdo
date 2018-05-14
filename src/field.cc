@@ -61,7 +61,8 @@ fldfun(const Field &field, int function)
 double
 fldrange(const Field &field)
 {
-  return field.nmiss ? arrayRangeMV(field.size, field.ptr, field.missval) : arrayRange(field.size, field.ptr);;
+  return field.nmiss ? arrayRangeMV(field.size, field.ptr, field.missval) : arrayRange(field.size, field.ptr);
+  ;
 }
 
 double
@@ -91,8 +92,8 @@ fldmean(const Field &field)
 double
 fldmeanw(const Field &field)
 {
-  return field.nmiss ? arrayWeightedMeanMV(field.size, field.ptr, field.weight, field.missval) :
-    arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
+  return field.nmiss ? arrayWeightedMeanMV(field.size, field.ptr, field.weight, field.missval)
+                     : arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
 }
 
 double
@@ -104,8 +105,8 @@ fldavg(const Field &field)
 double
 fldavgw(const Field &field)
 {
-  return field.nmiss ? arrayWeightedAvgMV(field.size, field.ptr, field.weight, field.missval) :
-    arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
+  return field.nmiss ? arrayWeightedAvgMV(field.size, field.ptr, field.weight, field.missval)
+                     : arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
 }
 
 static void

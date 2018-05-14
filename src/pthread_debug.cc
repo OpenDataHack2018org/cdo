@@ -44,8 +44,8 @@ pout2(const char *caller, const char *sval, int ival, const char *sval1, int ova
 }
 
 static void
-pout3(const char *caller, const char *sval, int ival, const char *sval1, int oval1, const char *sval2, int oval2,
-      const char *sval3, int oval3)
+pout3(const char *caller, const char *sval, int ival, const char *sval1, int oval1, const char *sval2, int oval2, const char *sval3,
+      int oval3)
 {
   if (ival == oval1)
     fprintf(stderr, "%-18s :  %-14s = %s\n", caller, sval, sval1);

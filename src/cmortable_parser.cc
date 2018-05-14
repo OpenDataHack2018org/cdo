@@ -308,12 +308,9 @@ cmortablebuf_to_pmlist_json(list_t *pmlist, size_t buffersize, char *buffer, con
       switch (status)
         {
         case JSMN_ERROR_INVAL:
-          fprintf(stderr, "JSON error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno,
-                  buffer[p->pos]);
+          fprintf(stderr, "JSON error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno, buffer[p->pos]);
           break;
-        case JSMN_ERROR_PART:
-          fprintf(stderr, "JSON error: End of string not found in %s (line=%d)!\n", filename, p->lineno);
-          break;
+        case JSMN_ERROR_PART: fprintf(stderr, "JSON error: End of string not found in %s (line=%d)!\n", filename, p->lineno); break;
         default: fprintf(stderr, "JSON error in %s (line=%d)\n", filename, p->lineno); break;
         }
     }
