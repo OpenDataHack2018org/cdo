@@ -232,7 +232,8 @@ Settime(void *process)
   int varID, levelID;
   int64_t vdateb[2];
   int vtimeb[2];
-  int sdate = 0, stime = 0;
+  int64_t sdate = 0;
+  int stime = 0;
   int taxisID2 = CDI_UNDEFID;
   size_t nmiss;
   int tunit = TUNIT_DAY;
@@ -283,7 +284,7 @@ Settime(void *process)
         }
       else
         {
-          sdate = *datestr ? parameter2int(datestr) : 10101;
+          sdate = *datestr ? parameter2long(datestr) : 10101;
         }
 
       if (operatorArgc() > 1)

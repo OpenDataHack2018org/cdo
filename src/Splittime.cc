@@ -34,7 +34,7 @@
 #define MAX_STREAMS 32
 
 struct tm
-datetime_to_tm(int date, int time)
+datetime_to_tm(int64_t date, int time)
 {
   int year, month, day, hour, minute, second;
   cdiDecodeDate(date, &year, &month, &day);

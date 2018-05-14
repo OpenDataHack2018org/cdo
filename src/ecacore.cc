@@ -744,7 +744,8 @@ eca3(const ECA_REQUEST_3 *request)
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
   int64_t ivdate1 = 0, ivdate2 = 0;
   int ivtime1 = 0, ivtime2 = 0;
-  int ovdate = 0, ovtime = 0;
+  int64_t ovdate = 0;
+  int ovtime = 0;
   int nrecs, nrecords;
   int gridID, zaxisID, varID, levelID;
   int itsID;

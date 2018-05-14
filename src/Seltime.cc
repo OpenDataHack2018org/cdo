@@ -196,7 +196,8 @@ Seltime(void *process)
   double selfval = 0;
   bool lconstout = false;
   bool process_nts1 = false, process_nts2 = false;
-  std::vector<int> vdate_list, vtime_list;
+  std::vector<int64_t> vdate_list;
+  std::vector<int> vtime_list;
   ListArray<int> listArrayInt;
   ListArray<double> listArrayFlt;
   Field ***vars = NULL;
