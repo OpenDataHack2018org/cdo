@@ -289,27 +289,27 @@ mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell_corner
 static void
 getLonLatCorner(size_t nx, size_t idx, const double *grid_corner_lon, const double *grid_corner_lat, double *lons, double *lats)
 {
-  size_t j = idx / nx + 1;
-  size_t i = idx - (j - 1) * nx + 1;
+  size_t j = idx / nx;
+  size_t i = idx - j * nx;
 
-  lons[0] = grid_corner_lon[2*i+1];
-  lons[1] = grid_corner_lon[2*i];
-  lons[2] = grid_corner_lon[2*i];
-  lons[3] = grid_corner_lon[2*i+1];
+  lons[0] = grid_corner_lon[2*i];
+  lons[1] = grid_corner_lon[2*i+1];
+  lons[2] = grid_corner_lon[2*i+1];
+  lons[3] = grid_corner_lon[2*i];
 
   if ( grid_corner_lat[2*j+1] > grid_corner_lat[2*j] )
-    {
-      lats[0] = grid_corner_lat[2*j+1];
-      lats[1] = grid_corner_lat[2*j+1];
-      lats[2] = grid_corner_lat[2*j];
-      lats[3] = grid_corner_lat[2*j];
-    }
-  else
     {
       lats[0] = grid_corner_lat[2*j];
       lats[1] = grid_corner_lat[2*j];
       lats[2] = grid_corner_lat[2*j+1];
       lats[3] = grid_corner_lat[2*j+1];
+    }
+  else
+    {
+      lats[0] = grid_corner_lat[2*j+1];
+      lats[1] = grid_corner_lat[2*j+1];
+      lats[2] = grid_corner_lat[2*j];
+      lats[3] = grid_corner_lat[2*j];
     }
 }
 
@@ -351,6 +351,7 @@ gridGenAreaReg2D(int gridID, double *area)
     {
       grid_gen_bounds(nlon, grid_center_lon.data(), grid_corner_lon.data());
       grid_gen_bounds(nlat, grid_center_lat.data(), grid_corner_lat.data());
+      grid_check_lat_borders(2 * nlat, grid_corner_lat.data());
     }
 
   grid_to_radian(xunitstr, nlon, grid_center_lon.data(), "grid1 center longitudes");
@@ -537,7 +538,7 @@ gridGenArea(int gridID, double *area)
 
   if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN)
     {
-      status = gridGenAreaUnstruct(gridID, area);
+      status = gridGenAreaReg2D(gridID, area);
     }
   else if (projtype == CDI_PROJ_RLL || projtype == CDI_PROJ_LAEA || projtype == CDI_PROJ_SINU || projtype == CDI_PROJ_LCC
            || gridtype == GRID_GME || gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED)
