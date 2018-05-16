@@ -232,6 +232,7 @@ cdoConfig(const char *option)
   const char *has_proj = YN[0];
   const char *has_threads = YN[0];
   const char *has_openmp = YN[0];
+  const char *has_wordexp = YN[0];
 
 #ifdef HAVE_LIBHDF5
   has_hdf5 = YN[1];
@@ -257,6 +258,10 @@ cdoConfig(const char *option)
   has_openmp = YN[1];
 #endif
 
+#ifdef HAVE_WORDEXP_H
+  has_wordexp = YN[1];
+#endif
+
   if (STR_IS_EQ("all-json", option) || STR_IS_EQ("all", option))
     {
       fprintf(stdout, "{");
@@ -277,6 +282,7 @@ cdoConfig(const char *option)
       fprintf(stdout, ",\"has-proj\":\"%s\"", has_proj);
       fprintf(stdout, ",\"has-threads\":\"%s\"", has_threads);
       fprintf(stdout, ",\"has-openmp\":\"%s\"", has_openmp);
+      fprintf(stdout, ",\"has-wordexp\":\"%s\"", has_wordexp);
       fprintf(stdout, "}\n");
     }
   else
@@ -315,6 +321,8 @@ cdoConfig(const char *option)
         fprintf(stdout, "%s\n", has_threads);
       else if (STR_IS_EQ("has-openmp", option))
         fprintf(stdout, "%s\n", has_openmp);
+      else if (STR_IS_EQ("has-wordexp", option))
+        fprintf(stdout, "%s\n", has_wordexp);
       else
         {
           fprintf(stdout, "unknown config option: %s\n", option);
@@ -338,6 +346,7 @@ cdoConfig(const char *option)
           fprintf(stdout, "  has-proj    whether PROJ is enabled\n");
           fprintf(stdout, "  has-threads whether PTHREADS is enabled\n");
           fprintf(stdout, "  has-openmp  whether OPENMP is enabled\n");
+          fprintf(stdout, "  has-wordexp whether WORDEXP is enabled\n");
 
           exit(EXIT_FAILURE);
         }
