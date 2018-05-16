@@ -28,6 +28,7 @@
 #include <dlfcn.h>
 #include <regex>
 #include <set>
+#include <cstring>
 #include <string>
 // for std::sort()
 #include <algorithm>
