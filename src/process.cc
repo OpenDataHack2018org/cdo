@@ -19,7 +19,7 @@
 #include "config.h"
 #endif
 
-#if defined(HAVE_PTHREAD_H)
+#ifdef HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
 #ifdef _OPENMP
@@ -28,10 +28,6 @@
 
 #include <stdio.h>
 #include <string.h>
-
-#if defined(HAVE_GLOB_H)
-#include <glob.h>
-#endif
 
 #include "cdo_int.h"
 #include "error.h"
@@ -407,7 +403,7 @@ ProcessType::addChild(ProcessType *childProcess)
 void
 ProcessType::addPipeInStream()
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef HAVE_LIBPTHREAD
   inputStreams.push_back(create_pstream(m_ID, inputStreams.size()));
   m_streamCnt++;
 #else
@@ -561,7 +557,7 @@ ProcessType::getTimes(int p_processNums)
 void
 ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
 {
-#if defined(HAVE_SYS_TIMES_H)
+#ifdef HAVE_SYS_TIMES_H
   if (m_ID == 0)
     {
       if (cdoBenchmark)
@@ -600,7 +596,7 @@ ProcessType::printProcessedValues()
   if (nvals > 0)
     {
       if (sizeof(int64_t) > sizeof(size_t))
-#if defined(_WIN32)
+#ifdef _WIN32
         fprintf(stderr, "Processed %I64d value%s from %d variable%s",
 #else
         fprintf(stderr, "Processed %jd value%s from %d variable%s",

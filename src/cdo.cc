@@ -23,7 +23,7 @@
 #include <iostream>
 #include <vector>
 #include "operator_help.h"
-#if defined(HAVE_EXECINFO_H)
+#ifdef HAVE_EXECINFO_H
 #include <execinfo.h>
 #endif
 
