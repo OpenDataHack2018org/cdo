@@ -27,10 +27,6 @@
 #include <execinfo.h>
 #endif
 
-#if defined(HAVE_WORDEXP_H)
-#include <wordexp.h>
-#endif
-
 #include <signal.h>
 #include <fenv.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */

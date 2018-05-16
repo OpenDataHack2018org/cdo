@@ -21,7 +21,9 @@
 #include <iostream>  // delete should not be used here
 /*TEMP*/
 
+#ifdef HAVE_WORDEXP_H
 #include <wordexp.h>
+#endif
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,16 +48,16 @@ char *strdup(const char *s);
 */
 #endif
 
-#if defined(HAVE_GLOB_H)
+#ifdef HAVE_GLOB_H
 static int
 get_glob_flags(void)
 {
   int glob_flags = 0;
 
-#if defined(GLOB_NOCHECK)
+#ifdef GLOB_NOCHECK
   glob_flags |= GLOB_NOCHECK;
 #endif
-#if defined(GLOB_TILDE)
+#ifdef GLOB_TILDE
   glob_flags |= GLOB_TILDE;
 #endif
 
@@ -94,7 +96,7 @@ expand_filename(const char *string)
 
   if (find_wildcard(string, strlen(string)))
     {
-#if defined(HAVE_GLOB_H)
+#ifdef HAVE_GLOB_H
       int glob_flags = get_glob_flags();
       glob_t glob_results;
       glob(string, glob_flags, 0, &glob_results);
@@ -105,7 +107,8 @@ expand_filename(const char *string)
 
   return filename;
 }
-#if defined(HAVE_WORDEXP_H)
+
+#ifdef HAVE_WORDEXP_H
 // Expands all input file wildcards and removes the wildcard while inserting all expanded files into argv
 std::vector<std::string>
 expandWildCards(std::vector<std::string> argv)
