@@ -23,10 +23,6 @@
 #include <omp.h>
 #endif
 
-#ifdef HAVE_FNMATCH_H
-#include <fnmatch.h>
-#endif
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>    /* tolower  */
@@ -108,7 +104,9 @@ cdoComment(void)
   return comment;
 }
 
-#if defined(HAVE_FNMATCH_H)
+#ifdef HAVE_FNMATCH_H
+#include <fnmatch.h>
+
 int
 wildcardmatch(const char *pattern, const char *string)
 {
@@ -127,12 +125,10 @@ wildcardmatch(const char *w, const char *s)
   if (*w == '\0' && *s == '\0') return 0;
 
   // Make sure that the characters after '*' are present in second string.
-  // This function assumes that the first string will not contain two
-  // consecutive '*'
+  // This function assumes that the first string will not contain two consecutive '*'
   if (*w == '*' && *(w + 1) != '\0' && *s == '\0') return 1;
 
-  // If the first string contains '?', or current characters of both strings
-  // match
+  // If the first string contains '?', or current characters of both strings match
   if ((*w == '?' && *s != '\0') || *w == *s) return wildcardmatch(w + 1, s + 1);
 
   // If there is *, then there are two possibilities
@@ -165,7 +161,7 @@ cdo_omp_set_num_threads(int nthreads)
 const char *
 getProgname(char *string)
 {
-#if defined(_WIN32)
+#ifdef _WIN32
   /*  progname = strrchr(string, '\\'); */
   char *progname = " cdo";
 #else

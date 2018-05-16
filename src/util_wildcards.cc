@@ -21,16 +21,18 @@
 #include <iostream>  // delete should not be used here
 /*TEMP*/
 
-#ifdef HAVE_WORDEXP_H
-#include <wordexp.h>
-#endif
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
 #include <string>
+#ifdef HAVE_WORDEXP_H
+#include <wordexp.h>
+#endif
+#ifdef HAVE_GLOB_H
 #include <glob.h>
+#endif
 
 #ifndef strdupx
 #ifndef strdup
