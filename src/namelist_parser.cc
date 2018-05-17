@@ -18,7 +18,7 @@
 #include "namelist.h"
 
 static void
-kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, namelisttok_t *t, int nvalues)
+kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, NamelistToken *t, int nvalues)
 {
   char vbuf[4096];
   keyValues_t *keyval = (keyValues_t *) Malloc(sizeof(keyValues_t));
@@ -48,13 +48,13 @@ kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, name
 }
 
 static int
-get_number_of_values(int ntok, namelisttok_t *tokens)
+get_number_of_values(int ntok, NamelistToken *tokens)
 {
   int it;
 
   for (it = 0; it < ntok; ++it)
     {
-      namelisttok_t *t = &tokens[it];
+      NamelistToken *t = &tokens[it];
       if (t->type != NAMELIST_WORD && t->type != NAMELIST_STRING) break;
     }
 
@@ -66,8 +66,8 @@ namelist_to_pml(list_t *pmlist, NamelistParser *parser, char *buf)
 {
   char name[4096];
   list_t *kvlist = NULL;
-  namelisttok_t *t;
-  namelisttok_t *tokens = parser->tokens;
+  NamelistToken *t;
+  NamelistToken *tokens = parser->tokens;
   unsigned int ntok = parser->toknext;
   // printf("Number of tokens %d\n", ntok);
 

@@ -37,7 +37,7 @@ enum namelisterr
 };
 
 // NAMELIST token description.
-struct namelisttok_t
+struct NamelistToken
 {
   int type;   // type (object, key, string word)
   int start;  // start position in NAMELIST buffer
@@ -46,7 +46,7 @@ struct namelisttok_t
 
 struct NamelistParser
 {
-  namelisttok_t *tokens;
+  NamelistToken *tokens;
   unsigned int num_tokens;
   unsigned int toknext;
   unsigned int pos;

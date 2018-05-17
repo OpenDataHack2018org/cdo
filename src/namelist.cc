@@ -51,7 +51,7 @@ namelist_destroy(NamelistParser *parser)
 }
 
 // Allocates a fresh unused token from the token pull.
-static namelisttok_t *
+static NamelistToken *
 namelist_alloc_token(NamelistParser *parser)
 {
   const unsigned int TOK_MEM_INCR = 64;
@@ -59,7 +59,7 @@ namelist_alloc_token(NamelistParser *parser)
   if (parser->toknext >= parser->num_tokens)
     {
       parser->num_tokens += TOK_MEM_INCR;
-      parser->tokens = (namelisttok_t *) realloc(parser->tokens, sizeof(namelisttok_t) * parser->num_tokens);
+      parser->tokens = (NamelistToken *) realloc(parser->tokens, sizeof(NamelistToken) * parser->num_tokens);
       if (parser->tokens == NULL)
         {
           fprintf(stderr, "%s: Failed to allocated more memory!", __func__);
@@ -67,14 +67,14 @@ namelist_alloc_token(NamelistParser *parser)
         }
     }
 
-  namelisttok_t *tok = &parser->tokens[parser->toknext++];
+  NamelistToken *tok = &parser->tokens[parser->toknext++];
   tok->start = tok->end = -1;
   return tok;
 }
 
 // Fills token type and boundaries.
 static void
-namelist_fill_token(namelisttok_t *token, int type, int start, int end)
+namelist_fill_token(NamelistToken *token, int type, int start, int end)
 {
   token->type = type;
   token->start = start;
@@ -84,7 +84,7 @@ namelist_fill_token(namelisttok_t *token, int type, int start, int end)
 void
 namelist_new_object(NamelistParser *parser)
 {
-  namelisttok_t *token;
+  NamelistToken *token;
   token = namelist_alloc_token(parser);
   token->type = NAMELIST_OBJECT;
   token->start = parser->pos;
@@ -94,7 +94,7 @@ namelist_new_object(NamelistParser *parser)
 static int
 namelist_parse_word(NamelistParser *parser, const char *buf, size_t len)
 {
-  namelisttok_t *token;
+  NamelistToken *token;
   int start = parser->pos;
 
   for (; parser->pos < len && buf[parser->pos] != '\0'; parser->pos++)
@@ -144,7 +144,7 @@ namelist_parse_string(NamelistParser *parser, const char *buf, size_t len, char 
       /* Quote: end of string */
       if (c == quote)
         {
-          namelisttok_t *token = namelist_alloc_token(parser);
+          NamelistToken *token = namelist_alloc_token(parser);
           namelist_fill_token(token, NAMELIST_STRING, start + 1, parser->pos);
           return 0;
         }
@@ -192,7 +192,7 @@ namelist_parse_string(NamelistParser *parser, const char *buf, size_t len, char 
 }
 
 static int
-namelist_check_keyname(const char *buf, namelisttok_t *t)
+namelist_check_keyname(const char *buf, NamelistToken *t)
 {
   switch (t->type)
     {
@@ -213,7 +213,7 @@ int
 namelist_parse(NamelistParser *parser, const char *buf, size_t len)
 {
   int status = 0;
-  namelisttok_t *token;
+  NamelistToken *token;
 
   parser->lineno = 1;
 
@@ -271,7 +271,7 @@ namelist_dump(NamelistParser *parser, const char *buf)
 
   for (unsigned int it = 0; it < ntok; ++it)
     {
-      namelisttok_t *t = &parser->tokens[it];
+      NamelistToken *t = &parser->tokens[it];
       int length = t->end - t->start;
       const char *start = buf + t->start;
       printf("Token %u", it + 1);
@@ -307,7 +307,7 @@ namelist_verify(NamelistParser *parser, const char *buf)
 
   if (ntok)
     {
-      namelisttok_t *t = &parser->tokens[0];
+      NamelistToken *t = &parser->tokens[0];
       if (t->type != NAMELIST_OBJECT && t->type != NAMELIST_KEY) return -1;
     }
 
