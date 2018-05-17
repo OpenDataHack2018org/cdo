@@ -129,6 +129,41 @@ go_bandit([]() {
                  Is().EqualTo(static_cast<int>(ProcessStatus::TooFewStreams)));
     });
   });
+
+  //-----------------------------Test_06------------------------------------------
+  //------------------------------------------------------------------------------
+  bandit::describe("Negative test for unprocessed inputs", [&]() {
+    /* clang-format off */
+    std::vector<const char *> argv_missingOutFileOperHasDash{
+        "-in2_out1"};
+    /* clang-format on */
+    parseStatus = createProcessesFromInput(argv_missingOutFileOperHasDash.size(),
+                                           &argv_missingOutFileOperHasDash[0]);
+
+    result_parse = static_cast<int>(parseStatus);
+    expected_parse = static_cast<int>(ParseStatus::MissingOutFile);
+
+    bandit::it("has unprocessed Input", [&]() {
+      AssertThat(result_parse, snowhouse::Equals(expected_parse));
+    });
+  });
+  //-----------------------------Test_06------------------------------------------
+  //------------------------------------------------------------------------------
+  bandit::describe("Negative test for unprocessed inputs", [&]() {
+    /* clang-format off */
+    std::vector<const char *> argv_missingOutFileOperHasntDash{
+        "in2_out1"};
+    /* clang-format on */
+    parseStatus = createProcessesFromInput(argv_missingOutFileOperHasntDash.size(),
+                                           &argv_missingOutFileOperHasntDash[0]);
+
+    result_parse = static_cast<int>(parseStatus);
+    expected_parse = static_cast<int>(ParseStatus::MissingOutFile);
+
+    bandit::it("has unprocessed Input", [&]() {
+      AssertThat(result_parse, snowhouse::Equals(expected_parse));
+    });
+  });
 });
 
 //==============================================================================
