@@ -44,6 +44,10 @@
 #include <iostream>
 #include <string>
 
+#ifdef HAVE_LIBPTHREAD
+pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
+
 ProcessType::ProcessType(int p_ID, const char *p_operatorName, const char *operatorCommand)
     : m_ID(p_ID), operatorName(p_operatorName)
 {

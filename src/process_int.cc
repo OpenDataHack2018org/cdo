@@ -48,16 +48,11 @@ std::vector<pthread_t> threadIDs;
 static int NumProcess = 0;
 static int NumProcessActive = 0;
 
-#ifdef HAVE_LIBPTHREAD
-pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
-
 ProcessType &
 processSelf(void)
 {
 #ifdef HAVE_LIBPTHREAD
   pthread_t thID = pthread_self();
-
   pthread_mutex_lock(&processMutex);
 
   for (auto &id_process_pair : Process)
@@ -71,7 +66,6 @@ processSelf(void)
             }
         }
     }
-
   pthread_mutex_unlock(&processMutex);
 #endif
 
