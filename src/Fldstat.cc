@@ -65,18 +65,15 @@ print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID,
                 if (showHeader)
                   {
                     if (operfunc == func_min)
-                      fprintf(stdout, "  Date     Time     Code  Level   Lon   "
-                                      "   Lat          Minval\n");
+                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
                     else
-                      fprintf(stdout, "  Date     Time     Code  Level   Lon   "
-                                      "   Lat          Maxval\n");
+                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
 
                     showHeader = false;
                   }
 
-                fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g "
-                                "%9.7g %12.5g\n",
-                        year, month, day, hour, minute, second, code, level, xval, yval, sglval);
+                fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n", year, month, day, hour, minute,
+                        second, code, level, xval, yval, sglval);
               }
           }
     }
@@ -236,10 +233,7 @@ Fldstat(void *process)
                     {
                       char varname[CDI_MAX_NAME];
                       vlistInqVarName(vlistID1, varID, varname);
-                      cdoWarning("Grid cell bounds not available, using "
-                                 "constant grid cell area weights for variable "
-                                 "%s!",
-                                 varname);
+                      cdoWarning("Grid cell bounds not available, using constant grid cell area weights for variable %s!", varname);
                     }
                 }
             }

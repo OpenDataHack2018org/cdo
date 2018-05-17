@@ -269,14 +269,12 @@ Setgrid(void *process)
               else if (gridtype == GRID_LONLAT && gridtype1 == GRID_CURVILINEAR)
                 {
                   gridID2 = gridCurvilinearToRegular(gridID1);
-                  if (gridID2 == -1)
-                    cdoWarning("Conversion of curvilinear grid to regular grid failed!");
+                  if (gridID2 == -1) cdoWarning("Conversion of curvilinear grid to regular grid failed!");
                 }
               else if (gridtype == GRID_LONLAT && gridtype1 == GRID_UNSTRUCTURED)
                 {
                   gridID2 = -1;
-                  if (gridID2 == -1)
-                    cdoWarning("Conversion of unstructured grid to regular grid failed!");
+                  if (gridID2 == -1) cdoWarning("Conversion of unstructured grid to regular grid failed!");
                 }
               else if (gridtype == GRID_LONLAT && gridtype1 == GRID_GENERIC)
                 {

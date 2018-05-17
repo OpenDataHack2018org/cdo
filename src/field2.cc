@@ -491,9 +491,8 @@ farmin(Field *field1, Field field2)
     {
       for (size_t i = 0; i < len; i++)
         {
-          array1[i] = DBL_IS_EQUAL(array2[i], missval2)
-                          ? array1[i]
-                          : DBL_IS_EQUAL(array1[i], missval1) ? array2[i] : MIN(array1[i], array2[i]);
+          array1[i] = DBL_IS_EQUAL(array2[i], missval2) ? array1[i]
+                                                        : DBL_IS_EQUAL(array1[i], missval1) ? array2[i] : MIN(array1[i], array2[i]);
         }
 
       field1->nmiss = arrayNumMV(len, array1, missval1);
@@ -526,9 +525,8 @@ farmax(Field *field1, Field field2)
     {
       for (size_t i = 0; i < len; i++)
         {
-          array1[i] = DBL_IS_EQUAL(array2[i], missval2)
-                          ? array1[i]
-                          : DBL_IS_EQUAL(array1[i], missval1) ? array2[i] : MAX(array1[i], array2[i]);
+          array1[i] = DBL_IS_EQUAL(array2[i], missval2) ? array1[i]
+                                                        : DBL_IS_EQUAL(array1[i], missval1) ? array2[i] : MAX(array1[i], array2[i]);
         }
 
       field1->nmiss = arrayNumMV(len, array1, missval1);
@@ -563,13 +561,13 @@ farminidx(Field *field1, Field *field2, Field field3, int idx)
     {
       for (size_t i = 0; i < len; i++)
         {
-          if ( DBL_IS_EQUAL(array3[i], missval3) )
+          if (DBL_IS_EQUAL(array3[i], missval3))
             {
-              if ( DBL_IS_EQUAL(array2[i], missval2) ) array1[i] = missval1;
+              if (DBL_IS_EQUAL(array2[i], missval2)) array1[i] = missval1;
             }
           else
             {
-              if ( DBL_IS_EQUAL(array2[i], missval2) )
+              if (DBL_IS_EQUAL(array2[i], missval2))
                 {
                   array2[i] = array3[i];
                   array1[i] = idx;
@@ -622,13 +620,13 @@ farmaxidx(Field *field1, Field *field2, Field field3, int idx)
     {
       for (size_t i = 0; i < len; i++)
         {
-          if ( DBL_IS_EQUAL(array3[i], missval3) )
+          if (DBL_IS_EQUAL(array3[i], missval3))
             {
-              if ( DBL_IS_EQUAL(array2[i], missval2) ) array1[i] = missval1;
+              if (DBL_IS_EQUAL(array2[i], missval2)) array1[i] = missval1;
             }
           else
             {
-              if ( DBL_IS_EQUAL(array2[i], missval2) )
+              if (DBL_IS_EQUAL(array2[i], missval2))
                 {
                   array2[i] = array3[i];
                   array1[i] = idx;

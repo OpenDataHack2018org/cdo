@@ -118,13 +118,14 @@ Ymonarith(void *process)
         }
 
       vardata2[mon].resize(nvars);
-      varnmiss2[mon].resize(nvars);;
+      varnmiss2[mon].resize(nvars);
+      ;
 
       for (varID = 0; varID < nvars; varID++)
         {
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           size_t nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-          vardata2[mon][varID].resize(nlev*gridsize);
+          vardata2[mon][varID].resize(nlev * gridsize);
           varnmiss2[mon][varID].resize(nlev);
         }
 

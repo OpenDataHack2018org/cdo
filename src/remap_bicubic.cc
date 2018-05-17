@@ -225,8 +225,8 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
 // Loop over destination grid
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(findex, rsearch, tgt_grid_size, src_grid, tgt_grid, src_array, \
-                                              tgt_array, missval, gradients)
+#pragma omp parallel for default(none) shared(findex, rsearch, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, \
+                                              gradients)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {

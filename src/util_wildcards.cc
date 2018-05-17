@@ -18,17 +18,21 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <iostream> // delete should not be used here 
+#include <iostream>  // delete should not be used here
 /*TEMP*/
 
-#include <wordexp.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
 #include <string>
+#ifdef HAVE_WORDEXP_H
+#include <wordexp.h>
+#endif
+#ifdef HAVE_GLOB_H
 #include <glob.h>
+#endif
 
 #ifndef strdupx
 #ifndef strdup
@@ -46,16 +50,16 @@ char *strdup(const char *s);
 */
 #endif
 
-#if defined(HAVE_GLOB_H)
+#ifdef HAVE_GLOB_H
 static int
 get_glob_flags(void)
 {
   int glob_flags = 0;
 
-#if defined(GLOB_NOCHECK)
+#ifdef GLOB_NOCHECK
   glob_flags |= GLOB_NOCHECK;
 #endif
-#if defined(GLOB_TILDE)
+#ifdef GLOB_TILDE
   glob_flags |= GLOB_TILDE;
 #endif
 
@@ -94,7 +98,7 @@ expand_filename(const char *string)
 
   if (find_wildcard(string, strlen(string)))
     {
-#if defined(HAVE_GLOB_H)
+#ifdef HAVE_GLOB_H
       int glob_flags = get_glob_flags();
       glob_t glob_results;
       glob(string, glob_flags, 0, &glob_results);
@@ -105,7 +109,8 @@ expand_filename(const char *string)
 
   return filename;
 }
-#if defined(HAVE_WORDEXP_H)
+
+#ifdef HAVE_WORDEXP_H
 // Expands all input file wildcards and removes the wildcard while inserting all expanded files into argv
 std::vector<std::string>
 expandWildCards(std::vector<std::string> argv)
@@ -123,9 +128,8 @@ expandWildCards(std::vector<std::string> argv)
             {
               fprintf(stderr, "%s: ", __func__);
               if (status == WRDE_BADCHAR)
-                fprintf(stderr,
-                        "Argument '%s' contains one of the following unsupported unquoted characters: <newline>, `|', "
-                        "`&', `;', `<', `>', `(', `)', `{', `}'.\n",
+                fprintf(stderr, "Argument '%s' contains one of the following unsupported unquoted characters: <newline>, `|', "
+                                "`&', `;', `<', `>', `(', `)', `{', `}'.\n",
                         argv[idx].c_str());
               else if (status == WRDE_NOSPACE)
                 fprintf(stderr, "Not enough memory to store the result.\n");
@@ -136,8 +140,8 @@ expandWildCards(std::vector<std::string> argv)
               exit(EXIT_FAILURE);
             }
           // range based insert (glob_results.we_wordv is inserted before wildcard
-          argv.insert(argv.begin() + idx + 1,"]");
-          argv.insert(argv.begin() + idx + 1,"[");
+          argv.insert(argv.begin() + idx + 1, "]");
+          argv.insert(argv.begin() + idx + 1, "[");
           argv.insert(argv.begin() + idx + 2, glob_results.we_wordv, glob_results.we_wordv + glob_results.we_wordc);
           argv.erase(argv.begin() + idx);
           // delete wildcard

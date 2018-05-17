@@ -37,26 +37,19 @@
 int
 nfc_to_nlat(int nfc, int ntr)
 {
-  int nlat = nfc / (ntr + 1);
-  nlat /= 2;
-
-  return nlat;
+  return (nfc / (ntr + 1)) / 2;
 }
 
 int
 nlat_to_ntr(int nlat)
 {
-  int ntr = (nlat * 2 - 1) / 3;
-
-  return ntr;
+  return (nlat * 2 - 1) / 3;
 }
 
 int
 nlat_to_ntr_linear(int nlat)
 {
-  int ntr = (nlat * 2 - 1) / 2;
-
-  return ntr;
+  return (nlat * 2 - 1) / 2;
 }
 
 int
@@ -102,30 +95,12 @@ nlat_to_nlon(int nlat)
   while (1)
     {
       int n = nlon;
-      if (n % 8 == 0)
-        {
-          n /= 8;
-        }
-      while (n % 6 == 0)
-        {
-          n /= 6;
-        }
-      while (n % 5 == 0)
-        {
-          n /= 5;
-        }
-      while (n % 4 == 0)
-        {
-          n /= 4;
-        }
-      while (n % 3 == 0)
-        {
-          n /= 3;
-        }
-      if (n % 2 == 0)
-        {
-          n /= 2;
-        }
+      if (n % 8 == 0) n /= 8;
+      while (n % 6 == 0) n /= 6;
+      while (n % 5 == 0) n /= 5;
+      while (n % 4 == 0) n /= 4;
+      while (n % 3 == 0) n /= 3;
+      if (n % 2 == 0) n /= 2;
 
       if (n <= 8) break;
 
@@ -149,10 +124,7 @@ scale_vec(double scalefactor, size_t nvals, double *restrict values)
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(nvals, scalefactor, values)
 #endif
-  for (size_t n = 0; n < nvals; ++n)
-    {
-      values[n] *= scalefactor;
-    }
+  for (size_t n = 0; n < nvals; ++n) values[n] *= scalefactor;
 }
 
 void
@@ -644,8 +616,8 @@ grib_get_reduced_row(long pl, double lon_first, double lon_last, long *npoints, 
 }
 
 static int
-qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast, double *array, int *rowlon, int ny, double missval,
-               int *iret, int lmiss, int lperio, int lveggy)
+qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast, double *array, int *rowlon, int ny, double missval, int *iret,
+               int lmiss, int lperio, int lveggy)
 {
   /* sub area (longitudes) */
   long ilon_firstx;
@@ -759,7 +731,8 @@ field2regular(int gridID1, int gridID2, double missval, double *array, size_t nm
   size_t nx = 0;
   if (fabs(xfirst) > 0 || (np > 0 && fabs(xlast - (360.0 - 90.0 / np)) > 90.0 / np))
     {
-      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon.data(), ny, missval, &iret, lmiss, lperio, lnearest);
+      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon.data(), ny, missval, &iret, lmiss, lperio,
+                          lnearest);
     }
   else
     {
@@ -991,209 +964,183 @@ gridToCurvilinear(int gridID1, int lbounds)
         }
     }
 
-  switch (gridtype)
+  if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN)
     {
-    case GRID_LONLAT:
-    case GRID_GAUSSIAN:
-      {
-        double xpole = 0, ypole = 0, angle = 0;
-        double xscale = 1, yscale = 1;
-        double *xvals = NULL, *yvals = NULL;
-        double *xbounds = NULL, *ybounds = NULL;
-        char xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
+      double xpole = 0, ypole = 0, angle = 0;
+      double xscale = 1, yscale = 1;
+      char xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
 
-        size_t nvertex = (size_t) gridInqNvertex(gridID1);
-        gridInqXunits(gridID1, xunits);
-        gridInqYunits(gridID1, yunits);
+      size_t nvertex = (size_t) gridInqNvertex(gridID1);
+      gridInqXunits(gridID1, xunits);
+      gridInqYunits(gridID1, yunits);
 
-        if (lproj_laea || lproj_lcc || lproj_sinu)
-          {
-            int len;
-            len = (int) strlen(xunits);
-            bool lvalid_xunits = (len == 1 && memcmp(xunits, "m", 1) == 0) || (len == 2 && memcmp(xunits, "km", 2) == 0);
-            len = (int) strlen(yunits);
-            bool lvalid_yunits = (len == 1 && memcmp(yunits, "m", 1) == 0) || (len == 2 && memcmp(yunits, "km", 2) == 0);
+      if (lproj_laea || lproj_lcc || lproj_sinu)
+        {
+          int len = (int) strlen(xunits);
+          bool lvalid_xunits = (len == 1 && memcmp(xunits, "m", 1) == 0) || (len == 2 && memcmp(xunits, "km", 2) == 0);
+          len = (int) strlen(yunits);
+          bool lvalid_yunits = (len == 1 && memcmp(yunits, "m", 1) == 0) || (len == 2 && memcmp(yunits, "km", 2) == 0);
 
-            if (!lvalid_xunits)
-              cdoWarning("Possibly wrong result! Invalid x-coordinate units: \"%s\" (expected \"m\" or \"km\")", xunits);
-            if (!lvalid_yunits)
-              cdoWarning("Possibly wrong result! Invalid y-coordinate units: \"%s\" (expected \"m\" or \"km\")", yunits);
-          }
+          if (!lvalid_xunits)
+            cdoWarning("Possibly wrong result! Invalid x-coordinate units: \"%s\" (expected \"m\" or \"km\")", xunits);
+          if (!lvalid_yunits)
+            cdoWarning("Possibly wrong result! Invalid y-coordinate units: \"%s\" (expected \"m\" or \"km\")", yunits);
+        }
 
-        if (memcmp(xunits, "km", 2) == 0) xscale = 1000;
-        if (memcmp(yunits, "km", 2) == 0) yscale = 1000;
+      if (memcmp(xunits, "km", 2) == 0) xscale = 1000;
+      if (memcmp(yunits, "km", 2) == 0) yscale = 1000;
 
-        gridDefXsize(gridID2, nx);
-        gridDefYsize(gridID2, ny);
+      gridDefXsize(gridID2, nx);
+      gridDefYsize(gridID2, ny);
 
-        double *xvals2D = (double *) Malloc(gridsize * sizeof(double));
-        double *yvals2D = (double *) Malloc(gridsize * sizeof(double));
+      std::vector<double> xvals2D(gridsize);
+      std::vector<double> yvals2D(gridsize);
 
-        if (nx == 0) nx = 1;
-        if (ny == 0) ny = 1;
+      if (nx == 0) nx = 1;
+      if (ny == 0) ny = 1;
 
-        xvals = (double *) Malloc(nx * sizeof(double));
-        yvals = (double *) Malloc(ny * sizeof(double));
+      std::vector<double> xvals(nx);
+      std::vector<double> yvals(ny);
 
-        if (gridInqXvals(gridID1, NULL))
-          gridInqXvals(gridID1, xvals);
-        else
-          for (size_t i = 0; i < nx; ++i) xvals[i] = 0;
+      if (gridInqXvals(gridID1, NULL))
+        gridInqXvals(gridID1, xvals.data());
+      else
+        for (size_t i = 0; i < nx; ++i) xvals[i] = 0;
 
-        if (gridInqYvals(gridID1, NULL))
-          gridInqYvals(gridID1, yvals);
-        else
-          for (size_t i = 0; i < ny; ++i) yvals[i] = 0;
+      if (gridInqYvals(gridID1, NULL))
+        gridInqYvals(gridID1, yvals.data());
+      else
+        for (size_t i = 0; i < ny; ++i) yvals[i] = 0;
 
-        if (lproj_rll)
-          {
-            gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
-            gridDefProj(gridID2, gridID1);
+      if (lproj_rll)
+        {
+          gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
+          gridDefProj(gridID2, gridID1);
 
-            for (size_t j = 0; j < ny; j++)
-              for (size_t i = 0; i < nx; i++)
-                {
-                  xvals2D[j * nx + i] = lamrot_to_lam(yvals[j], xvals[i], ypole, xpole, angle);
-                  yvals2D[j * nx + i] = phirot_to_phi(yvals[j], xvals[i], ypole, angle);
-                }
-          }
-        else
-          {
-            for (size_t j = 0; j < ny; j++)
-              for (size_t i = 0; i < nx; i++)
-                {
-                  xvals2D[j * nx + i] = xscale * xvals[i];
-                  yvals2D[j * nx + i] = yscale * yvals[j];
-                }
+          for (size_t j = 0; j < ny; j++)
+            for (size_t i = 0; i < nx; i++)
+              {
+                xvals2D[j * nx + i] = lamrot_to_lam(yvals[j], xvals[i], ypole, xpole, angle);
+                yvals2D[j * nx + i] = phirot_to_phi(yvals[j], xvals[i], ypole, angle);
+              }
+        }
+      else
+        {
+          for (size_t j = 0; j < ny; j++)
+            for (size_t i = 0; i < nx; i++)
+              {
+                xvals2D[j * nx + i] = xscale * xvals[i];
+                yvals2D[j * nx + i] = yscale * yvals[j];
+              }
 
-            if (lproj_sinu)
-              cdo_sinu_to_lonlat(gridsize, xvals2D, yvals2D);
-            else if (lproj_laea)
-              cdo_laea_to_lonlat(gridID1, gridsize, xvals2D, yvals2D);
-            else if (lproj_lcc)
-              cdo_lcc_to_lonlat(gridID1, gridsize, xvals2D, yvals2D);
-            else if (lproj4)
-              cdo_proj_to_lonlat(proj4param, gridsize, xvals2D, yvals2D);
-          }
+          if (lproj_sinu)
+            cdo_sinu_to_lonlat(gridsize, xvals2D.data(), yvals2D.data());
+          else if (lproj_laea)
+            cdo_laea_to_lonlat(gridID1, gridsize, xvals2D.data(), yvals2D.data());
+          else if (lproj_lcc)
+            cdo_lcc_to_lonlat(gridID1, gridsize, xvals2D.data(), yvals2D.data());
+          else if (lproj4)
+            cdo_proj_to_lonlat(proj4param, gridsize, xvals2D.data(), yvals2D.data());
+        }
 
-        gridDefXvals(gridID2, xvals2D);
-        gridDefYvals(gridID2, yvals2D);
+      gridDefXvals(gridID2, xvals2D.data());
+      gridDefYvals(gridID2, yvals2D.data());
 
-        if (xvals2D) Free(xvals2D);
-        if (yvals2D) Free(yvals2D);
+      if (lbounds)
+        {
+          std::vector<double> xbounds, ybounds;
 
-        if (!lbounds) goto NO_BOUNDS;
-
-        if (nvertex == 2 && gridInqXbounds(gridID1, NULL))
-          {
-            xbounds = (double *) Malloc(2 * nx * sizeof(double));
-            gridInqXbounds(gridID1, xbounds);
-            if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN)
-              if (check_range(2 * nx, xbounds, -720, 720))
+          if (nvertex == 2 && gridInqXbounds(gridID1, NULL))
+            {
+              xbounds.resize(2 * nx);
+              gridInqXbounds(gridID1, xbounds.data());
+              if (check_range(2 * nx, xbounds.data(), -720, 720))
                 {
                   cdoWarning("longitude bounds out of range, skipped!");
-                  Free(xbounds);
-                  xbounds = NULL;
+                  vectorFree(xbounds);
                 }
-          }
-        else if (nx > 1)
-          {
-            xbounds = (double *) Malloc(2 * nx * sizeof(double));
-            grid_gen_bounds(nx, xvals, xbounds);
-          }
+            }
+          else if (nx > 1)
+            {
+              xbounds.resize(2 * nx);
+              grid_gen_bounds(nx, xvals.data(), xbounds.data());
+            }
 
-        if (nvertex == 2 && gridInqYbounds(gridID1, NULL))
-          {
-            ybounds = (double *) Malloc(2 * ny * sizeof(double));
-            gridInqYbounds(gridID1, ybounds);
-            if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN)
-              if (check_range(2 * ny, ybounds, -180, 180))
+          if (nvertex == 2 && gridInqYbounds(gridID1, NULL))
+            {
+              ybounds.resize(2 * ny);
+              gridInqYbounds(gridID1, ybounds.data());
+              if (check_range(2 * ny, ybounds.data(), -180, 180))
                 {
                   cdoWarning("latitude bounds out of range, skipped!");
-                  Free(ybounds);
-                  ybounds = NULL;
+                  vectorFree(ybounds);
                 }
-          }
-        else if (ny > 1)
-          {
-            ybounds = (double *) Malloc(2 * ny * sizeof(double));
-            if (lproj_sinu || lproj_laea || lproj_lcc || lproj4)
-              grid_gen_bounds(ny, yvals, ybounds);
-            else
-              {
-                grid_gen_bounds(ny, yvals, ybounds);
-                grid_check_lat_borders(2 * ny, ybounds);
-              }
-          }
+            }
+          else if (ny > 1)
+            {
+              ybounds.resize(2 * ny);
+              if (lproj_sinu || lproj_laea || lproj_lcc || lproj4)
+                grid_gen_bounds(ny, yvals.data(), ybounds.data());
+              else
+                {
+                  grid_gen_bounds(ny, yvals.data(), ybounds.data());
+                  grid_check_lat_borders(2 * ny, ybounds.data());
+                }
+            }
 
-        if (xbounds && ybounds)
-          {
-            std::vector<double> xbounds2D(4 * gridsize);
-            std::vector<double> ybounds2D(4 * gridsize);
+          if (xbounds.size() && ybounds.size())
+            {
+              std::vector<double> xbounds2D(4 * gridsize);
+              std::vector<double> ybounds2D(4 * gridsize);
 
-            if (lproj_rll)
-              {
-                gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D.data(), ybounds2D.data());
-              }
-            else
-              {
-                if (lproj_sinu || lproj_laea || lproj_lcc || lproj4)
-                  {
-                    for (size_t j = 0; j < ny; j++)
-                      for (size_t i = 0; i < nx; i++)
-                        {
-                          index = j * 4 * nx + 4 * i;
+              if (lproj_rll)
+                {
+                  gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds.data(), ybounds.data(), xbounds2D.data(), ybounds2D.data());
+                }
+              else
+                {
+                  if (lproj_sinu || lproj_laea || lproj_lcc || lproj4)
+                    {
+                      for (size_t j = 0; j < ny; j++)
+                        for (size_t i = 0; i < nx; i++)
+                          {
+                            index = j * 4 * nx + 4 * i;
+                            xbounds2D[index + 0] = xscale * xbounds[2 * i];
+                            ybounds2D[index + 0] = yscale * ybounds[2 * j];
+                            xbounds2D[index + 1] = xscale * xbounds[2 * i];
+                            ybounds2D[index + 1] = yscale * ybounds[2 * j + 1];
+                            xbounds2D[index + 2] = xscale * xbounds[2 * i + 1];
+                            ybounds2D[index + 2] = yscale * ybounds[2 * j + 1];
+                            xbounds2D[index + 3] = xscale * xbounds[2 * i + 1];
+                            ybounds2D[index + 3] = yscale * ybounds[2 * j];
+                          }
 
-                          xbounds2D[index + 0] = xscale * xbounds[2 * i];
-                          ybounds2D[index + 0] = yscale * ybounds[2 * j];
+                      if (lproj_sinu)
+                        cdo_sinu_to_lonlat(4 * gridsize, xbounds2D.data(), ybounds2D.data());
+                      else if (lproj_laea)
+                        cdo_laea_to_lonlat(gridID1, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
+                      else if (lproj_lcc)
+                        cdo_lcc_to_lonlat(gridID1, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
+                      else if (lproj4)
+                        cdo_proj_to_lonlat(proj4param, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
+                    }
+                  else
+                    {
+                      grid_gen_xbounds2D(nx, ny, xbounds.data(), xbounds2D.data());
+                      grid_gen_ybounds2D(nx, ny, ybounds.data(), ybounds2D.data());
+                    }
+                }
 
-                          xbounds2D[index + 1] = xscale * xbounds[2 * i];
-                          ybounds2D[index + 1] = yscale * ybounds[2 * j + 1];
+              gridDefXbounds(gridID2, xbounds2D.data());
+              gridDefYbounds(gridID2, ybounds2D.data());
+            }
+        }
 
-                          xbounds2D[index + 2] = xscale * xbounds[2 * i + 1];
-                          ybounds2D[index + 2] = yscale * ybounds[2 * j + 1];
-
-                          xbounds2D[index + 3] = xscale * xbounds[2 * i + 1];
-                          ybounds2D[index + 3] = yscale * ybounds[2 * j];
-                        }
-
-                    if (lproj_sinu)
-                      cdo_sinu_to_lonlat(4 * gridsize, xbounds2D.data(), ybounds2D.data());
-                    else if (lproj_laea)
-                      cdo_laea_to_lonlat(gridID1, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
-                    else if (lproj_lcc)
-                      cdo_lcc_to_lonlat(gridID1, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
-                    else if (lproj4)
-                      cdo_proj_to_lonlat(proj4param, 4 * gridsize, xbounds2D.data(), ybounds2D.data());
-                  }
-                else
-                  {
-                    grid_gen_xbounds2D(nx, ny, xbounds, xbounds2D.data());
-                    grid_gen_ybounds2D(nx, ny, ybounds, ybounds2D.data());
-                  }
-              }
-
-            gridDefXbounds(gridID2, xbounds2D.data());
-            gridDefYbounds(gridID2, ybounds2D.data());
-
-            if (xbounds) Free(xbounds);
-            if (ybounds) Free(ybounds);
-          }
-
-      NO_BOUNDS:
-
-        if (xvals) Free(xvals);
-        if (yvals) Free(yvals);
-
-        gridCopyMask(gridID1, gridID2, gridsize);
-
-        break;
-      }
-    default:
-      {
-        cdoAbort("Grid type >%s< unsupported!", gridNamePtr(gridtype));
-        break;
-      }
+      gridCopyMask(gridID1, gridID2, gridsize);
+    }
+  else
+    {
+      cdoAbort("Grid type >%s< unsupported!", gridNamePtr(gridtype));
     }
 
   if (proj4param) Free(proj4param);
@@ -1321,97 +1268,89 @@ gridToUnstructured(int gridID1, int lbounds)
         gridDefXsize(gridID2, gridsize);
         gridDefYsize(gridID2, gridsize);
 
-        double *xvals = (double *) Malloc(nx * sizeof(double));
-        double *yvals = (double *) Malloc(ny * sizeof(double));
+        std::vector<double> xvals(nx);
+        std::vector<double> yvals(ny);
 
-        double *xvals2D = (double *) Malloc(gridsize * sizeof(double));
-        double *yvals2D = (double *) Malloc(gridsize * sizeof(double));
+        {
+          std::vector<double> xvals2D(gridsize);
+          std::vector<double> yvals2D(gridsize);
 
-        gridInqXvals(gridID1, xvals);
-        gridInqYvals(gridID1, yvals);
+          gridInqXvals(gridID1, xvals.data());
+          gridInqYvals(gridID1, yvals.data());
 
-        if (lproj_rll)
-          {
-            gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
+          if (lproj_rll)
+            {
+              gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
 
-            for (size_t j = 0; j < ny; j++)
-              for (size_t i = 0; i < nx; i++)
-                {
-                  xvals2D[j * nx + i] = lamrot_to_lam(yvals[j], xvals[i], ypole, xpole, angle);
-                  yvals2D[j * nx + i] = phirot_to_phi(yvals[j], xvals[i], ypole, angle);
-                }
-          }
-        else
-          {
-            for (size_t j = 0; j < ny; j++)
-              for (size_t i = 0; i < nx; i++)
-                {
-                  xvals2D[j * nx + i] = xvals[i];
-                  yvals2D[j * nx + i] = yvals[j];
-                }
-          }
+              for (size_t j = 0; j < ny; j++)
+                for (size_t i = 0; i < nx; i++)
+                  {
+                    xvals2D[j * nx + i] = lamrot_to_lam(yvals[j], xvals[i], ypole, xpole, angle);
+                    yvals2D[j * nx + i] = phirot_to_phi(yvals[j], xvals[i], ypole, angle);
+                  }
+            }
+          else
+            {
+              for (size_t j = 0; j < ny; j++)
+                for (size_t i = 0; i < nx; i++)
+                  {
+                    xvals2D[j * nx + i] = xvals[i];
+                    yvals2D[j * nx + i] = yvals[j];
+                  }
+            }
 
-        gridDefXvals(gridID2, xvals2D);
-        gridDefYvals(gridID2, yvals2D);
-
-        Free(xvals2D);
-        Free(yvals2D);
+          gridDefXvals(gridID2, xvals2D.data());
+          gridDefYvals(gridID2, yvals2D.data());
+        }
 
         if (lbounds)
           {
             size_t nvertex = (size_t) gridInqNvertex(gridID1);
-            double *xbounds = NULL, *ybounds = NULL;
+            std::vector<double> xbounds, ybounds;
 
             if (nvertex == 2 && gridInqXbounds(gridID1, NULL))
               {
-                xbounds = (double *) Malloc(2 * nx * sizeof(double));
-                gridInqXbounds(gridID1, xbounds);
+                xbounds.resize(2 * nx);
+                gridInqXbounds(gridID1, xbounds.data());
               }
             else if (nx > 1)
               {
-                xbounds = (double *) Malloc(2 * nx * sizeof(double));
-                grid_gen_bounds(nx, xvals, xbounds);
+                xbounds.resize(2 * nx);
+                grid_gen_bounds(nx, xvals.data(), xbounds.data());
               }
 
             if (nvertex == 2 && gridInqYbounds(gridID1, NULL))
               {
-                ybounds = (double *) Malloc(2 * ny * sizeof(double));
-                gridInqYbounds(gridID1, ybounds);
+                ybounds.resize(2 * ny);
+                gridInqYbounds(gridID1, ybounds.data());
               }
             else if (ny > 1)
               {
-                ybounds = (double *) Malloc(2 * ny * sizeof(double));
-                grid_gen_bounds(ny, yvals, ybounds);
-                grid_check_lat_borders(2 * ny, ybounds);
+                ybounds.resize(2 * ny);
+                grid_gen_bounds(ny, yvals.data(), ybounds.data());
+                grid_check_lat_borders(2 * ny, ybounds.data());
               }
 
-            if (xbounds && ybounds)
+            if (xbounds.size() && ybounds.size())
               {
-                double *xbounds2D = (double *) Malloc(4 * gridsize * sizeof(double));
-                double *ybounds2D = (double *) Malloc(4 * gridsize * sizeof(double));
+                std::vector<double> xbounds2D(4 * gridsize);
+                std::vector<double> ybounds2D(4 * gridsize);
 
                 if (lproj_rll)
                   {
-                    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
+                    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds.data(), ybounds.data(), xbounds2D.data(),
+                                     ybounds2D.data());
                   }
                 else
                   {
-                    grid_gen_xbounds2D(nx, ny, xbounds, xbounds2D);
-                    grid_gen_ybounds2D(nx, ny, ybounds, ybounds2D);
+                    grid_gen_xbounds2D(nx, ny, xbounds.data(), xbounds2D.data());
+                    grid_gen_ybounds2D(nx, ny, ybounds.data(), ybounds2D.data());
                   }
 
-                gridDefXbounds(gridID2, xbounds2D);
-                gridDefYbounds(gridID2, ybounds2D);
-
-                Free(xbounds);
-                Free(ybounds);
-                Free(xbounds2D);
-                Free(ybounds2D);
+                gridDefXbounds(gridID2, xbounds2D.data());
+                gridDefYbounds(gridID2, ybounds2D.data());
               }
           }
-
-        Free(xvals);
-        Free(yvals);
 
         gridCopyMask(gridID1, gridID2, gridsize);
 
@@ -1429,21 +1368,21 @@ gridToUnstructured(int gridID1, int lbounds)
     case GRID_GME:
       {
         size_t nv = 6;
-        double *xbounds = NULL, *ybounds = NULL;
 
         int nd, ni, ni2, ni3;
         gridInqParamGME(gridID1, &nd, &ni, &ni2, &ni3);
 
-        int *imask = (int *) Malloc(gridsize * sizeof(int));
-        double *xvals = (double *) Malloc(gridsize * sizeof(double));
-        double *yvals = (double *) Malloc(gridsize * sizeof(double));
+        std::vector<int> imask(gridsize);
+        std::vector<double> xvals(gridsize);
+        std::vector<double> yvals(gridsize);
+        std::vector<double> xbounds, ybounds;
         if (lbounds)
           {
-            xbounds = (double *) Malloc(nv * gridsize * sizeof(double));
-            ybounds = (double *) Malloc(nv * gridsize * sizeof(double));
+            xbounds.resize(nv * gridsize);
+            ybounds.resize(nv * gridsize);
           }
 
-        gme_grid(lbounds, gridsize, xvals, yvals, xbounds, ybounds, imask, ni, nd, ni2, ni3);
+        gme_grid(lbounds, gridsize, xvals.data(), yvals.data(), xbounds.data(), ybounds.data(), imask.data(), ni, nd, ni2, ni3);
 
         for (size_t i = 0; i < gridsize; i++)
           {
@@ -1462,27 +1401,21 @@ gridToUnstructured(int gridID1, int lbounds)
         gridDefXsize(gridID2, gridsize);
         gridDefYsize(gridID2, gridsize);
 
-        gridDefXvals(gridID2, xvals);
-        gridDefYvals(gridID2, yvals);
+        gridDefXvals(gridID2, xvals.data());
+        gridDefYvals(gridID2, yvals.data());
 
-        gridDefMaskGME(gridID2, imask);
+        gridDefMaskGME(gridID2, imask.data());
 
         gridDefNvertex(gridID2, nv);
 
         if (lbounds)
           {
-            gridDefXbounds(gridID2, xbounds);
-            gridDefYbounds(gridID2, ybounds);
+            gridDefXbounds(gridID2, xbounds.data());
+            gridDefYbounds(gridID2, ybounds.data());
           }
 
         gridDefXunits(gridID2, "degrees_east");
         gridDefYunits(gridID2, "degrees_north");
-
-        Free(imask);
-        Free(xvals);
-        Free(yvals);
-        if (xbounds) Free(xbounds);
-        if (ybounds) Free(ybounds);
 
         gridCopyMask(gridID1, gridID2, gridsize);
 
@@ -1575,7 +1508,7 @@ int
 gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 {
   int status = 0;
-  int *grid_mask = NULL;
+  std::vector<int> grid_mask;
 
   int gridtype = gridInqType(gridID);
   size_t gridsize = gridInqSize(gridID);
@@ -1583,15 +1516,15 @@ gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
   if (gridtype == GRID_GME)
     {
       gridID = gridToUnstructured(gridID, 1);
-      grid_mask = (int *) Malloc(gridsize * sizeof(int));
-      gridInqMaskGME(gridID, grid_mask);
+      grid_mask.resize(gridsize);
+      gridInqMaskGME(gridID, grid_mask.data());
     }
 
   double total_area = 0;
   int nvals = 0;
   for (size_t i = 0; i < gridsize; i++)
     {
-      if (grid_mask)
+      if (grid_mask.size())
         if (grid_mask[i] == 0) continue;
       total_area += grid_area[i];
       nvals++;
@@ -1601,7 +1534,7 @@ gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 
   for (size_t i = 0; i < gridsize; i++)
     {
-      if (grid_mask)
+      if (grid_mask.size())
         if (grid_mask[i] == 0)
           {
             grid_wgts[i] = 0;
@@ -1610,8 +1543,6 @@ gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 
       grid_wgts[i] = grid_area[i] / total_area;
     }
-
-  if (grid_mask) Free(grid_mask);
 
   return status;
 }
@@ -1705,12 +1636,12 @@ gridWeights(int gridID, double *grid_wgts)
   int gridtype = gridInqType(gridID);
   int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
 
-  double *grid_area = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> grid_area(gridsize);
 
   if (gridHasArea(gridID))
     {
       if (cdoVerbose) cdoPrint("Using existing grid cell area!");
-      gridInqArea(gridID, grid_area);
+      gridInqArea(gridID, grid_area.data());
     }
   else
     {
@@ -1718,7 +1649,7 @@ gridWeights(int gridID, double *grid_wgts)
           || projtype == CDI_PROJ_LCC || projtype == CDI_PROJ_SINU || gridtype == GRID_GME || gridtype == GRID_CURVILINEAR
           || gridtype == GRID_UNSTRUCTURED)
         {
-          a_status = gridGenArea(gridID, grid_area);
+          a_status = gridGenArea(gridID, grid_area.data());
         }
       else
         {
@@ -1728,7 +1659,7 @@ gridWeights(int gridID, double *grid_wgts)
 
   if (a_status == 0)
     {
-      w_status = gridGenWeights(gridID, grid_area, grid_wgts);
+      w_status = gridGenWeights(gridID, grid_area.data(), grid_wgts);
     }
   else
     {
@@ -1739,7 +1670,6 @@ gridWeights(int gridID, double *grid_wgts)
     printf("weights: %d %d %d %g %g\n", a_status, w_status, i, grid_area[i],
   grid_wgts[i]);
   */
-  Free(grid_area);
 
   return w_status;
 }

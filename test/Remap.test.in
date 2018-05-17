@@ -20,6 +20,7 @@ IFILE=$DATAPATH/bathy4.grb
 NTEST=1
 #
 HAS_THREADS=`${CDO} --config has-threads`
+HAS_OPENMP=`${CDO} --config has-openmp`
 #
 for GRIDTYPE in regular curvilinear unstructured; do
   SETGRID=""
@@ -47,8 +48,21 @@ for GRIDTYPE in regular curvilinear unstructured; do
       else
         echo "Running test: $NTEST"
 
-        for NTHREADS in 1 2 4; do
-          CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT -P $NTHREADS remap${RMOD},$GRID $SETGRID $IFILE ${OFILE}"
+        if [ "${HAS_OPENMP}" = yes ]; then
+          for NTHREADS in 1 2 4; do
+            CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT -P $NTHREADS remap${RMOD},$GRID $SETGRID $IFILE ${OFILE}"
+            echo "$CDOCOMMAND"
+
+            $CDOCOMMAND
+            test $? -eq 0 || let RSTAT+=1
+
+            $CDO $DEBUG_OUT diff,$ABSLIM $OFILE $RFILE > $CDOOUT 2> $CDOERR
+            test $? -eq 0 || let RSTAT+=1
+            test -s $CDOOUT && let RSTAT+=1
+            cat $CDOOUT $CDOERR
+          done
+        else
+          CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT remap${RMOD},$GRID $SETGRID $IFILE ${OFILE}"
           echo "$CDOCOMMAND"
 
           $CDOCOMMAND
@@ -58,7 +72,7 @@ for GRIDTYPE in regular curvilinear unstructured; do
           test $? -eq 0 || let RSTAT+=1
           test -s $CDOOUT && let RSTAT+=1
           cat $CDOOUT $CDOERR
-        done
+        fi
 
         test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
         if [ $RMOD = dis ]; then

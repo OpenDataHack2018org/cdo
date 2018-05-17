@@ -449,12 +449,12 @@ Specinfo(void *process)
                   "icon   ngp_icon\n");
 
   if (nout1)
-    fprintf(stdout, "   T%-4d  %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n", ntr1, nsp1, nlon1, nlat1, ngp1, ni1, ngp_gme1,
-            nrooti1, nlevel1, ngp_icon1);
+    fprintf(stdout, "   T%-4d  %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n", ntr1, nsp1, nlon1, nlat1, ngp1, ni1, ngp_gme1, nrooti1,
+            nlevel1, ngp_icon1);
 
   if (nout2)
-    fprintf(stdout, "   TL%-4d %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n", ntr2, nsp2, nlon2, nlat2, ngp2, ni2, ngp_gme2,
-            nrooti2, nlevel2, ngp_icon2);
+    fprintf(stdout, "   TL%-4d %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n", ntr2, nsp2, nlon2, nlat2, ngp2, ni2, ngp_gme2, nrooti2,
+            nlevel2, ngp_icon2);
 
   cdoFinish();
 

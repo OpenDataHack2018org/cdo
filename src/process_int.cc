@@ -729,7 +729,7 @@ cdoInitialize(void *p_process)
   // std::cout << arg->processID << std::endl;
   Cdo_Debug(CdoDebug::PROCESS, "Initializing process: ", process->m_operatorCommand);
   process->threadID = pthread_self();
-  // std::cout << "SomeMarker" << Process.size() << std::endl;
+// std::cout << "SomeMarker" << Process.size() << std::endl;
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PSTREAM) Cdo_Debug(CdoDebug::PROCESS, "process ", processSelf().m_ID, " thread ", pthread_self());
@@ -744,9 +744,8 @@ processInqPrompt(void)
   return process.inqPrompt();
 }
 
-extern "C"
-{
-  size_t getPeakRSS();
+extern "C" {
+size_t getPeakRSS();
 }
 
 static void

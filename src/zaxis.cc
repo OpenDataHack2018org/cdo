@@ -230,8 +230,7 @@ zaxis_read_attributes(size_t iatt, size_t nkv, kvmap_t *kvmap, int zaxisID)
         {
           for (int n = 0; n < num_rkeys; ++n)
             if (STR_IS_EQ(key, reserved_keys[n]))
-              cdoAbort("Found reserved key word >%s< in attribute names! Check name or position of >%s<.",
-                       key, attkey0);
+              cdoAbort("Found reserved key word >%s< in attribute names! Check name or position of >%s<.", key, attkey0);
         }
 
       int dtype = literals_find_datatype(nvalues, kv->values);

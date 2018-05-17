@@ -88,7 +88,7 @@ Inttime(void *process)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
     }
   /* increment in seconds */
-  int64_t ijulinc = (int64_t)incperiod * incunit;
+  int64_t ijulinc = (int64_t) incperiod * incunit;
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -267,7 +267,7 @@ Inttime(void *process)
 
               cdiDecodeDate(vdate, &year, &month, &day);
 
-              month += (int)ijulinc;
+              month += (int) ijulinc;
 
               while (month > 12)
                 {

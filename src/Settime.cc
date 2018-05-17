@@ -127,7 +127,7 @@ shifttime(int calendar, int tunit, int64_t ijulinc, int64_t *pdate, int *ptime)
       int year, month, day;
       cdiDecodeDate(vdate, &year, &month, &day);
 
-      month += (int)ijulinc;
+      month += (int) ijulinc;
 
       while (month > 12)
         {
@@ -232,7 +232,8 @@ Settime(void *process)
   int varID, levelID;
   int64_t vdateb[2];
   int vtimeb[2];
-  int sdate = 0, stime = 0;
+  int64_t sdate = 0;
+  int stime = 0;
   int taxisID2 = CDI_UNDEFID;
   size_t nmiss;
   int tunit = TUNIT_DAY;
@@ -283,7 +284,7 @@ Settime(void *process)
         }
       else
         {
-          sdate = *datestr ? parameter2int(datestr) : 10101;
+          sdate = *datestr ? parameter2long(datestr) : 10101;
         }
 
       if (operatorArgc() > 1)
@@ -313,7 +314,7 @@ Settime(void *process)
         }
 
       /* increment in seconds */
-      ijulinc = (int64_t)incperiod * incunit;
+      ijulinc = (int64_t) incperiod * incunit;
     }
   else if (operatorID == SETDATE)
     {
@@ -355,7 +356,7 @@ Settime(void *process)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       /* increment in seconds */
-      ijulinc = (int64_t)incperiod * incunit;
+      ijulinc = (int64_t) incperiod * incunit;
     }
   else if (operatorID == SETTUNITS || operatorID == SETTBOUNDS)
     {
@@ -368,8 +369,8 @@ Settime(void *process)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       if (operatorID == SETTBOUNDS
-          && !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS
-               || tunit == TUNIT_DAY || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR))
+          && !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS || tunit == TUNIT_DAY
+               || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR))
         cdoAbort("Unsupported frequency %s! Use hour, 3hours, 6hours, day, month or year.", timeunits);
     }
   else if (operatorID == SETCALENDAR)
@@ -531,7 +532,7 @@ Settime(void *process)
                 }
               else
                 {
-                  month += (int)ijulinc;
+                  month += (int) ijulinc;
 
                   while (month > 12)
                     {

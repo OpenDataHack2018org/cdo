@@ -34,29 +34,84 @@ struct juldate_t
   int secofday;
 };
 
-struct cdo_datetime_t
+struct CdoDateTime
 {
   int64_t date;
   int time;
 };
 
-struct dtinfo_type
+struct DateTimeInfo
 {
-  cdo_datetime_t c;     // corrected verification time
-  cdo_datetime_t v;     // verification time
-  cdo_datetime_t b[2];  // time bounds
+  CdoDateTime c;     // corrected verification time
+  CdoDateTime v;     // verification time
+  CdoDateTime b[2];  // time bounds
 };
 
-struct dtlist_type
+class DateTimeList
 {
+ public:
+  void init();
+
+  DateTimeList()
+    {
+      nalloc = 0;
+      size = 0;
+      calendar = -1;
+      has_bounds = -1;
+      stat = TimeStat::LAST;
+
+      init();
+    }
+
+  ~DateTimeList()
+    {
+    }
+
+  void setStat(TimeStat stat)
+  {
+    this->stat = stat;
+  }
+
+  void setCalendar(int calendar)
+  {
+    this->calendar = calendar;
+  }
+
+  int64_t getVdate(int tsID)
+  {
+    if (tsID < 0 || (size_t) tsID >= this->size) cdoAbort("Internal error; tsID out of bounds!");
+  
+    return this->dtinfo[tsID].c.date;
+  }
+
+  int getVtime(int tsID)
+  {
+    if (tsID < 0 || (size_t) tsID >= this->size) cdoAbort("Internal error; tsID out of bounds!");
+    
+    return this->dtinfo[tsID].c.time;
+  }
+
+  void shift()
+  {
+    for (size_t inp = 0; inp < this->size - 1; inp++) this->dtinfo[inp] = this->dtinfo[inp + 1];
+  }
+
+  void taxisInqTimestep(int taxisID, int tsID);
+  void taxisDefTimestep(int taxisID, int tsID);
+  void statTaxisDefTimestep(int taxisID, int nsteps);
+
+ private:
   size_t nalloc;
   size_t size;
   int has_bounds;
   int calendar;
   TimeStat stat;
   int timestat_date;
-  dtinfo_type timestat;
-  dtinfo_type *dtinfo;
+  DateTimeInfo timestat;
+  std::vector<DateTimeInfo> dtinfo;
+
+  void mean(int nsteps);
+  void midhigh(int nsteps);
 };
 
 juldate_t juldate_encode(int calendar, int64_t date, int time);
@@ -65,17 +120,6 @@ juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1);
 juldate_t juldate_add_seconds(int64_t seconds, juldate_t juldate);
 double juldate_to_seconds(juldate_t juldate);
 
-void datetime_avg(int dpy, int ndates, cdo_datetime_t *datetime);
-
-dtlist_type *dtlist_new(void);
-void dtlist_delete(dtlist_type *dtlist);
-void dtlist_shift(dtlist_type *dtlist);
-void dtlist_set_stat(dtlist_type *dtlist, TimeStat stat);
-void dtlist_set_calendar(dtlist_type *dtlist, int calendar);
-int64_t dtlist_get_vdate(dtlist_type *dtlist, int tsID);
-int dtlist_get_vtime(dtlist_type *dtlist, int tsID);
-void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID);
-void dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID);
-void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps);
+void datetime_avg(int dpy, int ndates, CdoDateTime *datetime);
 
 #endif /* DATETIME_H */

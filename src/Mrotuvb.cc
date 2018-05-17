@@ -276,8 +276,7 @@ Mrotuvb(void *process)
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
   size_t gridsize = gridInqSize(gridID1);
-  if (gpint == true && gridID1 == gridID2)
-    cdoAbort("Input grids are the same, use parameter >noint< to disable interpolation!");
+  if (gpint == true && gridID1 == gridID2) cdoAbort("Input grids are the same, use parameter >noint< to disable interpolation!");
   if (gpint == false && gridID1 != gridID2) cdoAbort("Input grids are not the same!");
   if (gridsize != gridInqSize(gridID2)) cdoAbort("Grids have different size!");
 

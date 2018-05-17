@@ -130,17 +130,11 @@ Sinfo(void *process)
 
       set_text_color(stdout, BRIGHT, BLACK);
       if (lensemble)
-        fprintf(stdout, "%6d : Institut Source   T Steptype Einfo Levels Num    Points "
-                        "Num Dtype : ",
-                -(indf + 1));
+        fprintf(stdout, "%6d : Institut Source   T Steptype Einfo Levels Num    Points Num Dtype : ", -(indf + 1));
       else if (nsubtypes > 1)
-        fprintf(stdout, "%6d : Institut Source   T Steptype Subtypes Levels Num    "
-                        "Points Num Dtype : ",
-                -(indf + 1));
+        fprintf(stdout, "%6d : Institut Source   T Steptype Subtypes Levels Num    Points Num Dtype : ", -(indf + 1));
       else
-        fprintf(stdout, "%6d : Institut Source   T Steptype Levels Num    Points Num "
-                        "Dtype : ",
-                -(indf + 1));
+        fprintf(stdout, "%6d : Institut Source   T Steptype Levels Num    Points Num Dtype : ", -(indf + 1));
 
       if (operfunc == func_name)
         fprintf(stdout, "Parameter name");
@@ -351,8 +345,7 @@ Sinfo(void *process)
                 }
             }
 
-          fprintf(stdout, "  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  "
-                          "YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss\n");
+          fprintf(stdout, "  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss\n");
 
           set_text_color(stdout, RESET, MAGENTA);
 

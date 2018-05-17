@@ -75,9 +75,9 @@ Yearmonstat(void *process)
   std::vector<RecordInfo> recinfo(maxrecs);
 
   int calendar = taxisInqCalendar(taxisID1);
-  dtlist_type *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, calendar);
+  DateTimeList dtlist;
+  dtlist.setStat(timestat_date);
+  dtlist.setCalendar(calendar);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
@@ -96,9 +96,9 @@ Yearmonstat(void *process)
       dsets = 0;
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
-          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-          vdate = dtlist_get_vdate(dtlist, nsets);
-          vtime = dtlist_get_vtime(dtlist, nsets);
+          dtlist.taxisInqTimestep(taxisID1, nsets);
+          vdate = dtlist.getVdate(nsets);
+          vtime = dtlist.getVtime(nsets);
           cdiDecodeDate(vdate, &year, &month, &day);
 
           if (nsets == 0) year0 = year;
@@ -205,7 +205,7 @@ Yearmonstat(void *process)
           cdoPrint("%s %s  nsets = %ld", vdatestr, vtimestr, nsets);
         }
 
-      dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
+      dtlist.statTaxisDefTimestep(taxisID2, nsets);
       pstreamDefTimestep(streamID2, otsID);
 
       for (int recID = 0; recID < maxrecs; recID++)
@@ -226,8 +226,6 @@ Yearmonstat(void *process)
   field_free(samp1, vlistID1);
 
   if (field.ptr) Free(field.ptr);
-
-  dtlist_delete(dtlist);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

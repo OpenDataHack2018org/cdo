@@ -85,10 +85,10 @@ cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagG
       cdo_print_grid(gridID_uv_destag, 1);
 
       cdoPrint("%s(): (gridXsize=%d, gridYsize=%d)", __func__, xsize, ysize);
-      cdoPrint("%s(): (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f)",
-               __func__, xfirst_U, yfirst_U, xfirst_V, yfirst_V);
-      cdoPrint("%s(): (xlast_U  = %3.2f; ylast_U  = %3.2f); (xlast_V  = %3.2f; ylast_V  = %3.2f)",
-               __func__, xlast_U, ylast_U, xlast_V, ylast_V);
+      cdoPrint("%s(): (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f)", __func__, xfirst_U, yfirst_U,
+               xfirst_V, yfirst_V);
+      cdoPrint("%s(): (xlast_U  = %3.2f; ylast_U  = %3.2f); (xlast_V  = %3.2f; ylast_V  = %3.2f)", __func__, xlast_U, ylast_U,
+               xlast_V, ylast_V);
     }
 
   double xfirst = 0, xlast = 0, yfirst = 0, ylast = 0;
@@ -201,8 +201,8 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
 
   if ((sampleFactor < 1) || (gridXsize < 1) || (gridYsize < 1) || (sampleFactor > (gridXsize / 4))
       || (sampleFactor > (gridYsize / 4)))
-    cdoAbort("%s(): Unsupported sampleFactor (%d)! Note that: gridXsize = %d, gridYsize = %d",
-             __func__, sampleFactor, gridXsize, gridYsize);
+    cdoAbort("%s(): Unsupported sampleFactor (%d)! Note that: gridXsize = %d, gridYsize = %d", __func__, sampleFactor, gridXsize,
+             gridYsize);
 
   if (CdoDebug::cdoDebugExt > 20) cdo_print_grid(gridSrcID, 1);
 

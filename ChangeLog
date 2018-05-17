@@ -3,6 +3,14 @@
 	* Using CDI library version 1.9.5
 	* Version 1.9.5 release
 
+2018-05-16 Uwe Schulzweida
+
+	* Added #ifdef around wordexp.h [Bug #8488]
+
+2018-05-14 Uwe Schulzweida
+
+	* New module: dhour<stat>   - Multi-day hourly statistics
+
 2018-05-11  Uwe Schulzweida
 
 	* Changed type of date from 32 to 64-bit integer

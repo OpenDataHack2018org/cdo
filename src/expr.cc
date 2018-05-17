@@ -589,8 +589,7 @@ expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
         }
       else
         {
-          cdoAbort("%s: Number of grid points differ (%s[%ld] <-> %s[%ld])", __func__, p1->param.name, ngp1, p2->param.name,
-                   ngp2);
+          cdoAbort("%s: Number of grid points differ (%s[%ld] <-> %s[%ld])", __func__, p1->param.name, ngp1, p2->param.name, ngp2);
         }
     }
 
@@ -684,8 +683,7 @@ ex_copy_var(int init, nodeType *p2, nodeType *p1)
   assert(ngp > 0);
 
   if (ngp != p2->param.ngp)
-    cdoAbort("%s: Number of grid points differ (%s[%zu] = %s[%zu])", __func__, p2->param.name, p2->param.ngp, p1->param.name,
-             ngp);
+    cdoAbort("%s: Number of grid points differ (%s[%zu] = %s[%zu])", __func__, p2->param.name, p2->param.ngp, p1->param.name, ngp);
 
   size_t nlev = p1->param.nlev;
   assert(nlev > 0);
@@ -779,14 +777,13 @@ expr(int init, int oper, nodeType *p1, nodeType *p2)
     {
       p = expr_con_var(init, oper, p1, p2);
       if (cdoVerbose)
-        cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %g %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp,
-                 p1->u.con.value, coper, p2->u.var.nm);
+        cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %g %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value,
+                 coper, p2->u.var.nm);
     }
   else if (p1->type == typeCon && p2->type == typeCon)
     {
       p = expr_con_con(oper, p1, p2);
-      if (cdoVerbose)
-        cdoPrint("\t%s\tarith\t%g = %g %s %g", ExIn[init], p->u.con.value, p1->u.con.value, coper, p2->u.con.value);
+      if (cdoVerbose) cdoPrint("\t%s\tarith\t%g = %g %s %g", ExIn[init], p->u.con.value, p1->u.con.value, coper, p2->u.con.value);
     }
   else
     cdoAbort("Internal problem!");
@@ -1273,9 +1270,7 @@ ex_not(int init, nodeType *p1)
 static nodeType *
 ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 {
-  if (p1->type == typeCon)
-    cdoAbort("expr?expr:expr: First expression is a constant but must be a "
-             "variable!");
+  if (p1->type == typeCon) cdoAbort("expr?expr:expr: First expression is a constant but must be a variable!");
 
   if (cdoVerbose)
     {
@@ -1323,9 +1318,7 @@ ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
               px = p2;
             }
           else
-            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = "
-                     "%ld, ngp2 = %ld)",
-                     ngp1, ngp2);
+            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", ngp1, ngp2);
         }
 
       if (nlev2 > 1 && nlev2 != nlev)
@@ -1336,9 +1329,7 @@ ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
               px = p2;
             }
           else
-            cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, "
-                     "nlev2 = %ld)",
-                     nlev, nlev2);
+            cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, nlev2 = %ld)", nlev, nlev2);
         }
     }
 
@@ -1366,9 +1357,7 @@ ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
               px = p3;
             }
           else
-            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = "
-                     "%ld, ngp3 = %ld)",
-                     ngp1, ngp3);
+            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp3 = %ld)", ngp1, ngp3);
         }
 
       if (nlev3 > 1 && nlev3 != nlev)
@@ -1379,9 +1368,7 @@ ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
               px = p3;
             }
           else
-            cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, "
-                     "nlev3 = %ld)",
-                     nlev, nlev3);
+            cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, nlev3 = %ld)", nlev, nlev3);
         }
     }
 
@@ -1528,8 +1515,7 @@ expr_run(nodeType *p, parseParamType *parse_arg)
                           if (steptype == TIME_CONSTANT)
                             fprintf(stdout, "   %s[lev=%zu:gp=%zu] = %g\n", vname, k + 1, i + 1, data[k * ngp + i]);
                           else
-                            fprintf(stdout, "   %s[ts=%ld:lev=%zu:gp=%zu] = %g\n", vname, tsID, k + 1, i + 1,
-                                    data[k * ngp + i]);
+                            fprintf(stdout, "   %s[ts=%ld:lev=%zu:gp=%zu] = %g\n", vname, tsID, k + 1, i + 1, data[k * ngp + i]);
                         }
                       else if (i == maxout)
                         {

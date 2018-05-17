@@ -218,7 +218,7 @@ Vargen(void *process)
   size_t nlon = NLON;
   size_t nlat = NLAT;
   ListArray<double> listArrayFlt;
-   
+
   cdoInitialize(process);
 
   // clang-format off

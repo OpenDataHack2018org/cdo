@@ -367,8 +367,7 @@ Vertintml(void *process)
             psID = varID;
         }
 
-      if (gridInqType(gridID) == GRID_SPECTRAL && zaxis_is_hybrid(zaxistype))
-        cdoAbort("Spectral data on model level unsupported!");
+      if (gridInqType(gridID) == GRID_SPECTRAL && zaxis_is_hybrid(zaxistype)) cdoAbort("Spectral data on model level unsupported!");
 
       if (gridInqType(gridID) == GRID_SPECTRAL) cdoAbort("Spectral data unsupported!");
 
@@ -426,8 +425,7 @@ Vertintml(void *process)
               if (geopotID == -1)
                 cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
               else
-                cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential),
-                         var_stdname(geopotential));
+                cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
             }
           arrayFill(gridsize, &sgeopot[0], 0.0);
         }
@@ -593,8 +591,8 @@ Vertintml(void *process)
 
                       if (useLogType && extrapolate) cdoAbort("Log. extrapolation of temperature unsupported!");
 
-                      interp_T(&sgeopot[0], vardata1[varID], vardata2[varID], &full_press[0], &half_press[0], &vert_index[0],
-                               plev, nplev, gridsize, nlevel, missval);
+                      interp_T(&sgeopot[0], vardata1[varID], vardata2[varID], &full_press[0], &half_press[0], &vert_index[0], plev,
+                               nplev, gridsize, nlevel, missval);
                     }
                   else if (varID == gheightID)
                     {
@@ -605,8 +603,7 @@ Vertintml(void *process)
                     }
                   else
                     {
-                      interp_X(vardata1[varID], vardata2[varID], hyb_press, &vert_index[0], plev, nplev, gridsize, nlevel,
-                               missval);
+                      interp_X(vardata1[varID], vardata2[varID], hyb_press, &vert_index[0], plev, nplev, gridsize, nlevel, missval);
                     }
 
                   if (!extrapolate) arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);

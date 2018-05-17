@@ -65,8 +65,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 0);
 
-  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
-    gridID = gridToCurvilinear(gridID, 0);
+  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR) gridID = gridToCurvilinear(gridID, 0);
 
   gridInqXvals(gridID, &xvals[0]);
   gridInqYvals(gridID, &yvals[0]);
@@ -103,8 +102,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : nmissx) shared(findex, \
-    cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
+#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : nmissx) shared( \
+    findex, cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {

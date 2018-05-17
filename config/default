@@ -31,8 +31,7 @@ set -x
 case "${HOSTNAME}" in
 # i386-apple-darwin10
     bailung*|d133*|d134*)
-        CDOLIBS="--enable-nearpt3 \
-                 --with-fftw3 \
+        CDOLIBS="--with-fftw3 \
                  --with-eccodes=$HOME/local/eccodes-2.6.0 \
                  --with-netcdf=$HOME/local/netcdf-4.4.1.1 \
                  --with-hdf5=$HOME/local/hdf5-1.8.19-threadsafe \
@@ -101,8 +100,7 @@ case "${HOSTNAME}" in
 #                 --with-cmor=/Users/m214003/work/CMOR \
 #                 --with-magics=$HOME/local/magics-2.25.3 \
 #                 --with-curl=/opt/local"
-        CDOLIBS="--enable-nearpt3 \
-                 --with-fftw3 \
+        CDOLIBS="--with-fftw3 \
                  --with-szlib=$HOME/local \
                  --with-eccodes=$HOME/local/eccodes-2.3.0 \
                  --with-netcdf=$HOME/local/netcdf-c-4.4.1.1 \

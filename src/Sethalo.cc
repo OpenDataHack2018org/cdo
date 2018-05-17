@@ -131,8 +131,10 @@ gentpngrid(int gridID1)
               for ( ilon = 0; ilon < 4*nlon1; ilon++ )
                 {
                   ilonr = 4*nlon1 - ilon - 1;
-                  xbounds2[4*1*nlon1 + ilon] = xbounds2[4*2*nlon1 + ilonr]; xbounds2[4*0*nlon1 + ilon] = xbounds2[4*3*nlon1 + ilonr];
-                  ybounds2[4*1*nlon1 + ilon] = ybounds2[4*2*nlon1 + ilonr]; ybounds2[4*0*nlon1 + ilon] = ybounds2[4*3*nlon1 + ilonr];
+                  xbounds2[4*1*nlon1 + ilon] = xbounds2[4*2*nlon1 + ilonr]; xbounds2[4*0*nlon1 + ilon] = xbounds2[4*3*nlon1 +
+              ilonr];
+                  ybounds2[4*1*nlon1 + ilon] = ybounds2[4*2*nlon1 + ilonr]; ybounds2[4*0*nlon1 + ilon] = ybounds2[4*3*nlon1 +
+              ilonr];
                 }
               */
             }

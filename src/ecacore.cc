@@ -744,7 +744,8 @@ eca3(const ECA_REQUEST_3 *request)
   char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
   int64_t ivdate1 = 0, ivdate2 = 0;
   int ivtime1 = 0, ivtime2 = 0;
-  int ovdate = 0, ovtime = 0;
+  int64_t ovdate = 0;
+  int ovtime = 0;
   int nrecs, nrecords;
   int gridID, zaxisID, varID, levelID;
   int itsID;
@@ -1407,8 +1408,8 @@ eca4(const ECA_REQUEST_4 *request)
                   computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay,
                              FALSE);
                   {
-                    writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration,
-                                   gslFirstDay, cdiEncodeDate(ovdate / 10000 - 1, 12, 31), ovtime, nlevels);
+                    writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration, gslFirstDay,
+                                   cdiEncodeDate(ovdate / 10000 - 1, 12, 31), ovtime, nlevels);
                     otsID++;
                   }
                 }
@@ -1430,8 +1431,8 @@ eca4(const ECA_REQUEST_4 *request)
         {
           computeGsl(nlevels, gridsize, yvals, missval, startDateWithHist, endDateWithHist, gslDuration, gslFirstDay, TRUE);
           {
-            writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration, gslFirstDay,
-                           ovdate, ovtime, nlevels);
+            writeGslStream(ostreamID, otaxisID, otsID, ovarID1, ovarID2, ivlistID1, FIRST_VAR_ID, gslDuration, gslFirstDay, ovdate,
+                           ovtime, nlevels);
             otsID++;
           }
         }

@@ -717,8 +717,8 @@ tricntr(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kj
 /****************************************************************************/
 
 static void
-gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd, double pgamma, int ki1, int kj1, int ki2,
-     int kj2, int ki, int kj)
+gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd, double pgamma, int ki1, int kj1, int ki2, int kj2,
+     int ki, int kj)
 {
   (void) knd;
 
@@ -1307,8 +1307,8 @@ gme_grid_restore(double *p, int ni, int nd)
 /*****************************************************************************/
 
 void
-gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon, double *blat, int *imask, int ni, int nd,
-         int ni2, int ni3)
+gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon, double *blat, int *imask, int ni, int nd, int ni2,
+         int ni3)
 {
   /* check gridsize */
   if ((size_t)(ni + 1) * (ni + 1) * nd != gridsize)

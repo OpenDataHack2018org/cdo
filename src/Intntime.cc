@@ -150,10 +150,8 @@ Intntime(void *process)
           taxisDefVtime(taxisID2, vtime);
           pstreamDefTimestep(streamID2, tsIDo++);
 
-          double fac1
-              = juldate_to_seconds(juldate_sub(juldate2, juldate)) / juldate_to_seconds(juldate_sub(juldate2, juldate1));
-          double fac2
-              = juldate_to_seconds(juldate_sub(juldate, juldate1)) / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+          double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+          double fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / juldate_to_seconds(juldate_sub(juldate2, juldate1));
 
           for (int recID = 0; recID < nrecs; recID++)
             {

@@ -213,9 +213,8 @@ intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double 
 }
 
 static void
-intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const double *restrict fieldm,
-           const double *restrict xm, const double *restrict ym, size_t gridsize2, double *field, const double *restrict x,
-           const double *restrict y)
+intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const double *restrict fieldm, const double *restrict xm,
+           const double *restrict ym, size_t gridsize2, double *field, const double *restrict x, const double *restrict y)
 {
   size_t nlon1 = nxm;
   double findex = 0;
@@ -230,8 +229,8 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const do
   progressInit();
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(findex, \
-    field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
+#pragma omp parallel for default(none) shared(findex, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, \
+                                              lon_is_circular, grid1_mask)
 #endif
   for (size_t i = 0; i < gridsize2; ++i)
     {
@@ -451,7 +450,8 @@ intgridbil(Field *field1, Field *field2)
               }
         }
 
-      intlinarr2(missval, lon_is_circular, nlon1, nlat1, array1, lon1.data(), lat1.data(), gridsize2, array2, xvals2.data(), yvals2.data());
+      intlinarr2(missval, lon_is_circular, nlon1, nlat1, array1, lon1.data(), lat1.data(), gridsize2, array2, xvals2.data(),
+                 yvals2.data());
 
       field2->nmiss = arrayNumMV(gridsize2, array2, missval);
     }
@@ -593,9 +593,8 @@ interpolate(Field *field1, Field *field2)
   if (out_nlon > 1)
     {
       lono[-1] = lono[out_nlon - 1] - 360 > 2 * lono[0] - lono[1] ? lono[out_nlon - 1] - 360 : 2 * lono[0] - lono[1];
-      lono[out_nlon] = lono[0] + 360 < 2 * lono[out_nlon - 1] - lono[out_nlon - 2]
-                           ? lono[0] + 360
-                           : 2 * lono[out_nlon - 1] - lono[out_nlon - 2];
+      lono[out_nlon] = lono[0] + 360 < 2 * lono[out_nlon - 1] - lono[out_nlon - 2] ? lono[0] + 360
+                                                                                   : 2 * lono[out_nlon - 1] - lono[out_nlon - 2];
     }
   else
     {
@@ -914,14 +913,10 @@ interpolate(Field *field1, Field *field2)
                           vlon2 *= M_PI / 180;
                           vlat1 *= M_PI / 180;
                           vlat2 *= M_PI / 180;
-                          b11 = a11 + (a12 - a11) * faclon1 + (a21 - a11) * faclat1
-                                + (a22 - a12 - a21 + a11) * faclon1 * faclat1;
-                          b12 = a11 + (a12 - a11) * faclon2 + (a21 - a11) * faclat1
-                                + (a22 - a12 - a21 + a11) * faclon2 * faclat1;
-                          b21 = a11 + (a12 - a11) * faclon1 + (a21 - a11) * faclat2
-                                + (a22 - a12 - a21 + a11) * faclon1 * faclat2;
-                          b22 = a11 + (a12 - a11) * faclon2 + (a21 - a11) * faclat2
-                                + (a22 - a12 - a21 + a11) * faclon2 * faclat2;
+                          b11 = a11 + (a12 - a11) * faclon1 + (a21 - a11) * faclat1 + (a22 - a12 - a21 + a11) * faclon1 * faclat1;
+                          b12 = a11 + (a12 - a11) * faclon2 + (a21 - a11) * faclat1 + (a22 - a12 - a21 + a11) * faclon2 * faclat1;
+                          b21 = a11 + (a12 - a11) * faclon1 + (a21 - a11) * faclat2 + (a22 - a12 - a21 + a11) * faclon1 * faclat2;
+                          b22 = a11 + (a12 - a11) * faclon2 + (a21 - a11) * faclat2 + (a22 - a12 - a21 + a11) * faclon2 * faclat2;
                         }
                       wsum += (vlon2 - vlon1) * (sin(vlat2) - sin(vlat1));
                       t = 2 * sin((vlat2 + vlat1) / 2) * sin((vlat2 - vlat1) / 2) / (vlat2 - vlat1);

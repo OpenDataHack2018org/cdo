@@ -263,8 +263,7 @@ mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell_corner
 
   for (int i = 1; i < num_corners; i++)
     {
-      if (IS_EQUAL(cell_corner_lon[i], cell_corner_lon[i - 1]) && IS_EQUAL(cell_corner_lat[i], cell_corner_lat[i - 1]))
-        continue;
+      if (IS_EQUAL(cell_corner_lon[i], cell_corner_lon[i - 1]) && IS_EQUAL(cell_corner_lat[i], cell_corner_lat[i - 1])) continue;
 
       // points that make up a side of cell
       lonlat_to_xyz(cell_corner_lon[i], cell_corner_lat[i], pnt3);
@@ -287,8 +286,112 @@ mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell_corner
   return sum;
 }
 
-int
-gridGenArea(int gridID, double *area)
+static void
+getLonLatCorner(size_t nx, size_t idx, const double *grid_corner_lon, const double *grid_corner_lat, double *lons, double *lats)
+{
+  size_t j = idx / nx;
+  size_t i = idx - j * nx;
+
+  lons[0] = grid_corner_lon[2*i];
+  lons[1] = grid_corner_lon[2*i+1];
+  lons[2] = grid_corner_lon[2*i+1];
+  lons[3] = grid_corner_lon[2*i];
+
+  if ( grid_corner_lat[2*j+1] > grid_corner_lat[2*j] )
+    {
+      lats[0] = grid_corner_lat[2*j];
+      lats[1] = grid_corner_lat[2*j];
+      lats[2] = grid_corner_lat[2*j+1];
+      lats[3] = grid_corner_lat[2*j+1];
+    }
+  else
+    {
+      lats[0] = grid_corner_lat[2*j+1];
+      lats[1] = grid_corner_lat[2*j+1];
+      lats[2] = grid_corner_lat[2*j];
+      lats[3] = grid_corner_lat[2*j];
+    }
+}
+
+static int
+gridGenAreaReg2D(int gridID, double *area)
+{
+  int status = 0;
+
+  size_t gridsize = gridInqSize(gridID);
+  size_t nlon = gridInqXsize(gridID);
+  size_t nlat = gridInqYsize(gridID);
+
+  if (gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0)
+    {
+      cdoWarning("Computation of grid cell area weights failed, grid cell center coordinates missing!");
+      return 1;
+    }
+
+  char xunitstr[CDI_MAX_NAME];
+  char yunitstr[CDI_MAX_NAME];
+  gridInqXunits(gridID, xunitstr);
+  gridInqYunits(gridID, yunitstr);
+
+  std::vector<double> grid_center_lon(nlon);
+  std::vector<double> grid_center_lat(nlat);
+
+  gridInqXvals(gridID, grid_center_lon.data());
+  gridInqYvals(gridID, grid_center_lat.data());
+
+  std::vector<double> grid_corner_lon(2 * nlon);
+  std::vector<double> grid_corner_lat(2 * nlat);
+
+  if (gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL))
+    {
+      gridInqXbounds(gridID, grid_corner_lon.data());
+      gridInqYbounds(gridID, grid_corner_lat.data());
+    }
+  else
+    {
+      grid_gen_bounds(nlon, grid_center_lon.data(), grid_corner_lon.data());
+      grid_gen_bounds(nlat, grid_center_lat.data(), grid_corner_lat.data());
+      grid_check_lat_borders(2 * nlat, grid_corner_lat.data());
+    }
+
+  grid_to_radian(xunitstr, nlon, grid_center_lon.data(), "grid1 center longitudes");
+  grid_to_radian(xunitstr, nlon * 2, grid_corner_lon.data(), "grid1 corner longitudes");
+
+  grid_to_radian(yunitstr, nlat, grid_center_lat.data(), "grid1 center latitudes");
+  grid_to_radian(yunitstr, nlat * 2, grid_corner_lat.data(), "grid1 corner latitudes");
+
+  int nv = 4;
+  double findex = 0;
+
+  progressInit();
+
+#ifdef _OPENMP
+#pragma omp parallel for default(none) shared(findex, gridsize, nlon, area, nv, grid_corner_lon, grid_corner_lat)
+#endif
+  for (size_t i = 0; i < gridsize; ++i)
+    {
+      int lprogress = 1;
+      if (cdo_omp_get_thread_num() != 0) lprogress = 0;
+
+#ifdef _OPENMP
+#pragma omp atomic
+#endif
+      findex++;
+      if (lprogress) progressStatus(0, 1, findex / gridsize);
+
+      double lons[4], lats[4];
+      getLonLatCorner(nlon, i, grid_corner_lon.data(), grid_corner_lat.data(), lons, lats);
+      // area[i] = mod_cell_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
+      area[i] = mod_huiliers_area(nv, lons, lats);
+    }
+
+  progressStatus(0, 1, 1);
+
+  return status;
+}
+
+static int
+gridGenAreaUnstruct(int gridID, double *area)
 {
   int status = 0;
   bool lgrid_gen_bounds = false;
@@ -296,14 +399,6 @@ gridGenArea(int gridID, double *area)
 
   size_t gridsize = gridInqSize(gridID);
   int gridtype = gridInqType(gridID);
-  int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
-
-  if (gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN && projtype != CDI_PROJ_RLL && projtype != CDI_PROJ_LAEA
-      && projtype != CDI_PROJ_SINU && projtype != CDI_PROJ_LCC && gridtype != GRID_GME && gridtype != GRID_CURVILINEAR
-      && gridtype != GRID_UNSTRUCTURED)
-    {
-      cdoAbort("Internal error! Unsupported gridtype: %s", gridNamePtr(gridtype));
-    }
 
   if (gridtype != GRID_UNSTRUCTURED && gridtype != GRID_CURVILINEAR)
     {
@@ -344,18 +439,14 @@ gridGenArea(int gridID, double *area)
 
   if (gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0)
     {
-      cdoWarning("Computation of grid cell area weights failed, grid cell "
-                 "center coordinates missing!");
-      status = 1;
-      return status;
+      cdoWarning("Computation of grid cell area weights failed, grid cell center coordinates missing!");
+      return 1;
     }
 
   if (nv == 0)
     {
-      cdoWarning("Computation of grid cell area weights failed, grid cell "
-                 "corner coordinates missing!");
-      status = 1;
-      return status;
+      cdoWarning("Computation of grid cell area weights failed, grid cell corner coordinates missing!");
+      return 1;
     }
 
   char xunitstr[CDI_MAX_NAME];
@@ -409,8 +500,8 @@ gridGenArea(int gridID, double *area)
   progressInit();
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat, \
-                                              grid_center_lon, grid_center_lat)
+#pragma omp parallel for default(none) shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat, grid_center_lon, \
+                                              grid_center_lat)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -427,11 +518,37 @@ gridGenArea(int gridID, double *area)
       if (nv <= 4)
         area[i] = mod_huiliers_area(nv, &grid_corner_lon[i * nv], &grid_corner_lat[i * nv]);
       else
-        area[i] = mod_huiliers_area2(nv, &grid_corner_lon[i * nv], &grid_corner_lat[i * nv],
-                                     grid_center_lon[i], grid_center_lat[i]);
+        area[i]
+            = mod_huiliers_area2(nv, &grid_corner_lon[i * nv], &grid_corner_lat[i * nv], grid_center_lon[i], grid_center_lat[i]);
     }
 
   progressStatus(0, 1, 1);
+
+  return status;
+}
+
+int
+gridGenArea(int gridID, double *area)
+{
+  int status = 0;
+
+  size_t gridsize = gridInqSize(gridID);
+  int gridtype = gridInqType(gridID);
+  int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
+
+  if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN)
+    {
+      status = gridGenAreaReg2D(gridID, area);
+    }
+  else if (projtype == CDI_PROJ_RLL || projtype == CDI_PROJ_LAEA || projtype == CDI_PROJ_SINU || projtype == CDI_PROJ_LCC
+           || gridtype == GRID_GME || gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED)
+    {
+      status = gridGenAreaUnstruct(gridID, area);
+    }
+  else
+    {
+      cdoAbort("Internal error! Unsupported gridtype: %s", gridNamePtr(gridtype));
+    }
 
   if (cdoVerbose)
     {

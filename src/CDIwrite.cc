@@ -26,8 +26,7 @@ const char *filetypestr(int filetype);
 const char *datatypestr(int datatype);
 
 static void
-print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size,
-           double tw)
+print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size, double tw)
 {
   nvalues /= 1000000;
   data_size /= 1024. * 1024. * 1024.;
@@ -120,8 +119,7 @@ CDIwrite(void *process)
   int gridID2 = gridID;
   if (gridInqType(gridID) == GRID_GME) gridID2 = gridToUnstructured(gridID, 0);
 
-  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
-    gridID2 = gridToCurvilinear(gridID, 0);
+  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR) gridID2 = gridToCurvilinear(gridID, 0);
 
   gridInqXvals(gridID2, &xvals[0]);
   gridInqYvals(gridID2, &yvals[0]);

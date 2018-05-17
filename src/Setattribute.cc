@@ -164,16 +164,16 @@ setAttributes(list_t *kvlist, int vlistID)
                   int len = (value && *value) ? (int) strlen(value) : 0;
                   int outlen = 0;
                   char *outvalue = NULL;
-                  if ( len ) outvalue = (char*) malloc(len);
-                  for ( int i = 0; i < len; ++i )
+                  if (len) outvalue = (char *) malloc(len);
+                  for (int i = 0; i < len; ++i)
                     {
-                      if ( i > 0 && value[i-1] == '\\' && value[i] == 'n' )
-                        outvalue[outlen-1] = '\n';
+                      if (i > 0 && value[i - 1] == '\\' && value[i] == 'n')
+                        outvalue[outlen - 1] = '\n';
                       else
                         outvalue[outlen++] = value[i];
                     }
                   cdiDefAttTxt(cdiID, varID, attname, outlen, outvalue);
-                  if ( outvalue ) free(outvalue);
+                  if (outvalue) free(outvalue);
                 }
             }
         }

@@ -27,9 +27,9 @@
 #include "grid.h"
 #include "pstream_int.h"
 
-
 static void
-mastrfu(int gridID, int zaxisID, std::vector<std::vector<double>> &field1, std::vector<std::vector<double>> &field2, size_t nmiss, double missval)
+mastrfu(int gridID, int zaxisID, std::vector<std::vector<double>> &field1, std::vector<std::vector<double>> &field2, size_t nmiss,
+        double missval)
 {
   size_t ilat;
   int ilev, n;
@@ -78,8 +78,7 @@ mastrfu(int gridID, int zaxisID, std::vector<std::vector<double>> &field1, std::
                   break;
                 }
               else
-                field2[ilev][ilat]
-                    += fact * (field1[n][ilat] + field1[n + 1][ilat]) * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
+                field2[ilev][ilat] += fact * (field1[n][ilat] + field1[n + 1][ilat]) * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
             }
     }
 }

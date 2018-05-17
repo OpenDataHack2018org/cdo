@@ -19,7 +19,7 @@
 #include "config.h"
 #endif
 
-#if defined(HAVE_PTHREAD_H)
+#ifdef HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
 #ifdef _OPENMP
@@ -28,10 +28,6 @@
 
 #include <stdio.h>
 #include <string.h>
-
-#if defined(HAVE_GLOB_H)
-#include <glob.h>
-#endif
 
 #include "cdo_int.h"
 #include "error.h"
@@ -165,20 +161,14 @@ ProcessType::handleProcessErr(ProcessStatus p_proErr)
       }
     case ProcessStatus::TooManyStreams:
       {
-        CdoError::Abort(Cdo::progname,
-                        "Too many streams specified!"
-                        " Operator ",
-                        m_operatorCommand, " needs ", m_module.streamInCnt, " input and ", m_module.streamOutCnt,
-                        " output streams.");
+        CdoError::Abort(Cdo::progname, "Too many streams specified! Operator ", m_operatorCommand, " needs ", m_module.streamInCnt,
+                        " input and ", m_module.streamOutCnt, " output streams.");
         break;
       }
     case ProcessStatus::TooFewStreams:
       {
-        CdoError::Abort(Cdo::progname,
-                        "Too few streams specified!"
-                        " Operator ",
-                        m_operatorCommand, " needs ", m_module.streamInCnt, " input and ", m_module.streamOutCnt,
-                        " output streams.");
+        CdoError::Abort(Cdo::progname, "Too few streams specified! Operator ", m_operatorCommand, " needs ", m_module.streamInCnt,
+                        " input and ", m_module.streamOutCnt, " output streams.");
         break;
       }
     }
@@ -413,7 +403,7 @@ ProcessType::addChild(ProcessType *childProcess)
 void
 ProcessType::addPipeInStream()
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef HAVE_LIBPTHREAD
   inputStreams.push_back(create_pstream(m_ID, inputStreams.size()));
   m_streamCnt++;
 #else
@@ -501,18 +491,12 @@ ProcessType::query_user_exit(const char *argument)
     {
       if (nbr_itr++ > USR_RPL_MAX_NBR)
         {
-          (void) fprintf(stdout,
-                         "\n%s: ERROR %d failed attempts to obtain valid "
-                         "interactive input.\n",
-                         prompt, nbr_itr - 1);
+          (void) fprintf(stdout, "\n%s: ERROR %d failed attempts to obtain valid interactive input.\n", prompt, nbr_itr - 1);
           exit(EXIT_FAILURE);
         }
 
       if (nbr_itr > 1) (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
-      (void) fprintf(stdout,
-                     "%s: %s exists ---`e'xit, or `o'verwrite (delete existing "
-                     "file) (e/o)? ",
-                     prompt, argument);
+      (void) fprintf(stdout, "%s: %s exists ---`e'xit, or `o'verwrite (delete existing file) (e/o)? ", prompt, argument);
       (void) fflush(stdout);
       if (fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL) continue;
 
@@ -573,7 +557,7 @@ ProcessType::getTimes(int p_processNums)
 void
 ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
 {
-#if defined(HAVE_SYS_TIMES_H)
+#ifdef HAVE_SYS_TIMES_H
   if (m_ID == 0)
     {
       if (cdoBenchmark)
@@ -592,8 +576,8 @@ ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
       p_times.p_systime = a_stime;
 
       p_times.p_cputime = p_times.p_usertime + p_times.p_systime;
-      fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_times.p_usertime, p_times.p_systime,
-              p_times.p_cputime, p_memstring);
+      fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_times.p_usertime, p_times.p_systime, p_times.p_cputime,
+              p_memstring);
     }
 #else
   fprintf(stderr, "\n");
@@ -612,15 +596,14 @@ ProcessType::printProcessedValues()
   if (nvals > 0)
     {
       if (sizeof(int64_t) > sizeof(size_t))
-#if defined(_WIN32)
+#ifdef _WIN32
         fprintf(stderr, "Processed %I64d value%s from %d variable%s",
 #else
         fprintf(stderr, "Processed %jd value%s from %d variable%s",
 #endif
                 (intmax_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
       else
-        fprintf(stderr, "Processed %zu value%s from %d variable%s", (size_t) nvals, ADD_PLURAL(nvals), nvars,
-                ADD_PLURAL(nvars));
+        fprintf(stderr, "Processed %zu value%s from %d variable%s", (size_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
     }
   else if (nvars > 0)
     {

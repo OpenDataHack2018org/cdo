@@ -250,8 +250,8 @@ phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1, double *zt
   hnm[0] = pmu * ztemp2[0];
 
   for (jn = 1; jn < waves; jn++)
-    hnm[jn] = (jn + 1) * pmu * ztemp2[jn]
-              - sqrt(((jn + jn + 3.0) * ((jn + 1) * (jn + 1) - 1.0)) / (jn + jn + 1.0)) * ztemp2[jn - 1];
+    hnm[jn]
+        = (jn + 1) * pmu * ztemp2[jn] - sqrt(((jn + jn + 3.0) * ((jn + 1) * (jn + 1) - 1.0)) / (jn + jn + 1.0)) * ztemp2[jn - 1];
 
   hnm += waves;
 

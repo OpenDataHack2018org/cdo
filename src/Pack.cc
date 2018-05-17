@@ -102,7 +102,7 @@ Pack(void *process)
   int varID, levelID;
   int nalloc = 0;
   int datatype = CDI_DATATYPE_INT16;
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList dtlist;
 
   cdoInitialize(process);
 
@@ -130,7 +130,7 @@ Pack(void *process)
           vars.resize(nalloc);
         }
 
-      dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
+      dtlist.taxisInqTimestep(taxisID1, tsID);
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
@@ -239,7 +239,7 @@ Pack(void *process)
 
   for (int tsID = 0; tsID < nts; tsID++)
     {
-      dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
+      dtlist.taxisDefTimestep(taxisID2, tsID);
       pstreamDefTimestep(streamID2, tsID);
 
       for (varID = 0; varID < nvars; varID++)
@@ -261,8 +261,6 @@ Pack(void *process)
 
       field_free(vars[tsID], vlistID1);
     }
-
-  dtlist_delete(dtlist);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

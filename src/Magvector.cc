@@ -251,8 +251,7 @@ VerifyVectorParameters(int num_param, char **param_names, int opID)
                 {
                   found = TRUE;
 
-                  if (!strcmp(split_str[0], "thin_fac") || !strcmp(split_str[0], "unit_vec")
-                      || !strcmp(split_str[0], "step_freq"))
+                  if (!strcmp(split_str[0], "thin_fac") || !strcmp(split_str[0], "unit_vec") || !strcmp(split_str[0], "step_freq"))
                     {
                       if (!IsNumeric(split_str[1])) syntax = FALSE;
                     }

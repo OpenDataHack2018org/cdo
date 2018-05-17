@@ -749,7 +749,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   std::vector<size_t *> srch_add(Threading::ompNumThreads);
   for (int i = 0; i < Threading::ompNumThreads; ++i) srch_add[i] = new size_t[src_grid_size];
 
-  size_t srch_corners = src_num_cell_corners; // num of corners of srch cells
+  size_t srch_corners = src_num_cell_corners;  // num of corners of srch cells
 
   double src_grid_bound_box[4];
   if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D) reg2d_bound_box(src_grid, src_grid_bound_box);
@@ -766,10 +766,10 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 // Loop over destination grid
 
 #ifdef _OPENMP
-#pragma omp parallel for schedule(dynamic) default(none) shared(findex, \
-    rsearch, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose,     \
-    tgt_num_cell_corners, target_cell_type, weightLinks, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
-    search, srch_add, tgt_grid_cell, num_srch_cells_stat)
+#pragma omp parallel for schedule(dynamic) default(none)                                                                        \
+    shared(findex, rsearch, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose, tgt_num_cell_corners, \
+           target_cell_type, weightLinks, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, search, srch_add,     \
+           tgt_grid_cell, num_srch_cells_stat)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -825,8 +825,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
           boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
                                   tgt_cell_bound_box_r);
 
-          num_srch_cells
-              = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r, srch_add[ompthID]);
+          num_srch_cells = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r, srch_add[ompthID]);
         }
 
       if (1 && cdoVerbose)
@@ -954,8 +953,8 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
   if (1 && cdoVerbose)
     {
-      cdoPrint("Num search cells min,mean,max :  %zu  %3.1f  %zu",
-               num_srch_cells_stat[1], num_srch_cells_stat[0] / (double) tgt_grid_size, num_srch_cells_stat[2]);
+      cdoPrint("Num search cells min,mean,max :  %zu  %3.1f  %zu", num_srch_cells_stat[1],
+               num_srch_cells_stat[0] / (double) tgt_grid_size, num_srch_cells_stat[2]);
     }
 
   // Finished with all cells: deallocate search arrays

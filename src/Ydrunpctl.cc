@@ -113,7 +113,7 @@ Ydrunpctl(void *process)
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  cdo_datetime_t *datetime = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
+  std::vector<CdoDateTime> datetime(ndates + 1);
 
   Field ***vars1 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
 
@@ -210,7 +210,7 @@ Ydrunpctl(void *process)
 
   while (TRUE)
     {
-      datetime_avg(dpy, ndates, datetime);
+      datetime_avg(dpy, ndates, datetime.data());
 
       vdate = datetime[ndates].date;
       vtime = datetime[ndates].time;

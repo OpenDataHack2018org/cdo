@@ -156,8 +156,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVa
           for (size_t n = 0; n < num_links; ++n)
             {
               dst_array[dst_add[n]] += src_array[src_add[n]] * map_wts[4 * n] + src_grad1[src_add[n]] * map_wts[4 * n + 1]
-                                       + src_grad2[src_add[n]] * map_wts[4 * n + 2]
-                                       + src_grad3[src_add[n]] * map_wts[4 * n + 3];
+                                       + src_grad2[src_add[n]] * map_wts[4 * n + 2] + src_grad3[src_add[n]] * map_wts[4 * n + 3];
             }
         }
     }

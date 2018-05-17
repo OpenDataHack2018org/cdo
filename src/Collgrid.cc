@@ -158,8 +158,7 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit, int ig
     }
 
   if (cdoVerbose && lregular)
-    for (int fileID = 0; fileID < nfiles; fileID++)
-      printf("1 %d %g %g \n", xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
+    for (int fileID = 0; fileID < nfiles; fileID++) printf("1 %d %g %g \n", xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
   if (lregular)
     {

@@ -50,7 +50,7 @@ getTimeInc(double jdelta, int64_t vdate0, int64_t vdate1, int64_t *incperiod, in
   *incperiod = 0;
   *incunit = 0;
 
-  int64_t lperiod = (jdelta < 0) ? (int64_t) (jdelta - 0.5) : (int64_t) (jdelta + 0.5);
+  int64_t lperiod = (jdelta < 0) ? (int64_t)(jdelta - 0.5) : (int64_t)(jdelta + 0.5);
 
   int sign = 1;
   if (lperiod < 0)
@@ -168,7 +168,7 @@ fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2], int64_t vdate
             {
               cdiDecodeDate(ndate, &year, &month, &day);
 
-              month += (int)ijulinc;
+              month += (int) ijulinc;
 
               while (month > 12)
                 {
@@ -384,8 +384,8 @@ Tinfo(void *process)
                 }
               else
                 {
-                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, tsID, incperiod0, incunit0, vdate, vdate0, vtime0,
-                                 calendar, day0, juldate, juldate0);
+                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, tsID, incperiod0, incunit0, vdate, vdate0, vtime0, calendar,
+                                 day0, juldate, juldate0);
 
                   arrow = '<';
 
@@ -401,13 +401,12 @@ Tinfo(void *process)
                 {
                   ngaps++;
                   if (cdoVerbose)
-                    fprintf(stdout, "  %c--- Gap %d, missing %s%d timestep%s", arrow, ngaps,
-                            its >= LIM_NTSM ? "more than " : "", its, its != 1 ? "s" : "");
+                    fprintf(stdout, "  %c--- Gap %d, missing %s%d timestep%s", arrow, ngaps, its >= LIM_NTSM ? "more than " : "",
+                            its, its != 1 ? "s" : "");
                 }
               else if (its < 0)
                 {
-                  if (cdoVerbose)
-                    fprintf(stdout, "  %c--- Wrong date/time information, negative increment!", arrow);
+                  if (cdoVerbose) fprintf(stdout, "  %c--- Wrong date/time information, negative increment!", arrow);
                 }
             }
 

@@ -203,8 +203,8 @@ com_vars(const char *arg)
     {
       cdiParamToString(all_vars[varID].param, paramstr, sizeof(paramstr));
 
-      fprintf(stdout, "varID=%3d, param=%s, name=%s, longname=\"%s\", units=\"%s\"\n", varID + 1, paramstr,
-              all_vars[varID].name, all_vars[varID].longname, all_vars[varID].units);
+      fprintf(stdout, "varID=%3d, param=%s, name=%s, longname=\"%s\", units=\"%s\"\n", varID + 1, paramstr, all_vars[varID].name,
+              all_vars[varID].longname, all_vars[varID].units);
     }
 
   return 0;

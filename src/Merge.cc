@@ -27,7 +27,6 @@
 #include "pstream_int.h"
 #include "util_files.h"
 
-
 static void
 checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 {
@@ -84,8 +83,7 @@ checkDupEntry(int vlistID1, int vlistID2, const char *filename)
                     {
                       if (param1 < 0 || param2 < 0)
                         {
-                          if (strcmp(vname1, vname2) == 0)
-                            cdoWarning("Duplicate entry of parameter %s in %s!", vname2, filename);
+                          if (strcmp(vname1, vname2) == 0) cdoWarning("Duplicate entry of parameter %s in %s!", vname2, filename);
                         }
                       else
                         {
@@ -256,8 +254,8 @@ Merge(void *process)
         {
           for (index = 1; index < nmerge; index++)
             if (vlistIDs[index] != -1 && numrecs[index] != 0)
-              cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!",
-                         taxisindex + 1, tsID, tsID == 1 ? "" : "s", index + 1);
+              cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!", taxisindex + 1, tsID,
+                         tsID == 1 ? "" : "s", index + 1);
           break;
         }
       else
@@ -265,8 +263,8 @@ Merge(void *process)
           for (index = 1; index < nmerge; index++)
             if (vlistIDs[index] != -1 && numrecs[index] == 0)
               {
-                cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!",
-                           index + 1, tsID, tsID == 1 ? "" : "s", taxisindex + 1);
+                cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!", index + 1, tsID,
+                           tsID == 1 ? "" : "s", taxisindex + 1);
                 break;
               }
           if (index < nmerge) break;

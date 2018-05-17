@@ -229,8 +229,7 @@ typedef short int yytype_int16;
 #endif
 
 #ifndef YY_ATTRIBUTE
-#if (defined __GNUC__ && (2 < __GNUC__ || (__GNUC__ == 2 && 96 <= __GNUC_MINOR__))) \
-    || defined __SUNPRO_C && 0x5110 <= __SUNPRO_C
+#if (defined __GNUC__ && (2 < __GNUC__ || (__GNUC__ == 2 && 96 <= __GNUC_MINOR__))) || defined __SUNPRO_C && 0x5110 <= __SUNPRO_C
 #define YY_ATTRIBUTE(Spec) __attribute__(Spec)
 #else
 #define YY_ATTRIBUTE(Spec) /* empty */
@@ -326,8 +325,7 @@ typedef short int yytype_int16;
 #ifndef YYSTACK_ALLOC_MAXIMUM
 #define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
 #endif
-#if (defined __cplusplus && !defined EXIT_SUCCESS \
-     && !((defined YYMALLOC || defined malloc) && (defined YYFREE || defined free)))
+#if (defined __cplusplus && !defined EXIT_SUCCESS && !((defined YYMALLOC || defined malloc) && (defined YYFREE || defined free)))
 #include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #ifndef EXIT_SUCCESS
 #define EXIT_SUCCESS 0
@@ -426,32 +424,29 @@ union yyalloc
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex, without out-of-bounds checking.  */
 static const yytype_uint8 yytranslate[]
-    = { 0, 2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2, 2,
-        2, 2,  2, 2, 2, 2, 2, 2, 2, 31, 28, 21, 19, 32, 20, 2, 22, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 26, 2, 27,
-        2, 2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2, 2,
-        2, 25, 2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2, 29,
-        2, 30, 2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2, 2,
-        2, 2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2, 2,
-        2, 2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2, 2,
-        2, 2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2, 2,
-        2, 2,  2, 2, 2, 2, 2, 2, 1, 2,  3,  4,  5,  6,  7,  8, 9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 24 };
+    = { 0, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2, 2, 2, 2, 2, 2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 31, 28, 21, 19, 32, 20, 2, 22, 2, 2, 2, 2, 2, 2,  2, 2,  2,  2,  2,  26, 2,  27, 2,  2,  2,  2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2, 2, 2, 2, 2, 2,  2, 2,  2,  2,  2,  25, 2,  2,  2,  2,  2,  2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2, 2, 2, 2, 2, 29, 2, 30, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2, 2, 2, 2, 2, 2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2, 2, 2, 2, 2, 2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2,  2, 2, 2, 2, 2, 2,  2, 2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2,  1, 2,  3, 4, 5, 6, 7, 8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 24 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[]
-    = { 0,  61, 61, 65, 66, 70, 71, 72, 73, 74,  75,  76,  77,  81,  82,  86,  87,  88,  89,  90,
-        91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 112 };
+static const yytype_uint8 yyrline[] = { 0,  61, 61, 65, 66, 70, 71, 72, 73, 74,  75,  76,  77,  81,  82,  86,  87,  88,  89,  90,
+                                        91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 112 };
 #endif
 
 #if YYDEBUG || YYERROR_VERBOSE || 1
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[]
-    = { "$end",  "error",     "$undefined", "CONSTANT", "VARIABLE", "FUNCTION", "QUESTION", "COLON",   "REMOVE",
-        "PRINT", "AND",       "OR",         "LEG",      "GE",       "LE",       "EQ",       "NE",      "GT",
-        "LT",    "'+'",       "'-'",        "'*'",      "'/'",      "UMINUS",   "NOT",      "'^'",     "';'",
-        "'='",   "')'",       "'{'",        "'}'",      "'('",      "','",      "$accept",  "program", "function",
-        "stmt",  "stmt_list", "expr",       "ternary",  YY_NULLPTR };
+    = { "$end",    "error",   "$undefined", "CONSTANT", "VARIABLE",  "FUNCTION", "QUESTION", "COLON",   "REMOVE", "PRINT", "AND",
+        "OR",      "LEG",     "GE",         "LE",       "EQ",        "NE",       "GT",       "LT",      "'+'",    "'-'",   "'*'",
+        "'/'",     "UMINUS",  "NOT",        "'^'",      "';'",       "'='",      "')'",      "'{'",     "'}'",    "'('",   "','",
+        "$accept", "program", "function",   "stmt",     "stmt_list", "expr",     "ternary",  YY_NULLPTR };
 #endif
 
 #ifdef YYPRINT
@@ -526,8 +521,8 @@ static const yytype_uint8 yyr1[] = { 0,  33, 34, 35, 35, 36, 36, 36, 36, 36, 36,
                                      38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 39 };
 
 /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
-static const yytype_uint8 yyr2[] = { 0, 2, 1, 2, 0, 1, 2, 4, 4, 2, 4, 4, 3, 1, 2, 1, 1, 2, 2, 3,
-                                     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 4, 3, 5 };
+static const yytype_uint8 yyr2[]
+    = { 0, 2, 1, 2, 0, 1, 2, 4, 4, 2, 4, 4, 3, 1, 2, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 6, 4, 3, 5 };
 
 #define yyerrok (yyerrstatus = 0)
 #define yyclearin (yychar = YYEMPTY)

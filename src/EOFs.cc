@@ -51,8 +51,8 @@ scale_eigvec_grid(double *restrict out, int tsID, size_t npack, const size_t *re
 }
 
 static void
-scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack, const size_t *restrict pack,
-                  const double *restrict weight, double **covar, double **data, double missval, double sum_w)
+scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack, const size_t *restrict pack, const double *restrict weight,
+                  double **covar, double **data, double missval, double sum_w)
 {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(npack, nts, tsID, pack, data, covar, out)
@@ -158,8 +158,7 @@ get_weightmode(void)
     }
 
   if (cdoVerbose)
-    cdoPrint("Using CDO_WEIGHT_MODE '%s' from %s", weight_mode == WEIGHT_OFF ? "off" : "on",
-             envstr ? "Environment" : " default");
+    cdoPrint("Using CDO_WEIGHT_MODE '%s' from %s", weight_mode == WEIGHT_OFF ? "off" : "on", envstr ? "Environment" : " default");
 
   return weight_mode;
 }
@@ -544,7 +543,7 @@ EOFs(void *process)
                                   j = pack[jpack];
                                   covar[ipack][jpack] = covar[ipack][jpack] *                        // covariance
                                                         sqrt(weight[i]) * sqrt(weight[j]) / sum_w /  // weights
-                                                        nts;  // number of data contributing
+                                                        nts;                                         // number of data contributing
                                 }
                             }
                         }

@@ -180,7 +180,7 @@ Select(void *process)
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
 
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList dtlist;
 
   if (!cdoVerbose && nfiles > 1) progressInit();
 
@@ -537,9 +537,9 @@ Select(void *process)
                     }
                 }
 
-              dtlist_taxisInqTimestep(dtlist, taxisID1, 0);
-              int64_t vdate = dtlist_get_vdate(dtlist, 0);
-              int vtime = dtlist_get_vtime(dtlist, 0);
+              dtlist.taxisInqTimestep(taxisID1, 0);
+              int64_t vdate = dtlist.getVdate(0);
+              int vtime = dtlist.getVtime(0);
               int second;
               cdiDecodeDate(vdate, &year, &month, &day);
               cdiDecodeTime(vtime, &hour, &minute, &second);
@@ -556,8 +556,7 @@ Select(void *process)
               if (SELLIST_CHECK(timestep)) copytimestep = true;
               if (SELLIST_CHECK(timestep_of_year)) copytimestep = true;
 
-              if (!copytimestep && SELLIST_NVAL(date) == 0 && SELLIST_NVAL(timestep) == 0
-                  && SELLIST_NVAL(timestep_of_year) == 0)
+              if (!copytimestep && SELLIST_NVAL(date) == 0 && SELLIST_NVAL(timestep) == 0 && SELLIST_NVAL(timestep_of_year) == 0)
                 {
                   bool lseason = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
 
@@ -701,8 +700,6 @@ END_LABEL:
   SELLIST_CHECK_FLAG(date);
 
   if (streamID2 != CDI_UNDEFID) pstreamClose(streamID2);
-
-  dtlist_delete(dtlist);
 
   vlistDestroy(vlistID0);
   vlistDestroy(vlistID2);

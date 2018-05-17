@@ -316,10 +316,7 @@ Filedes(void *process)
       int opt = (operatorID == GRIDDES) ? 1 : 0;
       for (int index = 0; index < ngrids; index++)
         {
-          printf("#\n"
-                 "# gridID %d\n"
-                 "#\n",
-                 index + 1);
+          printf("#\n# gridID %d\n#\n", index + 1);
           cdo_print_grid(vlistGrid(vlistID, index), opt);
         }
     }
@@ -327,10 +324,7 @@ Filedes(void *process)
     {
       for (int index = 0; index < nzaxis; index++)
         {
-          printf("#\n"
-                 "# zaxisID %d\n"
-                 "#\n",
-                 index + 1);
+          printf("#\n# zaxisID %d\n#\n", index + 1);
           cdo_print_zaxis(vlistZaxis(vlistID, index));
         }
     }
@@ -349,8 +343,7 @@ Filedes(void *process)
                 {
                   if (operatorID == VCT)
                     {
-                      fprintf(stdout, "#   k         vct_a(k) [Pa]             "
-                                      "vct_b(k) []\n");
+                      fprintf(stdout, "#   k         vct_a(k) [Pa]             vct_b(k) []\n");
                       for (int i = 0; i < vctsize / 2; i++)
                         fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize / 2 + i]);
                     }

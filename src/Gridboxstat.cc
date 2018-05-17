@@ -26,7 +26,7 @@
       Gridboxstat    gridboxavg          Gridbox average
       Gridboxstat    gridboxstd          Gridbox standard deviation
       Gridboxstat    gridboxstd1         Gridbox standard deviation [Normalize by (n-1)]
-      Gridboxstat    gridboxvar          Gridbox variance 
+      Gridboxstat    gridboxvar          Gridbox variance
       Gridboxstat    gridboxvar1         Gridbox variance [Normalize by (n-1)]
 */
 
@@ -113,7 +113,6 @@ genBoxGridReg2D(int gridID1, size_t xinc, size_t yinc, int gridID2)
       gridDefYbounds(gridID2, grid2_corner_lat.data());
     }
 }
-
 
 static void
 genBoxGridCurv2D(int gridID1, size_t xinc, size_t yinc, int gridID2)
@@ -247,8 +246,7 @@ genBoxGridCurv2D(int gridID1, size_t xinc, size_t yinc, int gridID2)
                                   lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
                                   lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
                                   lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
-                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
-                                      || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
+                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat)) || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
                                     c_flag[corner] = 1;
                                 }
                             }
@@ -281,8 +279,7 @@ genBoxGridCurv2D(int gridID1, size_t xinc, size_t yinc, int gridID2)
                                   lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
                                   lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
                                   lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
-                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
-                                      || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
+                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat)) || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
                                     c_flag[corner] = 1;
                                 }
                             }
@@ -315,8 +312,7 @@ genBoxGridCurv2D(int gridID1, size_t xinc, size_t yinc, int gridID2)
                                   lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
                                   lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
                                   lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
-                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
-                                      || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
+                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat)) || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
                                     c_flag[corner] = 1;
                                 }
                             }
@@ -349,8 +345,7 @@ genBoxGridCurv2D(int gridID1, size_t xinc, size_t yinc, int gridID2)
                                   lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
                                   lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
                                   lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
-                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
-                                      || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
+                                  if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat)) || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
                                     c_flag[corner] = 1;
                                 }
                             }

@@ -984,8 +984,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
               read_fc4d(nc_file_id, name, &(*vars)[varid], gridIDfc, zaxisIDml, nhgl, nmp1);
               varid++;
             }
-          else if (dimidsp[0] == nhgl_dimid && dimidsp[1] == nmp1_dimid && dimidsp[2] == complex_dimid
-                   && dimidsp[3] == ilev_dimid)
+          else if (dimidsp[0] == nhgl_dimid && dimidsp[1] == nmp1_dimid && dimidsp[2] == complex_dimid && dimidsp[3] == ilev_dimid)
             {
               read_fc4d(nc_file_id, name, &(*vars)[varid], gridIDfc, zaxisIDmlh, nhgl, nmp1);
               varid++;

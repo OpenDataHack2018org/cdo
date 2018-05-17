@@ -56,7 +56,8 @@ Sorttimestamp(void *process)
   cdoInitialize(process);
 
   std::vector<Field **> vars;
-  std::vector<int> vdate, vtime;
+  std::vector<int64_t> vdate;
+  std::vector<int> vtime;
 
   int nfiles = cdoStreamCnt() - 1;
 

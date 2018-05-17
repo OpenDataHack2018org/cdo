@@ -26,7 +26,6 @@
 #include "pstream_int.h"
 #include "grid.h"
 
-
 void
 genGridIndex(int gridID1, int gridID2, int *index)
 {

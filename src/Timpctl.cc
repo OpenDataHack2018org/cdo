@@ -80,9 +80,9 @@ timpctl(int operatorID)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  dtlist_type *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
+  DateTimeList dtlist;
+  dtlist.setStat(timestat_date);
+  dtlist.setCalendar(taxisInqCalendar(taxisID1));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
@@ -139,9 +139,9 @@ timpctl(int operatorID)
       int nsets = 0;
       while (nrecs && (nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
-          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-          int64_t vdate1 = dtlist_get_vdate(dtlist, nsets);
-          int vtime1 = dtlist_get_vtime(dtlist, nsets);
+          dtlist.taxisInqTimestep(taxisID1, nsets);
+          int64_t vdate1 = dtlist.getVdate(nsets);
+          int vtime1 = dtlist.getVtime(nsets);
 
           if (nsets == 0) SET_DATE(indate2, vdate1, vtime1);
           SET_DATE(indate1, vdate1, vtime1);
@@ -178,7 +178,7 @@ timpctl(int operatorID)
             hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID, levelID, pn);
         }
 
-      dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
+      dtlist.statTaxisDefTimestep(taxisID4, nsets);
       pstreamDefTimestep(streamID4, otsID);
 
       for (int recID = 0; recID < maxrecs; recID++)
@@ -197,8 +197,6 @@ timpctl(int operatorID)
 
   field_free(vars1, vlistID1);
   hsetDestroy(hset);
-
-  dtlist_delete(dtlist);
 
   if (field.ptr) Free(field.ptr);
 

@@ -58,10 +58,9 @@ remap_set_threshhold(double threshhold)
 */
 static void
 pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon, bool *lcoinc, bool *lthresh, double beglat,
-                  double beglon, double endlat, double endlon, double *begseg, bool lrevers, long num_srch_cells,
-                  long srch_corners, const size_t *restrict srch_add, const double *restrict srch_corner_lat,
-                  const double *restrict srch_corner_lon, bool *luse_last, double *intrsct_x, double *intrsct_y,
-                  int *avoid_pole_count, double *avoid_pole_offset)
+                  double beglon, double endlat, double endlon, double *begseg, bool lrevers, long num_srch_cells, long srch_corners,
+                  const size_t *restrict srch_add, const double *restrict srch_corner_lat, const double *restrict srch_corner_lon,
+                  bool *luse_last, double *intrsct_x, double *intrsct_y, int *avoid_pole_count, double *avoid_pole_offset)
 {
   /*
     Intent(in):
@@ -521,11 +520,11 @@ after_srch_loop:
    have already been restricted in the calling routine.
 */
 static void
-intersection(long *location, double *intrsct_lat, double *intrsct_lon, bool *lcoinc, double beglat, double beglon,
-             double endlat, double endlon, double *begseg, bool lbegin, bool lrevers, long num_srch_cells, long srch_corners,
+intersection(long *location, double *intrsct_lat, double *intrsct_lon, bool *lcoinc, double beglat, double beglon, double endlat,
+             double endlon, double *begseg, bool lbegin, bool lrevers, long num_srch_cells, long srch_corners,
              const size_t *restrict srch_add, const double *restrict srch_corner_lat, const double *restrict srch_corner_lon,
-             long *last_loc, bool *lthresh, double *intrsct_lat_off, double *intrsct_lon_off, bool *luse_last,
-             double *intrsct_x, double *intrsct_y, int *avoid_pole_count, double *avoid_pole_offset)
+             long *last_loc, bool *lthresh, double *intrsct_lat_off, double *intrsct_lon_off, bool *luse_last, double *intrsct_x,
+             double *intrsct_y, int *avoid_pole_count, double *avoid_pole_offset)
 {
   /*
     Intent(in):
@@ -573,8 +572,8 @@ intersection(long *location, double *intrsct_lat, double *intrsct_lon, bool *lco
     {
       if (*lthresh) *location = *last_loc;
       pole_intersection(location, intrsct_lat, intrsct_lon, lcoinc, lthresh, beglat, beglon, endlat, endlon, begseg, lrevers,
-                        num_srch_cells, srch_corners, srch_add, srch_corner_lat, srch_corner_lon, luse_last, intrsct_x,
-                        intrsct_y, avoid_pole_count, avoid_pole_offset);
+                        num_srch_cells, srch_corners, srch_add, srch_corner_lat, srch_corner_lon, luse_last, intrsct_x, intrsct_y,
+                        avoid_pole_count, avoid_pole_offset);
 
       if (*lthresh)
         {
@@ -1282,10 +1281,10 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
   srch_corners = tgt_num_cell_corners;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none)                                                                         \
-  shared(findex, rsearch, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, cdoVerbose, max_subseg, \
-         srch_corner_lat, srch_corner_lon, max_srch_cells, src_num_cell_corners, srch_corners,         \
-         src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
+#pragma omp parallel for default(none) shared(findex, rsearch, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, \
+                                              cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells,     \
+                                              src_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size,        \
+                                              src_grid_size, srch_add)
 #endif
   for (long src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add)
     {
@@ -1317,10 +1316,8 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
       // Create search arrays
       if (num_srch_cells > max_srch_cells[ompthID])
         {
-          srch_corner_lat[ompthID]
-              = (double *) realloc(srch_corner_lat[ompthID], srch_corners * num_srch_cells * sizeof(double));
-          srch_corner_lon[ompthID]
-              = (double *) realloc(srch_corner_lon[ompthID], srch_corners * num_srch_cells * sizeof(double));
+          srch_corner_lat[ompthID] = (double *) realloc(srch_corner_lat[ompthID], srch_corners * num_srch_cells * sizeof(double));
+          srch_corner_lon[ompthID] = (double *) realloc(srch_corner_lon[ompthID], srch_corners * num_srch_cells * sizeof(double));
           max_srch_cells[ompthID] = num_srch_cells;
         }
 
@@ -1386,8 +1383,7 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
               /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
               num_subseg++;
               if (num_subseg >= max_subseg)
-                cdoAbort("Integration stalled: num_subseg exceeded limit "
-                         "(grid1[%zu]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
+                cdoAbort("Integration stalled: num_subseg exceeded limit (grid1[%zu]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
                          src_cell_add, beglon, endlon, beglat, endlat);
 
               /* Uwe Schulzweida: skip very small regions */
@@ -1396,9 +1392,8 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
                   if (fabs(beglat - endlat) < 1.e-10 || fabs(beglon - endlon) < 1.e-10)
                     {
                       if (cdoVerbose)
-                        cdoPrint("Skip very small region (grid1[%ld]): lon=%g "
-                                 "dlon=%g lat=%g dlat=%g",
-                                 src_cell_add, beglon, endlon - beglon, beglat, endlat - beglat);
+                        cdoPrint("Skip very small region (grid1[%ld]): lon=%g dlon=%g lat=%g dlat=%g", src_cell_add, beglon,
+                                 endlon - beglon, beglat, endlat - beglat);
                       break;
                     }
                 }
@@ -1482,10 +1477,10 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
   findex = 0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none)                                                                         \
-  shared(findex, rsearch, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, cdoVerbose, max_subseg, \
-         srch_corner_lat, srch_corner_lon, max_srch_cells, tgt_num_cell_corners, srch_corners,         \
-         src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
+#pragma omp parallel for default(none) shared(findex, rsearch, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, \
+                                              cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells,     \
+                                              tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size,        \
+                                              src_grid_size, srch_add)
 #endif
   for (long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -1517,10 +1512,8 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
       // Create search arrays
       if (num_srch_cells > max_srch_cells[ompthID])
         {
-          srch_corner_lat[ompthID]
-              = (double *) realloc(srch_corner_lat[ompthID], srch_corners * num_srch_cells * sizeof(double));
-          srch_corner_lon[ompthID]
-              = (double *) realloc(srch_corner_lon[ompthID], srch_corners * num_srch_cells * sizeof(double));
+          srch_corner_lat[ompthID] = (double *) realloc(srch_corner_lat[ompthID], srch_corners * num_srch_cells * sizeof(double));
+          srch_corner_lon[ompthID] = (double *) realloc(srch_corner_lon[ompthID], srch_corners * num_srch_cells * sizeof(double));
           max_srch_cells[ompthID] = num_srch_cells;
         }
 
@@ -1584,8 +1577,7 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
               /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
               num_subseg++;
               if (num_subseg >= max_subseg)
-                cdoAbort("Integration stalled: num_subseg exceeded limit "
-                         "(grid2[%zu]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
+                cdoAbort("Integration stalled: num_subseg exceeded limit (grid2[%zu]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
                          tgt_cell_add, beglon, endlon, beglat, endlat);
 
               /* Uwe Schulzweida: skip very small regions */
@@ -1594,9 +1586,8 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
                   if (fabs(beglat - endlat) < 1.e-10 || fabs(beglon - endlon) < 1.e-10)
                     {
                       if (cdoVerbose)
-                        cdoPrint("Skip very small region (grid2[%ld]): lon=%g "
-                                 "dlon=%g lat=%g dlat=%g",
-                                 tgt_cell_add, beglon, endlon - beglon, beglat, endlat - beglat);
+                        cdoPrint("Skip very small region (grid2[%ld]): lon=%g dlon=%g lat=%g dlat=%g", tgt_cell_add, beglon,
+                                 endlon - beglon, beglat, endlat - beglat);
                       break;
                     }
                 }

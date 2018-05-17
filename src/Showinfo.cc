@@ -41,7 +41,7 @@
 void *
 Showinfo(void *process)
 {
-  int date0 = 0;
+  int64_t date0 = 0;
   int year, month, day;
   int month0 = 0, year0 = 0;
 

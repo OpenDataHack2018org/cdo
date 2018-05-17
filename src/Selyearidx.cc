@@ -37,8 +37,8 @@ Selyearidx(void *process)
 
   cdoInitialize(process);
 
-  cdoOperatorAdd("selyearidx",   0,   0, NULL);
-  cdoOperatorAdd("seltimeidx",   1,   0, NULL);
+  cdoOperatorAdd("selyearidx", 0, 0, NULL);
+  cdoOperatorAdd("seltimeidx", 1, 0, NULL);
 
   bool ltime = cdoOperatorF1(cdoOperatorID());
 
@@ -78,8 +78,7 @@ Selyearidx(void *process)
       double missval = vlistInqVarMissval(vlistID2, varID);
       for (levelID = 0; levelID < nlevs; ++levelID)
         {
-          for (size_t i = 0; i < gridsize; ++i)
-            vars2[varID][levelID].ptr[i] = missval;
+          for (size_t i = 0; i < gridsize; ++i) vars2[varID][levelID].ptr[i] = missval;
         }
     }
 
@@ -94,7 +93,7 @@ Selyearidx(void *process)
       if (nrecs == 0) break;
 
       int64_t vdate = taxisInqVdate(taxisID1);
-      //int vtime = taxisInqVtime(taxisID1);
+      // int vtime = taxisInqVtime(taxisID1);
       cdiDecodeDate(vdate, &year, &month, &day);
       int year1 = year;
 
@@ -122,7 +121,7 @@ Selyearidx(void *process)
           cdiDecodeDate(vdate, &year, &month, &day);
           cdiDecodeTime(vtime, &hour, &minute, &second);
 
-          if ( year1 != year ) break;
+          if (year1 != year) break;
 
           for (int recID = 0; recID < nrecs; recID++)
             {
@@ -131,11 +130,12 @@ Selyearidx(void *process)
 
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
               for (size_t i = 0; i < gridsize; ++i)
-                if ( nsets == (int) lround(vars1[varID][levelID].ptr[i]))
+                if (nsets == (int) lround(vars1[varID][levelID].ptr[i]))
                   {
                     if (lexactdate) taxisCopyTimestep(taxisID3, taxisID2);
-                    if ( ltime )
-                      vars2[varID][levelID].ptr[i] = date_to_julday(calendar, vdate) + (hour*3600 + minute*60 + second)/86400.;
+                    if (ltime)
+                      vars2[varID][levelID].ptr[i]
+                          = date_to_julday(calendar, vdate) + (hour * 3600 + minute * 60 + second) / 86400.;
                     else
                       vars2[varID][levelID].ptr[i] = array[i];
                   }
@@ -145,7 +145,7 @@ Selyearidx(void *process)
           tsID2++;
         }
 
-      if ( nsets )
+      if (nsets)
         {
           if (!lexactdate) taxisCopyTimestep(taxisID3, taxisID1);
           pstreamDefTimestep(streamID3, tsID3);
@@ -153,7 +153,7 @@ Selyearidx(void *process)
           for (int recID = 0; recID < maxrecs; recID++)
             {
               if (tsID && recinfo[recID].lconst) continue;
-              
+
               varID = recinfo[recID].varID;
               levelID = recinfo[recID].levelID;
               pstreamDefRecord(streamID3, varID, levelID);

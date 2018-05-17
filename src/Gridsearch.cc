@@ -206,11 +206,9 @@ search_cells(cellsearch_type *cellsearch, long tgt_cell_add, long *srch_add)
   for (long src_cell_add = 0; src_cell_add < src_grid->size; ++src_cell_add)
     {
       src_cell_addm4 = src_cell_add << 2;
-      if ((src_cell_bound_box[src_cell_addm4 + 2] <= bound_box_lon2)
-          && (src_cell_bound_box[src_cell_addm4 + 3] >= bound_box_lon1))
+      if ((src_cell_bound_box[src_cell_addm4 + 2] <= bound_box_lon2) && (src_cell_bound_box[src_cell_addm4 + 3] >= bound_box_lon1))
         {
-          if ((src_cell_bound_box[src_cell_addm4] <= bound_box_lat2)
-              && (src_cell_bound_box[src_cell_addm4 + 1] >= bound_box_lat1))
+          if ((src_cell_bound_box[src_cell_addm4] <= bound_box_lat2) && (src_cell_bound_box[src_cell_addm4 + 1] >= bound_box_lat1))
             {
               srch_add[num_srch_cells] = src_cell_add;
               num_srch_cells++;

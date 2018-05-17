@@ -236,8 +236,7 @@ static void
 timer_header(void)
 {
   fprintf(rt_unit, "\nTimer report:  shift = %g\n", tm_shift);
-  fprintf(rt_unit, "timer  calls        t_min    t_average        t_max      "
-                   "t_total  text\n");
+  fprintf(rt_unit, "timer  calls        t_min    t_average        t_max      t_total  text\n");
 }
 
 void

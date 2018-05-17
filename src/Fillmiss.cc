@@ -391,8 +391,7 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
 
   if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 0);
 
-  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
-    gridID = gridToCurvilinear(gridID, 0);
+  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR) gridID = gridToCurvilinear(gridID, 0);
 
   std::vector<double> xvals(gridsize);
   std::vector<double> yvals(gridsize);
@@ -459,8 +458,8 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
   double findex = 0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(knnWeights, findex, mindex, vindex, array1, array2, xvals, \
-                                              yvals, gs, nmiss, numNeighbors)
+#pragma omp parallel for default(none) shared(knnWeights, findex, mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, \
+                                              numNeighbors)
 #endif
   for (size_t i = 0; i < nmiss; ++i)
     {

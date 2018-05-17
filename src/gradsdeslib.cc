@@ -1180,8 +1180,8 @@ getvnm(struct gavar *pvar, char *mrec)
  */
 
 char *
-gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachsub *pch1st, struct gaens *ens1st, gaint t,
-       gaint e, gaint *flag)
+gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachsub *pch1st, struct gaens *ens1st, gaint t, gaint e,
+       gaint *flag)
 {
   struct gachsub *pchsub;
   struct gaens *ens;

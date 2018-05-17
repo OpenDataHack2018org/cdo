@@ -128,10 +128,7 @@ Fldrms(void *process)
                     {
                       char varname[CDI_MAX_NAME];
                       vlistInqVarName(vlistID1, varID, varname);
-                      cdoWarning("Grid cell bounds not available, using "
-                                 "constant grid cell area weights for variable "
-                                 "%s!",
-                                 varname);
+                      cdoWarning("Grid cell bounds not available, using constant grid cell area weights for variable %s!", varname);
                     }
                 }
             }

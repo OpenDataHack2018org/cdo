@@ -124,8 +124,7 @@ literal_to_double(const char *literal)
 int
 main(void)
 {
-  const char *literals[]
-      = { "127b", "-32768s", "-2147483647", "-1.e+36f", "1.e+308", "temperature", "surface pressure", "1000." };
+  const char *literals[] = { "127b", "-32768s", "-2147483647", "-1.e+36f", "1.e+308", "temperature", "surface pressure", "1000." };
   int nliterals = sizeof(literals) / sizeof(literals[0]);
 
   for (int i = 0; i < nliterals; ++i)

@@ -325,7 +325,7 @@ Info(void *process)
 
   int operfunc = cdoOperatorF1(operatorID);
 
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList dtlist;
 
   for (int indf = 0; indf < cdoStreamCnt(); indf++)
     {
@@ -348,9 +348,9 @@ Info(void *process)
       int tsID = 0;
       while ((nrecs = cdoStreamInqTimestep(streamID, tsID)))
         {
-          dtlist_taxisInqTimestep(dtlist, taxisID, 0);
-          int64_t vdate = dtlist_get_vdate(dtlist, 0);
-          int vtime = dtlist_get_vtime(dtlist, 0);
+          dtlist.taxisInqTimestep(taxisID, 0);
+          int64_t vdate = dtlist.getVdate(0);
+          int vtime = dtlist.getVtime(0);
 
           date2str(vdate, vdatestr, sizeof(vdatestr));
           time2str(vtime, vtimestr, sizeof(vtimestr));
@@ -362,8 +362,9 @@ Info(void *process)
               if ((tsID == 0 && recID == 0) || operatorID == MAP)
                 {
                   set_text_color(stdout, BRIGHT, BLACK);
-                  fprintf(stdout, "%6d :       Date     Time   %s Gridsize    Miss :     Minimum        Mean     Maximum : ",
-                          -(indf + 1), operatorID == XINFON ? "Nlevs" : "Level");
+                  fprintf(stdout,
+                          "%6d :       Date     Time   %s Gridsize    Miss :     Minimum        Mean     Maximum : ", -(indf + 1),
+                          operatorID == XINFON ? "Nlevs" : "Level");
 
                   if (operfunc == E_NAME)
                     fprintf(stdout, "Parameter name");
@@ -555,8 +556,6 @@ Info(void *process)
 
       pstreamClose(streamID);
     }
-
-  dtlist_delete(dtlist);
 
   cdoFinish();
 

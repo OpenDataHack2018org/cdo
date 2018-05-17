@@ -251,8 +251,8 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *rgrid, size_t *restrict src_ad
           size_t i = addr - j * nx;
           if (k == 0 || k == 2) i = (i > 0) ? i - 1 : rgrid->is_cyclic ? nx - 1 : 0;
           if (k == 0 || k == 1) j = (j > 0) ? j - 1 : 0;
-          if (pointInQuad(rgrid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat,
-                          rgrid->cell_center_lon, rgrid->cell_center_lat))
+          if (pointInQuad(rgrid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, rgrid->cell_center_lon,
+                          rgrid->cell_center_lat))
             {
               search_result = 1;
               return search_result;

@@ -105,9 +105,9 @@ Runstat(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  dtlist_type *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
+  DateTimeList dtlist;
+  dtlist.setStat(timestat_date);
+  dtlist.setCalendar(taxisInqCalendar(taxisID1));
 
   Field ***vars1 = (Field ***) Malloc((ndates + 1) * sizeof(Field **));
   Field ***vars2 = NULL, ***samp1 = NULL;
@@ -130,7 +130,7 @@ Runstat(void *process)
       int nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if (nrecs == 0) cdoAbort("File has less then %d timesteps!", ndates);
 
-      dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
+      dtlist.taxisInqTimestep(taxisID1, tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -260,7 +260,7 @@ Runstat(void *process)
             }
         }
 
-      dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
+      dtlist.statTaxisDefTimestep(taxisID2, ndates);
       pstreamDefTimestep(streamID2, otsID);
 
       for (int recID = 0; recID < maxrecs; recID++)
@@ -277,7 +277,7 @@ Runstat(void *process)
 
       otsID++;
 
-      dtlist_shift(dtlist);
+      dtlist.shift();
 
       vars1[ndates] = vars1[0];
       if (!runstat_nomiss) samp1[ndates] = samp1[0];
@@ -293,7 +293,7 @@ Runstat(void *process)
       int nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if (nrecs == 0) break;
 
-      dtlist_taxisInqTimestep(dtlist, taxisID1, ndates - 1);
+      dtlist.taxisInqTimestep(taxisID1, ndates - 1);
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -384,8 +384,6 @@ Runstat(void *process)
   if (lvarstd || lrange) Free(vars2);
 
   if (imask) Free(imask);
-
-  dtlist_delete(dtlist);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

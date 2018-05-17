@@ -221,8 +221,7 @@ Consecstat(void *process)
               for (size_t i = 0; i < gridInqSize(vars[varID][levelID].grid); i++)
                 hist[varID][levelID].ptr[i] = vars[varID][levelID].ptr[i];
 #else
-              memcpy(hist[varID][levelID].ptr, vars[varID][levelID].ptr,
-                     gridInqSize(vars[varID][levelID].grid) * sizeof(double));
+              memcpy(hist[varID][levelID].ptr, vars[varID][levelID].ptr, gridInqSize(vars[varID][levelID].grid) * sizeof(double));
 #endif
               break;
             default: printf(SWITCHWARN, __func__); break;

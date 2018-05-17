@@ -209,8 +209,8 @@ defLonLatGrid(int nx, int ny, double c0, double lts, double re)
 }
 
 static int
-defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, double dx, double dy, double p1,
-                  double p2, double p3, double p4)
+defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, double dx, double dy, double p1, double p2,
+                  double p3, double p4)
 {
   UNUSED(p1);
   UNUSED(p2);
@@ -436,8 +436,8 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
     }
 
   if (cdoVerbose)
-    cdoPrint("  Region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g", region.xmin, region.xmax, region.ymin, region.ymax,
-             region.dx, region.dy);
+    cdoPrint("  Region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g", region.xmin, region.xmax, region.ymin, region.ymax, region.dx,
+             region.dy);
 
   H5Gclose(grp_id);
 
@@ -452,8 +452,8 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   /* in case of questions on this, contact frank.kaspar@dwd.de */
   if (strcmp(proj.ellipsoid, "WSG-84") == 0) strcpy(proj.ellipsoid, "WGS-84");
 
-  if ((int) region.xmin == -8887500 && (int) region.xmax == -8887500 && (int) region.ymin == 8887500
-      && (int) region.ymax == 8887500 && (int) region.dx == 15000 && (int) region.dy == 15000)
+  if ((int) region.xmin == -8887500 && (int) region.xmax == -8887500 && (int) region.ymin == 8887500 && (int) region.ymax == 8887500
+      && (int) region.dx == 15000 && (int) region.dy == 15000)
     {
       region.xmax = 8887500.0;
       region.ymin = -8887500.0;
@@ -483,8 +483,7 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 
   if (strcmp(proj.name, "sinusoidal") != 0
       && ((nx == xsize && ny == ysize && (int) region.xmin == -8887500 && (int) region.xmax == 8887500
-           && (int) region.ymin == -8887500 && (int) region.ymax == 8887500 && (int) region.dx == 15000
-           && (int) region.dy == 15000)
+           && (int) region.ymin == -8887500 && (int) region.ymax == 8887500 && (int) region.dx == 15000 && (int) region.dy == 15000)
           || (nx == xsize && ny == ysize && (int) region.xmin == -5827500 && (int) region.xmax == 5827500
               && (int) region.ymin == 3307500 && (int) region.ymax == 8887500 && (int) region.dx == 15000
               && (int) region.dy == 15000)
@@ -492,8 +491,7 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
               && (int) region.ymin == 3307500 && (int) region.ymax == 8887500 && (int) region.dx == 45000
               && (int) region.dy == 45000)
           || (nx == xsize && ny == ysize && (int) region.xmin == -5827500 && (int) region.xmax == 5827500
-              && (int) region.ymin == 3307500 && (int) region.ymax == 8887500 && (int) region.dx == 3000
-              && (int) region.dy == 3000)
+              && (int) region.ymin == 3307500 && (int) region.ymax == 8887500 && (int) region.dx == 3000 && (int) region.dy == 3000)
           || (nx == 298 && ny == 371 && (int) region.xmin == -6709222 && (int) region.xmax == 6709222
               && (int) region.ymin == -6664078 && (int) region.ymax == 9984898 && (int) region.dx == 45000
               && (int) region.dy == 45000)
@@ -527,8 +525,8 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
            && memcmp(proj.ellipsoid, "Sphere", 6) == 0)
     {
       double a = (proj.parameter[4] < 0) ? 6370997.0 : proj.parameter[4];
-      gridID = defLaeaGrid(nx, ny, region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy, a,
-                           proj.parameter[2], proj.parameter[3]);
+      gridID = defLaeaGrid(nx, ny, region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy, a, proj.parameter[2],
+                           proj.parameter[3]);
     }
   else if (memcmp(proj.name, "Cylindrical Equal Area", 22) == 0 && memcmp(proj.ellipsoid, "Sphere", 6) == 0)
     {
@@ -845,8 +843,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
           atype = H5Aget_type(attr);
           H5Aget_name(attr, sizeof(attname), attname);
 
-          if (strcmp(attname, "CLASS") == 0 || strcmp(attname, "IMAGE_VERSION") == 0 || strcmp(attname, "PALETTE") == 0)
-            continue;
+          if (strcmp(attname, "CLASS") == 0 || strcmp(attname, "IMAGE_VERSION") == 0 || strcmp(attname, "PALETTE") == 0) continue;
 
           atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
           atype_size = H5Tget_size(atype);
@@ -1452,8 +1449,7 @@ Importcmsaf(void *process)
       vlistDefVarName(vlistID, varID, dsets.obj[ivar].name);
       if (dsets.obj[ivar].description) vlistDefVarLongname(vlistID, varID, dsets.obj[ivar].description);
       if (dsets.obj[ivar].units) vlistDefVarUnits(vlistID, varID, dsets.obj[ivar].units);
-      if (dsets.obj[ivar].title)
-        cdiDefAttTxt(vlistID, varID, "title", (int) strlen(dsets.obj[ivar].title), dsets.obj[ivar].title);
+      if (dsets.obj[ivar].title) cdiDefAttTxt(vlistID, varID, "title", (int) strlen(dsets.obj[ivar].title), dsets.obj[ivar].title);
 
       /*
       vlistDefVarUnits(vlistID, varID, units[i]);

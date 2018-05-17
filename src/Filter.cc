@@ -127,7 +127,7 @@ Filter(void *process)
   bool use_fftw = false;
   double fmin = 0, fmax = 0;
   double fdata = 0;
-  dtlist_type *dtlist = dtlist_new();
+  DateTimeList dtlist;
   struct FftMemory
   {
     std::vector<double> array1;
@@ -184,7 +184,7 @@ Filter(void *process)
           vars.resize(nalloc);
         }
 
-      dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
+      dtlist.taxisInqTimestep(taxisID1, tsID);
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
@@ -204,10 +204,10 @@ Filter(void *process)
         {
           int64_t incperiod = 0;
           int year, month, day;
-          int64_t vdate0 = dtlist_get_vdate(dtlist, tsID - 1);
-          int64_t vdate = dtlist_get_vdate(dtlist, tsID);
-          int vtime0 = dtlist_get_vtime(dtlist, tsID - 1);
-          int vtime = dtlist_get_vtime(dtlist, tsID);
+          int64_t vdate0 = dtlist.getVdate(tsID - 1);
+          int64_t vdate = dtlist.getVdate(tsID);
+          int vtime0 = dtlist.getVtime(tsID - 1);
+          int vtime = dtlist.getVtime(tsID);
 
           cdiDecodeDate(vdate0, &year0, &month0, &day0);
           cdiDecodeDate(vdate, &year, &month, &day);
@@ -327,8 +327,7 @@ Filter(void *process)
 
                   filter_fftw(nts, fmasc, ompmem[ompthID].out_fft, &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
 
-                  for (int tsID = 0; tsID < nts; tsID++)
-                    vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;
+                  for (int tsID = 0; tsID < nts; tsID++) vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;
                 }
 #endif
             }
@@ -369,7 +368,7 @@ Filter(void *process)
 
   for (int tsID = 0; tsID < nts; tsID++)
     {
-      dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
+      dtlist.taxisDefTimestep(taxisID2, tsID);
       pstreamDefTimestep(streamID2, tsID);
 
       for (int varID = 0; varID < nvars; varID++)
@@ -391,8 +390,6 @@ Filter(void *process)
 
       field_free(vars[tsID], vlistID1);
     }
-
-  dtlist_delete(dtlist);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

@@ -36,7 +36,7 @@ BreakBeforeBinaryOperators: All
 BreakBeforeBraces: GNU
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: false
-ColumnLimit:     128
+ColumnLimit:     132
 CommentPragmas:  '^ IWYU pragma:'
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4

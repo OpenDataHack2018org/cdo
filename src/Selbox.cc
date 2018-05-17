@@ -766,8 +766,7 @@ genindexgrid(int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long
 }
 
 static void
-window(int nwpv, double *array1, int gridID1, double *array2, long lat1, long lat2, long lon11, long lon12, long lon21,
-       long lon22)
+window(int nwpv, double *array1, int gridID1, double *array2, long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
   long ilat, ilon;
   long nlon = gridInqXsize(gridID1);
@@ -963,8 +962,8 @@ Selbox(void *process)
               if (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED)
                 window_cell(nwpv, array1.data(), gridID1, array2.data(), gridsize2, sbox[index].cellidx.data());
               else
-                window(nwpv, array1.data(), gridID1, array2.data(), sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, sbox[index].lon12,
-                       sbox[index].lon21, sbox[index].lon22);
+                window(nwpv, array1.data(), gridID1, array2.data(), sbox[index].lat1, sbox[index].lat2, sbox[index].lon11,
+                       sbox[index].lon12, sbox[index].lon21, sbox[index].lon22);
 
               if (nmiss)
                 {

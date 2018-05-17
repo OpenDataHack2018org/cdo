@@ -53,15 +53,14 @@ const char *contour_params[]
         "device", "step_freq", "file_split", "lat_min",  "lat_max", "lon_min", "lon_max",   "projection" };
 int contour_param_count = sizeof(contour_params) / sizeof(char *);
 
-const char *shaded_params[] = { "min",        "max",          "count",   "interval",     "list",    "colour_min",
-                                "colour_max", "colour_table", "RGB",     "colour_triad", "device",  "step_freq",
-                                "file_split", "lat_min",      "lat_max", "lon_min",      "lon_max", "projection" };
+const char *shaded_params[]
+    = { "min",          "max",    "count",     "interval",   "list",    "colour_min", "colour_max", "colour_table", "RGB",
+        "colour_triad", "device", "step_freq", "file_split", "lat_min", "lat_max",    "lon_min",    "lon_max",      "projection" };
 int shaded_param_count = sizeof(shaded_params) / sizeof(char *);
 
-const char *grfill_params[]
-    = { "min",          "max",        "count",   "interval",     "list",      "colour_min", "colour_max",
-        "colour_table", "resolution", "RGB",     "colour_triad", "device",    "step_freq",  "file_split",
-        "lat_min",      "lat_max",    "lon_min", "lon_max",      "projection" };
+const char *grfill_params[] = { "min",          "max",        "count",   "interval",     "list",      "colour_min", "colour_max",
+                                "colour_table", "resolution", "RGB",     "colour_triad", "device",    "step_freq",  "file_split",
+                                "lat_min",      "lat_max",    "lon_min", "lon_max",      "projection" };
 int grfill_param_count = sizeof(grfill_params) / sizeof(char *);
 
 const char *STD_COLOUR_TABLE[] = { "red",
@@ -179,9 +178,8 @@ const char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL
            *PROJECTION = NULL;
 
 static void
-magplot(const char *plotfile, int operatorID, const char *varname, const char *units, long nlon, long nlat,
-        double *grid_center_lon, double *grid_center_lat, double *array, int nparam, char **params, char *datetime,
-        bool lregular)
+magplot(const char *plotfile, int operatorID, const char *varname, const char *units, long nlon, long nlat, double *grid_center_lon,
+        double *grid_center_lat, double *array, int nparam, char **params, char *datetime, bool lregular)
 
 {
   long i;
@@ -770,10 +768,9 @@ VerifyPlotParameters(int num_param, char **param_names, int opID)
                     }
 
                   if (!strcmp(split_str[0], "min") || !strcmp(split_str[0], "max") || !strcmp(split_str[0], "lat_min")
-                      || !strcmp(split_str[0], "lat_max") || !strcmp(split_str[0], "lon_min")
-                      || !strcmp(split_str[0], "lon_max") || !strcmp(split_str[0], "count") || !strcmp(split_str[0], "interval")
-                      || !strcmp(split_str[0], "thickness") || !strcmp(split_str[0], "resolution")
-                      || !strcmp(split_str[0], "step_freq"))
+                      || !strcmp(split_str[0], "lat_max") || !strcmp(split_str[0], "lon_min") || !strcmp(split_str[0], "lon_max")
+                      || !strcmp(split_str[0], "count") || !strcmp(split_str[0], "interval") || !strcmp(split_str[0], "thickness")
+                      || !strcmp(split_str[0], "resolution") || !strcmp(split_str[0], "step_freq"))
                     {
                       if (!IsNumeric(split_str[1]))
                         syntax = FALSE;
@@ -1291,8 +1288,8 @@ Magplot(void *process)
                 }
 
               if (DBG) fprintf(stderr, "Plot %d\n", varID);
-              magplot(cdoGetStreamName(1).c_str(), operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat,
-                      array, nparam, pnames, datetimestr, lregular);
+              magplot(cdoGetStreamName(1).c_str(), operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array,
+                      nparam, pnames, datetimestr, lregular);
             }
           else
             fprintf(stderr, "operator not implemented\n");

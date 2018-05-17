@@ -81,9 +81,9 @@ Seaspctl(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<RecordInfo> recinfo(maxrecs);
 
-  dtlist_type *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
+  DateTimeList dtlist;
+  dtlist.setStat(timestat_date);
+  dtlist.setCalendar(taxisInqCalendar(taxisID1));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
@@ -152,8 +152,8 @@ Seaspctl(void *process)
       bool newseas = false;
       while (nrecs && (nrecs = cdoStreamInqTimestep(streamID1, tsID)))
         {
-          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-          int64_t vdate1 = dtlist_get_vdate(dtlist, nsets);
+          dtlist.taxisInqTimestep(taxisID1, nsets);
+          int64_t vdate1 = dtlist.getVdate(nsets);
 
           cdiDecodeDate(vdate1, &year, &month, &day);
 
@@ -205,7 +205,7 @@ Seaspctl(void *process)
             hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID, levelID, pn);
         }
 
-      dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
+      dtlist.statTaxisDefTimestep(taxisID4, nsets);
       pstreamDefTimestep(streamID4, otsID);
 
       for (int recID = 0; recID < maxrecs; recID++)
@@ -231,8 +231,6 @@ Seaspctl(void *process)
 
   Free(vars1);
   hsetDestroy(hset);
-
-  dtlist_delete(dtlist);
 
   if (field.ptr) Free(field.ptr);
 

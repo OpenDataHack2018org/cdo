@@ -28,6 +28,7 @@
 #include <dlfcn.h>
 #include <regex>
 #include <set>
+#include <cstring>
 #include <string>
 // for std::sort()
 #include <algorithm>
@@ -273,9 +274,7 @@ add_alias(std::string alias, std::string original)
     }
   if (modules_map.find(alias) != modules_map.end())
     {
-      Error("alias %s could not be added: alias name already exists as an "
-            "operator",
-            alias.c_str());
+      Error("alias %s could not be added: alias name already exists as an operator", alias.c_str());
     }
   aliases[alias] = original;
 

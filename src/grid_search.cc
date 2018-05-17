@@ -445,8 +445,7 @@ gridsearch_delete(GridSearch *gs)
 }
 
 static size_t
-gs_nearest_kdtree(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
-                  GridSearch *gs)
+gs_nearest_kdtree(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist, GridSearch *gs)
 {
   kdTree_t *kdt = (kdTree_t *) search_container;
   if (kdt == NULL) return 0;

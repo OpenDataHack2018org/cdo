@@ -29,7 +29,6 @@ extern "C" {
 #include "lib/yac/geometry.h"
 }
 
-
 static void
 quick_sort(double *array, size_t array_length)
 {
@@ -275,8 +274,8 @@ calculate_the_polygon_area(double cell_corners[], int number_corners)
   double twice_the_polygon_area = 0;
 
   for (int i = 0; i < number_corners - 1; i++)
-    twice_the_polygon_area += (cell_corners[i * 2 + 0] * cell_corners[(i + 1) * 2 + 1])
-                              - (cell_corners[(i + 1) * 2 + 0] * cell_corners[i * 2 + 1]);
+    twice_the_polygon_area
+        += (cell_corners[i * 2 + 0] * cell_corners[(i + 1) * 2 + 1]) - (cell_corners[(i + 1) * 2 + 0] * cell_corners[i * 2 + 1]);
 
   return twice_the_polygon_area / 2;
 }
@@ -295,8 +294,8 @@ are_polygon_vertices_arranged_in_clockwise_order(double cell_area)
 }
 
 static void
-verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon,
-            double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat)
+verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon, double *grid_center_lat,
+            double *grid_corner_lon, double *grid_corner_lat)
 {
   /*
      First, this function performs the following test:
@@ -371,8 +370,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
       if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) > eps)
         {
           subarray_end = cell_no * 2;
-          if ((subarray_end - subarray_start) > 1)
-            quick_sort_of_subarray_by_lat(center_point_array, subarray_start, subarray_end);
+          if ((subarray_end - subarray_start) > 1) quick_sort_of_subarray_by_lat(center_point_array, subarray_start, subarray_end);
 
           subarray_start = subarray_end + 2;
         }
@@ -604,8 +602,8 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
       /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the
        * cell. */
 
-      int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, actual_number_of_corners + 1,
-                                                     center_point_plane_projection);
+      int winding_number
+          = winding_numbers_algorithm(cell_corners_plane_projection, actual_number_of_corners + 1, center_point_plane_projection);
 
       // if ( winding_number == 0 ) printf("%d,", cell_no+1);
       if (winding_number == 0) no_of_cells_with_center_points_out_of_bounds += 1;
