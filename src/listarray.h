@@ -31,7 +31,7 @@ private:
   void
   ensureArraySize(int num)
   {
-    while (nalloc < (num + 1))
+    while (nalloc <= num)
       {
         nalloc += allinc;
         array.resize(nalloc);

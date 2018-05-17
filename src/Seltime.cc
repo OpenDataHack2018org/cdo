@@ -142,7 +142,7 @@ datestr_to_double(const char *datestr, int opt)
 }
 
 static int
-datelist(ListArray<double> listArrayFlt)
+datelist(ListArray<double> &listArrayFlt)
 {
   bool set2 = true;
   double fval = 0;

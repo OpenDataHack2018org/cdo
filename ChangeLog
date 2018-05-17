@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.5
 	* Version 1.9.5 release
 
+2018-05-17 Uwe Schulzweida
+
+	* seldate: segmentation fault (bug introduce in 1.9.4)
+
 2018-05-16 Uwe Schulzweida
 
 	* Added #ifdef around wordexp.h [Bug #8488]
