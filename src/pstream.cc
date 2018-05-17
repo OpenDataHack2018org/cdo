@@ -51,18 +51,19 @@
 #include "cdoOptions.h"
 #include "cdo_history.h"
 
-#ifdef HAVE_LIBPTHREAD
-#include <pthread.h>
-#include "pthread_debug.h"
-
-// TODO: make threadsafe
-int pthreadScope = 0;
 static int processNum = 0;
 void
 setProcessNum(int p_num)
 {
   processNum = p_num;
 }
+
+#ifdef HAVE_LIBPTHREAD
+#include <pthread.h>
+#include "pthread_debug.h"
+
+// TODO: make threadsafe
+int pthreadScope = 0;
 
 static pthread_mutex_t streamOpenReadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t streamOpenWriteMutex = PTHREAD_MUTEX_INITIALIZER;
