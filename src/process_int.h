@@ -25,7 +25,8 @@ enum class ParseStatus
   Ok = 0,
   OpenBracketMissing = -1,
   ClosingBracketMissing = -2,
-  UnprocessedInput = -3
+  UnprocessedInput = -3,
+  MissingOutFile = -4
 };
 /**
  * Sets the underlying Process threadID and calls omp_set_num_threads

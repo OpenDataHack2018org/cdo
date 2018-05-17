@@ -401,6 +401,10 @@ createProcessesFromInput(int argc, const char **argv)
     }
   else
     {
+      if (maxIdx <= 0)
+        {
+          return ParseStatus::MissingOutFile;
+        }
       handleFirstOperator(maxIdx, argc, argv, root_process);
     }
 
@@ -505,6 +509,13 @@ handleParseError(ParseStatus p_errCode)
       {
         CdoError::Abort(Cdo::progname, "Unprocessed Input, could not process all Operators/Files");
         break;
+      }
+    case ParseStatus::MissingOutFile:
+      {
+        CdoError::Abort(Cdo::progname, "Missing out file for first operator");
+        break;
+      }
+    case ParseStatus::Ok: { return;
       }
     }
 }
