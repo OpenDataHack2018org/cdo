@@ -61,7 +61,7 @@ main(int argc, char *argv[])
       return -1;
     }
 
-  namelist_parser *p = namelist_new();
+  NamelistParser *p = namelist_new();
 
   int status = namelist_parse(p, buffer, filesize);
   printf("Processed number of lines: %d\n", p->lineno - 1);

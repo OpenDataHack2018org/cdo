@@ -21,7 +21,7 @@
 #include "namelist.h"
 
 static void
-namelist_init(namelist_parser *parser)
+namelist_init(NamelistParser *parser)
 {
   parser->tokens = NULL;
   parser->num_tokens = 0;
@@ -30,17 +30,17 @@ namelist_init(namelist_parser *parser)
   parser->lineno = 0;
 }
 
-namelist_parser *
+NamelistParser *
 namelist_new(void)
 {
-  namelist_parser *parser = (namelist_parser *) malloc(sizeof(namelist_parser));
+  NamelistParser *parser = (NamelistParser *) malloc(sizeof(NamelistParser));
   namelist_init(parser);
 
   return parser;
 }
 
 void
-namelist_destroy(namelist_parser *parser)
+namelist_destroy(NamelistParser *parser)
 {
   if (parser)
     {
@@ -52,7 +52,7 @@ namelist_destroy(namelist_parser *parser)
 
 // Allocates a fresh unused token from the token pull.
 static namelisttok_t *
-namelist_alloc_token(namelist_parser *parser)
+namelist_alloc_token(NamelistParser *parser)
 {
   const unsigned int TOK_MEM_INCR = 64;
 
@@ -82,7 +82,7 @@ namelist_fill_token(namelisttok_t *token, int type, int start, int end)
 }
 
 void
-namelist_new_object(namelist_parser *parser)
+namelist_new_object(NamelistParser *parser)
 {
   namelisttok_t *token;
   token = namelist_alloc_token(parser);
@@ -92,7 +92,7 @@ namelist_new_object(namelist_parser *parser)
 
 // Fills next available token with NAMELIST word.
 static int
-namelist_parse_word(namelist_parser *parser, const char *buf, size_t len)
+namelist_parse_word(NamelistParser *parser, const char *buf, size_t len)
 {
   namelisttok_t *token;
   int start = parser->pos;
@@ -130,7 +130,7 @@ found:
 
 // Fills next token with NAMELIST string.
 static int
-namelist_parse_string(namelist_parser *parser, const char *buf, size_t len, char quote)
+namelist_parse_string(NamelistParser *parser, const char *buf, size_t len, char quote)
 {
   int start = parser->pos;
 
@@ -210,7 +210,7 @@ namelist_check_keyname(const char *buf, namelisttok_t *t)
 }
 
 int
-namelist_parse(namelist_parser *parser, const char *buf, size_t len)
+namelist_parse(NamelistParser *parser, const char *buf, size_t len)
 {
   int status = 0;
   namelisttok_t *token;
@@ -264,7 +264,7 @@ namelist_parse(namelist_parser *parser, const char *buf, size_t len)
 }
 
 void
-namelist_dump(namelist_parser *parser, const char *buf)
+namelist_dump(NamelistParser *parser, const char *buf)
 {
   unsigned int ntok = parser->toknext;
   printf("Number of tokens %d\n", ntok);
@@ -301,7 +301,7 @@ namelist_dump(namelist_parser *parser, const char *buf)
 }
 
 int
-namelist_verify(namelist_parser *parser, const char *buf)
+namelist_verify(NamelistParser *parser, const char *buf)
 {
   unsigned int ntok = parser->toknext;
 

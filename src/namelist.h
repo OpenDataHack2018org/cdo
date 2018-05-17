@@ -14,8 +14,8 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef __NAMELIST_H_
-#define __NAMELIST_H_
+#ifndef NAMELIST_H_
+#define NAMELIST_H_
 
 enum namelisttype
 {
@@ -37,30 +37,30 @@ enum namelisterr
 };
 
 // NAMELIST token description.
-typedef struct
+struct namelisttok_t
 {
   int type;   // type (object, key, string word)
   int start;  // start position in NAMELIST buffer
   int end;    // end position in NAMELIST buffer
-} namelisttok_t;
+};
 
-typedef struct
+struct NamelistParser
 {
   namelisttok_t *tokens;
   unsigned int num_tokens;
   unsigned int toknext;
   unsigned int pos;
   unsigned int lineno;
-} namelist_parser;
+};
 
-namelist_parser *namelist_new(void);
+NamelistParser *namelist_new(void);
 
-void namelist_destroy(namelist_parser *parser);
+void namelist_destroy(NamelistParser *parser);
 
-int namelist_parse(namelist_parser *parser, const char *buf, size_t len);
+int namelist_parse(NamelistParser *parser, const char *buf, size_t len);
 
-void namelist_dump(namelist_parser *parser, const char *buf);
+void namelist_dump(NamelistParser *parser, const char *buf);
 
-int namelist_verify(namelist_parser *parser, const char *buf);
+int namelist_verify(NamelistParser *parser, const char *buf);
 
-#endif  // __NAMELIST_H_
+#endif  // NAMELIST_H_

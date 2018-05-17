@@ -62,7 +62,7 @@ get_number_of_values(int ntok, namelisttok_t *tokens)
 }
 
 static int
-namelist_to_pml(list_t *pmlist, namelist_parser *parser, char *buf)
+namelist_to_pml(list_t *pmlist, NamelistParser *parser, char *buf)
 {
   char name[4096];
   list_t *kvlist = NULL;
@@ -117,7 +117,7 @@ list_t *
 namelistbuf_to_pmlist(listbuf_t *listbuf)
 {
   const char *name = listbuf->name;
-  namelist_parser *p = namelist_new();
+  NamelistParser *p = namelist_new();
 
   int status = namelist_parse(p, listbuf->buffer, listbuf->size);
   if (status)
