@@ -82,8 +82,8 @@ ProcessType::initProcess()
 {
 #ifdef HAVE_LIBPTHREAD
   threadID = pthread_self();
-  l_threadID = 1;
 #endif
+  m_isActive = true;
   nchild = 0;
 
   cdoProcessTime(&s_utime, &s_stime);
@@ -95,7 +95,6 @@ ProcessType::initProcess()
   ntimesteps = 0;
 
   m_streamCnt = 0;
-  m_isActive = false;
 
   m_oargc = 0;
   m_operatorCommand = "UNINITALIZED";
@@ -265,7 +264,7 @@ ProcessType::hasAllInputs()
 void
 ProcessType::setInactive()
 {
-  l_threadID = 0;
+  m_isActive = false;
 }
 
 void

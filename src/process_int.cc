@@ -62,7 +62,7 @@ processSelf(void)
 
   for (auto &id_process_pair : Process)
     {
-      if (id_process_pair.second.l_threadID)
+      if (id_process_pair.second.m_isActive)
         {
           if (pthread_equal(id_process_pair.second.threadID, thID))
             {

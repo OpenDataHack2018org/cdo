@@ -65,7 +65,6 @@ public:
   int m_posInParent;
 #ifdef HAVE_LIBPTHREAD
   pthread_t threadID;
-  int l_threadID;
 #endif
   short nchild;
   std::vector<ProcessType *> childProcesses;
@@ -91,7 +90,7 @@ public:
   char const *operatorArg;
   char prompt[64];
   short m_noper;
-  bool m_isActive; /*TEMP*/  // not used right now, maybe later (12.Jan.2018)
+  bool m_isActive;
 
   module_t m_module;
   std::vector<char *> m_oargv;
