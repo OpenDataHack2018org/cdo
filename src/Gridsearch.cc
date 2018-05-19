@@ -19,9 +19,6 @@
 #include "cdo_int.h"
 #include "grid.h"
 
-void check_lon_range(long nlons, double *lons);
-void check_lat_range(long nlats, double *lats);
-
 typedef struct
 {
   int gridID;
@@ -80,9 +77,6 @@ grid_new(int gridID, const char *txt)
 
   grid_to_radian(xunits, grid->num_cell_corners * grid->size, grid->cell_corner_lon, "grid corner lon");
   grid_to_radian(yunits, grid->num_cell_corners * grid->size, grid->cell_corner_lat, "grid corner lat");
-
-  // check_lon_range(grid->num_cell_corners*grid->size, grid->cell_corner_lon);
-  // check_lat_range(grid->num_cell_corners*grid->size, grid->cell_corner_lat);
 
   if (lgrid_destroy) gridDestroy(gridID);
 

@@ -285,9 +285,8 @@ apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
                 vlistDefVarLongname(vlistID2, varID, value);
               else if (STR_IS_EQ(key, "units"))
                 cdo_define_var_units(var, vlistID2, varID, value);
-              else if (STR_IS_EQ(key, "name")) /*vlistDefVarName(vlistID2,
-                                                  varID,
-                                                  parameter2word(value))*/
+              else if (STR_IS_EQ(key, "name"))
+            	// vlistDefVarName(vlistID2, varID, parameter2word(value))
                 ;
               else if (STR_IS_EQ(key, "out_name"))
                 {

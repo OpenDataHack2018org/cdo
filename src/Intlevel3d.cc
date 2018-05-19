@@ -30,8 +30,6 @@
 #include "listarray.h"
 #include "after_vertint.h"
 
-bool levelDirUp(int nlev, double *lev);
-bool levelDirDown(int nlev, double *lev);
 void vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1, int *lev_idx2,
                        double *lev_wgt1, double *lev_wgt2);
 void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1,

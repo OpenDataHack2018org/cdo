@@ -22,14 +22,14 @@
 
 constexpr int MAX_CHILDS = 9;
 
-typedef struct
+struct CellIndex
 {
   long ncells;
   long *neighbor;  // neighbor cell index
   long *parent;    // parent cell index
   long *child;     // child cell index
   const char *filename;
-} CellIndex;
+};
 
 static void
 copy_data_to_index(long ncells, const double *restrict data, long *restrict cellindex)
@@ -95,9 +95,8 @@ read_cellindex(const char *filename)
   // cellindex->neighbor = (long*) Malloc(3*ncells*sizeof(long));
   cellindex->parent = (long *) Malloc(ncells * sizeof(long));
   cellindex->child = NULL;
-  // cellindex->child    = (cid != CDI_UNDEFID) ? (int*)
-  // Malloc(MAX_CHILDS*ncells*sizeof(int)) : NULL;
-  double *data = (double *) Malloc(ncells * sizeof(double));
+  // cellindex->child    = (cid != CDI_UNDEFID) ? (int*) Malloc(MAX_CHILDS*ncells*sizeof(int)) : NULL;
+  std::vector<double> data(ncells);
 
   int nrecs = streamInqTimestep(streamID, 0);
   for (int recID = 0; recID < nrecs; recID++)
@@ -107,8 +106,8 @@ read_cellindex(const char *filename)
       streamInqRecord(streamID, &varID, &levelID);
       if (varID == pid /* || varID == nid || varID == cid */)
         {
-          streamReadRecord(streamID, data, &nmiss);
-          if (varID == pid) copy_data_to_index(ncells, data, cellindex->parent);
+          streamReadRecord(streamID, data.data(), &nmiss);
+          if (varID == pid) copy_data_to_index(ncells, data.data(), cellindex->parent);
           // else if ( varID == nid ) copy_data_to_index(ncells, data,
           // cellindex->neighbor+levelID*ncells); else if ( varID == cid )
           // copy_data_to_index(ncells, data, cellindex->child+levelID*ncells);
@@ -120,8 +119,6 @@ read_cellindex(const char *filename)
   // for ( long i = 0; i < 3*ncells; ++i ) cellindex->neighbor[i] -= 1;
 
   streamClose(streamID);
-
-  Free(data);
 
   return cellindex;
 }

@@ -21,7 +21,7 @@
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#if defined(CDO)
+#ifdef CDO
 #include "cdo_int.h"
 #include "pstream_write.h"
 #define streamDefRecord pstreamDefRecord

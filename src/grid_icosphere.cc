@@ -8,12 +8,6 @@
 #include <array>
 #include <map>
 
-static inline double
-rad2deg(double v)
-{
-  return v * 180. / M_PI;
-}
-
 // Converts cartesian coordinates to geographical
 static inline void
 cc2gc(double xyz[], double *lon, double *lat)
@@ -252,6 +246,12 @@ genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yval
 }
 
 #ifdef TEST_ICO
+static inline double
+rad2deg(double v)
+{
+  return v * 180. / M_PI;
+}
+
 int
 main(void)
 {
