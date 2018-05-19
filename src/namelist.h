@@ -17,50 +17,65 @@
 #ifndef NAMELIST_H_
 #define NAMELIST_H_
 
-enum namelisttype
+#include <vector>
+
+enum class NamelistType
 {
-  NAMELIST_UNDEFINED = 0,
-  NAMELIST_OBJECT = 1,
-  NAMELIST_KEY = 2,
-  NAMELIST_STRING = 3,
-  NAMELIST_WORD = 4
+  UNDEFINED = 0,
+  OBJECT = 1,
+  KEY = 2,
+  STRING = 3,
+  WORD = 4
 };
 
-enum namelisterr
+enum class NamelistError
 {
-  NAMELIST_ERROR_INVAL = -1,  // Invalid character inside NAMELIST string/word
-  NAMELIST_ERROR_PART = -2,   // The string is not a full NAMELIST packet, more bytes expected
-  NAMELIST_ERROR_INKEY = -3,  // Invalid character inside NAMELIST key
-  NAMELIST_ERROR_INTYP = -4,  // Invalid NAMELIST key type
-  NAMELIST_ERROR_INOBJ = -5,  // Invalid NAMELIST object
-  NAMELIST_ERROR_EMKEY = -6   // Empty key name
+  UNDEFINED = 0,
+  INVAL = -1,  // Invalid character inside NAMELIST string/word
+  PART = -2,   // The string is not a full NAMELIST packet, more bytes expected
+  INKEY = -3,  // Invalid character inside NAMELIST key
+  INTYP = -4,  // Invalid NAMELIST key type
+  INOBJ = -5,  // Invalid NAMELIST object
+  EMKEY = -6   // Empty key name
 };
 
 // NAMELIST token description.
 struct NamelistToken
 {
-  int type;   // type (object, key, string word)
-  int start;  // start position in NAMELIST buffer
-  int end;    // end position in NAMELIST buffer
+  NamelistType type;   // type (object, key, string word)
+  int start;           // start position in NAMELIST buffer
+  int end;             // end position in NAMELIST buffer
 };
 
-struct NamelistParser
+class NamelistParser
 {
-  NamelistToken *tokens;
+ public:
+  std::vector<NamelistToken> tokens;
   unsigned int num_tokens;
   unsigned int toknext;
   unsigned int pos;
   unsigned int lineno;
+
+  void init()
+    {
+      num_tokens = 0;
+      toknext = 0;
+      pos = 0;
+      lineno = 0;
+    }
+
+  NamelistParser()
+    {
+      init();
+    }
+
+  ~NamelistParser()
+    {
+    }
+  
+  NamelistError parse(const char *buf, size_t len);
+  void dump(const char *buf);
+  int verify();
 };
-
-NamelistParser *namelist_new(void);
-
-void namelist_destroy(NamelistParser *parser);
-
-int namelist_parse(NamelistParser *parser, const char *buf, size_t len);
-
-void namelist_dump(NamelistParser *parser, const char *buf);
-
-int namelist_verify(NamelistParser *parser, const char *buf);
 
 #endif  // NAMELIST_H_

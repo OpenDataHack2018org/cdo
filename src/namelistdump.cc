@@ -61,36 +61,34 @@ main(int argc, char *argv[])
       return -1;
     }
 
-  NamelistParser *p = namelist_new();
+  NamelistParser p;
 
-  int status = namelist_parse(p, buffer, filesize);
-  printf("Processed number of lines: %d\n", p->lineno - 1);
+  NamelistError status = p.parse(buffer, filesize);
+  printf("Processed number of lines: %d\n", p.lineno - 1);
   if (status != 0)
     {
       switch (status)
         {
-        case NAMELIST_ERROR_INVAL:
-          fprintf(stderr, "Namelist error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno,
-                  buffer[p->pos]);
+        case NamelistError::INVAL:
+          fprintf(stderr, "Namelist error: Invalid character in %s (line=%d character='%c')!\n", filename, p.lineno,
+                  buffer[p.pos]);
           break;
-        case NAMELIST_ERROR_PART:
-          fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", filename, p->lineno);
+        case NamelistError::PART:
+          fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", filename, p.lineno);
           break;
-        case NAMELIST_ERROR_INKEY:
-          fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", filename, p->lineno);
+        case NamelistError::INKEY:
+          fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", filename, p.lineno);
           break;
-        case NAMELIST_ERROR_INTYP:
-          fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", filename, p->lineno);
+        case NamelistError::INTYP:
+          fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", filename, p.lineno);
           break;
-        case NAMELIST_ERROR_INOBJ: fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", filename, p->lineno); break;
-        case NAMELIST_ERROR_EMKEY: fprintf(stderr, "Namelsit error: Emtry key name in %s (line=%d)!\n", filename, p->lineno); break;
-        default: fprintf(stderr, "Namelsit error in %s (line=%d)!\n", filename, p->lineno); break;
+        case NamelistError::INOBJ: fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", filename, p.lineno); break;
+        case NamelistError::EMKEY: fprintf(stderr, "Namelsit error: Emtry key name in %s (line=%d)!\n", filename, p.lineno); break;
+        default: fprintf(stderr, "Namelsit error in %s (line=%d)!\n", filename, p.lineno); break;
         }
     }
 
-  namelist_dump(p, buffer);
-
-  namelist_destroy(p);
+  p.dump(buffer);
 
   free(buffer);
 

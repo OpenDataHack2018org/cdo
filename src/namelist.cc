@@ -20,36 +20,6 @@
 
 #include "namelist.h"
 
-static void
-namelist_init(NamelistParser *parser)
-{
-  parser->tokens = NULL;
-  parser->num_tokens = 0;
-  parser->toknext = 0;
-  parser->pos = 0;
-  parser->lineno = 0;
-}
-
-NamelistParser *
-namelist_new(void)
-{
-  NamelistParser *parser = (NamelistParser *) malloc(sizeof(NamelistParser));
-  namelist_init(parser);
-
-  return parser;
-}
-
-void
-namelist_destroy(NamelistParser *parser)
-{
-  if (parser)
-    {
-      if (parser->tokens) free(parser->tokens);
-      namelist_init(parser);
-      free(parser);
-    }
-}
-
 // Allocates a fresh unused token from the token pull.
 static NamelistToken *
 namelist_alloc_token(NamelistParser *parser)
@@ -59,12 +29,7 @@ namelist_alloc_token(NamelistParser *parser)
   if (parser->toknext >= parser->num_tokens)
     {
       parser->num_tokens += TOK_MEM_INCR;
-      parser->tokens = (NamelistToken *) realloc(parser->tokens, sizeof(NamelistToken) * parser->num_tokens);
-      if (parser->tokens == NULL)
-        {
-          fprintf(stderr, "%s: Failed to allocated more memory!", __func__);
-          exit(-1);
-        }
+      parser->tokens.resize(parser->num_tokens);
     }
 
   NamelistToken *tok = &parser->tokens[parser->toknext++];
@@ -74,7 +39,7 @@ namelist_alloc_token(NamelistParser *parser)
 
 // Fills token type and boundaries.
 static void
-namelist_fill_token(NamelistToken *token, int type, int start, int end)
+namelist_fill_token(NamelistToken *token, NamelistType type, int start, int end)
 {
   token->type = type;
   token->start = start;
@@ -86,12 +51,12 @@ namelist_new_object(NamelistParser *parser)
 {
   NamelistToken *token;
   token = namelist_alloc_token(parser);
-  token->type = NAMELIST_OBJECT;
+  token->type = NamelistType::OBJECT;
   token->start = parser->pos;
 }
 
 // Fills next available token with NAMELIST word.
-static int
+static NamelistError
 namelist_parse_word(NamelistParser *parser, const char *buf, size_t len)
 {
   NamelistToken *token;
@@ -115,21 +80,21 @@ namelist_parse_word(NamelistParser *parser, const char *buf, size_t len)
       if (buf[parser->pos] < 32 || buf[parser->pos] >= 127)
         {
           parser->pos = start;
-          return NAMELIST_ERROR_INVAL;
+          return NamelistError::INVAL;
         }
     }
 
 found:
 
   token = namelist_alloc_token(parser);
-  namelist_fill_token(token, NAMELIST_WORD, start, parser->pos);
+  namelist_fill_token(token, NamelistType::WORD, start, parser->pos);
   parser->pos--;
 
-  return 0;
+  return NamelistError::UNDEFINED;
 }
 
 // Fills next token with NAMELIST string.
-static int
+static NamelistError
 namelist_parse_string(NamelistParser *parser, const char *buf, size_t len, char quote)
 {
   int start = parser->pos;
@@ -145,8 +110,8 @@ namelist_parse_string(NamelistParser *parser, const char *buf, size_t len, char 
       if (c == quote)
         {
           NamelistToken *token = namelist_alloc_token(parser);
-          namelist_fill_token(token, NAMELIST_STRING, start + 1, parser->pos);
-          return 0;
+          namelist_fill_token(token, NamelistType::STRING, start + 1, parser->pos);
+          return NamelistError::UNDEFINED;
         }
 
       /* Backslash: Quoted symbol expected */
@@ -174,63 +139,63 @@ namelist_parse_string(NamelistParser *parser, const char *buf, size_t len, char 
                         (buf[parser->pos] >= 65 && buf[parser->pos] <= 70) ||  // A-F
                         (buf[parser->pos] >= 97 && buf[parser->pos] <= 102)))  // a-f
                     {
-                      return NAMELIST_ERROR_INVAL;
+                      return NamelistError::INVAL;
                     }
                   parser->pos++;
                 }
               parser->pos--;
               break;
             // Unexpected symbol
-            default: return NAMELIST_ERROR_INVAL;
+            default: return NamelistError::INVAL;
             }
         }
     }
 
   parser->pos = start;
 
-  return NAMELIST_ERROR_PART;
+  return NamelistError::PART;
 }
 
-static int
+static NamelistError
 namelist_check_keyname(const char *buf, NamelistToken *t)
 {
   switch (t->type)
     {
-    case NAMELIST_STRING:
+    case NamelistType::STRING:
       while (isspace((int) buf[t->start]) && t->start < t->end) t->start++;
       while (isspace((int) buf[t->end - 1]) && t->start < t->end) t->end--;
-      if ((t->end - t->start) < 1) return NAMELIST_ERROR_EMKEY;
+      if ((t->end - t->start) < 1) return NamelistError::EMKEY;
       for (int i = t->start; i < t->end; ++i)
-        if (isspace((int) buf[i])) return NAMELIST_ERROR_INKEY;
-    case NAMELIST_WORD: t->type = NAMELIST_KEY; break;
-    default: return NAMELIST_ERROR_INTYP;
+        if (isspace((int) buf[i])) return NamelistError::INKEY;
+    case NamelistType::WORD: t->type = NamelistType::KEY; break;
+    default: return NamelistError::INTYP;
     }
 
-  return 0;
+  return NamelistError::UNDEFINED;
 }
 
-int
-namelist_parse(NamelistParser *parser, const char *buf, size_t len)
+NamelistError
+NamelistParser::parse(const char *buf, size_t len)
 {
-  int status = 0;
+  NamelistError status = NamelistError::UNDEFINED;
   NamelistToken *token;
 
-  parser->lineno = 1;
+  this->lineno = 1;
 
-  for (; parser->pos < len && buf[parser->pos] != '\0'; parser->pos++)
+  for (; this->pos < len && buf[this->pos] != '\0'; this->pos++)
     {
-      char c = buf[parser->pos];
+      char c = buf[this->pos];
       switch (c)
         {
-        case '&': namelist_new_object(parser); break;
+        case '&': namelist_new_object(this); break;
         case '/':
-          for (int i = parser->toknext - 1; i >= 0; i--)
+          for (int i = this->toknext - 1; i >= 0; i--)
             {
-              token = &parser->tokens[i];
+              token = &this->tokens[i];
               if (token->start != -1 && token->end == -1)
                 {
-                  if (token->type != NAMELIST_OBJECT) return NAMELIST_ERROR_INOBJ;
-                  token->end = parser->pos + 1;
+                  if (token->type != NamelistType::OBJECT) return NamelistError::INOBJ;
+                  token->end = this->pos + 1;
                   break;
                 }
             }
@@ -238,60 +203,60 @@ namelist_parse(NamelistParser *parser, const char *buf, size_t len)
         case '\t':
         case ' ': break;
         case '\r':
-          if (parser->pos + 1 < len && buf[parser->pos + 1] == '\n') parser->pos++;
-        case '\n': parser->lineno++; break;
+          if (this->pos + 1 < len && buf[this->pos + 1] == '\n') this->pos++;
+        case '\n': this->lineno++; break;
         case ',': break;
         case '#':
         case '!':  // Skip to end of line
-          for (; parser->pos < len && buf[parser->pos] != '\0'; parser->pos++)
-            if (buf[parser->pos] == '\r' || buf[parser->pos] == '\n')
+          for (; this->pos < len && buf[this->pos] != '\0'; this->pos++)
+            if (buf[this->pos] == '\r' || buf[this->pos] == '\n')
               {
-                parser->pos--;
+                this->pos--;
                 break;
               }
           break;
         case ':':
-        case '=': status = namelist_check_keyname(buf, &parser->tokens[parser->toknext - 1]); break;
+        case '=': status = namelist_check_keyname(buf, &this->tokens[this->toknext - 1]); break;
         case '\"':
-        case '\'': status = namelist_parse_string(parser, buf, len, c); break;
-        default: status = namelist_parse_word(parser, buf, len); break;
+        case '\'': status = namelist_parse_string(this, buf, len, c); break;
+        default: status = namelist_parse_word(this, buf, len); break;
         }
 
-      if (status) return status;
+      if (status!=NamelistError::UNDEFINED) return status;
     }
 
   return status;
 }
 
 void
-namelist_dump(NamelistParser *parser, const char *buf)
+NamelistParser::dump(const char *buf)
 {
-  unsigned int ntok = parser->toknext;
+  unsigned int ntok = this->toknext;
   printf("Number of tokens %d\n", ntok);
 
   for (unsigned int it = 0; it < ntok; ++it)
     {
-      NamelistToken *t = &parser->tokens[it];
+      NamelistToken *t = &this->tokens[it];
       int length = t->end - t->start;
       const char *start = buf + t->start;
       printf("Token %u", it + 1);
-      if (t->type == NAMELIST_OBJECT)
+      if (t->type == NamelistType::OBJECT)
         {
           printf(" NAMELIST=");
           if (length > 80) length = 80;
           printf("'%.*s'", length, start);
         }
-      else if (t->type == NAMELIST_KEY)
+      else if (t->type == NamelistType::KEY)
         {
           printf(" KEY=");
           printf("'%.*s'", length, start);
         }
-      else if (t->type == NAMELIST_WORD)
+      else if (t->type == NamelistType::WORD)
         {
           printf(" WORD=");
           printf("'%.*s'", length, start);
         }
-      else if (t->type == NAMELIST_STRING)
+      else if (t->type == NamelistType::STRING)
         {
           printf(" STRING=");
           printf("'%.*s'", length, start);
@@ -301,14 +266,14 @@ namelist_dump(NamelistParser *parser, const char *buf)
 }
 
 int
-namelist_verify(NamelistParser *parser, const char *buf)
+NamelistParser::verify()
 {
-  unsigned int ntok = parser->toknext;
+  unsigned int ntok = this->toknext;
 
   if (ntok)
     {
-      NamelistToken *t = &parser->tokens[0];
-      if (t->type != NAMELIST_OBJECT && t->type != NAMELIST_KEY) return -1;
+      NamelistToken *t = &this->tokens[0];
+      if (t->type != NamelistType::OBJECT && t->type != NamelistType::KEY) return -1;
     }
 
   return 0;
