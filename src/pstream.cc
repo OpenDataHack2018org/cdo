@@ -193,6 +193,7 @@ PstreamType::pstreamOpenReadPipe()
   return self;
 #else
   cdoAbort("Cannot use pipes, pthread support not compiled in!");
+  return -1;
 #endif
 }
 

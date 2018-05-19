@@ -339,6 +339,7 @@ cdo_sinu_to_lonlat(size_t nvals, double *xvals, double *yvals)
 #endif
 }
 
+#ifdef HAVE_LIBPROJ
 static bool
 cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int attlen, double *attflt)
 {
@@ -362,7 +363,6 @@ cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int attl
   return status;
 }
 
-#ifdef HAVE_LIBPROJ
 static void
 grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, double *x_0, double *y_0)
 {

@@ -202,8 +202,7 @@ fill_gridvals(size_t xsize, size_t ysize, double *xvals, double *yvals)
                     index2 = j*xsize + ii;
                     if ( xvals[index2] > -180 && xvals[index2] < 360 )
                       {
-                        xvals[index] = (xmax*(i-ii) +
-            xvals[index2]*((xsize-1)-i))/(xsize-1-ii); break;
+                        xvals[index] = (xmax*(i-ii) + xvals[index2]*((xsize-1)-i))/(xsize-1-ii); break;
                       }
                   }
               }
