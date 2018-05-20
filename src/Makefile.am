@@ -145,6 +145,8 @@ libcdo_la_SOURCES =            \
                process.h       \
                process_int.cc       \
                process_int.h       \
+               processManager.cc       \
+               processManager.h       \
                pstream.cc       \
                pstream.h       \
                pstream_int.cc  \
