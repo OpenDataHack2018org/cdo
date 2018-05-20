@@ -31,7 +31,7 @@ go_bandit([]() {
   int result_process;
   int expected_process;
 
-  bandit::before_each([&]() { clearProcesses(); });
+  bandit::before_each([&]() { g_processManager.clearProcesses(); });
 
   //-----------------------------Test_01------------------------------------------
   //------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ go_bandit([]() {
     std::vector<const char *> argv_unprocessedInput{
         "-in2_out1", "-in0_out1", "-in0_out1", "-in0_out1", "out" };
     /* clang-format on */
-    parseStatus = createProcessesFromInput(argv_unprocessedInput.size(),
+    parseStatus = g_processManager.createProcessesFromInput(argv_unprocessedInput.size(),
                                            &argv_unprocessedInput[0]);
 
     result_parse = static_cast<int>(parseStatus);
@@ -59,7 +59,7 @@ go_bandit([]() {
         "-in2_out1", "[", "-in0_out1", "-in0_out1", "out"
         };
     /* clang-format on */
-    parseStatus = createProcessesFromInput(argv_missingCloseBracket.size(),
+    parseStatus = g_processManager.createProcessesFromInput(argv_missingCloseBracket.size(),
                                            &argv_missingCloseBracket[0]);
 
     result_parse = static_cast<int>(parseStatus);
@@ -77,7 +77,7 @@ go_bandit([]() {
         "-in2_out1", "-in0_out1", "-in0_out1", "]", "out"
         };
     /* clang-format on */
-    parseStatus = createProcessesFromInput(argv_missingOpenBracket.size(),
+    parseStatus = g_processManager.createProcessesFromInput(argv_missingOpenBracket.size(),
                                            &argv_missingOpenBracket[0]);
 
     result_parse = static_cast<int>(parseStatus);
@@ -95,9 +95,9 @@ go_bandit([]() {
         "-in2_out1", "[", "-in0_out1", "-in0_out1", "-in0_out1", "]", "out"
     };
     /* clang-format on */
-    parseStatus = createProcessesFromInput(argv_wrongBracketTooMany.size(),
+    parseStatus = g_processManager.createProcessesFromInput(argv_wrongBracketTooMany.size(),
                                            &argv_wrongBracketTooMany[0]);
-    processStatus = getProcess(0)->checkStreamCnt();
+    processStatus = g_processManager.getProcess(0).checkStreamCnt();
 
     result_parse = static_cast<int>(parseStatus);
     expected_parse = static_cast<int>(ParseStatus::Ok);
@@ -118,9 +118,9 @@ go_bandit([]() {
         "-in2_out1", "[", "-in0_out1", "]", "out"
     };
     /* clang-format on */
-    parseStatus = createProcessesFromInput(argv_wrongBracketTooFew.size(),
+    parseStatus = g_processManager.createProcessesFromInput(argv_wrongBracketTooFew.size(),
                                            &argv_wrongBracketTooFew[0]);
-    processStatus = getProcess(0)->checkStreamCnt();
+    processStatus = g_processManager.getProcess(0).checkStreamCnt();
 
     bandit::it("this one has too few inputs", [&]() {
       AssertThat(static_cast<int>(parseStatus),
@@ -137,7 +137,7 @@ go_bandit([]() {
     std::vector<const char *> argv_missingOutFileOperHasDash{
         "-in2_out1"};
     /* clang-format on */
-    parseStatus = createProcessesFromInput(argv_missingOutFileOperHasDash.size(),
+    parseStatus = g_processManager.createProcessesFromInput(argv_missingOutFileOperHasDash.size(),
                                            &argv_missingOutFileOperHasDash[0]);
 
     result_parse = static_cast<int>(parseStatus);
@@ -154,7 +154,7 @@ go_bandit([]() {
     std::vector<const char *> argv_missingOutFileOperHasntDash{
         "in2_out1"};
     /* clang-format on */
-    parseStatus = createProcessesFromInput(argv_missingOutFileOperHasntDash.size(),
+    parseStatus = g_processManager.createProcessesFromInput(argv_missingOutFileOperHasntDash.size(),
                                            &argv_missingOutFileOperHasntDash[0]);
 
     result_parse = static_cast<int>(parseStatus);
