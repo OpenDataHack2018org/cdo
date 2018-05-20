@@ -82,7 +82,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
   int gridID = -1;
   int i;
 
-  griddes_t grid;
+  GridDesciption grid;
   gridInit(&grid);
 
   int nlon, nlat;

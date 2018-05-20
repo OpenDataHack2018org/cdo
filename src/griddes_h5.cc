@@ -304,7 +304,7 @@ gridFromH5file(const char *gridfile)
   hsize_t dims_out[9]; /* dataset dimensions               */
   herr_t status;       /* Generic return value		*/
   int rank;
-  griddes_t grid;
+  GridDesciption grid;
 
   gridInit(&grid);
 

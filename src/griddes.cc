@@ -32,7 +32,7 @@ int grid_read(FILE *gfp, const char *dname);
 int grid_read_pingo(FILE *gfp, const char *dname);
 
 void
-gridInit(griddes_t *grid)
+gridInit(GridDesciption *grid)
 {
   grid->mask = NULL;
   grid->xvals = NULL;
@@ -125,7 +125,7 @@ getoptname(char *optname, const char *optstring, int nopt)
 }
 
 int
-gridDefine(griddes_t grid)
+gridDefine(GridDesciption grid)
 {
   int gridID = CDI_UNDEFID;
 

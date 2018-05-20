@@ -24,7 +24,7 @@
 size_t genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yvals, double **xbounds, double **ybounds);
 
 static void
-gen_grid_icosphere(griddes_t *grid, const char *pline)
+gen_grid_icosphere(GridDesciption *grid, const char *pline)
 {
   int gridtype = GRID_UNSTRUCTURED;
   bool lbounds = true;
@@ -84,7 +84,7 @@ gen_grid_icosphere(griddes_t *grid, const char *pline)
 }
 
 static void
-gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
+gen_grid_lonlat(GridDesciption *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
   int gridtype = GRID_LONLAT;
   bool lbounds = true;
@@ -217,7 +217,7 @@ grid_from_name(const char *gridnameptr)
 {
   const char *pline;
   int gridID = CDI_UNDEFID;
-  griddes_t grid;
+  GridDesciption grid;
   size_t len;
   char *endptr;
 

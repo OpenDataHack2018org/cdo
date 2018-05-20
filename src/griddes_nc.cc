@@ -74,7 +74,7 @@ gridFromNCfile(const char *gridfile)
   size_t attlen;
   size_t grid_rank, grid_size, grid_nvertex;
   int grid_dims[2];
-  griddes_t grid;
+  GridDesciption grid;
 
   gridInit(&grid);
 

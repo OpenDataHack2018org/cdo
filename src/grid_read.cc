@@ -44,14 +44,14 @@ cdo_read_field(const char *name, char *pline, int size, double *field, int *line
     }
 }
 
-typedef struct
+struct kvmap_t
 {
   keyValues_t *kv;
   bool isValid;
-} kvmap_t;
+};
 
 static void
-grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *iproj, size_t *igmap, const char *dname)
+grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, GridDesciption *grid, size_t *iproj, size_t *igmap, const char *dname)
 {
   char uuidStr[256];
 
@@ -78,30 +78,20 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
               return;
             }
 
-          if (STR_IS_EQ(gridtype, "lonlat"))
-            grid->type = GRID_LONLAT;
-          else if (STR_IS_EQ(gridtype, "latlon"))
-            grid->type = GRID_LONLAT;
-          else if (STR_IS_EQ(gridtype, "gaussian"))
-            grid->type = GRID_GAUSSIAN;
-          else if (STR_IS_EQ(gridtype, "gaussian_reduced"))
-            grid->type = GRID_GAUSSIAN_REDUCED;
-          else if (STR_IS_EQ(gridtype, "curvilinear"))
-            grid->type = GRID_CURVILINEAR;
-          else if (STR_IS_EQ(gridtype, "unstructured"))
-            grid->type = GRID_UNSTRUCTURED;
-          else if (STR_IS_EQ(gridtype, "cell"))
-            grid->type = GRID_UNSTRUCTURED;
-          else if (STR_IS_EQ(gridtype, "spectral"))
-            grid->type = GRID_SPECTRAL;
-          else if (STR_IS_EQ(gridtype, "gme"))
-            grid->type = GRID_GME;
-          else if (STR_IS_EQ(gridtype, "projection"))
-            grid->type = GRID_PROJECTION;
-          else if (STR_IS_EQ(gridtype, "generic"))
-            grid->type = GRID_GENERIC;
-          else
-            cdoAbort("Invalid gridtype: %s (grid description file: %s)", gridtype, dname);
+          // clang-format off
+          if      (STR_IS_EQ(gridtype, "lonlat"))           grid->type = GRID_LONLAT;
+          else if (STR_IS_EQ(gridtype, "latlon"))           grid->type = GRID_LONLAT;
+          else if (STR_IS_EQ(gridtype, "gaussian"))         grid->type = GRID_GAUSSIAN;
+          else if (STR_IS_EQ(gridtype, "gaussian_reduced")) grid->type = GRID_GAUSSIAN_REDUCED;
+          else if (STR_IS_EQ(gridtype, "curvilinear"))      grid->type = GRID_CURVILINEAR;
+          else if (STR_IS_EQ(gridtype, "unstructured"))     grid->type = GRID_UNSTRUCTURED;
+          else if (STR_IS_EQ(gridtype, "cell"))             grid->type = GRID_UNSTRUCTURED;
+          else if (STR_IS_EQ(gridtype, "spectral"))         grid->type = GRID_SPECTRAL;
+          else if (STR_IS_EQ(gridtype, "gme"))              grid->type = GRID_GME;
+          else if (STR_IS_EQ(gridtype, "projection"))       grid->type = GRID_PROJECTION;
+          else if (STR_IS_EQ(gridtype, "generic"))          grid->type = GRID_GENERIC;
+          else cdoAbort("Invalid gridtype: %s (grid description file: %s)", gridtype, dname);
+          // clang-format on
 
           if (grid->type == GRID_LONLAT || grid->type == GRID_GAUSSIAN)
             grid->nvertex = 2;
@@ -226,8 +216,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
           size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->xsize;
           if (size == 0) cdoAbort("xsize or gridsize undefined (grid description file: %s)!", dname);
           if (size != nvalues)
-            cdoAbort("xsize=%zu and size of xvals=%zu differ (grid description "
-                     "file: %s)!",
+            cdoAbort("xsize=%zu and size of xvals=%zu differ (grid description file: %s)!",
                      nvalues, size, dname);
 
           grid->xvals = (double *) Malloc(size * sizeof(double));
@@ -238,8 +227,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
           size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->ysize;
           if (size == 0) cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
           if (size != nvalues)
-            cdoAbort("ysize=%zu and size of yvals=%zu differ (grid description "
-                     "file: %s)!",
+            cdoAbort("ysize=%zu and size of yvals=%zu differ (grid description file: %s)!",
                      nvalues, size, dname);
 
           grid->yvals = (double *) Malloc(size * sizeof(double));
@@ -251,8 +239,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
           if (size == 0) cdoAbort("xsize or gridsize undefined (grid description file: %s)!", dname);
           if (grid->nvertex == 0) cdoAbort("nvertex undefined (grid description file: %s)!", dname);
           if (grid->nvertex * size != nvalues)
-            cdoAbort("Number of xbounds=%zu and size of xbounds=%zu differ "
-                     "(grid description file: %s)!",
+            cdoAbort("Number of xbounds=%zu and size of xbounds=%zu differ (grid description file: %s)!",
                      nvalues, grid->nvertex * size, dname);
 
           grid->xbounds = (double *) Malloc(grid->nvertex * size * sizeof(double));
@@ -264,8 +251,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
           if (size == 0) cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
           if (grid->nvertex == 0) cdoAbort("nvertex undefined (grid description file: %s)!", dname);
           if (grid->nvertex * size != nvalues)
-            cdoAbort("Number of ybounds=%zu and size of ybounds=%zu differ "
-                     "(grid description file: %s)!",
+            cdoAbort("Number of ybounds=%zu and size of ybounds=%zu differ (grid description file: %s)!",
                      nvalues, grid->nvertex * size, dname);
 
           grid->ybounds = (double *) Malloc(grid->nvertex * size * sizeof(double));
@@ -276,8 +262,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
           if (grid->size == 0) grid->size = grid->xsize * grid->ysize;
           if (grid->size == 0) cdoAbort("gridsize undefined (grid description file: %s)!", dname);
           if ((size_t) grid->size * 2 != nvalues)
-            cdoAbort("Number of gridlonlat values=%zu and size of grid=%zu "
-                     "differ (grid description file: %s)!",
+            cdoAbort("Number of gridlonlat values=%zu and size of grid=%zu differ (grid description file: %s)!",
                      nvalues, grid->size * 2, dname);
           grid->xvals = (double *) Malloc(grid->size * sizeof(double));
           grid->yvals = (double *) Malloc(grid->size * sizeof(double));
@@ -292,8 +277,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *
           size_t size = grid->size;
           if (grid->size == 0) cdoAbort("gridsize undefined (grid description file: %s)!", dname);
           if (size != nvalues)
-            cdoAbort("Number of mask values=%zu and size of grid=%zu differ "
-                     "(grid description file: %s)!",
+            cdoAbort("Number of mask values=%zu and size of grid=%zu differ (grid description file: %s)!",
                      nvalues, size, dname);
           grid->mask = (int *) Malloc(size * sizeof(int));
           size_t count = 0;
@@ -413,7 +397,7 @@ grid_read(FILE *gfp, const char *dname)
       ik++;
     }
 
-  griddes_t grid;
+  GridDesciption grid;
   gridInit(&grid);
 
   size_t iproj = 0;
@@ -428,7 +412,7 @@ grid_read(FILE *gfp, const char *dname)
 
       if (iproj > 0)
         {
-          griddes_t proj;
+          GridDesciption proj;
           gridInit(&proj);
           grid_read_data(iproj, nkv, kvmap, &proj, &iproj, &igmap, dname);
 
