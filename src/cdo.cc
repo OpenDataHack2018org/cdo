@@ -1882,13 +1882,9 @@ main(int argc, char *argv[])
 
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
-      getProcess(0)->m_module.func(getProcess(0));
       close_library_handles();
-#else
-      createProcesses(new_argv.size(), (const char **) &new_cargv[0]);
-      runProcesses();
 #endif
-      clearProcesses();
+      cdoRun(new_argv.size(), (const char **) &new_cargv[0]);
 
       timer_stop(timer_total);
 

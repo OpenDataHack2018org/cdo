@@ -111,7 +111,7 @@ cdoAbort(const char *fmt, ...)
 
   if (_ExitOnError)
     {
-      killProcesses();
+      g_processManager.killProcesses();
       pstreamCloseAll();
       exit(EXIT_FAILURE);
     }

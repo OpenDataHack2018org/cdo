@@ -18,20 +18,15 @@
 #ifndef PROCESS_INT_H
 #define PROCESS_INT_H
 
+#include "processManager.h"
+static ProcessManager g_processManager;
 #include "process.h"
 
-enum class ParseStatus
-{
-  Ok = 0,
-  OpenBracketMissing = -1,
-  ClosingBracketMissing = -2,
-  UnprocessedInput = -3,
-  MissingOutFile = -4
-};
 /**
  * Sets the underlying Process threadID and calls omp_set_num_threads
  */
-void cdoInitialize(void *process);
+
+void cdoRun(int processed_argc, const char **processed_argv); void cdoInitialize(void *process);
 void cdoFinish();
 
 /**
@@ -81,7 +76,7 @@ std::string cdoGetStreamName(int p_streamIndex);
  *  Returns the basis name for output files.
  *  If no obase was found Cdo will exit
  */
-char *cdoGetObase();
+const char *cdoGetObase();
 
 /**
  * Returns the number type for the operator used in the current process
@@ -159,45 +154,10 @@ int processInqVarNum();
 const char *processInqPrompt(void);
 
 /**
- * Returns number of created processes
- */
-int processNums(void);
-/**
- * Returns number of running processes.
- */
-int processNumsActive();
-
-/**
  * Returns the surrounding process
  */
 ProcessType &processSelf(void);
-/**
- * Returns process with id \p p_processID
- */
-ProcessType *getProcess(int p_processID);
-
-/**
- * Deletes all processes
- */
-void clearProcesses();
-
 void processStartTime(double *utime, double *stime);
-
-/**
- * Creates processes from argv.
- * @param argc standard argc  minus the options
- * @param argv standard argv after option processing starting with the first
- * operator
- */
-
-void handleParseError(ParseStatus p_errCode);
-ParseStatus createProcessesFromInput(int argc, const char **argv);
-void createProcesses(int argc, const char **argv);
-
-/**
- * Creates single process from cdo operator command
- */
-ProcessType *processCreate(const char *command);
 
 /**
  * Returns vlistID for pstream with ID = \p pstreamID
@@ -211,12 +171,6 @@ int cdoStreamInqVlist(int pstreamID);
  */
 bool cdoStreamIsPipe(int pstreamID);
 
-void runProcesses();
-
-void killProcesses();
-
 int cdoStreamInqTimestep(int pstreamID, int tsID);
-
-void validateProcesses();
 
 #endif
