@@ -91,6 +91,7 @@ public:
   char prompt[64];
   short m_noper;
   bool m_isActive;
+  const char * m_obase;
 
   module_t m_module;
   std::vector<char *> m_oargv;

@@ -363,7 +363,7 @@ ProcessType::getOperatorID()
         }
       if (operID == m_noper)
         {
-          cdoAbort("Operator not callable by this name!");
+            CdoError::Abort(Cdo::progname, prompt, "Operator not callable by this name! Name is:", operatorName);
         }
     }
   else
