@@ -55,6 +55,7 @@ int PROCESS = 0;
 int PIPE = 0;
 int ARGUMENT = 0;
 int PTHREAD = 0;
+int PROCESS_MANAGER = 0;
 
 // File switches and streams
 std::string outfile;
