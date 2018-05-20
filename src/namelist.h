@@ -40,11 +40,14 @@ enum class NamelistError
 };
 
 // NAMELIST token description.
-struct NamelistToken
+class NamelistToken
 {
+ public:
   NamelistType type;   // type (object, key, string word)
   int start;           // start position in NAMELIST buffer
   int end;             // end position in NAMELIST buffer
+
+  void fill(NamelistType type, int start, int end);
 };
 
 class NamelistParser
@@ -76,6 +79,13 @@ class NamelistParser
   NamelistError parse(const char *buf, size_t len);
   void dump(const char *buf);
   int verify();
+
+ private:
+  NamelistError checkKeyname(const char *buf, NamelistToken *t);
+  NamelistError parseString(const char *buf, size_t len, char quote);
+  NamelistError parseWord(const char *buf, size_t len);
+  void newObject();
+  NamelistToken *allocToken();
 };
 
 #endif  // NAMELIST_H_
