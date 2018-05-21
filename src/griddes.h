@@ -18,15 +18,18 @@
 #define GRIDDES_H
 
 #include <stdbool.h>
+#include <vector>
 
-struct GridDesciption
+class GridDesciption
 {
-  int *mask;
-  double *xvals;
-  double *yvals;
-  double *xbounds;
-  double *ybounds;
-  double *area;
+ public:
+  std::vector<int> mask;
+  std::vector<double> xvals;
+  std::vector<double> yvals;
+  std::vector<double> xbounds;
+  std::vector<double> ybounds;
+  std::vector<double> area;
+  std::vector<int> rowlon;
   double xfirst, yfirst;
   double xlast, ylast;
   double xinc, yinc;
@@ -45,7 +48,6 @@ struct GridDesciption
   int isRotated; // TRUE for rotated grids
   int type;
   int ntr;
-  int *rowlon;
   bool genBounds;
   int nvertex;
   size_t size;
@@ -72,10 +74,15 @@ struct GridDesciption
   char yunits[CDI_MAX_NAME];
   char ydimname[CDI_MAX_NAME];
   char vdimname[CDI_MAX_NAME];
+
+  void init();
+  GridDesciption()
+    {
+      init();
+    }
 };
 
-void gridInit(GridDesciption *grid);
-int gridDefine(GridDesciption grid);
+int gridDefine(GridDesciption &grid);
 
 int gridFromNCfile(const char *gridfile);
 int gridFromH5file(const char *gridfile);

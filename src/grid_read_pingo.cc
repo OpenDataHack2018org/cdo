@@ -83,7 +83,6 @@ grid_read_pingo(FILE *gfp, const char *dname)
   int i;
 
   GridDesciption grid;
-  gridInit(&grid);
 
   int nlon, nlat;
   if (!input_ival(gfp, &nlon)) return gridID;
@@ -94,13 +93,13 @@ grid_read_pingo(FILE *gfp, const char *dname)
       grid.xsize = nlon;
       grid.ysize = nlat;
 
-      grid.xvals = (double *) Malloc(grid.xsize * sizeof(double));
-      grid.yvals = (double *) Malloc(grid.ysize * sizeof(double));
+      grid.xvals.resize(grid.xsize);
+      grid.yvals.resize(grid.ysize);
 
       if (!input_ival(gfp, &nlon)) return gridID;
       if (nlon == 2)
         {
-          if (input_darray(gfp, 2, grid.xvals) != 2) return gridID;
+          if (input_darray(gfp, 2, grid.xvals.data()) != 2) return gridID;
           grid.xvals[1] -= 360 * floor((grid.xvals[1] - grid.xvals[0]) / 360);
 
           if (grid.xsize > 1)
@@ -110,7 +109,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
         }
       else if (nlon == (int) grid.xsize)
         {
-          if (input_darray(gfp, nlon, grid.xvals) != (size_t) nlon) return gridID;
+          if (input_darray(gfp, nlon, grid.xvals.data()) != (size_t) nlon) return gridID;
           for (i = 0; i < nlon - 1; i++)
             if (grid.xvals[i + 1] <= grid.xvals[i]) break;
 
@@ -130,12 +129,12 @@ grid_read_pingo(FILE *gfp, const char *dname)
       if (!input_ival(gfp, &nlat)) return gridID;
       if (nlat == 2)
         {
-          if (input_darray(gfp, 2, grid.yvals) != 2) return gridID;
+          if (input_darray(gfp, 2, grid.yvals.data()) != 2) return gridID;
           for (i = 0; i < (int) grid.ysize; i++) grid.yvals[i] = grid.yvals[0] + i * (grid.yvals[1] - grid.yvals[0]);
         }
       else if (nlat == (int) grid.ysize)
         {
-          if (input_darray(gfp, nlat, grid.yvals) != (size_t) nlat) return gridID;
+          if (input_darray(gfp, nlat, grid.yvals.data()) != (size_t) nlat) return gridID;
         }
       else
         return gridID;
@@ -157,25 +156,19 @@ grid_read_pingo(FILE *gfp, const char *dname)
       bool lgauss = false;
       if (nlat > 2) /* check if gaussian */
         {
-          double *yvals, *yw;
-          yvals = (double *) Malloc(grid.ysize * sizeof(double));
-          yw = (double *) Malloc(grid.ysize * sizeof(double));
-          gaussaw(yvals, yw, grid.ysize);
-          Free(yw);
+          std::vector<double> yvals(grid.ysize);
+          std::vector<double> yw(grid.ysize);
+          gaussaw(yvals.data(), yw.data(), grid.ysize);
+
           for (i = 0; i < (int) grid.ysize; i++) yvals[i] = asin(yvals[i]) * RAD2DEG;
 
           for (i = 0; i < (int) grid.ysize; i++)
             if (fabs(yvals[i] - grid.yvals[i]) > ((yvals[0] - yvals[1]) / 500)) break;
 
           if (i == (int) grid.ysize) lgauss = true;
-
-          Free(yvals);
         }
 
-      if (lgauss)
-        grid.type = GRID_GAUSSIAN;
-      else
-        grid.type = GRID_LONLAT;
+      grid.type = lgauss ? GRID_GAUSSIAN : GRID_LONLAT;
     }
 
   if (grid.type != CDI_UNDEFID) gridID = gridDefine(grid);
