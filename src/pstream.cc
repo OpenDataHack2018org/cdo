@@ -729,8 +729,8 @@ PstreamType::checkDatarange(int varID, double *array, size_t nmiss)
       if (smin < vmin || smax > vmax)
         cdoWarning("Some data values (min=%g max=%g) are outside the\n"
                    "    valid range (%g - %g) of the used output precision!\n"
-                   "    Use the CDO option%s -b 64 to increase the output precision.",
-                   smin, smax, vmin, vmax, (datatype == CDI_DATATYPE_FLT32) ? "" : " -b 32 or");
+                   "    Use the CDO option%s -b F64 to increase the output precision.",
+                   smin, smax, vmin, vmax, (datatype == CDI_DATATYPE_FLT32) ? "" : " -b F32 or");
     }
 }
 
