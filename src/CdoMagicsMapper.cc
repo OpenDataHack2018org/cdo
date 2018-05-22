@@ -41,20 +41,14 @@ int Reset_magics_param_CTABLE(const char *user_name);
 
 /* Define an array of Mapper structures to sort. */
 
-typedef struct
-
+struct CdoMagicsMapper
 {
   const char *cdo_name;
   const char *magics_name;
   const char *magics_type;
-  int (*Set_magics_param)(const char *user_name, const char *param_value); /* Function to Update the
-                                                                              Corresponding Magics
-                                                                              parameters */
-  int (*Reset_magics_param)(const char *user_name);                        /* Function to Reset the
-                                                                              Corresponding Magics
-                                                                              parameters  */
-
-} CdoMagicsMapper;
+  int (*Set_magics_param)(const char *user_name, const char *param_value); // Function to Update the Corresponding Magics parameters
+  int (*Reset_magics_param)(const char *user_name);                        // Function to Reset the Corresponding Magics parameters
+};
 
 CdoMagicsMapper mapper[] =
 

@@ -54,10 +54,7 @@ genindexgrid(int gridID1, size_t gridsize2, long *cellidx)
 static void
 sel_index(double *array1, double *array2, long nind, long *indarr)
 {
-  for (long i = 0; i < nind; ++i)
-    {
-      array2[i] = array1[indarr[i]];
-    }
+  for (long i = 0; i < nind; ++i) array2[i] = array1[indarr[i]];
 }
 
 void *
@@ -67,10 +64,10 @@ Selgridcell(void *process)
   int varID;
   int gridID1 = -1, gridID2;
   int index, gridtype = -1;
-  typedef struct
+  struct sindex_t
   {
     int gridID1, gridID2;
-  } sindex_t;
+  };
   ListArray<int> listArrayInt;
 
   cdoInitialize(process);

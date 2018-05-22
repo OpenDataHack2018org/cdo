@@ -20,7 +20,7 @@
 
 #include "field.h"
 
-typedef struct
+struct HISTOGRAM
 {
   double min;
   double max;
@@ -28,15 +28,15 @@ typedef struct
   int nbins;
   int nsamp;
   void *ptr;
-} HISTOGRAM;
+};
 
-typedef struct
+struct HISTOGRAM_SET
 {
   int nvars;
   int *nlevels;
   int *grids;
   HISTOGRAM ***histograms;
-} HISTOGRAM_SET;
+};
 
 HISTOGRAM_SET *hsetCreate(int nvars);
 void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int nhists);

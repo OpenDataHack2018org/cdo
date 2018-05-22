@@ -33,7 +33,7 @@
 
 #define MAX_DSETS 1024
 
-typedef struct
+struct dset_obj_t
 {
   char *name;
   char *description;
@@ -53,9 +53,9 @@ typedef struct
   double offset;
   double missval;
   double *array;
-} dset_obj_t;
+};
 
-typedef struct
+struct datasets_t
 {
   int nsets;
   int mergelevel;
@@ -64,7 +64,7 @@ typedef struct
   int lprojtype;
   int lmetadata;
   dset_obj_t obj[MAX_DSETS];
-} datasets_t;
+};
 
 #ifdef HAVE_LIBHDF5
 static void
@@ -327,13 +327,13 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   hid_t ptype_id;
   hsize_t dims;
   int xsize, ysize;
-  typedef struct proj_t
+  struct proj_t
   {
     char name[64];
     char ellipsoid[64];
     float parameter[10];
-  } proj_t;
-  typedef struct region_t
+  };
+  struct region_t
   {
     float xmin;
     float xmax;
@@ -341,7 +341,7 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
     float ymax;
     float dx;
     float dy;
-  } region_t;
+  };
 
   proj_t proj;
   region_t region;
@@ -552,7 +552,7 @@ static int
 read_region(hid_t loc_id, int nx, int ny)
 {
   int gridID = -1;
-  typedef struct region_t
+  struct region_t
   {
     double area_extent[4];
     int xsize;
@@ -566,7 +566,7 @@ read_region(hid_t loc_id, int nx, int ny)
     char name[128];
     char pcs_id[128];
     char pcs_def[128];
-  } region_t;
+  };
   region_t region;
   char proj[128];
   double a, lon0, lat0;

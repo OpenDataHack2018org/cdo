@@ -185,13 +185,13 @@ window_cell(double *array1, double *array2, size_t gridsize2, size_t *cellidx)
   for (size_t i = 0; i < gridsize2; ++i) array2[i] = array1[cellidx[i]];
 }
 
-typedef struct
+struct sgridType
 {
   int gridID;
   int *gridIDs;
   size_t *gridsize;
   size_t **gridindex;
-} sgridType;
+};
 
 void *
 Distgrid(void *process)

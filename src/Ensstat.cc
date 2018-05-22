@@ -40,16 +40,16 @@
 #include "cdoOptions.h"
 #include "util_files.h"
 
-typedef struct
+struct ens_file_t
 {
   int streamID;
   int vlistID;
   size_t nmiss[2];
   double missval[2];
   double *array[2];
-} ens_file_t;
+};
 
-typedef struct
+struct ensstat_arg_t
 {
   int t;
   int varID[2];
@@ -66,7 +66,7 @@ typedef struct
   bool lpctl;
   bool count_data;
   int nvars;
-} ensstat_arg_t;
+};
 
 static void *
 ensstat_func(void *ensarg)

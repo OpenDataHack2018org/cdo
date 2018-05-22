@@ -47,7 +47,7 @@
 
 int stringToParam(const char *paramstr);
 
-typedef struct
+struct var_t
 {
   bool convert;
   bool remove;
@@ -78,7 +78,7 @@ typedef struct
 
   double amean;
   long nvals, n_lower_min, n_greater_max;
-} var_t;
+};
 
 void
 cdo_define_var_units(var_t *var, int vlistID2, int varID, const char *units)

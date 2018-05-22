@@ -190,10 +190,10 @@ find_index(int search, long n, const long *restrict array)
   return -1;
 }
 
-typedef struct
+struct sinfo_t
 {
   int p, i;
-} sinfo_t;
+};
 
 static int
 cmpsinfo(const void *a, const void *b)

@@ -14,17 +14,17 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef _COUNTER_H
-#define _COUNTER_H
+#ifndef COUNTER_H
+#define COUNTER_H
 
-typedef struct
+struct counter_t
 {
   double cputime;
   char mark[32];
-} counter_t;
+};
 
 void counter_start(counter_t *counter);
 void counter_stop(counter_t *counter);
 double counter_cputime(counter_t counter);
 
-#endif /* _COUNTER_H */
+#endif /* COUNTER_H */

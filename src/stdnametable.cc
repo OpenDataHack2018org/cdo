@@ -19,14 +19,14 @@
 #include <assert.h>
 #include "stdnametable.h"
 
-typedef struct
+struct stdnametable_t
 {
   int varid;
   int echamcode;
   const char *name;
   const char *stdname;  // Standard name
   const char *units;    // Units
-} stdnametable_t;
+};
 
 const stdnametable_t stdnametable[] = {
   // clang-format off

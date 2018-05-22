@@ -19,21 +19,21 @@
 #include "cdo_int.h"
 #include "grid.h"
 
-typedef struct
+struct grid_type
 {
   int gridID;
   long size;
   long num_cell_corners;
   double *cell_corner_lon;
   double *cell_corner_lat;
-} grid_type;
+} ;
 
-typedef struct
+struct cellsearch_type
 {
   grid_type *src_grid;
   grid_type *tgt_grid;
   float *src_cell_bound_box;
-} cellsearch_type;
+};
 
 static grid_type *
 grid_new(int gridID, const char *txt)

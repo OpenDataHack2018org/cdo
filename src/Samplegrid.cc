@@ -17,10 +17,9 @@
 /*
    This module "SampleGrid" contains the following operators:
 
-    samplegrid      Resample current grid with given factor, typically 2 (which
-   will half the resolution); tested on curvilinear and LCC grids; subgrid
-   Similar to selindexbox but this operator works for LCC grids (tested on
-   HARMONIE NWP model).
+    samplegrid      Resample current grid with given factor, typically 2 (which will half the resolution);
+                    tested on curvilinear and LCC grids;
+    subgrid         Similar to selindexbox but this operator works for LCC grids (tested on HARMONIE NWP model).
 */
 
 #include <cdi.h>
@@ -76,12 +75,12 @@ Samplegrid(void *process)
   int subI0 = 0, subI1 = 0, subJ0 = 0, subJ1 = 0;
   int index;
   size_t nmiss;
-  typedef struct
+  struct sbox_t
   {
     int gridSrcID, gridIDsampled;
     int *cellidx, nvals;
     int subI0, subI1, subJ0, subJ1;
-  } sbox_t;
+  };
 
   cdoInitialize(process);
 

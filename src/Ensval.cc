@@ -86,12 +86,12 @@ Ensval(void *process)
   char file_suffix[32];
   char type_suffix[10];
 
-  typedef struct
+  struct ens_file_t
   {
     int streamID;
     int vlistID;
     double *array;
-  } ens_file_t;
+  };
 
   // INITIALIZE POINTERS
   alpha = NULL;

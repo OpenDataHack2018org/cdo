@@ -42,46 +42,46 @@ enum
 typedef enum { typeCon, typeVar, typeFun, typeFun1c, typeOpr, typeCom } nodeEnum;
 
 // commands
-typedef struct
+struct comNodeType
 {
   char *cname;  // command name
   char *vname;  // variable name
-} comNodeType;
+};
 
 // constants
-typedef struct
+struct conNodeType
 {
   double value;  // value of constant
-} conNodeType;
+};
 
 // variables
-typedef struct
+struct varNodeType
 {
   char *nm;  // variable name
-} varNodeType;
+};
 
 // 1c functions
-typedef struct
+struct fun1cNodeType
 {
   char *name;              // function name
   double value;            // value of constant
   struct nodeTypeTag *op;  // operand
-} fun1cNodeType;
+};
 
 // functions
-typedef struct
+struct funNodeType
 {
   char *name;              // function name
   struct nodeTypeTag *op;  // operand
-} funNodeType;
+};
 
 // operators
-typedef struct
+struct oprNodeType
 {
   int oper;                   // operator
   int nops;                   // number of operands
   struct nodeTypeTag *op[1];  // operands (expandable)
-} oprNodeType;
+};
 
 enum {PARAM_VAR, PARAM_CONST};
 
@@ -128,7 +128,7 @@ typedef struct nodeTypeTag
   } u;
 } nodeType;
 
-typedef struct
+struct coordType
 {
   bool needed;
   int coord;
@@ -137,9 +137,9 @@ typedef struct
   char *units;
   char *longname;
   double *data;
-} coordType;
+};
 
-typedef struct
+struct parseParamType
 {
   bool init;
   bool debug;
@@ -154,7 +154,7 @@ typedef struct
   int surfaceID;
   coordType *coords;
   paramType *params;
-} parseParamType;
+};
 
 typedef union
 {

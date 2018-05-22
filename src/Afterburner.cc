@@ -82,12 +82,12 @@ void scan_darray(char *namelist, const char *name, double *values, int maxValues
 
 char zaxistypename[CDI_MAX_NAME];
 
-typedef struct
+struct RARG
 {
   int lana, nrecs;
   struct Variable *vars;
   struct Control *globs;
-} RARG;
+};
 
 #ifdef AFTERBURNER
 int stdin_is_tty = 0;  /* true if stdin  is character device */

@@ -183,7 +183,7 @@ EOFs(void *process)
 
   int calendar = CALENDAR_STANDARD;
 
-  typedef struct
+  struct eofdata_t
   {
     bool init;
     bool first_call;
@@ -191,7 +191,7 @@ EOFs(void *process)
     double *covar_array;
     double **covar;
     double **data;
-  } eofdata_t;
+  };
 
   if (cdoTimer)
     {

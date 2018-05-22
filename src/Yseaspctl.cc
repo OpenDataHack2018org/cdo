@@ -30,11 +30,11 @@
 
 #define NSEAS 4
 
-typedef struct
+struct date_time_t
 {
   int64_t vdate;
   int vtime;
-} date_time_t;
+};
 
 void set_date(int64_t vdate_new, int vtime_new, date_time_t *datetime);
 

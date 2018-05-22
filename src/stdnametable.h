@@ -37,7 +37,7 @@ const char *var_units(int varid);
 
 int echamcode_from_stdname(const char *stdname);
 
-typedef struct
+struct gribcode_t
 {
   int geopot;
   int temp;
@@ -48,7 +48,7 @@ typedef struct
   int wind;
   int uwind;
   int vwind;
-} gribcode_t;
+};
 
 enum struct ModelMode
 {

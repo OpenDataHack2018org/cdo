@@ -28,11 +28,11 @@
 
 #define NALLOC_INC 1024
 
-typedef struct
+struct timeinfo_t
 {
   int index;
   double datetime;
-} timeinfo_t;
+};
 
 static int
 cmpdatetime(const void *a, const void *b)

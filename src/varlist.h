@@ -17,7 +17,7 @@
 #ifndef VARLIST_H
 #define VARLIST_H
 
-typedef struct
+struct varlist_t
 {
   bool check_datarange;
   int gridsize;
@@ -25,6 +25,6 @@ typedef struct
   double missval;
   double addoffset;
   double scalefactor;
-} varlist_t;
+};
 
 #endif

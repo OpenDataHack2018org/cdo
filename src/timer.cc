@@ -91,7 +91,7 @@ double tm_overhead = 0.0;
 
 #define MAX_TIMER 128 /* max number of timers allowed */
 
-typedef struct
+struct RT_TYPE
 {
   int reserved;
   int calls;
@@ -102,7 +102,7 @@ typedef struct
   double last;
   char mark1[32]; /* max: 16 on IBM; 8 for double (all other) */
   char text[128];
-} RT_TYPE;
+};
 
 RT_TYPE rt[MAX_TIMER];
 RT_TYPE rt_init = { 0, 0, 0, 0, 1.e30, 0, 0, "", "noname" };

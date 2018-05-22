@@ -38,7 +38,7 @@ enum cdo_pt_state
   DIE
 };
 
-typedef struct cdo_task_info
+struct cdo_task_t
 {
   void *(*routine)(void *);
   void *arg;
@@ -51,7 +51,7 @@ typedef struct cdo_task_info
   pthread_cond_t boss_cond;
   pthread_mutex_t boss_mtx;
 #endif
-} cdo_task_t;
+};
 
 #ifdef HAVE_LIBPTHREAD
 static void *

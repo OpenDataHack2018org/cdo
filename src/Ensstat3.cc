@@ -85,12 +85,12 @@ Ensstat3(void *process)
   double val;
   int ival;
 
-  typedef struct
+  struct ens_file_t
   {
     int streamID;
     int vlistID;
     double *array;
-  } ens_file_t;
+  };
 
   cdoInitialize(process);
 
