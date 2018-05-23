@@ -309,14 +309,32 @@ std::string
 cdoGetOutStreamName(int p_outStream)
 {
   ProcessType &process = processSelf();
-  return process.outputStreams[p_outStream]->m_name;
+  std::string name;
+  if (process.outputStreams[p_outStream]->isPipe())
+    {
+      name = process.parentProcesses[p_outStream]->operatorName;
+    }
+  else
+    {
+      name = process.outputStreams[p_outStream]->m_name;
+    }
+  return name;
 }
 
 std::string
 cdoGetInStreamName(int p_inStream)
 {
   ProcessType &process = processSelf();
-  return process.inputStreams[p_inStream]->m_name;
+  std::string name;
+  if (process.inputStreams[p_inStream]->isPipe())
+    {
+      name = process.childProcesses[p_inStream]->operatorName;
+    }
+  else
+    {
+      name = process.inputStreams[p_inStream]->m_name;
+    }
+  return name;
 }
 std::string
 cdoGetStreamName(int p_streamIndex)
@@ -462,12 +480,14 @@ cdoStreamInqVlist(int pstreamID)
   return vlistID;
 }
 
-int processNumsActive()
+int
+processNumsActive()
 {
-    return g_processManager.processNumsActive();
+  return g_processManager.processNumsActive();
 }
 
-int processNums()
+int
+processNums()
 {
-    return g_processManager.processNums();
+  return g_processManager.processNums();
 }
