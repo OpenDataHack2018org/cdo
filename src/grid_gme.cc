@@ -1316,11 +1316,8 @@ gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon,
       fprintf(stderr, "gme_grid: Calculation of the global GME grid failed (ni=%d)!\n", ni);
       if ((size_t)(ni + 1) * (ni + 1) * nd > gridsize)
         {
-          fprintf(stderr, "gme_grid: Resulting grid size is greater than the "
-                          "predetermined grid size of %zu.\n",
-                  gridsize);
-          fprintf(stderr, "gme_grid: Maybe this is only a part of a global GME "
-                          "grid without further information.\n");
+          fprintf(stderr, "gme_grid: Resulting grid size is greater than the predetermined grid size of %zu.\n", gridsize);
+          fprintf(stderr, "gme_grid: Maybe this is only a part of a global GME grid without further information.\n");
         }
       exit(-1);
     }

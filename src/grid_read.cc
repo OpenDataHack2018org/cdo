@@ -146,9 +146,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, GridDesciption &grid, siz
             }
           else
             {
-              cdoWarning("Warning: %d not in allowed modes: <0, 64, 96>; Using "
-                         "default: 64\n",
-                         scmode);
+              cdoWarning("Warning: %d not in allowed modes: <0, 64, 96>; Using default: 64\n", scmode);
               grid.scanningMode = 64;
             }
         }

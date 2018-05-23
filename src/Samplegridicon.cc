@@ -420,8 +420,7 @@ compute_child_from_bounds(CellIndex *cellindex2, long ncells2, double *grid_cent
               if (winding_number != 0)
                 {
                   if (k >= MAX_CHILDS)
-                    cdoAbort("Internal problem, limit of MAX_CHILDS reached "
-                             "(limit=9).");
+                    cdoAbort("Internal problem, limit of MAX_CHILDS reached (limit=9).");
                   child2[cell_no2 * MAX_CHILDS + k++] = (long) cell_no1;
                 }
             }

@@ -571,8 +571,7 @@ Setpartab(void *process)
                 }
               if (nerr)
                 {
-                  cdoWarning("Udunits: Error converting units from [%s] to "
-                             "[%s], parameter: %s",
+                  cdoWarning("Udunits: Error converting units from [%s] to [%s], parameter: %s",
                              var->units_old, var->units, var->name);
                   var->changeunits = false;
                 }

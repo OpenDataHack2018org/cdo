@@ -1292,8 +1292,7 @@ parse_options_long(int argc, char *argv[])
                 }
               else
                 {
-                  cdoAbort("Warning: %d not in allowed modes: <0, 64, 96>; "
-                           "Using default: 64\n",
+                  cdoAbort("Warning: %d not in allowed modes: <0, 64, 96>; Using default: 64\n",
                            scanningModeValue);
                   streamGrbDefDataScanningMode(64);
                 }

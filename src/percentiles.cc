@@ -166,9 +166,7 @@ void
 percentile_check_number(double pn)
 {
   if (pn < 0 || pn > 100)
-    cdoAbort("Percentile number %g out of range! Percentiles must be in the "
-             "range [0,100].",
-             pn);
+    cdoAbort("Percentile number %g out of range! Percentiles must be in the range [0,100].", pn);
 }
 
 /*

@@ -183,14 +183,12 @@ Intlevel3d(void *process)
 
   /* Missing values are not allowed for coordinate variables */
   if (0 != zlevels_in_miss)
-    cdoAbort("Input vertical coordinate variables are not allowed to contain "
-             "missing values.");
+    cdoAbort("Input vertical coordinate variables are not allowed to contain missing values.");
   else if (cdoVerbose)
     cdoPrint("Input vertical coordinate has no missing values.");
 
   if (0 != zlevels_out_miss)
-    cdoAbort("Output vertical coordinate variables are not allowd to contain "
-             "missing values.");
+    cdoAbort("Output vertical coordinate variables are not allowd to contain missing values.");
   else if (cdoVerbose)
     cdoPrint("Output vertical coordinate has no missing values.");
 
@@ -202,14 +200,12 @@ Intlevel3d(void *process)
 
   size_t gridSize = gridsizeo;
 
-  /* input and output vertical coordinates must have exactly the same horizontal
-   * grid */
+  /* input and output vertical coordinates must have exactly the same horizontal grid */
   if (gridsizei != gridsizeo)
     {
       /* i =0; printf ( "lonIn:%g latIn:%g lonOut:%g
        * latOut:%g\n",lonIn[i],latIn[i],lonOut[i],latOut[i] ); */
-      cdoAbort("Input and output vertical coordinates do NOT exactly have the "
-               "same horizontal grid.");
+      cdoAbort("Input and output vertical coordinates do NOT exactly have the same horizontal grid.");
     }
 
   /*

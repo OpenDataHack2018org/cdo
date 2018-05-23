@@ -586,8 +586,7 @@ interpolate(Field *field1, Field *field2)
   for (i = 0; i < out_nlat - 1; i++)
     if (IS_EQUAL(lato[i + 1], lato[i]) || (i < out_nlat - 2 && ((lato[i + 1] > lato[i]) != (lato[i + 2] > lato[i + 1]))))
       {
-        cdoAbort("Latitudes of output grid must be in descending or ascending "
-                 "order!");
+        cdoAbort("Latitudes of output grid must be in descending or ascending order!");
       }
 
   if (out_nlon > 1)

@@ -207,8 +207,7 @@ Spectrum(void *process)
 
   operatorInputArg("detrend type, length of segments, number of segments, window type\n\n"
                    "       detrend type: 0 - data should be used unchanged\n"
-                   "                     1 - the mean of the whole time series should be "
-                   "subtracted\n"
+                   "                     1 - the mean of the whole time series should be subtracted\n"
                    "                     2 - the whole time series should be detrended\n"
                    "                     3 - every segment should be detrended\n\n"
                    "        window type: 0 - no data windowing\n"

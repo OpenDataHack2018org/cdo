@@ -75,10 +75,8 @@ Setrcaname(void *process)
                     {
                       if (nlev != 1)
                         {
-                          cdoWarning("Number of levels should be 1 for level "
-                                     "type 105!");
-                          cdoWarning("Maybe environment variable "
-                                     "SPLIT_LTYPE_105 is not set.");
+                          cdoWarning("Number of levels should be 1 for level type 105!");
+                          cdoWarning("Maybe environment variable SPLIT_LTYPE_105 is not set.");
                           continue;
                         }
                       level = (int) cdoZaxisInqLevel(zaxisID, 0);

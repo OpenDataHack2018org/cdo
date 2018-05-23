@@ -298,8 +298,7 @@ vlistCompareX(int vlistID1, int vlistID2, int flag)
   int nlevels2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, 0));
 
   if (nvars2 != 1)
-    cdoAbort("Internal problem, vlistCompareX() called with unexpected "
-             "vlistID2 argument!");
+    cdoAbort("Internal problem, vlistCompareX() called with unexpected vlistID2 argument!");
 
   for (int varID = 0; varID < nvars; varID++)
     {
@@ -442,8 +441,7 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlev
                   vct = (double *) Malloc(nvct * sizeof(double));
                   zaxisInqVct(zaxisID, vct);
                   if (cdoVerbose)
-                    cdoPrint("Detected half-level model definition : nlevel == (nvct/2 - 1) (nlevel: %d, nvct: %d, "
-                             "nhlevf: %d, nhlevh: %d) ",
+                    cdoPrint("Detected half-level model definition : nlevel == (nvct/2 - 1) (nlevel: %d, nvct: %d, nhlevf: %d, nhlevh: %d) ",
                              nlevel, nvct, nhlevf, nhlevh);
                 }
             }
@@ -460,8 +458,7 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlev
                   vct = (double *) Malloc(nvct * sizeof(double));
                   zaxisInqVct(zaxisID, vct);
                   if (cdoVerbose)
-                    cdoPrint("Detected full-level model definition : nlevel == (nvct/2) (nlevel: %d, nvct: %d, nhlevf: "
-                             "%d, nhlevh: %d) ",
+                    cdoPrint("Detected full-level model definition : nlevel == (nvct/2) (nlevel: %d, nvct: %d, nhlevf: %d, nhlevh: %d) ",
                              nlevel, nvct, nhlevf, nhlevh);
                 }
             }

@@ -283,8 +283,7 @@ Ensstat(void *process)
               else
                 {
                   lerror = true;
-                  cdoWarning("Inconsistent ensemble file, number of records at "
-                             "time step %d of %s and %s differ!",
+                  cdoWarning("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
                              tsID + 1, cdoGetStreamName(0).c_str(), cdoGetStreamName(fileID).c_str());
                 }
               goto CLEANUP;

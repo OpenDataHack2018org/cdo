@@ -179,9 +179,7 @@ cdoConvertUnits(void **ut_converter, bool *changeunits, char *units, char *units
             }
           else if (status == -3)
             {
-              cdoWarning("%s - converting units from [%s] to [%s] failed, not "
-                         "convertible!",
-                         name, units_old, units);
+              cdoWarning("%s - converting units from [%s] to [%s] failed, not convertible!", name, units_old, units);
             }
           else
             cdoWarning("%s - converting units from [%s] to [%s] failed!", name, units_old, units);
@@ -200,9 +198,7 @@ cdoConvertUnits(void **ut_converter, bool *changeunits, char *units, char *units
       static bool lwarn_udunits = true;
       if (lwarn_udunits)
         {
-          cdoWarning("%s - converting units from [%s] to [%s] failed, UDUNITS2 "
-                     "support not compiled in!",
-                     name, units_old, units);
+          cdoWarning("%s - converting units from [%s] to [%s] failed, UDUNITS2 support not compiled in!", name, units_old, units);
           *changeunits = false;
           lwarn_udunits = false;
         }

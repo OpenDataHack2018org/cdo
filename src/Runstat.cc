@@ -158,8 +158,7 @@ Runstat(void *process)
             }
 
           if (runstat_nomiss && nmiss > 0)
-            cdoAbort("Missing values supported was swichted off by env. "
-                     "RUNSTAT_NOMISS!");
+            cdoAbort("Missing values supported was swichted off by env. RUNSTAT_NOMISS!");
 
           if (!runstat_nomiss)
             {

@@ -125,8 +125,7 @@ EOF3d(void *process)
   if (n_eig > nts)
     {
       cdoWarning("Solving in time-space:");
-      cdoWarning("Number of eigen-functions to write out is bigger than number "
-                 "of time-steps.");
+      cdoWarning("Number of eigen-functions to write out is bigger than number of time-steps.");
       cdoWarning("Setting n_eig to %i.", nts);
       n_eig = nts;
     }
@@ -186,8 +185,7 @@ EOF3d(void *process)
     }
 
   if (cdoVerbose)
-    cdoPrint("Allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%zu "
-             "for processing in %s",
+    cdoPrint("Allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%zu for processing in %s",
              nts, n, gridsizemax, "time_space");
 
   double *weight = (double *) Malloc(maxlevs * gridsizemax * sizeof(double));
@@ -238,9 +236,8 @@ EOF3d(void *process)
                   if (datacounts[varID][offset + i] != 0) cdoAbort("Missing values unsupported!");
                   if (missval_warning == false)
                     {
-                      // cdoWarning("Missing Value Support not checked for this
-                      // Operator!"); cdoWarning("Does not work with changing
-                      // locations of missing values in time.");
+                      // cdoWarning("Missing Value Support not checked for this Operator!");
+                      // cdoWarning("Does not work with changing locations of missing values in time.");
                       missval_warning = true;
                     }
                   datafields[varID][tsID][i + offset] = 0;
@@ -265,8 +262,7 @@ EOF3d(void *process)
         {
           char vname[64];
           vlistInqVarName(vlistID1, varID, &vname[0]);
-          cdoPrint("==========================================================="
-                   "=================");
+          cdoPrint("============================================================================");
           cdoPrint("Calculating covariance matrix and SVD for var%i (%s)", varID, vname);
         }
 
@@ -294,8 +290,7 @@ EOF3d(void *process)
         {
           char vname[64];
           vlistInqVarName(vlistID1, varID, &vname[0]);
-          cdoWarning("Refusing to calculate EOF from a single time step for "
-                     "var%i (%s)",
+          cdoWarning("Refusing to calculate EOF from a single time step for var%i (%s)",
                      varID + 1, &vname[0]);
           continue;
         }

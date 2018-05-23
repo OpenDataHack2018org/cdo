@@ -320,9 +320,7 @@ eigen_solution_of_triangular_matrix(double *d, double *e, int n, double **a, con
        if (user_asked)
        {
        lock ();
-       fprintf (stderr,
-                   "%s: Status: Computing eigen solution pass 3 of 3"
-                   " cycle %ld of %ld.\n", prompt, (long) (l + 1), (long) n);
+       fprintf (stderr, "%s: Status: Computing eigen solution pass 3 of 3 cycle %ld of %ld.\n", prompt, (long) (l + 1), (long) n);
        fflush (stderr);
        unlock ();
        user_asked = FALSE;

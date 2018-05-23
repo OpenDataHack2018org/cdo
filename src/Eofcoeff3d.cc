@@ -123,8 +123,7 @@ Eofcoeff3d(void *process)
   int zaxisID3 = zaxisCreate(ZAXIS_GENERIC, 1);
   zaxisDefLevels(zaxisID3, &zvals);
   zaxisDefName(zaxisID3, "zaxis_Reduced");
-  zaxisDefLongname(zaxisID3, "Reduced zaxis from EOF3D - only one coefficient "
-                             "per 3D eigenvector and time step");
+  zaxisDefLongname(zaxisID3, "Reduced zaxis from EOF3D - only one coefficient per 3D eigenvector and time step");
 
   // Create var-list and time-axis for output
 

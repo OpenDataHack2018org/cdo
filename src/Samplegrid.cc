@@ -95,8 +95,7 @@ Samplegrid(void *process)
     {
       if (CdoDebug::cdoDebugExt) cdoPrint("samplegrid operator requested..");
       if (nch < 1)
-        cdoAbort("Number of input arguments < 1; At least 1 argument needed: "
-                 "resample-factor (2,3,4, .. etc)");
+        cdoAbort("Number of input arguments < 1; At least 1 argument needed: resample-factor (2,3,4, .. etc)");
       resampleFactor = parameter2int(operatorArgv()[0]);
 
       if (CdoDebug::cdoDebugExt) cdoPrint("resampleFactor = %d", resampleFactor);
@@ -105,9 +104,8 @@ Samplegrid(void *process)
     {
       if (CdoDebug::cdoDebugExt) cdoPrint("subgrid operator requested..");
       if (nch < 4)
-        cdoAbort("Number of input arguments < 4; Must specify sub-grid "
-                 "indices: i0,i1,j0,j1; This works only with LCC grid. For "
-                 "other grids use: selindexbox");
+        cdoAbort("Number of input arguments < 4; Must specify sub-grid indices: i0,i1,j0,j1; This works only with LCC grid."
+                 " For other grids use: selindexbox");
       subI0 = parameter2int(operatorArgv()[0]);
       subI1 = parameter2int(operatorArgv()[1]);
       subJ0 = parameter2int(operatorArgv()[2]);

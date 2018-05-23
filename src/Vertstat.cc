@@ -337,8 +337,7 @@ Vertstat(void *process)
                       {
                         char varname[CDI_MAX_NAME];
                         vlistInqVarName(vlistID1, varID, varname);
-                        cdoWarning("Layer bounds not available, using constant "
-                                   "vertical weights for variable %s!",
+                        cdoWarning("Layer bounds not available, using constant vertical weights for variable %s!",
                                    varname);
                       }
                     else

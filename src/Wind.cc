@@ -193,8 +193,7 @@ Wind(void *process)
             }
 
           if (gridIDsp == -1 && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED)
-            cdoAbort("Gaussian reduced grid found. Use option -R to convert it "
-                     "to a regular grid!");
+            cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
           if (gridIDsp == -1) cdoAbort("No Gaussian grid data found!");
 
@@ -230,8 +229,7 @@ Wind(void *process)
           if (gridInqType(gridID1) != GRID_SPECTRAL) cdoAbort("Vorticity is not on spectral grid!");
 
           if (gridID1 != vlistInqVarGrid(vlistID1, varID1))
-            cdoAbort("Divergence and vorticity must have the same grid "
-                     "represention!");
+            cdoAbort("Divergence and vorticity must have the same grid represention!");
 
           if (gridIDgp != -1)
             {

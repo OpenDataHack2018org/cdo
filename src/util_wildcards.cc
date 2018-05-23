@@ -129,8 +129,7 @@ expandWildCards(std::vector<std::string> argv)
               fprintf(stderr, "%s: ", __func__);
               if (status == WRDE_BADCHAR)
                 fprintf(stderr, "Argument '%s' contains one of the following unsupported unquoted characters: <newline>, `|', "
-                                "`&', `;', `<', `>', `(', `)', `{', `}'.\n",
-                        argv[idx].c_str());
+                                "`&', `;', `<', `>', `(', `)', `{', `}'.\n", argv[idx].c_str());
               else if (status == WRDE_NOSPACE)
                 fprintf(stderr, "Not enough memory to store the result.\n");
               else if (status == WRDE_SYNTAX)
