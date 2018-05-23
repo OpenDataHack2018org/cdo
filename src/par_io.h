@@ -25,15 +25,15 @@
 #include <pthread.h>
 #endif
 
-typedef struct
+struct read_arg_t
 {
   int streamID;
   int *varID, *levelID;
   size_t *nmiss;
   double *array;
-} read_arg_t;
+};
 
-typedef struct
+struct par_io_t
 {
   int varID, levelID;
   size_t nmiss;
@@ -45,7 +45,7 @@ typedef struct
   pthread_t thrID;
   pthread_attr_t attr;
 #endif
-} par_io_t;
+};
 
 void parReadRecord(int streamID, int *varID, int *levelID, double *array, size_t *nmiss, par_io_t *parIO);
 

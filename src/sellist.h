@@ -26,7 +26,7 @@ typedef union
   const char *cval;
 } cvalues_t;
 
-typedef struct
+struct selentry_t
 {
   int nvalues;
   char *key;
@@ -35,13 +35,13 @@ typedef struct
   int type;
   char *txt;
   void *cvalues;
-} selentry_t;
+};
 
-typedef struct
+struct sellist_t
 {
   int size;
   selentry_t *entry;
-} sellist_t;
+};
 
 #define SELLIST_INT 1
 #define SELLIST_FLT 2

@@ -212,141 +212,95 @@ printLibraries(void)
   fprintf(stderr, "\n");
 }
 
+
+#include <iostream>
+#include <utility>
+
 void
 cdoConfig(const char *option)
 {
-  static const char *YN[] = { "no", "yes" };
-  const char *has_srv = YN[cdiHaveFiletype(CDI_FILETYPE_SRV)];
-  const char *has_ext = YN[cdiHaveFiletype(CDI_FILETYPE_EXT)];
-  const char *has_ieg = YN[cdiHaveFiletype(CDI_FILETYPE_IEG)];
-  const char *has_grb = YN[cdiHaveFiletype(CDI_FILETYPE_GRB)];
-  const char *has_grb2 = YN[cdiHaveFiletype(CDI_FILETYPE_GRB2)];
-  const char *has_nc = YN[cdiHaveFiletype(CDI_FILETYPE_NC)];
-  const char *has_nc2 = YN[cdiHaveFiletype(CDI_FILETYPE_NC2)];
-  const char *has_nc4 = YN[cdiHaveFiletype(CDI_FILETYPE_NC4)];
-  const char *has_nc4c = YN[cdiHaveFiletype(CDI_FILETYPE_NC4C)];
-  const char *has_nc5 = YN[cdiHaveFiletype(CDI_FILETYPE_NC5)];
-  const char *has_hdf5 = YN[0];
-  const char *has_cgribex = YN[0];
-  const char *has_cmor = YN[0];
-  const char *has_proj = YN[0];
-  const char *has_threads = YN[0];
-  const char *has_openmp = YN[0];
-  const char *has_wordexp = YN[0];
+  std::map<std::string, std::pair<std::string, bool>> configMap;
+
+  // clang-format off
+  configMap["has-srv"]      = {"SERVICE",          cdiHaveFiletype(CDI_FILETYPE_SRV)};
+  configMap["has-ext"]      = {"EXTRA",            cdiHaveFiletype(CDI_FILETYPE_EXT)};
+  configMap["has-ieg"]      = {"IEG",              cdiHaveFiletype(CDI_FILETYPE_IEG)};
+  configMap["has-grb"]      = {"GRIB 1",           cdiHaveFiletype(CDI_FILETYPE_GRB)};
+  configMap["has-grb1"]     = {"GRIB 1",           cdiHaveFiletype(CDI_FILETYPE_GRB)};
+  configMap["has-grb2"]     = {"GRIB 2",           cdiHaveFiletype(CDI_FILETYPE_GRB2)};
+  configMap["has-nc"]       = {"NetCDF",           cdiHaveFiletype(CDI_FILETYPE_NC)};
+  configMap["has-nc2"]      = {"NetCDF 2",         cdiHaveFiletype(CDI_FILETYPE_NC2)};
+  configMap["has-nc4"]      = {"NetCDF 4",         cdiHaveFiletype(CDI_FILETYPE_NC4)};
+  configMap["has-nc4c"]     = {"NetCDF 4 classic", cdiHaveFiletype(CDI_FILETYPE_NC4C)};
+  configMap["has-nc5"]      = {"NetCDF 5",         cdiHaveFiletype(CDI_FILETYPE_NC5)};
+  configMap["has-hdf5"]     = {"HDF5",             false};
+  configMap["has-cgribex"]  = {"CGRIBEX",          false};
+  configMap["has-cmor"]     = {"CMOR",             false};
+  configMap["has-proj"]     = {"PROJ",             false};
+  configMap["has-threads"]  = {"PTHREADS",         false};
+  configMap["has-openmp"]   = {"OPENMP",           false};
+  configMap["has-wordexp"]  = {"WORDEXP",          false};
+  // clang-format on
 
 #ifdef HAVE_LIBHDF5
-  has_hdf5 = YN[1];
+  configMap["has-hdf5"].second = true;
 #endif
 
 #ifdef HAVE_LIBCGRIBEX
-  has_cgribex = YN[1];
+  configMap["has-cgribex"].second = true;
 #endif
 
 #ifdef HAVE_LIBCMOR
-  has_cmor = YN[1];
+  configMap["has-cmor"].second = true;
 #endif
 
 #ifdef HAVE_LIBPROJ
-  has_proj = YN[1];
+  configMap["has-proj"].second = true;
 #endif
 
 #ifdef HAVE_LIBPTHREAD
-  has_threads = YN[1];
+  configMap["has-threads"].second = true;
 #endif
 
 #ifdef _OPENMP
-  has_openmp = YN[1];
+  configMap["has-openmp"].second = true;
 #endif
 
 #ifdef HAVE_WORDEXP_H
-  has_wordexp = YN[1];
+  configMap["has-wordexp"].second = true;
 #endif
 
   if (STR_IS_EQ("all-json", option) || STR_IS_EQ("all", option))
     {
-      fprintf(stdout, "{");
-      fprintf(stdout, "\"has-srv\":\"%s\"", has_srv);
-      fprintf(stdout, ",\"has-ext\":\"%s\"", has_ext);
-      fprintf(stdout, ",\"has-ieg\":\"%s\"", has_ieg);
-      fprintf(stdout, ",\"has-grb\":\"%s\"", has_grb);
-      fprintf(stdout, ",\"has-grb1\":\"%s\"", has_grb);
-      fprintf(stdout, ",\"has-grb2\":\"%s\"", has_grb2);
-      fprintf(stdout, ",\"has-nc\":\"%s\"", has_nc);
-      fprintf(stdout, ",\"has-nc2\":\"%s\"", has_nc2);
-      fprintf(stdout, ",\"has-nc4\":\"%s\"", has_nc4);
-      fprintf(stdout, ",\"has-nc4c\":\"%s\"", has_nc4c);
-      fprintf(stdout, ",\"has-nc5\":\"%s\"", has_nc5);
-      fprintf(stdout, ",\"has-hdf5\":\"%s\"", has_hdf5);
-      fprintf(stdout, ",\"has-cgribex\":\"%s\"", has_cgribex);
-      fprintf(stdout, ",\"has-cmor\":\"%s\"", has_cmor);
-      fprintf(stdout, ",\"has-proj\":\"%s\"", has_proj);
-      fprintf(stdout, ",\"has-threads\":\"%s\"", has_threads);
-      fprintf(stdout, ",\"has-openmp\":\"%s\"", has_openmp);
-      fprintf(stdout, ",\"has-wordexp\":\"%s\"", has_wordexp);
-      fprintf(stdout, "}\n");
+      std::cout << "{";
+      int i = 0;
+      for (auto entry : configMap)
+        {
+          if (i++) fprintf(stdout, ",");
+          std::cout << "\"" << entry.first << "\":\"" << (entry.second.second ? "yes" : "no") << "\"";
+        }
+      std::cout << "}\n";
     }
   else
     {
-      if (STR_IS_EQ("has-srv", option))
-        fprintf(stdout, "%s\n", has_srv);
-      else if (STR_IS_EQ("has-ext", option))
-        fprintf(stdout, "%s\n", has_ext);
-      else if (STR_IS_EQ("has-ieg", option))
-        fprintf(stdout, "%s\n", has_ieg);
-      else if (STR_IS_EQ("has-grb", option))
-        fprintf(stdout, "%s\n", has_grb);
-      else if (STR_IS_EQ("has-grb1", option))
-        fprintf(stdout, "%s\n", has_grb);
-      else if (STR_IS_EQ("has-grb2", option))
-        fprintf(stdout, "%s\n", has_grb2);
-      else if (STR_IS_EQ("has-nc", option))
-        fprintf(stdout, "%s\n", has_nc);
-      else if (STR_IS_EQ("has-nc2", option))
-        fprintf(stdout, "%s\n", has_nc2);
-      else if (STR_IS_EQ("has-nc4", option))
-        fprintf(stdout, "%s\n", has_nc4);
-      else if (STR_IS_EQ("has-nc4c", option))
-        fprintf(stdout, "%s\n", has_nc4c);
-      else if (STR_IS_EQ("has-nc5", option))
-        fprintf(stdout, "%s\n", has_nc5);
-      else if (STR_IS_EQ("has-hdf5", option))
-        fprintf(stdout, "%s\n", has_hdf5);
-      else if (STR_IS_EQ("has-cgribex", option))
-        fprintf(stdout, "%s\n", has_cgribex);
-      else if (STR_IS_EQ("has-cmor", option))
-        fprintf(stdout, "%s\n", has_cmor);
-      else if (STR_IS_EQ("has-proj", option))
-        fprintf(stdout, "%s\n", has_proj);
-      else if (STR_IS_EQ("has-threads", option))
-        fprintf(stdout, "%s\n", has_threads);
-      else if (STR_IS_EQ("has-openmp", option))
-        fprintf(stdout, "%s\n", has_openmp);
-      else if (STR_IS_EQ("has-wordexp", option))
-        fprintf(stdout, "%s\n", has_wordexp);
-      else
+      bool foundOption = false;
+      for (auto entry : configMap)
+        {
+          if (STR_IS_EQ(entry.first.c_str(), option))
+            {
+              foundOption = true;
+              std::cout << (entry.second.second ? "yes" : "no") << "\n";
+            }
+        }
+      
+      if ( !foundOption )
         {
           fprintf(stdout, "unknown config option: %s\n", option);
           fprintf(stdout, "\n");
           fprintf(stdout, "Available config option:\n");
           fprintf(stdout, "\n");
-          fprintf(stdout, "  has-srv     whether SERVICE is enabled\n");
-          fprintf(stdout, "  has-ext     whether EXTRA is enabled\n");
-          fprintf(stdout, "  has-ieg     whether IEG is enabled\n");
-          fprintf(stdout, "  has-grb     whether GRIB 1 is enabled\n");
-          fprintf(stdout, "  has-grb1    whether GRIB 1 is enabled\n");
-          fprintf(stdout, "  has-grb2    whether GRIB 2 is enabled\n");
-          fprintf(stdout, "  has-nc      whether NetCDF is enabled\n");
-          fprintf(stdout, "  has-nc2     whether NetCDF 2 is enabled\n");
-          fprintf(stdout, "  has-nc4     whether NetCDF 4 is enabled\n");
-          fprintf(stdout, "  has-nc4c    whether NetCDF 4 classic is enabled\n");
-          fprintf(stdout, "  has-nc5     whether NetCDF5 is enabled\n");
-          fprintf(stdout, "  has-hdf5    whether HDF5 is enabled\n");
-          fprintf(stdout, "  has-cgribex whether CGRIBEX is enabled\n");
-          fprintf(stdout, "  has-cmor    whether CMOR is enabled\n");
-          fprintf(stdout, "  has-proj    whether PROJ is enabled\n");
-          fprintf(stdout, "  has-threads whether PTHREADS is enabled\n");
-          fprintf(stdout, "  has-openmp  whether OPENMP is enabled\n");
-          fprintf(stdout, "  has-wordexp whether WORDEXP is enabled\n");
+          for (auto entry : configMap)
+            fprintf(stdout, "  %-12s  whether %s is enabled\n", entry.first.c_str(), entry.second.first.c_str());
 
           exit(EXIT_FAILURE);
         }

@@ -54,8 +54,7 @@ cdiOpenError(int cdiErrno, const char *fmt, const char *path)
         case CDI_FILETYPE_GRB: break;
         case CDI_FILETYPE_GRB2:
           fprintf(stderr, "To create a CDO application with GRIB2 support use: "
-                          "./configure --with-eccodes=<ECCODES root directory> "
-                          "...\n");
+                          "./configure --with-eccodes=<ECCODES root directory> ...\n");
           break;
         case CDI_FILETYPE_SRV: break;
         case CDI_FILETYPE_EXT: break;
@@ -70,9 +69,7 @@ cdiOpenError(int cdiErrno, const char *fmt, const char *path)
                                   ? "4"
                                   : ((filetype == CDI_FILETYPE_NC2) ? "2" : ((filetype == CDI_FILETYPE_NC5) ? "5" : ""));
 #if defined HAVE_LIBNETCDF
-            fprintf(stderr, "CDO was build with a NetCDF version which doesn't support "
-                            "NetCDF%s data!\n",
-                    ncv);
+            fprintf(stderr, "CDO was build with a NetCDF version which doesn't support NetCDF%s data!\n", ncv);
 #else
             fprintf(stderr, "To create a CDO application with NetCDF%s support use: "
                             "./configure --with-netcdf=<NetCDF%s root directory> ...\n",

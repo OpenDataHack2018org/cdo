@@ -25,13 +25,13 @@
 #include "process_int.h"
 #include "counter.h"
 
-typedef struct
+struct vars_t
 {
   int param;
   char name[CDI_MAX_NAME];
   char longname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
-} vars_t;
+};
 
 vars_t *all_vars = NULL;
 
@@ -56,12 +56,12 @@ int com_set(const char *);
 int com_vars(const char *);
 // int com_stat(char *);
 
-typedef struct
+struct command_t
 {
   const char *name;          /* User printable name of the function. */
   int (*func)(const char *); /* Function to call to do the job. */
   const char *doc;           /* Documentation for this function. */
-} command_t;
+};
 
 command_t commands[] = { { "help", com_help, "Display this text" },
                          { "?", com_help, "Synonym for 'help'" },
@@ -73,8 +73,7 @@ command_t commands[] = { { "help", com_help, "Display this text" },
                          //  { "stat", com_stat, "Print out statistics on FILE" },
                          { NULL, NULL, NULL } };
 
-/* Return non-zero if ARG is a valid argument for CALLER, else print
-an error message and return zero. */
+/* Return non-zero if ARG is a valid argument for CALLER, else print an error message and return zero. */
 int
 valid_argument(char *caller, char *arg)
 {
@@ -210,8 +209,7 @@ com_vars(const char *arg)
   return 0;
 }
 
-/* Look up NAME as the name of a command, and return a pointer to that
-   command. Return a NULL pointer if NAME isn't a command name. */
+/* Look up NAME as the name of a command, and return a pointer to that command. Return a NULL pointer if NAME isn't a command name. */
 command_t *
 find_command(char *name)
 {
@@ -348,8 +346,7 @@ Command(void *process)
       readcmd("cdo cmd", line, MAX_LINE);
 
       /* Remove leading and trailing whitespace from the line.
-         Then, if there is anything left, add it to the history list
-         and execute it. */
+         Then, if there is anything left, add it to the history list and execute it. */
       char *s = stripwhite(line);
       if (*s) execute_line(s);
     }

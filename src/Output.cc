@@ -111,9 +111,7 @@ Output(void *process)
                 {
                   int len2 = strlen(parnames[i]);
                   if (len2 > len && parnames[i][len] != ':')
-                    cdoAbort("Key parameter >%s< contains invalid character at "
-                             "position %d!",
-                             parnames[i], len + 1);
+                    cdoAbort("Key parameter >%s< contains invalid character at position %d!", parnames[i], len + 1);
 
                   if (k == knohead)
                     lhead = false;

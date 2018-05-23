@@ -620,8 +620,7 @@ Remapeta(void *process)
 
               arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_T || maxval > MAX_T)
-                cdoWarning("Input temperature at level %d out of range (min=%g "
-                           "max=%g)!",
+                cdoWarning("Input temperature at level %d out of range (min=%g max=%g)!",
                            levelID + 1, minval, maxval);
             }
 
@@ -682,8 +681,7 @@ Remapeta(void *process)
 
               arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_T || maxval > MAX_T)
-                cdoWarning("Output temperature at level %d out of range "
-                           "(min=%g max=%g)!",
+                cdoWarning("Output temperature at level %d out of range (min=%g max=%g)!",
                            levelID + 1, minval, maxval);
 
               setmissval(gridsize, imiss, missval, single2);

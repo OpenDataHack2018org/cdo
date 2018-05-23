@@ -19,24 +19,21 @@
 #include "cdo_int.h"
 #include "grid.h"
 
-void check_lon_range(long nlons, double *lons);
-void check_lat_range(long nlats, double *lats);
-
-typedef struct
+struct grid_type
 {
   int gridID;
   long size;
   long num_cell_corners;
   double *cell_corner_lon;
   double *cell_corner_lat;
-} grid_type;
+} ;
 
-typedef struct
+struct cellsearch_type
 {
   grid_type *src_grid;
   grid_type *tgt_grid;
   float *src_cell_bound_box;
-} cellsearch_type;
+};
 
 static grid_type *
 grid_new(int gridID, const char *txt)
@@ -80,9 +77,6 @@ grid_new(int gridID, const char *txt)
 
   grid_to_radian(xunits, grid->num_cell_corners * grid->size, grid->cell_corner_lon, "grid corner lon");
   grid_to_radian(yunits, grid->num_cell_corners * grid->size, grid->cell_corner_lat, "grid corner lat");
-
-  // check_lon_range(grid->num_cell_corners*grid->size, grid->cell_corner_lon);
-  // check_lat_range(grid->num_cell_corners*grid->size, grid->cell_corner_lat);
 
   if (lgrid_destroy) gridDestroy(gridID);
 

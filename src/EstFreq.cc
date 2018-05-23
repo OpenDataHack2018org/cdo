@@ -104,10 +104,9 @@ EstFreq(void *process)
       /* First, estimation by maximal number of time steps divided by covered
        * years between last and first time step */
       if (cdoVerbose)
-        printf("Frequency is calculated by dividing the number of time steps "
-               "'%d' included in the time axis by the covered years of the "
-               "time axis\ncomputed by the difference of the year of the last "
-               "time stamp '%d' and the year of the first time stamp '%d'.\n",
+        printf("Frequency is calculated by dividing the number of time steps '%d' included in the time axis by the covered years"
+               " of the time axis\ncomputed by the difference of the year of the last time stamp '%d' and the year of the first"
+               " time stamp '%d'.\n",
                ntsteps, lyear, fyear);
       double covered_years = lyear - fyear + 1.0;
       if (DBL_IS_EQUAL(ntsteps / covered_years, 1.))
@@ -127,17 +126,13 @@ EstFreq(void *process)
         {
           int covered_months = lmonth - fmonth + 1;
           if (cdoVerbose)
-            printf("The fraction ntsteps / covered_years = '%f' is neither 1, "
-                   "12, 365, 365.25, 366 nor a multiple of 365 which would "
-                   "correspond to frequencies yearly, monthly, daily or "
-                   "subdaily respectively.\n Next try:\n\nFrequency is "
-                   "calculated by dividing the number of time steps '%d' in "
-                   "year '%d' by the covered months in that year '%d'.\n",
+            printf("The fraction ntsteps / covered_years = '%f' is neither 1, 12, 365, 365.25, 366 nor a multiple of 365 which "
+                   "would correspond to frequencies yearly, monthly, daily or subdaily respectively.\n Next try:\n\nFrequency is "
+                   "calculated by dividing the number of time steps '%d' in year '%d' by the covered months in that year '%d'.\n",
                    ntsteps / covered_years, step_per_year, fyear, covered_months);
           if (step_per_year > 366 * 8)
-            cdoAbort("Step per year '%d' in year '%d' is bigger than 366*8 "
-                     "which corresponds to a frequency of sub-3hourly! This is "
-                     "not yet enabled.",
+            cdoAbort("Step per year '%d' in year '%d' is bigger than 366*8 which corresponds to a frequency of sub-3hourly!"
+                     " This is not yet enabled.",
                      step_per_year, fyear);
           else
             {

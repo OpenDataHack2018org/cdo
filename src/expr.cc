@@ -84,13 +84,13 @@ static double ts_cminute(double *data) { return data[CMINUTE]; }
 static double ts_chour(double *data) { return data[CHOUR]; }
 // clang-format on
 
-typedef struct
+struct func_t
 {
   int type;
   int flag;
   const char *name;  // function name
   double (*func)();  // pointer to function
-} func_t;
+};
 
 static func_t fun_sym_tbl[] = {
   // scalar functions

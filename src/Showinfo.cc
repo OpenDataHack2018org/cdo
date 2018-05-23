@@ -180,9 +180,7 @@ Showinfo(void *process)
     }
   else if (operatorID == SHOWGRID)
     {
-      fprintf(stdout, "# param nr | grid nr | z-axis nr:   /* Use in "
-                      "combination with operatores: griddes and zaxisdes */ "
-                      "\n");
+      fprintf(stdout, "# param nr | grid nr | z-axis nr:   /* Use in combination with operatores: griddes and zaxisdes */\n");
       for (int varID = 0; varID < nvars; varID++)
         {
           int gridID = vlistInqVarGrid(vlistID, varID);

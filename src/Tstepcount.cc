@@ -56,10 +56,10 @@ Tstepcount(void *process)
   int64_t vdate = 0;
   int vtime = 0;
   double refval = 0;
-  typedef struct
+  struct memory_t
   {
     double *array1;
-  } memory_t;
+  };
 
   cdoInitialize(process);
 

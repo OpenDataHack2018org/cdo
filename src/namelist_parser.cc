@@ -18,7 +18,7 @@
 #include "namelist.h"
 
 static void
-kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, namelisttok_t *t, int nvalues)
+kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, NamelistToken *t, int nvalues)
 {
   char vbuf[4096];
   keyValues_t *keyval = (keyValues_t *) Malloc(sizeof(keyValues_t));
@@ -48,37 +48,37 @@ kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, name
 }
 
 static int
-get_number_of_values(int ntok, namelisttok_t *tokens)
+get_number_of_values(int ntok, NamelistToken *tokens)
 {
   int it;
 
   for (it = 0; it < ntok; ++it)
     {
-      namelisttok_t *t = &tokens[it];
-      if (t->type != NAMELIST_WORD && t->type != NAMELIST_STRING) break;
+      NamelistToken *t = &tokens[it];
+      if (t->type != NamelistType::WORD && t->type != NamelistType::STRING) break;
     }
 
   return it;
 }
 
 static int
-namelist_to_pml(list_t *pmlist, namelist_parser *parser, char *buf)
+namelist_to_pml(list_t *pmlist, NamelistParser &parser, char *buf)
 {
   char name[4096];
   list_t *kvlist = NULL;
-  namelisttok_t *t;
-  namelisttok_t *tokens = parser->tokens;
-  unsigned int ntok = parser->toknext;
+  NamelistToken *t;
+  NamelistToken *tokens = parser.tokens.data();
+  unsigned int ntok = parser.toknext;
   // printf("Number of tokens %d\n", ntok);
 
   for (unsigned int it = 0; it < ntok; ++it)
     {
       t = &tokens[it];
       // printf("Token %u", it+1);
-      if (t->type == NAMELIST_OBJECT)
+      if (t->type == NamelistType::OBJECT)
         {
           name[0] = 0;
-          if (it + 1 < ntok && tokens[it + 1].type == NAMELIST_WORD)
+          if (it + 1 < ntok && tokens[it + 1].type == NamelistType::WORD)
             {
               it++;
               t = &tokens[it];
@@ -88,7 +88,7 @@ namelist_to_pml(list_t *pmlist, namelist_parser *parser, char *buf)
           kvlist = kvlist_new(name);
           list_append(pmlist, &kvlist);
         }
-      else if (t->type == NAMELIST_KEY)
+      else if (t->type == NamelistType::KEY)
         {
           if (kvlist == NULL)
             {
@@ -117,34 +117,33 @@ list_t *
 namelistbuf_to_pmlist(listbuf_t *listbuf)
 {
   const char *name = listbuf->name;
-  namelist_parser *p = namelist_new();
+  NamelistParser p;
 
-  int status = namelist_parse(p, listbuf->buffer, listbuf->size);
-  if (status)
+  NamelistError status = p.parse(listbuf->buffer, listbuf->size);
+  if (status!=NamelistError::UNDEFINED)
     {
       switch (status)
         {
-        case NAMELIST_ERROR_INVAL:
-          fprintf(stderr, "Namelist error: Invalid character in %s (line=%d character='%c')!\n", name, p->lineno,
-                  listbuf->buffer[p->pos]);
+        case NamelistError::INVAL:
+          fprintf(stderr, "Namelist error: Invalid character in %s (line=%d character='%c')!\n", name, p.lineno,
+                  listbuf->buffer[p.pos]);
           break;
-        case NAMELIST_ERROR_PART:
-          fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", name, p->lineno);
+        case NamelistError::PART:
+          fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", name, p.lineno);
           break;
-        case NAMELIST_ERROR_INKEY: fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", name, p->lineno); break;
-        case NAMELIST_ERROR_INTYP:
-          fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", name, p->lineno);
+        case NamelistError::INKEY: fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", name, p.lineno); break;
+        case NamelistError::INTYP:
+          fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", name, p.lineno);
           break;
-        case NAMELIST_ERROR_INOBJ: fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", name, p->lineno); break;
-        case NAMELIST_ERROR_EMKEY: fprintf(stderr, "Namelist error: Emtry key name in %s (line=%d)!\n", name, p->lineno); break;
-        default: fprintf(stderr, "Namelist error in %s (line=%d)!\n", name, p->lineno); break;
+        case NamelistError::INOBJ: fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", name, p.lineno); break;
+        case NamelistError::EMKEY: fprintf(stderr, "Namelist error: Emtry key name in %s (line=%d)!\n", name, p.lineno); break;
+        default: fprintf(stderr, "Namelist error in %s (line=%d)!\n", name, p.lineno); break;
         }
       cdoAbort("Namelist error!");
     }
 
-  // namelist_dump(p, listbuf->buffer);
-  status = namelist_verify(p, listbuf->buffer);
-  if (status)
+  // p.dump(listbuf->buffer);
+  if (p.verify())
     {
       fprintf(stderr, "Namelist error: Invalid contents in %s!\n", name);
       cdoAbort("Namelist error!");
@@ -153,7 +152,6 @@ namelistbuf_to_pmlist(listbuf_t *listbuf)
   list_t *pmlist = list_new(sizeof(list_t *), free_kvlist, listbuf->name);
 
   namelist_to_pml(pmlist, p, listbuf->buffer);
-  namelist_destroy(p);
 
   return pmlist;
 }

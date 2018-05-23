@@ -74,13 +74,13 @@
 #include "datetime.h"
 //#include "pstream_write.h"
 
-typedef struct
+struct readarg_t
 {
   int tsIDnext;
   int streamID, nrecs;
   RecordInfo *recinfo;
   Field **vars;
-} readarg_t;
+};
 
 static int num_recs = 0;
 

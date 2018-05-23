@@ -52,7 +52,7 @@ paramToString(int param, char *paramstr, int maxlen)
 
 typedef enum { CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME } pt_mode_t;
 
-typedef struct
+struct var_t
 {
   bool convert;
   bool remove;
@@ -83,7 +83,7 @@ typedef struct
 
   double amean;
   long nvals, n_lower_min, n_greater_max;
-} var_t;
+};
 
 void cdo_define_var_units(var_t *var, int vlistID2, int varID, const char *units);
 
@@ -571,8 +571,7 @@ Setpartab(void *process)
                 }
               if (nerr)
                 {
-                  cdoWarning("Udunits: Error converting units from [%s] to "
-                             "[%s], parameter: %s",
+                  cdoWarning("Udunits: Error converting units from [%s] to [%s], parameter: %s",
                              var->units_old, var->units, var->name);
                   var->changeunits = false;
                 }

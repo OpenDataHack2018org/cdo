@@ -146,7 +146,7 @@ gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict l
   gs->dims[0] = dims[0];
   gs->dims[1] = dims[1];
   size_t nx = dims[0];
-  size_t ny = dims[0];
+  size_t ny = dims[1];
 
   size_t nxm = xIsCyclic ? nx + 1 : nx;
 

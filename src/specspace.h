@@ -14,12 +14,12 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef _SPECSPACE_H
-#define _SPECSPACE_H
+#ifndef SPECSPACE_H
+#define SPECSPACE_H
 
 #include "afterburner.h"
 
-typedef struct
+struct SPTRANS
 {
   long nlon;
   long nlat;
@@ -33,15 +33,15 @@ typedef struct
   double *pol3;    /* only for uv2dv  */
   double *coslat;  /* only for scaluv with uv2dv */
   double *rcoslat; /* only for scaluv with dv2uv */
-} SPTRANS;
+};
 
-typedef struct
+struct DVTRANS
 {
   int ntr;
   int fdim;
   double *f1;
   double *f2;
-} DVTRANS;
+};
 
 void dv2ps(const double *restrict div, double *restrict pot, long nlev, long ntr);
 

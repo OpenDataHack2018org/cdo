@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.5
 	* Version 1.9.5 release
 
+2018-05-18 Uwe Schulzweida
+
+	* remapnn/remapdis: wrong result with regular 2D source grids if nlat > nlon  [Bug #8498]
+
 2018-05-17 Uwe Schulzweida
 
 	* seldate: segmentation fault (bug introduce in 1.9.4)

@@ -1016,8 +1016,7 @@ Gradsdes(void *process)
   if (cdoVerbose) cdoPrint("GrADS GRIB map version: %d", map_version);
 
   if (map_version == 4 && sizeof(off_t) != 8)
-    cdoAbort("GrADS GRIB map version %d requires size of off_t to be 8! The "
-             "size of off_t is %ld.",
+    cdoAbort("GrADS GRIB map version %d requires size of off_t to be 8! The size of off_t is %ld.",
              map_version, sizeof(off_t));
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
@@ -1076,8 +1075,7 @@ Gradsdes(void *process)
           nvarsout++;
           nrecsout += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
           if (ntsteps != 1 && ntsteps != 0 && vlistInqVarTimetype(vlistID, varID) == TIME_CONSTANT)
-            cdoAbort("Unsupported GrADS record structure! Variable %d has only "
-                     "1 time step.",
+            cdoAbort("Unsupported GrADS record structure! Variable %d has only 1 time step.",
                      vlistInqVarCode(vlistID, varID));
         }
       else
@@ -1321,8 +1319,7 @@ Gradsdes(void *process)
                       if (checksize < 0L || checksize > 2147483647L)
                         {
                           nrecords -= nrecsout;
-                          cdoWarning("File size limit reached for GrADS GRIB "
-                                     "map_version=%d! Only the first %d time "
+                          cdoWarning("File size limit reached for GrADS GRIB map_version=%d! Only the first %d time "
                                      "steps (2GB) are processed.",
                                      map_version, tsID);
                           goto LABEL_STOP;
@@ -1391,10 +1388,8 @@ LABEL_STOP:
     }
   if (filetype == CDI_FILETYPE_GRB2)
     {
-      cdoAbort("The fileformat GRIB2 is not fully supported yet for the "
-               "gradsdes operator.\n"
-               "The .ctl file %s was generated. You can add the necessary .idx "
-               "file by running\n\tgribmap -i %s",
+      cdoAbort("The fileformat GRIB2 is not fully supported yet for the gradsdes operator.\n"
+               "The .ctl file %s was generated. You can add the necessary .idx file by running\n\tgribmap -i %s",
                ctlfile, ctlfile);
       // write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum,
       // bignum);

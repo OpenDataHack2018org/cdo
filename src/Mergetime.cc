@@ -35,7 +35,7 @@ Mergetime(void *process)
   int last_vdate = -1, last_vtime = -1;
   bool skip_same_time = false;
   double *array = NULL;
-  typedef struct
+  struct sfile_t
   {
     int streamID;
     int vlistID;
@@ -44,7 +44,7 @@ Mergetime(void *process)
     int64_t vdate;
     int vtime;
     int nrecs;
-  } sfile_t;
+  };
 
   cdoInitialize(process);
 

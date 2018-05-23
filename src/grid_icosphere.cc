@@ -8,12 +8,6 @@
 #include <array>
 #include <map>
 
-static inline double
-rad2deg(double v)
-{
-  return v * 180. / M_PI;
-}
-
 // Converts cartesian coordinates to geographical
 static inline void
 cc2gc(double xyz[], double *lon, double *lat)
@@ -223,28 +217,29 @@ circumCenterMean(const vec3 &v0, const vec3 &v1, const vec3 &v2)
 }
 
 size_t
-genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yvals, double **xbounds, double **ybounds)
+genIcosphereCoords(int subdivisions, bool lbounds, std::vector<double> &xvals, std::vector<double> &yvals,
+                   std::vector<double> &xbounds, std::vector<double> &ybounds)
 {
   IndexedMesh mesh = makeIcosphere(subdivisions);
   VertexList &vertices = mesh.first;
   TriangleList &triangles = mesh.second;
 
   size_t ncells = triangles.size();
-  *xvals = (double *) malloc(ncells * sizeof(double));
-  *yvals = (double *) malloc(ncells * sizeof(double));
+  xvals.resize(ncells);
+  yvals.resize(ncells);
   if (lbounds)
     {
-      *xbounds = (double *) malloc(3 * ncells * sizeof(double));
-      *ybounds = (double *) malloc(3 * ncells * sizeof(double));
+      xbounds.resize(3 * ncells);
+      ybounds.resize(3 * ncells);
     }
 
   size_t i = 0;
   for (Triangle &t : triangles)
     {
       vec3 center = circumCenterMean(vertices[t.vertex[0]], vertices[t.vertex[1]], vertices[t.vertex[2]]);
-      cc2gc(&center[0], &(*xvals)[i], &(*yvals)[i]);
+      cc2gc(&center[0], &xvals[i], &yvals[i]);
       if (lbounds)
-        for (size_t k = 0; k < 3; ++k) cc2gc(&vertices[t.vertex[k]][0], &(*xbounds)[i * 3 + k], &(*ybounds)[i * 3 + k]);
+        for (size_t k = 0; k < 3; ++k) cc2gc(&vertices[t.vertex[k]][0], &xbounds[i * 3 + k], &ybounds[i * 3 + k]);
       i++;
     }
 
@@ -252,6 +247,12 @@ genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yval
 }
 
 #ifdef TEST_ICO
+static inline double
+rad2deg(double v)
+{
+  return v * 180. / M_PI;
+}
+
 int
 main(void)
 {

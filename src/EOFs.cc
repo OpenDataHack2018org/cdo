@@ -115,8 +115,7 @@ get_eigenmode(void)
         eigen_mode = JACOBI;
       else
         {
-          cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. "
-                     "Available options are",
+          cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",
                      envstr);
           cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
           cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
@@ -152,8 +151,7 @@ get_weightmode(void)
       else if (!strncmp(envstr, "on", 2))
         weight_mode = WEIGHT_ON;
       else
-        cdoWarning("Unknown environmental setting %s for CDO_WEIGHT_MODE. "
-                   "Available options are: on/off",
+        cdoWarning("Unknown environmental setting %s for CDO_WEIGHT_MODE. Available options are: on/off",
                    envstr);
     }
 
@@ -183,7 +181,7 @@ EOFs(void *process)
 
   int calendar = CALENDAR_STANDARD;
 
-  typedef struct
+  struct eofdata_t
   {
     bool init;
     bool first_call;
@@ -191,7 +189,7 @@ EOFs(void *process)
     double *covar_array;
     double **covar;
     double **data;
-  } eofdata_t;
+  };
 
   if (cdoTimer)
     {
@@ -276,11 +274,9 @@ EOFs(void *process)
       if (n_eig > nts)
         {
           cdoWarning("Solving in time-space:");
-          cdoWarning("Number of eigen-functions to write out is bigger than "
-                     "number of time-steps.");
+          cdoWarning("Number of eigen-functions to write out is bigger than number of time-steps.");
           cdoWarning("Setting n_eig to %d.", nts);
-          cdoWarning("If You want to force a solution in grid-space use "
-                     "operator eofspatial");
+          cdoWarning("If You want to force a solution in grid-space use operator eofspatial");
           n_eig = nts;
         }
       n = nts;
@@ -292,11 +288,9 @@ EOFs(void *process)
       if ((size_t) n_eig > gridsize)
         {
           cdoWarning("Solving in spatial space");
-          cdoWarning("Number of eigen-functions to write out is bigger than "
-                     "grid size");
+          cdoWarning("Number of eigen-functions to write out is bigger than grid size");
           cdoWarning("Setting n_eig to %zu", gridsize);
-          cdoWarning("If You want to force a solution in time-space use "
-                     "operator eoftime");
+          cdoWarning("If You want to force a solution in time-space use operator eoftime");
           n_eig = gridsize;
         }
       n = gridsize;
@@ -510,8 +504,7 @@ EOFs(void *process)
                   eofdata[varID][levelID].first_call = false;
 
                   if (cdoVerbose)
-                    cdoPrint("Calculating covar matrices for %i levels of "
-                             "var%i (%s)",
+                    cdoPrint("Calculating covar matrices for %i levels of var%i (%s)",
                              nlevs, varID, vname);
 
                   if (cdoTimer) timer_start(timer_cov);
@@ -551,8 +544,7 @@ EOFs(void *process)
                   else if (time_space)
                     {
                       if (cdoVerbose)
-                        cdoPrint("allocating covar with %i x %i elements | "
-                                 "npack=%zu",
+                        cdoPrint("allocating covar with %i x %i elements | npack=%zu",
                                  nts, nts, npack);
 
                       covar_array = (double *) Malloc(nts * nts * sizeof(double));
@@ -589,15 +581,13 @@ EOFs(void *process)
                   if (cdoTimer) timer_start(timer_eig);
 
                   if (eigen_mode == JACOBI)
-                    // TODO: use return status (>0 okay, -1 did not converge at
-                    // all)
+                    // TODO: use return status (>0 okay, -1 did not converge at all)
                     parallel_eigen_solution_of_symmetric_matrix(covar, eig_val, n, __func__);
                   else
                     eigen_solution_of_symmetric_matrix(covar, eig_val, n, __func__);
 
                   if (cdoTimer) timer_stop(timer_eig);
-                  /* NOW: covar contains the eigenvectors, eig_val the
-                   * eigenvalues */
+                  /* NOW: covar contains the eigenvectors, eig_val the eigenvalues */
 
                   for (size_t i = 0; i < gridsize; ++i) out[i] = missval;
 

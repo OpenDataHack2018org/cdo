@@ -31,7 +31,7 @@ typedef struct _listNode_t
   struct _listNode_t *next;
 } listNode_t;
 
-typedef struct
+struct list_t
 {
   size_t logicalLength;
   size_t elementSize;
@@ -39,7 +39,7 @@ typedef struct
   listNode_t *head;
   listNode_t *tail;
   freeFunction_t freeFunc;
-} list_t;
+};
 
 list_t *list_new(size_t elementSize, freeFunction_t freeFunc, const char *name);
 void list_destroy(list_t *list);

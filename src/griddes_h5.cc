@@ -202,8 +202,7 @@ fill_gridvals(size_t xsize, size_t ysize, double *xvals, double *yvals)
                     index2 = j*xsize + ii;
                     if ( xvals[index2] > -180 && xvals[index2] < 360 )
                       {
-                        xvals[index] = (xmax*(i-ii) +
-            xvals[index2]*((xsize-1)-i))/(xsize-1-ii); break;
+                        xvals[index] = (xmax*(i-ii) + xvals[index2]*((xsize-1)-i))/(xsize-1-ii); break;
                       }
                   }
               }
@@ -305,9 +304,7 @@ gridFromH5file(const char *gridfile)
   hsize_t dims_out[9]; /* dataset dimensions               */
   herr_t status;       /* Generic return value		*/
   int rank;
-  griddes_t grid;
-
-  gridInit(&grid);
+  GridDesciption grid;
 
   hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);
   H5Pset_fclose_degree(fapl_id, H5F_CLOSE_STRONG);
@@ -401,22 +398,21 @@ gridFromH5file(const char *gridfile)
       grid.ysize = dims_out[0];
       grid.size = grid.xsize * grid.ysize;
 
-      grid.xvals = (double *) Malloc(grid.size * sizeof(double));
-      grid.yvals = (double *) Malloc(grid.size * sizeof(double));
+      grid.xvals.resize(grid.size);
+      grid.yvals.resize(grid.size);
 
       if (ftype)
         {
-          status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals);
-          status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals);
+          status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals.data());
+          status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals.data());
         }
       else
         {
-          int *iarray = (int *) Malloc(grid.size * sizeof(int));
-          status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+          std::vector<int> iarray(grid.size);
+          status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray.data());
           for (size_t i = 0; i < grid.size; ++i) grid.xvals[i] = iarray[i];
-          status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+          status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray.data());
           for (size_t i = 0; i < grid.size; ++i) grid.yvals[i] = iarray[i];
-          Free(iarray);
         }
 
       status = H5Sclose(dataspace);
@@ -425,7 +421,7 @@ gridFromH5file(const char *gridfile)
       status = H5Dclose(lon_id);
       status = H5Dclose(lat_id);
 
-      fill_gridvals(grid.xsize, grid.ysize, grid.xvals, grid.yvals);
+      fill_gridvals(grid.xsize, grid.ysize, grid.xvals.data(), grid.yvals.data());
 
       grid.type = GRID_CURVILINEAR;
       grid.datatype = CDI_DATATYPE_FLT32;
@@ -495,8 +491,7 @@ gridFromH5file(const char *gridfile)
               goto RETURN;
             }
           /*
-          printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
-                 (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
+          printf("\nRank: %d\nDimensions: %lu x %lu \n", rank, (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
           */
 
           hid_t type_id = H5Dget_type(lon_id); /* get datatype*/
@@ -546,22 +541,21 @@ gridFromH5file(const char *gridfile)
           grid.ysize = dims_out[0];
           grid.size = grid.xsize * grid.ysize;
 
-          grid.xvals = (double *) Malloc(grid.size * sizeof(double));
-          grid.yvals = (double *) Malloc(grid.size * sizeof(double));
+          grid.xvals.resize(grid.size);
+          grid.yvals.resize(grid.size);
 
           if (ftype)
             {
-              status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals);
-              status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals);
+              status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals.data());
+              status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals.data());
             }
           else
             {
-              int *iarray = (int *) Malloc(grid.size * sizeof(int));
-              status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+              std::vector<int> iarray(grid.size);
+              status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray.data());
               for (size_t i = 0; i < grid.size; ++i) grid.xvals[i] = iarray[i];
-              status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+              status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray.data());
               for (size_t i = 0; i < grid.size; ++i) grid.yvals[i] = iarray[i];
-              Free(iarray);
             }
 
           status = H5Sclose(dataspace);

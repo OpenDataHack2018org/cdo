@@ -208,8 +208,7 @@ Rhopot(void *process)
   if (saoID == -1) cdoAbort("Sea water salinity not found!");
   if (toID == -1 && thoID != -1)
     {
-      cdoPrint("Use the CDO operator 'adisit' to convert potential temperature "
-               "to In-situ temperature.");
+      cdoPrint("Use the CDO operator 'adisit' to convert potential temperature to In-situ temperature.");
       cdoPrint("Here is an example:");
       cdoPrint("   cdo rhopot -adisit %s %s", cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
     }

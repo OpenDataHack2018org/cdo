@@ -123,8 +123,7 @@ Spectral(void *process)
             }
 
           if (gridIDsp == -1 && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED)
-            cdoAbort("Gaussian reduced grid found. Use option -R to convert it "
-                     "to a regular grid!");
+            cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
           if (gridIDsp == -1) cdoAbort("Computation of spherical harmonics failed!");
 

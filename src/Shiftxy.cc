@@ -232,8 +232,7 @@ Shiftxy(void *process)
         {
           cdoPrint("Unsupported grid type: %s", gridNamePtr(gridtype));
           if (gridtype == GRID_GAUSSIAN_REDUCED)
-            cdoPrint("Use option -R to convert Gaussian reduced grid to a "
-                     "regular grid!");
+            cdoPrint("Use option -R to convert Gaussian reduced grid to a regular grid!");
           cdoAbort("Unsupported grid type!");
         }
     }

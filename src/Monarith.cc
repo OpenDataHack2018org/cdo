@@ -110,8 +110,7 @@ Monarith(void *process)
             {
               int year2 = yearmon2 / 100;
               int mon2 = yearmon2 - (yearmon2 / 100) * 100;
-              cdoAbort("Timestep %d in %s has wrong date! Current year=%4d "
-                       "mon=%2d, expected year=%4d mon=%2d",
+              cdoAbort("Timestep %d in %s has wrong date! Current year=%4d mon=%2d, expected year=%4d mon=%2d",
                        tsID2 + 1, cdoGetStreamName(1).c_str(), year2, mon2, year1, mon1);
             }
 

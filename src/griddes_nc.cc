@@ -74,9 +74,7 @@ gridFromNCfile(const char *gridfile)
   size_t attlen;
   size_t grid_rank, grid_size, grid_nvertex;
   int grid_dims[2];
-  griddes_t grid;
-
-  gridInit(&grid);
+  GridDesciption grid;
 
   /* open grid file and read grid size/name data */
 
@@ -119,18 +117,18 @@ gridFromNCfile(const char *gridfile)
 
       /* allocate grid coordinates and read data */
 
-      grid.xvals = (double *) Malloc(grid.size * sizeof(double));
-      grid.yvals = (double *) Malloc(grid.size * sizeof(double));
-      grid.xbounds = (double *) Malloc(grid.nvertex * grid.size * sizeof(double));
-      grid.ybounds = (double *) Malloc(grid.nvertex * grid.size * sizeof(double));
+      grid.xvals.resize(grid.size);
+      grid.yvals.resize(grid.size);
+      grid.xbounds.resize(grid.nvertex * grid.size);
+      grid.ybounds.resize(grid.nvertex * grid.size);
 
       nce(nc_inq_vartype(nc_file_id, nc_gridlat_id, &xtype));
       grid.datatype = (xtype == NC_FLOAT) ? CDI_DATATYPE_FLT32 : CDI_DATATYPE_FLT64;
 
-      nce(nc_get_var_double(nc_file_id, nc_gridlon_id, grid.xvals));
-      nce(nc_get_var_double(nc_file_id, nc_gridlat_id, grid.yvals));
-      nce(nc_get_var_double(nc_file_id, nc_gridclon_id, grid.xbounds));
-      nce(nc_get_var_double(nc_file_id, nc_gridclat_id, grid.ybounds));
+      nce(nc_get_var_double(nc_file_id, nc_gridlon_id, grid.xvals.data()));
+      nce(nc_get_var_double(nc_file_id, nc_gridlat_id, grid.yvals.data()));
+      nce(nc_get_var_double(nc_file_id, nc_gridclon_id, grid.xbounds.data()));
+      nce(nc_get_var_double(nc_file_id, nc_gridclat_id, grid.ybounds.data()));
 
       nce(nc_inq_attlen(nc_file_id, nc_gridlon_id, "units", &attlen));
       nce(nc_get_att_text(nc_file_id, nc_gridlon_id, "units", grid.xunits));
@@ -142,16 +140,12 @@ gridFromNCfile(const char *gridfile)
       if (nc_inq_varid(nc_file_id, "grid_imask", &nc_gridmask_id) == NC_NOERR)
         {
           size_t i;
-          grid.mask = (int *) Malloc(grid.size * sizeof(int));
-          nce(nc_get_var_int(nc_file_id, nc_gridmask_id, grid.mask));
+          grid.mask.resize(grid.size);
+          nce(nc_get_var_int(nc_file_id, nc_gridmask_id, grid.mask.data()));
           for (i = 0; i < grid.size; ++i)
             if (grid.mask[i] != 1) break;
 
-          if (i == grid.size)
-            {
-              Free(grid.mask);
-              grid.mask = NULL;
-            }
+          if (i == grid.size) vectorFree(grid.mask);
         }
 
       gridID = gridDefine(grid);
@@ -184,7 +178,6 @@ writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   size_t grid_rank = 0, len;
   int grid_dims[2];
   int nc_dims_id[3], ndims;
-  double *vals;
   char units[CDI_MAX_NAME];
 
   int gridtype = gridInqType(gridID);
@@ -315,21 +308,19 @@ writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 
   nce(nc_put_var_int(nc_file_id, nc_grdimask_id, grid_imask));
 
-  vals = (double *) Malloc(gridInqNvertex(gridID) * gridsize * sizeof(double));
+  std::vector<double> vals(gridInqNvertex(gridID) * gridsize);
 
-  gridInqYvals(gridID, vals);
-  nce(nc_put_var_double(nc_file_id, nc_gridlat_id, vals));
+  gridInqYvals(gridID, vals.data());
+  nce(nc_put_var_double(nc_file_id, nc_gridlat_id, vals.data()));
 
-  gridInqXvals(gridID, vals);
-  nce(nc_put_var_double(nc_file_id, nc_gridlon_id, vals));
+  gridInqXvals(gridID, vals.data());
+  nce(nc_put_var_double(nc_file_id, nc_gridlon_id, vals.data()));
 
-  gridInqYbounds(gridID, vals);
-  nce(nc_put_var_double(nc_file_id, nc_gridclat_id, vals));
+  gridInqYbounds(gridID, vals.data());
+  nce(nc_put_var_double(nc_file_id, nc_gridclat_id, vals.data()));
 
-  gridInqXbounds(gridID, vals);
-  nce(nc_put_var_double(nc_file_id, nc_gridclon_id, vals));
-
-  Free(vals);
+  gridInqXbounds(gridID, vals.data());
+  nce(nc_put_var_double(nc_file_id, nc_gridclon_id, vals.data()));
 
   nce(nc_close(nc_file_id));
 

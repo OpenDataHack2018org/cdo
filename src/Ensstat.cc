@@ -40,16 +40,16 @@
 #include "cdoOptions.h"
 #include "util_files.h"
 
-typedef struct
+struct ens_file_t
 {
   int streamID;
   int vlistID;
   size_t nmiss[2];
   double missval[2];
   double *array[2];
-} ens_file_t;
+};
 
-typedef struct
+struct ensstat_arg_t
 {
   int t;
   int varID[2];
@@ -66,7 +66,7 @@ typedef struct
   bool lpctl;
   bool count_data;
   int nvars;
-} ensstat_arg_t;
+};
 
 static void *
 ensstat_func(void *ensarg)
@@ -283,8 +283,7 @@ Ensstat(void *process)
               else
                 {
                   lerror = true;
-                  cdoWarning("Inconsistent ensemble file, number of records at "
-                             "time step %d of %s and %s differ!",
+                  cdoWarning("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
                              tsID + 1, cdoGetStreamName(0).c_str(), cdoGetStreamName(fileID).c_str());
                 }
               goto CLEANUP;

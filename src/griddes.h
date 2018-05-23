@@ -14,37 +14,40 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef _GRIDDES_H
-#define _GRIDDES_H
+#ifndef GRIDDES_H
+#define GRIDDES_H
 
 #include <stdbool.h>
+#include <vector>
 
-typedef struct
+class GridDesciption
 {
-  int *mask;
-  double *xvals;
-  double *yvals;
-  double *xbounds;
-  double *ybounds;
-  double *area;
+ public:
+  std::vector<int> mask;
+  std::vector<double> xvals;
+  std::vector<double> yvals;
+  std::vector<double> xbounds;
+  std::vector<double> ybounds;
+  std::vector<double> area;
+  std::vector<int> rowlon;
   double xfirst, yfirst;
   double xlast, ylast;
   double xinc, yinc;
-  double xpole, ypole, angle; /* rotated north pole             */
+  double xpole, ypole, angle; // rotated north pole
   int scanningMode;
-  /* scanningMode  = 128 * iScansNegatively + 64 * jScansPositively + 32 *
-     jPointsAreConsecutive; 64  = 128 * 0                + 64 *        1
-     + 32 * 0 00  = 128 * 0                + 64 *        0         + 32 * 0 96
-     = 128 * 0                + 64 *        1         + 32 * 1 Default /
-     implicit scanning mode is 64: i and j scan positively, i points are
-     consecutive (row-major)        */
+  /*
+    scanningMode  = 128 * iScansNegatively + 64 * jScansPositively + 32 * jPointsAreConsecutive;
+              64  = 128 * 0                + 64 *        1         + 32 * 0 
+              00  = 128 * 0                + 64 *        0         + 32 * 0
+              96  = 128 * 0                + 64 *        1         + 32 * 1
+    Default  implicit scanning mode is 64: i and j scan positively, i points are consecutive (row-major)
+  */
   bool uvRelativeToGrid;
   double a;
   int datatype;
-  int isRotated; /* TRUE for rotated grids         */
+  int isRotated; // TRUE for rotated grids
   int type;
   int ntr;
-  int *rowlon;
   bool genBounds;
   int nvertex;
   size_t size;
@@ -71,12 +74,17 @@ typedef struct
   char yunits[CDI_MAX_NAME];
   char ydimname[CDI_MAX_NAME];
   char vdimname[CDI_MAX_NAME];
-} griddes_t;
 
-void gridInit(griddes_t *grid);
-int gridDefine(griddes_t grid);
+  void init();
+  GridDesciption()
+    {
+      init();
+    }
+};
+
+int gridDefine(GridDesciption &grid);
 
 int gridFromNCfile(const char *gridfile);
 int gridFromH5file(const char *gridfile);
 
-#endif /* _GRIDDES_H */
+#endif /* GRIDDES_H */

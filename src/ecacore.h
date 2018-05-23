@@ -45,7 +45,7 @@ typedef void (*ECA_FUNC_3)(Field *, Field, double);
  * addc      the addend b
  * epilog    the final operation carried out after processing
  */
-typedef struct
+struct ECA_MAJOR_REQUEST_ELEMENT_1
 {
   const char *name;
   const char *longname;
@@ -57,7 +57,7 @@ typedef struct
   double mulc;
   double addc;
   ECA_EPILOG epilog;
-} ECA_MAJOR_REQUEST_ELEMENT_1;
+};
 
 /**
  * Structure describing a processing request of the form
@@ -76,7 +76,7 @@ typedef struct
  * h2        the 2nd field operator
  * h3        the 3rd field operator
  */
-typedef struct
+struct ECA_MINOR_REQUEST_ELEMENT_1
 {
   const char *name;
   const char *longname;
@@ -85,13 +85,13 @@ typedef struct
   double h1arg;
   ECA_FUNC_2 h2;
   ECA_FUNC_2 h3;
-} ECA_MINOR_REQUEST_ELEMENT_1;
+};
 
-typedef struct
+struct ECA_REQUEST_1
 {
   ECA_MAJOR_REQUEST_ELEMENT_1 var1;
   ECA_MINOR_REQUEST_ELEMENT_1 var2;
-} ECA_REQUEST_1;
+};
 
 /**
  * Structure describing a processing request of the form
@@ -116,7 +116,7 @@ typedef struct
  * f5arg     the argument of the 5th field operator
  * epilog    the final operation carried out after processing
  */
-typedef struct
+struct ECA_MAJOR_REQUEST_ELEMENT_2
 {
   const char *name;
   const char *longname;
@@ -130,7 +130,7 @@ typedef struct
   ECA_FUNC_3 f5;
   double f5arg;
   ECA_EPILOG epilog;
-} ECA_MAJOR_REQUEST_ELEMENT_2;
+};
 
 /**
  * Structure describing a processing request of the form
@@ -149,7 +149,7 @@ typedef struct
  * h1arg     the argument of the 1st field operator
  * h2        the 2nd field operator
  */
-typedef struct
+struct ECA_MINOR_REQUEST_ELEMENT_2
 {
   const char *name;
   const char *longname;
@@ -157,13 +157,13 @@ typedef struct
   ECA_FUNC_1 h1;
   double h1arg;
   ECA_FUNC_2 h2;
-} ECA_MINOR_REQUEST_ELEMENT_2;
+};
 
-typedef struct
+struct ECA_REQUEST_2
 {
   ECA_MAJOR_REQUEST_ELEMENT_2 var1;
   ECA_MINOR_REQUEST_ELEMENT_2 var2;
-} ECA_REQUEST_2;
+};
 
 /**
  * Structure describing a processing request of the form
@@ -182,7 +182,7 @@ typedef struct
  * f2        the 2nd field operator
  * f3        the 3rd field operator
  */
-typedef struct
+struct ECA_REQUEST_3
 {
   const char *name;
   const char *longname;
@@ -190,7 +190,7 @@ typedef struct
   ECA_FUNC_2 f1;
   ECA_FUNC_2 f2;
   ECA_FUNC_2 f3;
-} ECA_REQUEST_3;
+};
 
 /**
  * Structure describing a GSL-like processing request. The structure
@@ -211,7 +211,7 @@ typedef struct
  * s2arg      argument of the 2nd field selector
  * consecutiveDays  the number od concecutive days
  */
-typedef struct
+struct ECA_REQUEST_4
 {
   const char *name;
   const char *longname;
@@ -226,7 +226,7 @@ typedef struct
   ECA_FUNC_1 s3;
   double s3arg;
   int consecutiveDays;
-} ECA_REQUEST_4;
+};
 
 /**
  * Function processing a request of type 1.

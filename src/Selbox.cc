@@ -823,13 +823,13 @@ Selbox(void *process)
   int index, gridtype = -1;
   size_t nmiss;
   double missval;
-  typedef struct
+  struct sbox_t
   {
     int gridID1, gridID2;
     std::vector<long> cellidx;
     long nvals;
     long lat1, lat2, lon11, lon12, lon21, lon22;
-  } sbox_t;
+  };
 
   cdoInitialize(process);
 
@@ -899,8 +899,7 @@ Selbox(void *process)
         {
           cdoPrint("Unsupported grid type: %s", gridNamePtr(gridtype));
           if (gridtype == GRID_GAUSSIAN_REDUCED)
-            cdoPrint("Use option -R to convert Gaussian reduced grid to a "
-                     "regular grid!");
+            cdoPrint("Use option -R to convert Gaussian reduced grid to a regular grid!");
           cdoAbort("Unsupported grid type!");
         }
     }

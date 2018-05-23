@@ -33,7 +33,9 @@
 /* extern int GetMagicsParameterInfo( const char *user_name, char **magics_name,
  * char **magics_type ); */
 
+#ifdef HAVE_LIBXML2
 extern int GetMagicsParameterInfo(const char *user_name, char *param_value);
+#endif
 
 /* Recursive function that sets the results parameters from the XML structure */
 

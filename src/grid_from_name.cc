@@ -21,10 +21,11 @@
 #include "griddes.h"
 #include "util_string.h"
 
-size_t genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yvals, double **xbounds, double **ybounds);
+size_t genIcosphereCoords(int subdivisions, bool lbounds, std::vector<double> &xvals, std::vector<double> &yvals,
+                          std::vector<double> &xbounds, std::vector<double> &ybounds);
 
 static void
-gen_grid_icosphere(griddes_t *grid, const char *pline)
+gen_grid_icosphere(GridDesciption &grid, const char *pline)
 {
   int gridtype = GRID_UNSTRUCTURED;
   bool lbounds = true;
@@ -71,20 +72,20 @@ gen_grid_icosphere(griddes_t *grid, const char *pline)
         }
     }
 
-  grid->type = gridtype;
-  if (lbounds) grid->nvertex = 3;
+  grid.type = gridtype;
+  if (lbounds) grid.nvertex = 3;
 
-  size_t ncells = genIcosphereCoords(b + 1, lbounds, &grid->xvals, &grid->yvals, &grid->xbounds, &grid->ybounds);
-  grid->xsize = ncells;
-  grid->ysize = ncells;
-  strcpy(grid->xname, "clon");
-  strcpy(grid->yname, "clat");
-  strcpy(grid->xunits, "radian");
-  strcpy(grid->yunits, "radian");
+  size_t ncells = genIcosphereCoords(b + 1, lbounds, grid.xvals, grid.yvals, grid.xbounds, grid.ybounds);
+  grid.xsize = ncells;
+  grid.ysize = ncells;
+  strcpy(grid.xname, "clon");
+  strcpy(grid.yname, "clat");
+  strcpy(grid.xunits, "radian");
+  strcpy(grid.yunits, "radian");
 }
 
 static void
-gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
+gen_grid_lonlat(GridDesciption &grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
   int gridtype = GRID_LONLAT;
   bool lbounds = true;
@@ -151,63 +152,63 @@ gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, dou
       if (inc < 1e-9) inc = 1;
     }
 
-  grid->type = gridtype;
+  grid.type = gridtype;
 
   if (lon1 >= lon2 || lat1 >= lat2) cdoAbort("Invalid grid box: lon1=%g lon2=%g lat1=%g lat2=%g", lon1, lon2, lat1, lat2);
 
   size_t nlon = (size_t)((lon2 - lon1) / inc + 0.5);
   size_t nlat = (size_t)((lat2 - lat1) / inc + 0.5);
 
-  grid->xvals = (double *) Malloc(nlon * sizeof(double));
-  grid->yvals = (double *) Malloc(nlat * sizeof(double));
+  grid.xvals.resize(nlon);
+  grid.yvals.resize(nlat);
 
-  for (size_t i = 0; i < nlon; ++i) grid->xvals[i] = lon1 + inc / 2 + i * inc;
-  for (size_t i = 0; i < nlat; ++i) grid->yvals[i] = lat1 + inc / 2 + i * inc;
+  for (size_t i = 0; i < nlon; ++i) grid.xvals[i] = lon1 + inc / 2 + i * inc;
+  for (size_t i = 0; i < nlat; ++i) grid.yvals[i] = lat1 + inc / 2 + i * inc;
 
   if (gridtype == GRID_LONLAT)
     {
-      grid->xsize = nlon;
-      grid->ysize = nlat;
+      grid.xsize = nlon;
+      grid.ysize = nlat;
     }
   else
     {
       std::vector<double> yvals(nlat);
-      for (size_t j = 0; j < nlat; ++j) yvals[j] = grid->yvals[j];
+      for (size_t j = 0; j < nlat; ++j) yvals[j] = grid.yvals[j];
       size_t gridsize = nlon * nlat;
-      grid->xvals = (double *) Realloc(grid->xvals, gridsize * sizeof(double));
-      grid->yvals = (double *) Realloc(grid->yvals, gridsize * sizeof(double));
+      grid.xvals.resize(gridsize);
+      grid.yvals.resize(gridsize);
       for (size_t j = 0; j < nlat; ++j)
         for (size_t i = 0; i < nlon; ++i)
           {
-            grid->xvals[j * nlon + i] = grid->xvals[i];
-            grid->yvals[j * nlon + i] = yvals[j];
+            grid.xvals[j * nlon + i] = grid.xvals[i];
+            grid.yvals[j * nlon + i] = yvals[j];
           }
 
       if (gridtype == GRID_CURVILINEAR)
         {
-          grid->xsize = nlon;
-          grid->ysize = nlat;
+          grid.xsize = nlon;
+          grid.ysize = nlat;
         }
       else
         {
-          grid->xsize = gridsize;
-          grid->ysize = gridsize;
-          if (lbounds) grid->nvertex = 4;
+          grid.xsize = gridsize;
+          grid.ysize = gridsize;
+          if (lbounds) grid.nvertex = 4;
         }
 
       if (lbounds && nlon > 1 && nlat > 1)
         {
           std::vector<double> xbounds(2 * nlon);
-          grid_gen_bounds(nlon, grid->xvals, &xbounds[0]);
-
           std::vector<double> ybounds(2 * nlat);
-          grid_gen_bounds(nlat, &yvals[0], &ybounds[0]);
-          grid_check_lat_borders(2 * nlat, &ybounds[0]);
 
-          grid->xbounds = (double *) Malloc(4 * gridsize * sizeof(double));
-          grid->ybounds = (double *) Malloc(4 * gridsize * sizeof(double));
-          grid_gen_xbounds2D(nlon, nlat, &xbounds[0], grid->xbounds);
-          grid_gen_ybounds2D(nlon, nlat, &ybounds[0], grid->ybounds);
+          grid_gen_bounds(nlon, grid.xvals.data(), xbounds.data());
+          grid_gen_bounds(nlat, yvals.data(), ybounds.data());
+          grid_check_lat_borders(2 * nlat, ybounds.data());
+
+          grid.xbounds.resize(4 * gridsize);
+          grid.ybounds.resize(4 * gridsize);
+          grid_gen_xbounds2D(nlon, nlat, xbounds.data(), grid.xbounds.data());
+          grid_gen_ybounds2D(nlon, nlat, ybounds.data(), grid.ybounds.data());
         }
     }
 }
@@ -217,14 +218,12 @@ grid_from_name(const char *gridnameptr)
 {
   const char *pline;
   int gridID = CDI_UNDEFID;
-  griddes_t grid;
+  GridDesciption grid;
   size_t len;
   char *endptr;
 
   char *gridname = strdup(gridnameptr);
   strtolower(gridname);
-
-  gridInit(&grid);
 
   if (gridname[0] == 't' && gridname[1] == 'l') /* tl<RES>grid or tl<RES>spec */
     {
@@ -316,8 +315,8 @@ grid_from_name(const char *gridnameptr)
           grid.type = GRID_LONLAT;
           grid.xsize = 1;
           grid.ysize = 1;
-          grid.xvals = (double *) Malloc(sizeof(double));
-          grid.yvals = (double *) Malloc(sizeof(double));
+          grid.xvals.resize(1);
+          grid.yvals.resize(1);
           grid.xvals[0] = atof(pline);
           while (isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-') pline++;
           if (*pline == '_') pline++;
@@ -421,7 +420,7 @@ grid_from_name(const char *gridnameptr)
       double dll = 0.1;
 
       pline = &gridname[len];
-      gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
+      gen_grid_lonlat(grid, pline, dll, lon1, lon2, lat1, lat2);
     }
   else if (cmpstrlen(gridname, "europe", len) == 0)  // europe_Xdeg
     {
@@ -430,7 +429,7 @@ grid_from_name(const char *gridnameptr)
       double dll = 1;
 
       pline = &gridname[len];
-      gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
+      gen_grid_lonlat(grid, pline, dll, lon1, lon2, lat1, lat2);
     }
   else if (cmpstrlen(gridname, "africa", len) == 0)  // africa_Xdeg
     {
@@ -439,7 +438,7 @@ grid_from_name(const char *gridnameptr)
       double dll = 1;
 
       pline = &gridname[len];
-      gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
+      gen_grid_lonlat(grid, pline, dll, lon1, lon2, lat1, lat2);
     }
   else if (cmpstrlen(gridname, "global", len) == 0)  // global_Xdeg
     {
@@ -448,12 +447,12 @@ grid_from_name(const char *gridnameptr)
       double dll = 1;
 
       pline = &gridname[len];
-      gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
+      gen_grid_lonlat(grid, pline, dll, lon1, lon2, lat1, lat2);
     }
   else if (cmpstrlen(gridname, "ico", len) == 0)  // icoR02BXX
     {
       pline = &gridname[len];
-      gen_grid_icosphere(&grid, pline);
+      gen_grid_icosphere(grid, pline);
     }
 
   if (grid.type != -1) gridID = gridDefine(grid);

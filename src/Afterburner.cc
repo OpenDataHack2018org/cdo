@@ -32,7 +32,7 @@
 
 #include <cdi.h>
 
-#if defined(CDO)
+#ifdef CDO
 
 #include "cdo_int.h"
 #include "cdo_task.h"
@@ -42,7 +42,7 @@
 #define streamDefTimestep pstreamDefTimestep
 #endif
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 #include "afterdoc.h"
 #endif
 
@@ -63,12 +63,16 @@
 #define CLOCKS_PER_SEC 1000000
 #endif
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 static double starttime = 0.0;
 #endif
 
+#ifdef AFTERBURNER
 void afterInqHistory(int fileID);
 void afterDefHistory(int fileID, char *histstring);
+
+long get_nfft(void);
+#endif
 
 int scan_par_obsolate(char *namelist, const char *name, int def);
 void scan_code(char *namelist, struct Variable *vars, int maxCodes, int *numCodes);
@@ -76,18 +80,16 @@ int scan_par(int verbose, char *namelist, const char *name, int def);
 int scan_time(int verbose, char *namelist, int *hours, int max_hours);
 void scan_darray(char *namelist, const char *name, double *values, int maxValues, int *numValues);
 
-long get_nfft(void);
-
 char zaxistypename[CDI_MAX_NAME];
 
-typedef struct
+struct RARG
 {
   int lana, nrecs;
   struct Variable *vars;
   struct Control *globs;
-} RARG;
+};
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 int stdin_is_tty = 0;  /* true if stdin  is character device */
 int stdout_is_tty = 0; /* true if stdout is character device */
 #endif
@@ -104,7 +106,7 @@ static char *filename;
 static char **ifiles;
 static char *ifile = NULL;
 static char *ofile = NULL;
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 static char *ofile2 = NULL;
 #endif
 
@@ -542,7 +544,7 @@ after_defineNextTimestep(struct Control *globs)
       streamDefTimestep(globs->ostreamID, otsID);
     }
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
   if (globs->Mean >= 2)
     {
       if (otsID == 0)
@@ -1235,7 +1237,7 @@ after_checkNamelist(struct Control *globs)
     }
 }
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 static void
 after_usage(void)
 {
@@ -1273,7 +1275,7 @@ after_parini(struct Control *globs, struct Variable *vars)
 
   if (stdin_is_tty)
     {
-#if defined(CDO)
+#ifdef CDO
       fprintf(stderr, "Default namelist: \n");
       fprintf(stderr, "  TYPE=0, CODE=-1, LEVEL=-1, INTERVAL=0, MEAN=0, EXTRAPOLATE=0\n");
 #endif
@@ -1286,7 +1288,7 @@ after_parini(struct Control *globs, struct Variable *vars)
       if (length == 0L)
         {
           fprintf(stderr, "\n stdin not connected\n");
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
           after_usage();
 #endif
         }
@@ -1332,7 +1334,7 @@ after_parini(struct Control *globs, struct Variable *vars)
   globs->Mean = scan_par(globs->Verbose, namelist, "mean", 0);
   globs->OutputInterval = scan_par(globs->Verbose, namelist, "interval", MONTHLY_INTERVAL);
 
-#if defined(CDO)
+#ifdef CDO
   if (globs->Mean >= 2) cdoAbort("Namelist parameter MEAN=%d out of bounds (0:1)", globs->Mean);
 #endif
 
@@ -1344,7 +1346,7 @@ after_parini(struct Control *globs, struct Variable *vars)
 
   switch (fileFormat)
     {
-#if defined(CDO)
+#ifdef CDO
     case -1: ofiletype = -1; break;
 #else
     case -1: ofiletype = CDI_FILETYPE_SRV; break;
@@ -1689,7 +1691,7 @@ after_postcntl(struct Control *globs, struct Variable *vars)
 
   snprintf(histstring, sizeof(histstring), "afterburner version %s  type = %d", VERSION, globs->Type);
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
   afterInqHistory(globs->istreamID);
   if (globs->Mean != 2) afterDefHistory(globs->ostreamID, histstring);
   if (globs->Mean >= 2) afterDefHistory(globs->ostreamID2, histstring);
@@ -1846,7 +1848,7 @@ after_readVct(struct Control *globs, const char *vctfile)
   fclose(fp);
 }
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 static void
 after_version(void)
 {
@@ -1910,7 +1912,7 @@ after_variable_init(struct Variable *vars)
   vars->tableID = -1;
 }
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 static void
 after_printCodes(void)
 {
@@ -1953,7 +1955,7 @@ after_printCodes(void)
 /* procstat   - appends info about memory usage    */
 /*              and time consumption               */
 /* =============================================== */
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 static void
 after_procstat(char *procpath, int truncation)
 {
@@ -2048,7 +2050,7 @@ after_processing(struct Control *globs, struct Variable *vars)
 
   if (globs->Mean != 2)
     {
-#if defined(CDO)
+#ifdef CDO
       globs->ostreamID = cdoStreamOpenWrite(cdoStreamName(ofileidx), ofiletype);
 #else
       globs->ostreamID = streamOpenWrite(ofile, ofiletype);
@@ -2059,7 +2061,7 @@ after_processing(struct Control *globs, struct Variable *vars)
 
       globs->ovlistID = vlistCreate();
     }
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
   if (globs->Mean >= 2)
     {
       globs->ostreamID2 = streamOpenWrite(ofile2, ofiletype);
@@ -2189,13 +2191,13 @@ after_processing(struct Control *globs, struct Variable *vars)
 
   after_control(globs, vars);
 
-#if defined(CDO)
+#ifdef CDO
   if (globs->ostreamID != CDI_UNDEFID) pstreamClose(globs->ostreamID);
 #else
   if (globs->ostreamID2 != CDI_UNDEFID) streamClose(globs->ostreamID2);
   if (globs->ostreamID != CDI_UNDEFID) streamClose(globs->ostreamID);
 #endif
-#if defined(CDO)
+#ifdef CDO
   processDefVarNum(vlistNvars(globs->ivlistID));
   processSelf().addNvals(streamNvals(globs->istreamID));
 #endif
@@ -2217,7 +2219,7 @@ after_processing(struct Control *globs, struct Variable *vars)
 extern char *optarg;
 extern int optind, opterr, optopt;
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
 static int
 afterburner(int argc, char *argv[])
 {
@@ -2235,7 +2237,7 @@ afterburner(int argc, char *argv[])
 
   starttime = (double) clock();
 
-#if defined(AFTERBURNER)
+#ifdef AFTERBURNER
   { /* check character device on stdin and stdout */
     struct stat statbuf;
     fstat(0, &statbuf);
@@ -2392,7 +2394,7 @@ afterburner(int argc, char *argv[])
 }
 #endif
 
-#if defined(CDO)
+#ifdef CDO
 void *
 Afterburner(void *process)
 {

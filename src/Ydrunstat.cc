@@ -38,7 +38,7 @@
 
 #define NDAY 373
 
-typedef struct
+struct YDAY_STATS
 {
   int64_t vdate[NDAY];
   int vtime[NDAY];
@@ -46,7 +46,7 @@ typedef struct
   Field **vars2[NDAY];
   int nsets[NDAY];
   int vlist;
-} YDAY_STATS;
+};
 
 static YDAY_STATS *ydstatCreate(int vlistID);
 static void ydstatDestroy(YDAY_STATS *stats);

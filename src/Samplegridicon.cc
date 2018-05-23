@@ -22,14 +22,14 @@
 
 constexpr int MAX_CHILDS = 9;
 
-typedef struct
+struct CellIndex
 {
   long ncells;
   long *neighbor;  // neighbor cell index
   long *parent;    // parent cell index
   long *child;     // child cell index
   const char *filename;
-} cellindex_type;
+};
 
 static void
 copy_data_to_index(long ncells, const double *restrict data, long *restrict cellindex)
@@ -38,7 +38,7 @@ copy_data_to_index(long ncells, const double *restrict data, long *restrict cell
 }
 
 static void
-free_cellindex(cellindex_type *cellindex)
+free_cellindex(CellIndex *cellindex)
 {
   if (cellindex->neighbor) Free(cellindex->neighbor);
   if (cellindex->parent) Free(cellindex->parent);
@@ -46,7 +46,7 @@ free_cellindex(cellindex_type *cellindex)
   Free(cellindex);
 }
 
-static cellindex_type *
+static CellIndex *
 read_cellindex(const char *filename)
 {
   openLock();
@@ -88,16 +88,15 @@ read_cellindex(const char *filename)
 
   long ncells = gridInqSize(gridID);
 
-  cellindex_type *cellindex = (cellindex_type *) Malloc(sizeof(cellindex_type));
+  CellIndex *cellindex = (CellIndex *) Malloc(sizeof(CellIndex));
   cellindex->ncells = ncells;
 
   cellindex->neighbor = NULL;
   // cellindex->neighbor = (long*) Malloc(3*ncells*sizeof(long));
   cellindex->parent = (long *) Malloc(ncells * sizeof(long));
   cellindex->child = NULL;
-  // cellindex->child    = (cid != CDI_UNDEFID) ? (int*)
-  // Malloc(MAX_CHILDS*ncells*sizeof(int)) : NULL;
-  double *data = (double *) Malloc(ncells * sizeof(double));
+  // cellindex->child    = (cid != CDI_UNDEFID) ? (int*) Malloc(MAX_CHILDS*ncells*sizeof(int)) : NULL;
+  std::vector<double> data(ncells);
 
   int nrecs = streamInqTimestep(streamID, 0);
   for (int recID = 0; recID < nrecs; recID++)
@@ -107,8 +106,8 @@ read_cellindex(const char *filename)
       streamInqRecord(streamID, &varID, &levelID);
       if (varID == pid /* || varID == nid || varID == cid */)
         {
-          streamReadRecord(streamID, data, &nmiss);
-          if (varID == pid) copy_data_to_index(ncells, data, cellindex->parent);
+          streamReadRecord(streamID, data.data(), &nmiss);
+          if (varID == pid) copy_data_to_index(ncells, data.data(), cellindex->parent);
           // else if ( varID == nid ) copy_data_to_index(ncells, data,
           // cellindex->neighbor+levelID*ncells); else if ( varID == cid )
           // copy_data_to_index(ncells, data, cellindex->child+levelID*ncells);
@@ -120,8 +119,6 @@ read_cellindex(const char *filename)
   // for ( long i = 0; i < 3*ncells; ++i ) cellindex->neighbor[i] -= 1;
 
   streamClose(streamID);
-
-  Free(data);
 
   return cellindex;
 }
@@ -193,10 +190,10 @@ find_index(int search, long n, const long *restrict array)
   return -1;
 }
 
-typedef struct
+struct sinfo_t
 {
   int p, i;
-} sinfo_t;
+};
 
 static int
 cmpsinfo(const void *a, const void *b)
@@ -207,7 +204,7 @@ cmpsinfo(const void *a, const void *b)
 }
 
 static void
-compute_child_from_parent(cellindex_type *cellindex1, cellindex_type *cellindex2)
+compute_child_from_parent(CellIndex *cellindex1, CellIndex *cellindex2)
 {
   long ncells1 = cellindex1->ncells;
   long *parent1 = cellindex1->parent;
@@ -306,7 +303,7 @@ int winding_numbers_algorithm(double cell_corners[], int number_corners, double 
 #define MAX_SEARCH 128  // the triangles are distorted!
 
 static void
-compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid_center_lon2, double *grid_center_lat2,
+compute_child_from_bounds(CellIndex *cellindex2, long ncells2, double *grid_center_lon2, double *grid_center_lat2,
                           double *grid_corner_lon2, double *grid_corner_lat2, long ncells1, double *grid_center_lon1,
                           double *grid_center_lat1)
 {
@@ -423,8 +420,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
               if (winding_number != 0)
                 {
                   if (k >= MAX_CHILDS)
-                    cdoAbort("Internal problem, limit of MAX_CHILDS reached "
-                             "(limit=9).");
+                    cdoAbort("Internal problem, limit of MAX_CHILDS reached (limit=9).");
                   child2[cell_no2 * MAX_CHILDS + k++] = (long) cell_no1;
                 }
             }
@@ -434,7 +430,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
 }
 
 static void
-compute_child_from_coordinates(cellindex_type *cellindex1, cellindex_type *cellindex2)
+compute_child_from_coordinates(CellIndex *cellindex1, CellIndex *cellindex2)
 {
   long ncells1 = cellindex1->ncells;
   long ncells2 = cellindex2->ncells;
@@ -460,7 +456,7 @@ compute_child_from_coordinates(cellindex_type *cellindex1, cellindex_type *celli
 }
 
 static void
-compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
+compute_child(CellIndex *cellindex1, CellIndex *cellindex2)
 {
   bool lparent = true;
   long ncells1 = cellindex1->ncells;
@@ -482,7 +478,7 @@ compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
 }
 
 static void
-compute_sum(long i, long *n, double *sum, double *sumq, long kci, cellindex_type **cellindex, double *array)
+compute_sum(long i, long *n, double *sum, double *sumq, long kci, CellIndex **cellindex, double *array)
 {
   // printf("compute: i, kci %d %d\n", i, kci);
   long ncells2 = cellindex[kci]->ncells;
@@ -504,7 +500,7 @@ compute_sum(long i, long *n, double *sum, double *sumq, long kci, cellindex_type
 }
 
 static void
-samplegrid(double missval, long nci, cellindex_type **cellindex, double *array1, double *array2, double *array3)
+samplegrid(double missval, long nci, CellIndex **cellindex, double *array1, double *array2, double *array3)
 {
   static bool lstat = true;
   long kci = nci - 1;
@@ -552,7 +548,7 @@ Samplegridicon(void *process)
   int nsamplegrids = operatorArgc();
   if (nsamplegrids < 2) cdoAbort("Parameter missing!");
 
-  std::vector<cellindex_type *> cellindex(nsamplegrids);
+  std::vector<CellIndex *> cellindex(nsamplegrids);
 
   for (int i = 0; i < nsamplegrids; ++i)
     {

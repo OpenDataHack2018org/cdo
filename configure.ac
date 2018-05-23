@@ -5,7 +5,7 @@
 #  libtool  2.4.2
 
 AC_PREREQ([2.68])
-AC_INIT([cdo], [1.9.5rc1], [http://mpimet.mpg.de/cdo])
+AC_INIT([cdo], [1.9.5rc2], [http://mpimet.mpg.de/cdo])
 
 AC_DEFINE_UNQUOTED(CDO, ["$PACKAGE_VERSION"], [CDO version])
 

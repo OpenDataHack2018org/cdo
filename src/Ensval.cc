@@ -86,12 +86,12 @@ Ensval(void *process)
   char file_suffix[32];
   char type_suffix[10];
 
-  typedef struct
+  struct ens_file_t
   {
     int streamID;
     int vlistID;
     double *array;
-  } ens_file_t;
+  };
 
   // INITIALIZE POINTERS
   alpha = NULL;
@@ -476,8 +476,7 @@ Ensval(void *process)
 
               if (fabs(osum - 1) > 1.e-06 || fabs(gsum - 1) > 1.e-06)
                 {
-                  cdoAbort("Internal error - normalization constraint of "
-                           "problem not fulfilled");
+                  cdoAbort("Internal error - normalization constraint of problem not fulfilled");
                   cdoAbort("This is likely due to missing values");
                 }
               o = 0;
@@ -507,8 +506,7 @@ Ensval(void *process)
                 {
                   //	      cdoPrint("Brier score for var %i level %i
                   // calculated",varID, levelID);
-                  cdoPrint("BRS: obar %12.6g "
-                           "brs  %12.6g reli %12.6g resol %12.6g u %12.6g",
+                  cdoPrint("BRS: obar %12.6g brs  %12.6g reli %12.6g resol %12.6g u %12.6g",
                            obar, brs_reli - brs_resol + brs_uncty, brs_reli, brs_resol, brs_uncty);
                 }
             }

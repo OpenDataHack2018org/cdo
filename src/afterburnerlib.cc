@@ -21,7 +21,7 @@
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#if defined(CDO)
+#ifdef CDO
 #include "cdo_int.h"
 #include "pstream_write.h"
 #define streamDefRecord pstreamDefRecord
@@ -1726,8 +1726,7 @@ after_processML(struct Control *globs, struct Variable *vars)
             }
           else if (vars[PS].hybrid)
             {
-              Warning("log surface pressure (code 152) not found - using "
-                      "surface pressure (code 134)!");
+              Warning("log surface pressure (code 152) not found - using surface pressure (code 134)!");
               arrayCopy(globs->DimGP, vars[PS].hybrid, vars[PS_PROG].hybrid);
             }
           else

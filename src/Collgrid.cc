@@ -22,7 +22,7 @@
 #include "grid.h"
 #include "util_files.h"
 
-typedef struct
+struct ensfileType
 {
   int streamID;
   int vlistID;
@@ -31,13 +31,13 @@ typedef struct
   size_t gridsize;
   std::vector<long> gridindex;
   std::vector<double> array;
-} ensfileType;
+};
 
-typedef struct
+struct xyinfoType
 {
   double x, y;
   int id;
-} xyinfoType;
+};
 
 static int
 cmpx(const void *a, const void *b)

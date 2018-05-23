@@ -32,10 +32,12 @@
 #endif
 
 static int nvars_ml = 4;
+#ifdef HAVE_LIBNETCDF
 static const char strfiletype_ml[] = "Initial file spectral";
 static const char strfiletype_res[] = "Restart history file";
+#endif
 
-typedef struct
+struct VAR
 {
   int gridtype;
   int zaxistype;
@@ -48,9 +50,9 @@ typedef struct
   size_t gridsize;
   int nlev;
   double *ptr;
-} VAR;
+};
 
-typedef struct
+struct ATTS
 {
   int naint;
   int naflt;
@@ -61,7 +63,7 @@ typedef struct
   double *afltentry[1024];
   char *atxtname[1024];
   char *atxtentry[1024];
-} ATTS;
+};
 
 static void
 iniatts(ATTS *atts)
@@ -85,6 +87,7 @@ inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name, const 
   if (units) var->units = strdup(units);
 }
 
+#ifdef HAVE_LIBNETCDF
 static void
 inivars_ml(VAR **vars)
 {
@@ -98,7 +101,6 @@ inivars_ml(VAR **vars)
   inivar(&(*vars)[4], GRID_SPECTRAL, ZAXIS_SURFACE, 152, "LSP", "log surface pressure", "");
 }
 
-#ifdef HAVE_LIBNETCDF
 static void
 nce(int istat)
 {

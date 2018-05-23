@@ -445,8 +445,7 @@ Specinfo(void *process)
   ngp_icon1 = NGP_ICON(nrooti1, nlevel1);
   ngp_icon2 = NGP_ICON(nrooti2, nlevel2);
 
-  fprintf(stdout, "truncation     nsp  nlon  nlat      ngp  gme    ngp_gme  "
-                  "icon   ngp_icon\n");
+  fprintf(stdout, "truncation     nsp  nlon  nlat      ngp  gme    ngp_gme  icon   ngp_icon\n");
 
   if (nout1)
     fprintf(stdout, "   T%-4d  %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n", ntr1, nsp1, nlon1, nlat1, ngp1, ni1, ngp_gme1, nrooti1,

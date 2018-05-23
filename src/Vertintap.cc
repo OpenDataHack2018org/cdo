@@ -301,8 +301,7 @@ Vertintap(void *process)
           if (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && nlevel > 1)
             {
               vlistInqVarName(vlistID1, varID, varname);
-              cdoWarning("Parameter %d has wrong number of levels, skipped! "
-                         "(param=%s nlevel=%d)",
+              cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
                          varID + 1, varname, nlevel);
             }
 
@@ -426,8 +425,7 @@ Vertintap(void *process)
                   else
                     {
                       vlistInqVarName(vlistID1, varID, varname);
-                      cdoAbort("Number of generalized height level differ from "
-                               "full/half level (param=%s)!",
+                      cdoAbort("Number of generalized height level differ from full/half level (param=%s)!",
                                varname);
                     }
 

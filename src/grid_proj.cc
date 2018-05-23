@@ -37,6 +37,7 @@
 #include "grid.h"
 #include "grid_proj.h"
 
+#ifdef HAVE_LIBPROJ
 static char *
 gen_param(const char *fmt, ...)
 {
@@ -55,6 +56,7 @@ gen_param(const char *fmt, ...)
 
   return rstr;
 }
+#endif
 
 static void
 verify_lcc_parameter(double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0, double y_0)
@@ -337,6 +339,7 @@ cdo_sinu_to_lonlat(size_t nvals, double *xvals, double *yvals)
 #endif
 }
 
+#ifdef HAVE_LIBPROJ
 static bool
 cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int attlen, double *attflt)
 {
@@ -407,6 +410,7 @@ grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, double 
         cdoWarning("%s mapping parameter missing!", projection);
     }
 }
+#endif
 
 void
 cdo_laea_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)

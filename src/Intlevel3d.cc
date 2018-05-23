@@ -30,8 +30,6 @@
 #include "listarray.h"
 #include "after_vertint.h"
 
-bool levelDirUp(int nlev, double *lev);
-bool levelDirDown(int nlev, double *lev);
 void vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1, int *lev_idx2,
                        double *lev_wgt1, double *lev_wgt2);
 void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1,
@@ -185,14 +183,12 @@ Intlevel3d(void *process)
 
   /* Missing values are not allowed for coordinate variables */
   if (0 != zlevels_in_miss)
-    cdoAbort("Input vertical coordinate variables are not allowed to contain "
-             "missing values.");
+    cdoAbort("Input vertical coordinate variables are not allowed to contain missing values.");
   else if (cdoVerbose)
     cdoPrint("Input vertical coordinate has no missing values.");
 
   if (0 != zlevels_out_miss)
-    cdoAbort("Output vertical coordinate variables are not allowd to contain "
-             "missing values.");
+    cdoAbort("Output vertical coordinate variables are not allowd to contain missing values.");
   else if (cdoVerbose)
     cdoPrint("Output vertical coordinate has no missing values.");
 
@@ -204,14 +200,12 @@ Intlevel3d(void *process)
 
   size_t gridSize = gridsizeo;
 
-  /* input and output vertical coordinates must have exactly the same horizontal
-   * grid */
+  /* input and output vertical coordinates must have exactly the same horizontal grid */
   if (gridsizei != gridsizeo)
     {
       /* i =0; printf ( "lonIn:%g latIn:%g lonOut:%g
        * latOut:%g\n",lonIn[i],latIn[i],lonOut[i],latOut[i] ); */
-      cdoAbort("Input and output vertical coordinates do NOT exactly have the "
-               "same horizontal grid.");
+      cdoAbort("Input and output vertical coordinates do NOT exactly have the same horizontal grid.");
     }
 
   /*

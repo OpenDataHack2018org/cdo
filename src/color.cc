@@ -460,8 +460,7 @@ cptWriteC(FILE *fp, CPT cpt, const char *name)
   fprintf(fp, "\nstatic LUT %s[] = {\n", lut_name);
   for (n = 0; n < cpt.ncolors; n++)
     {
-      fprintf(fp, "  { %7g, %7g, %7g, {%3d, %3d, %3d}, {%3d, %3d, %3d}, {%3d, %3d, "
-                  "%3d}, %d, %d},\n",
+      fprintf(fp, "  { %7g, %7g, %7g, {%3d, %3d, %3d}, {%3d, %3d, %3d}, {%3d, %3d, %3d}, %d, %d},\n",
               cpt.lut[n].z_low, cpt.lut[n].z_high, cpt.lut[n].i_dz, cpt.lut[n].rgb_low[0], cpt.lut[n].rgb_low[1],
               cpt.lut[n].rgb_low[2], cpt.lut[n].rgb_high[0], cpt.lut[n].rgb_high[1], cpt.lut[n].rgb_high[2], cpt.lut[n].rgb_diff[0],
               cpt.lut[n].rgb_diff[1], cpt.lut[n].rgb_diff[2], cpt.lut[n].annot, cpt.lut[n].skip);

@@ -32,62 +32,56 @@ int grid_read(FILE *gfp, const char *dname);
 int grid_read_pingo(FILE *gfp, const char *dname);
 
 void
-gridInit(griddes_t *grid)
+GridDesciption::init()
 {
-  grid->mask = NULL;
-  grid->xvals = NULL;
-  grid->yvals = NULL;
-  grid->xbounds = NULL;
-  grid->ybounds = NULL;
-  grid->rowlon = NULL;
-  grid->area = NULL;
-  grid->type = CDI_UNDEFID;
-  grid->datatype = CDI_UNDEFID;
-  grid->size = 0;
-  grid->xsize = 0;
-  grid->ysize = 0;
-  grid->np = 0;
-  grid->lcomplex = 1;
-  grid->ntr = 0;
-  grid->nvertex = 0;
-  grid->genBounds = false;
-  grid->def_xfirst = false;
-  grid->def_yfirst = false;
-  grid->def_xlast = false;
-  grid->def_ylast = false;
-  grid->def_xinc = false;
-  grid->def_yinc = false;
-  grid->xfirst = 0;
-  grid->yfirst = 0;
-  grid->xlast = 0;
-  grid->ylast = 0;
-  grid->xinc = 0;
-  grid->yinc = 0;
-  grid->nd = 0;
-  grid->ni = 0;
-  grid->ni2 = 0;
-  grid->ni3 = 0;
-  grid->number = 0;
-  grid->position = 0;
-  grid->uuid[0] = 0;
-  grid->path[0] = 0;
-  grid->xname[0] = 0;
-  grid->xlongname[0] = 0;
-  grid->xunits[0] = 0;
-  grid->yname[0] = 0;
-  grid->ylongname[0] = 0;
-  grid->yunits[0] = 0;
-  grid->xdimname[0] = 0;
-  grid->ydimname[0] = 0;
-  grid->vdimname[0] = 0;
-  grid->uvRelativeToGrid = false;
-  grid->scanningMode = 64;
-  /* scanningMode  = 128 * iScansNegatively + 64 * jScansPositively + 32 *
-     jPointsAreConsecutive; 64  = 128 * 0                + 64 *        1
-     + 32 * 0 00  = 128 * 0                + 64 *        0         + 32 * 0 96
-     = 128 * 0                + 64 *        1         + 32 * 1 Default /
-     implicit scanning mode is 64: i and j scan positively, i points are
-     consecutive (row-major)        */
+  this->type = CDI_UNDEFID;
+  this->datatype = CDI_UNDEFID;
+  this->size = 0;
+  this->xsize = 0;
+  this->ysize = 0;
+  this->np = 0;
+  this->lcomplex = 1;
+  this->ntr = 0;
+  this->nvertex = 0;
+  this->genBounds = false;
+  this->def_xfirst = false;
+  this->def_yfirst = false;
+  this->def_xlast = false;
+  this->def_ylast = false;
+  this->def_xinc = false;
+  this->def_yinc = false;
+  this->xfirst = 0;
+  this->yfirst = 0;
+  this->xlast = 0;
+  this->ylast = 0;
+  this->xinc = 0;
+  this->yinc = 0;
+  this->nd = 0;
+  this->ni = 0;
+  this->ni2 = 0;
+  this->ni3 = 0;
+  this->number = 0;
+  this->position = 0;
+  this->uuid[0] = 0;
+  this->path[0] = 0;
+  this->xname[0] = 0;
+  this->xlongname[0] = 0;
+  this->xunits[0] = 0;
+  this->yname[0] = 0;
+  this->ylongname[0] = 0;
+  this->yunits[0] = 0;
+  this->xdimname[0] = 0;
+  this->ydimname[0] = 0;
+  this->vdimname[0] = 0;
+  this->uvRelativeToGrid = false;
+  this->scanningMode = 64;
+  /*
+    scanningMode  = 128 * iScansNegatively + 64 * jScansPositively + 32 * jPointsAreConsecutive;
+              64  = 128 * 0                + 64 *        1         + 32 * 0 
+              00  = 128 * 0                + 64 *        0         + 32 * 0
+              96  = 128 * 0                + 64 *        1         + 32 * 1
+    Default  implicit scanning mode is 64: i and j scan positively, i points are consecutive (row-major)
+  */
 }
 
 int
@@ -109,12 +103,7 @@ getoptname(char *optname, const char *optstring, int nopt)
   if (pend)
     {
       pend = strchr(pname, ',');
-      size_t namelen;
-      if (pend == NULL)
-        namelen = strlen(pname);
-      else
-        namelen = pend - pname;
-
+      size_t namelen = (pend == NULL) ? strlen(pname) : pend - pname;
       memcpy(optname, pname, namelen);
       optname[namelen] = '\0';
     }
@@ -125,7 +114,7 @@ getoptname(char *optname, const char *optstring, int nopt)
 }
 
 int
-gridDefine(griddes_t grid)
+gridDefine(GridDesciption &grid)
 {
   int gridID = CDI_UNDEFID;
 
@@ -161,15 +150,15 @@ gridDefine(griddes_t grid)
         if (grid.uvRelativeToGrid) gridDefUvRelativeToGrid(gridID, 1);
         if (grid.nvertex) gridDefNvertex(gridID, grid.nvertex);
 
-        if ((grid.def_xfirst || grid.def_xlast || grid.def_xinc) && grid.xvals == NULL)
+        if ((grid.def_xfirst || grid.def_xlast || grid.def_xinc) && grid.xvals.size() == 0)
           {
-            grid.xvals = (double *) Malloc(grid.xsize * sizeof(double));
-            gridGenXvals(grid.xsize, grid.xfirst, grid.xlast, grid.xinc, grid.xvals);
+            grid.xvals.resize(grid.xsize);
+            gridGenXvals(grid.xsize, grid.xfirst, grid.xlast, grid.xinc, grid.xvals.data());
 
-            if (grid.genBounds && grid.xbounds == NULL && grid.xsize > 1)
+            if (grid.genBounds && grid.xbounds.size() == 0 && grid.xsize > 1)
               {
                 grid.nvertex = 2;
-                grid.xbounds = (double *) Malloc(grid.xsize * grid.nvertex * sizeof(double));
+                grid.xbounds.resize(grid.xsize * grid.nvertex);
                 for (size_t i = 0; i < grid.xsize - 1; ++i)
                   {
                     grid.xbounds[2 * i + 1] = 0.5 * (grid.xvals[i] + grid.xvals[i + 1]);
@@ -180,16 +169,16 @@ gridDefine(griddes_t grid)
               }
           }
 
-        if ((grid.def_yfirst || grid.def_ylast || grid.def_yinc) && grid.yvals == NULL)
+        if ((grid.def_yfirst || grid.def_ylast || grid.def_yinc) && grid.yvals.size() == 0)
           {
             if (!grid.def_ylast) grid.ylast = grid.yfirst;
-            grid.yvals = (double *) Malloc(grid.ysize * sizeof(double));
-            gridGenYvals(grid.type, grid.ysize, grid.yfirst, grid.ylast, grid.yinc, grid.yvals);
+            grid.yvals.resize(grid.ysize);
+            gridGenYvals(grid.type, grid.ysize, grid.yfirst, grid.ylast, grid.yinc, grid.yvals.data());
 
-            if (grid.genBounds && grid.ybounds == NULL && grid.ysize > 1)
+            if (grid.genBounds && grid.ybounds.size() == 0 && grid.ysize > 1)
               {
                 grid.nvertex = 2;
-                grid.ybounds = (double *) Malloc(grid.ysize * grid.nvertex * sizeof(double));
+                grid.ybounds.resize(grid.ysize * grid.nvertex);
                 for (size_t i = 0; i < grid.ysize - 1; ++i)
                   {
                     grid.ybounds[2 * i + 1] = 0.5 * (grid.yvals[i] + grid.yvals[i + 1]);
@@ -209,36 +198,12 @@ gridDefine(griddes_t grid)
               }
           }
 
-        if (grid.xvals)
-          {
-            gridDefXvals(gridID, grid.xvals);
-            Free(grid.xvals);
-          }
-        if (grid.yvals)
-          {
-            gridDefYvals(gridID, grid.yvals);
-            Free(grid.yvals);
-          }
-        if (grid.xbounds)
-          {
-            gridDefXbounds(gridID, grid.xbounds);
-            Free(grid.xbounds);
-          }
-        if (grid.ybounds)
-          {
-            gridDefYbounds(gridID, grid.ybounds);
-            Free(grid.ybounds);
-          }
-        if (grid.mask)
-          {
-            gridDefMask(gridID, grid.mask);
-            Free(grid.mask);
-          }
-        if (grid.rowlon)
-          {
-            gridDefRowlon(gridID, grid.ysize, grid.rowlon);
-            Free(grid.rowlon);
-          }
+        if (grid.xvals.size()) gridDefXvals(gridID, grid.xvals.data());
+        if (grid.yvals.size()) gridDefYvals(gridID, grid.yvals.data());
+        if (grid.xbounds.size()) gridDefXbounds(gridID, grid.xbounds.data());
+        if (grid.ybounds.size()) gridDefYbounds(gridID, grid.ybounds.data());
+        if (grid.mask.size()) gridDefMask(gridID, grid.mask.data());
+        if (grid.rowlon.size()) gridDefRowlon(gridID, grid.ysize, grid.rowlon.data());
 
         break;
       }
@@ -267,36 +232,12 @@ gridDefine(griddes_t grid)
             if (*grid.path) gridDefReference(gridID, grid.path);
           }
 
-        if (grid.xvals)
-          {
-            gridDefXvals(gridID, grid.xvals);
-            Free(grid.xvals);
-          }
-        if (grid.yvals)
-          {
-            gridDefYvals(gridID, grid.yvals);
-            Free(grid.yvals);
-          }
-        if (grid.area)
-          {
-            gridDefArea(gridID, grid.area);
-            Free(grid.area);
-          }
-        if (grid.xbounds)
-          {
-            gridDefXbounds(gridID, grid.xbounds);
-            Free(grid.xbounds);
-          }
-        if (grid.ybounds)
-          {
-            gridDefYbounds(gridID, grid.ybounds);
-            Free(grid.ybounds);
-          }
-        if (grid.mask)
-          {
-            gridDefMask(gridID, grid.mask);
-            Free(grid.mask);
-          }
+        if (grid.xvals.size()) gridDefXvals(gridID, grid.xvals.data());
+        if (grid.yvals.size()) gridDefYvals(gridID, grid.yvals.data());
+        if (grid.area.size()) gridDefArea(gridID, grid.area.data());
+        if (grid.xbounds.size()) gridDefXbounds(gridID, grid.xbounds.data());
+        if (grid.ybounds.size()) gridDefYbounds(gridID, grid.ybounds.data());
+        if (grid.mask.size()) gridDefMask(gridID, grid.mask.data());
 
         break;
       }
@@ -322,11 +263,7 @@ gridDefine(griddes_t grid)
 
         gridDefParamGME(gridID, grid.nd, grid.ni, grid.ni2, grid.ni3);
 
-        if (grid.mask)
-          {
-            gridDefMask(gridID, grid.mask);
-            Free(grid.mask);
-          }
+        if (grid.mask.size()) gridDefMask(gridID, grid.mask.data());
 
         break;
       }

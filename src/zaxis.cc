@@ -109,11 +109,11 @@ zaxisDefine(zaxis_t zaxis)
   return zaxisID;
 }
 
-typedef struct
+struct kvmap_t
 {
   keyValues_t *kv;
   bool isValid;
-} kvmap_t;
+};
 
 static void
 zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, size_t *iatt, const char *dname)

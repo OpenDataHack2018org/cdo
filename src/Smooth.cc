@@ -37,16 +37,17 @@ enum
 {
   FORM_LINEAR
 };
+
 static const char *Form[] = { "linear" };
 
-typedef struct
+struct smoothpoint_t
 {
   size_t maxpoints;
   int form;
   double radius;
   double weight0;
   double weightR;
-} smoothpoint_t;
+};
 
 static void
 smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss, smoothpoint_t spoint)

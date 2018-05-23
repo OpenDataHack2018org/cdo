@@ -85,12 +85,12 @@ Ensstat3(void *process)
   double val;
   int ival;
 
-  typedef struct
+  struct ens_file_t
   {
     int streamID;
     int vlistID;
     double *array;
-  } ens_file_t;
+  };
 
   cdoInitialize(process);
 
@@ -195,10 +195,8 @@ Ensstat3(void *process)
     {
       if (zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) > 1)
         {
-          cdoWarning("More than one level not supported when processing ranked "
-                     "histograms.");
-          cdoWarning("Try to use `cdo splitlevel` to split the dataset into "
-                     "levels and apply");
+          cdoWarning("More than one level not supported when processing ranked histograms.");
+          cdoWarning("Try to use `cdo splitlevel` to split the dataset into levels and apply");
           cdoWarning("the operator seperately to each level.");
           cdoAbort("Exit due to unsupported file structure");
         }
@@ -258,8 +256,7 @@ Ensstat3(void *process)
               if (nrecs == 0)
                 cdoAbort("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(fileID).c_str());
               else
-                cdoAbort("Inconsistent ensemble file, number of records at "
-                         "time step %d of %s and %s differ!",
+                cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
                          tsID + 1, cdoGetStreamName(0).c_str(), cdoGetStreamName(fileID).c_str());
             }
         }
@@ -451,8 +448,7 @@ Ensstat3(void *process)
     }
   else if (operfunc == func_roc)
     {
-      fprintf(stdout, "#             :     TP     FP     FN     TN         TPR "
-                      "       FPR\n");
+      fprintf(stdout, "#             :     TP     FP     FN     TN         TPR        FPR\n");
 
       for (i = 0; i <= nbins; i++)
         {

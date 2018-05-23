@@ -26,14 +26,14 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-typedef struct
+struct levinfo_t
 {
   int levelID;
   size_t nmiss;
   double level;
-} levinfo_t;
+};
 
-typedef struct
+struct varinfo_t
 {
   int varID;
   int nlevs;
@@ -41,7 +41,7 @@ typedef struct
   char param[CDI_MAX_NAME];
   char name[CDI_MAX_NAME];
   levinfo_t *levInfo;
-} varinfo_t;
+};
 
 static int
 cmpvarcode(const void *a, const void *b)

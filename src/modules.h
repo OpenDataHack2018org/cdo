@@ -43,7 +43,7 @@
   */
 typedef void (*dyn_oper_t)(void *arg);
 
-typedef struct
+struct module_t
 {
   void *(*func)(void *);                // Module
   std::vector<std::string> help;        // Help
@@ -52,7 +52,7 @@ typedef struct
   short number;                         // Allowed number type
   short streamInCnt;                    // Number of input streams
   short streamOutCnt;                   // Number of output streams
-} module_t;
+};
 
 /***
   vector for library handles for loaded custom modules

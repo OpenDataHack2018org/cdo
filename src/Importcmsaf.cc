@@ -33,7 +33,7 @@
 
 #define MAX_DSETS 1024
 
-typedef struct
+struct dset_obj_t
 {
   char *name;
   char *description;
@@ -53,9 +53,9 @@ typedef struct
   double offset;
   double missval;
   double *array;
-} dset_obj_t;
+};
 
-typedef struct
+struct datasets_t
 {
   int nsets;
   int mergelevel;
@@ -64,7 +64,7 @@ typedef struct
   int lprojtype;
   int lmetadata;
   dset_obj_t obj[MAX_DSETS];
-} datasets_t;
+};
 
 #ifdef HAVE_LIBHDF5
 static void
@@ -327,13 +327,13 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   hid_t ptype_id;
   hsize_t dims;
   int xsize, ysize;
-  typedef struct proj_t
+  struct proj_t
   {
     char name[64];
     char ellipsoid[64];
     float parameter[10];
-  } proj_t;
-  typedef struct region_t
+  };
+  struct region_t
   {
     float xmin;
     float xmax;
@@ -341,7 +341,7 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
     float ymax;
     float dx;
     float dy;
-  } region_t;
+  };
 
   proj_t proj;
   region_t region;
@@ -403,8 +403,7 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   H5Tclose(fltarr_tid);
 
   if (cdoVerbose)
-    cdoPrint("  Projection: name=%s\n\t\t\tellipsoid=%s\n\t\t\tparameter=%g %g "
-             "%g %g %g %g",
+    cdoPrint("  Projection: name=%s\n\t\t\tellipsoid=%s\n\t\t\tparameter=%g %g %g %g %g %g",
              proj.name, proj.ellipsoid, proj.parameter[0], proj.parameter[1], proj.parameter[2], proj.parameter[3],
              proj.parameter[4], proj.parameter[5]);
 
@@ -500,8 +499,7 @@ read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
               && (int) region.dy == 45000)))
     {
       if (cdoVerbose)
-        cdoPrint("Replacing incorrect projection parameters for sinusoidal "
-                 "products:");
+        cdoPrint("Replacing incorrect projection parameters for sinusoidal products:");
       strcpy(proj.ellipsoid, "WGS-84");
       strcpy(proj.name, "sinusoidal");
       proj.parameter[0] = 0.0;
@@ -552,7 +550,7 @@ static int
 read_region(hid_t loc_id, int nx, int ny)
 {
   int gridID = -1;
-  typedef struct region_t
+  struct region_t
   {
     double area_extent[4];
     int xsize;
@@ -566,7 +564,7 @@ read_region(hid_t loc_id, int nx, int ny)
     char name[128];
     char pcs_id[128];
     char pcs_def[128];
-  } region_t;
+  };
   region_t region;
   char proj[128];
   double a, lon0, lat0;
@@ -1113,9 +1111,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
                 {
                   missval = -255;
                   dtype = CDI_DATATYPE_INT16;
-                  cdoPrint("Dataset %s: changed missval to %g and datatype to "
-                           "INT16!",
-                           varname, missval);
+                  cdoPrint("Dataset %s: changed missval to %g and datatype to INT16!", varname, missval);
 
                   for (size_t i = 0; i < gridsize * nt; i++)
                     if (mask[i]) array[i] = missval;
@@ -1500,14 +1496,12 @@ Importcmsaf(void *process)
               nmiss = arrayNumMV(gridsize, array, missval);
 
               if (cdoVerbose)
-                cdoPrint(" Write var %d,  level %d, nmiss %zu, missval %g, "
-                         "minval %g, maxval %g",
+                cdoPrint(" Write var %d,  level %d, nmiss %zu, missval %g, minval %g, maxval %g",
                          varID, levelID, nmiss, missval, minval, maxval);
               /*
                 if ( ! (missval < minval || missval > maxval) )
                 cdoWarning(" Missval is inside of valid values! Name: %s  Range:
-                %g - %g  Missval: %g\n", dsets.obj[ivar].name, minval, maxval,
-                missval);
+                %g - %g  Missval: %g\n", dsets.obj[ivar].name, minval, maxval, missval);
               */
               pstreamDefRecord(streamID, varID, levelID);
               pstreamWriteRecord(streamID, array, nmiss);

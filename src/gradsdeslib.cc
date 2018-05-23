@@ -1887,8 +1887,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((pos = intprs(ch, &(pfi->dnum[0]))) == NULL) goto err1;
           if (pfi->dnum[0] < 1)
             {
-              sprintf(pout, "Warning: Invalid XDEF syntax in %s -- Changing size of "
-                            "X axis from %d to 1 \n",
+              sprintf(pout, "Warning: Invalid XDEF syntax in %s -- Changing size of X axis from %d to 1 \n",
                       pfi->dnam, pfi->dnum[0]);
               gaprnt(1, pout);
               pfi->dnum[0] = 1;
@@ -1922,8 +1921,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((pos = intprs(ch, &(pfi->dnum[1]))) == NULL) goto err1;
           if (pfi->dnum[1] < 1)
             {
-              sprintf(pout, "Warning: Invalid YDEF syntax in %s -- Changing size of "
-                            "Y axis from %d to 1 \n",
+              sprintf(pout, "Warning: Invalid YDEF syntax in %s -- Changing size of Y axis from %d to 1 \n",
                       pfi->dnam, pfi->dnum[1]);
               gaprnt(1, pout);
               pfi->dnum[1] = 1;
@@ -1950,8 +1948,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((pos = intprs(ch, &(pfi->dnum[2]))) == NULL) goto err1;
           if (pfi->dnum[2] < 1)
             {
-              sprintf(pout, "Warning: Invalid ZDEF syntax in %s -- Changing size of "
-                            "Z axis from %d to 1 \n",
+              sprintf(pout, "Warning: Invalid ZDEF syntax in %s -- Changing size of Z axis from %d to 1 \n",
                       pfi->dnam, pfi->dnum[2]);
               gaprnt(1, pout);
               pfi->dnum[2] = 1;
@@ -1979,8 +1976,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((pos = intprs(ch, &(pfi->dnum[3]))) == NULL) goto err1;
           if (pfi->dnum[3] < 1)
             {
-              sprintf(pout, "Warning: Invalid TDEF syntax in %s -- Changing size of "
-                            "T axis from %d to 1 \n",
+              sprintf(pout, "Warning: Invalid TDEF syntax in %s -- Changing size of T axis from %d to 1 \n",
                       pfi->dnam, pfi->dnum[3]);
               gaprnt(1, pout);
               pfi->dnum[3] = 1;
@@ -2242,9 +2238,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
                 }
               else
                 {
-                  sprintf(pout, "Open Error:  Looking for \"endvars\", found \"%s\" "
-                                "instead.\n",
-                          rec);
+                  sprintf(pout, "Open Error:  Looking for \"endvars\", found \"%s\" instead.\n", rec);
                   gaprnt(0, pout);
                   goto err9;
                 }
@@ -2332,20 +2326,17 @@ read_gradsdes(char *filename, dsets_t *pfi)
         {
           if (pfi->tmplat)
             {
-              gaprnt(0, "Open Error: Variables with transposed VAR-T "
-                        "dimensions cannot be templated together\n");
+              gaprnt(0, "Open Error: Variables with transposed VAR-T dimensions cannot be templated together\n");
               err = 1;
             }
           if (hdrb > 0)
             {
-              gaprnt(0, "Open Error: Variables with transposed VAR-T "
-                        "dimensions are incompatible with time headers\n");
+              gaprnt(0, "Open Error: Variables with transposed VAR-T dimensions are incompatible with time headers\n");
               err = 1;
             }
           if (trlb > 0)
             {
-              gaprnt(0, "Open Error: Variables with transposed VAR-T "
-                        "dimensions are incompatible with TRAILERBYTES\n");
+              gaprnt(0, "Open Error: Variables with transposed VAR-T dimensions are incompatible with TRAILERBYTES\n");
               err = 1;
             }
         }
@@ -2556,9 +2547,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           ch = gafndt(pfi->name, &tdefe, &tdefe, pfi->abvals[3], pfi->pchsub1, pfi->ens1, ens->gt, e, &flag);
           if (ch == NULL)
             {
-              sprintf(pout, "Open Error: couldn't determine data file name for e=%d "
-                            "t=%d\n",
-                      e, ens->gt);
+              sprintf(pout, "Open Error: couldn't determine data file name for e=%d t=%d\n", e, ens->gt);
               gaprnt(0, pout);
               goto err8;
             }
@@ -2582,13 +2571,10 @@ read_gradsdes(char *filename, dsets_t *pfi)
                     { /* not indexed    */
                       if ((flag == 1) && (pfi->dnum[4] > 1))
                         {
-                          gaprnt(0, "Open Error: If the data type is gridded "
-                                    "binary, \n");
-                          gaprnt(0, "  and the E dimension size is greater "
-                                    "than 1 \n");
+                          gaprnt(0, "Open Error: If the data type is gridded binary, \n");
+                          gaprnt(0, "  and the E dimension size is greater than 1 \n");
                           gaprnt(0, "  and templating in the T dimension is used,\n");
-                          gaprnt(0, "  then templating in the E dimension must "
-                                    "also be used.\n");
+                          gaprnt(0, "  then templating in the E dimension must also be used.\n");
                           goto retrn;
                         }
                     }
@@ -2597,10 +2583,8 @@ read_gradsdes(char *filename, dsets_t *pfi)
                       if ((flag < 2) && (pfi->dnum[4] > 1))
                         {
                           gaprnt(0, "Open Error: If the data type is GRIB1 \n");
-                          gaprnt(0, "  and the E dimension size is greater "
-                                    "than 1 \n");
-                          gaprnt(0, "  then templating in the E dimension must "
-                                    "be used.\n");
+                          gaprnt(0, "  and the E dimension size is greater than 1 \n");
+                          gaprnt(0, "  then templating in the E dimension must be used.\n");
                           goto retrn;
                         }
                     }
@@ -2615,8 +2599,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
               pos = gafndt(pfi->name, &tdef, &tdefe, pfi->abvals[3], pfi->pchsub1, pfi->ens1, t, e, &flag);
               if (pos == NULL)
                 {
-                  sprintf(pout, "Open Error: couldn't determine data file name for "
-                                "e=%d t=%d\n",
+                  sprintf(pout, "Open Error: couldn't determine data file name for e=%d t=%d\n",
                           e, t);
                   gaprnt(0, pout);
                   goto err8;

@@ -33,7 +33,9 @@
 
 #define DBG 0
 
+#ifdef HAVE_LIBXML2
 extern void *magics_node;
+#endif
 
 /* Recursive function that sets the Magics parameters from the XML structure */
 
