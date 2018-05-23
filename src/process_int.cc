@@ -312,7 +312,18 @@ cdoGetOutStreamName(int p_outStream)
   std::string name;
   if (process.outputStreams[p_outStream]->isPipe())
     {
-      name = process.parentProcesses[p_outStream]->operatorName;
+      // the following if-else statement is a bugfix only.
+      // since right now the p_inStream (aka streamID) can not
+      // be mapped to its corresponding childProcess.
+      // This needs to be fixed later. (23.5.2018 Oliver Heidmann)
+      if (p_outStream < process.childProcesses.size())
+        {
+          name = process.parentProcesses[p_outStream]->operatorName;
+        }
+      else
+        {
+          name = process.parentProcesses.back()->operatorName;
+        }
     }
   else
     {
@@ -328,7 +339,18 @@ cdoGetInStreamName(int p_inStream)
   std::string name;
   if (process.inputStreams[p_inStream]->isPipe())
     {
-      name = process.childProcesses[p_inStream]->operatorName;
+      // the following if-else statement is a bugfix only.
+      // since right now the p_inStream (aka streamID) can not
+      // be mapped to its childProcess.
+      // This needs to be fixed later. (23.5.2018 Oliver Heidmann)
+      if (p_inStream < process.childProcesses.size())
+        {
+          name = process.childProcesses[p_inStream]->operatorName;
+        }
+      else
+        {
+          name = process.childProcesses.back()->operatorName;
+        }
     }
   else
     {
