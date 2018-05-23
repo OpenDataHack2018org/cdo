@@ -476,7 +476,7 @@ Ensval(void *process)
 
               if (fabs(osum - 1) > 1.e-06 || fabs(gsum - 1) > 1.e-06)
                 {
-                  cdoAbort("Internal error - normalization constraint of "problem not fulfilled");
+                  cdoAbort("Internal error - normalization constraint of problem not fulfilled");
                   cdoAbort("This is likely due to missing values");
                 }
               o = 0;
