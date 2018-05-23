@@ -14,7 +14,7 @@ go_bandit([]() {
   add_module("in1_out1", {in1_out1, {}, {"in1_out1"}, 1, 0, 1, 1});
   add_module("in2_out1", {in2_out1, {}, {"in2_out1"}, 1, 0, 2, 1});
   add_module("inVariable_out1",
-             {inVariable_out1, {}, {"inVariable_out1"}, 1, 0, -1, 0});
+             {inVariable_out1, {}, {"inVariable_out1"}, 1, 0, -1, 1});
 
   // this test checks if operators with non variable input numbers can be
   // chained
@@ -74,10 +74,10 @@ go_bandit([]() {
         std::vector<const char *> test_argv{
             "-inVariable_out1", "-in2_out1",   "-in1_out1", "input_file1",
             "-in1_out1",        "input_file2", "-in1_out1", "input_file3",
-            "-in1_out1",        "input_file4"};
+            "-in1_out1",        "input_file4", "out"};
 
         std::vector<unsigned int> expectedInputs{3, 2, 1, 1, 1, 1};
-        std::vector<unsigned int> expectedOutputs{0, 1, 1, 1, 1, 1};
+        std::vector<unsigned int> expectedOutputs{1, 1, 1, 1, 1, 1};
 
         g_processManager.createProcessesFromInput(test_argv.size(), &test_argv[0]);
 
