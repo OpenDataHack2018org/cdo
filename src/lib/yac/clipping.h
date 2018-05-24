@@ -129,13 +129,13 @@ void yac_compute_overlap_areas (unsigned N,
   * covered by N source cells the N partial areas should add up to the area of
   * the target cell.
   *
-  * @param[in]  N             number of source cells
-  * @param[in]  source_cell   list of source cells
-  * @param[in]  target_cell   target cell
-  * @param[in]  target_node_x x-coordinate of target cell node or center point
-  * @param[in]  target_node_y y-coordinate of target cell node or center point
-  * @param[out] partial_areas list of N partial weights, one weight for each
-  *                           source-target intersection
+  * @param[in]  N               number of source cells
+  * @param[in]  source_cell     list of source cells
+  * @param[in]  target_cell     target cell
+  * @param[in]  target_node_xyz cartesian coordinate of target cell node or
+  *                             center point
+  * @param[out] partial_areas   list of N partial weights, one weight for each
+  *                             source-target intersection
   *
   * \remark source and target cell have to be convex
   *
@@ -143,8 +143,7 @@ void yac_compute_overlap_areas (unsigned N,
 void yac_compute_concave_overlap_areas (unsigned N,
                                         struct grid_cell * source_cell,
                                         struct grid_cell target_cell,
-                                        double * target_node_x,
-                                        double * target_node_y,
+                                        double target_node_xyz[3],
                                         double * partial_areas);
 /**
   * \brief correct interpolation weights

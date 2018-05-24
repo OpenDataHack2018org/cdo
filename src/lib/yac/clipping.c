@@ -137,8 +137,7 @@ void yac_compute_overlap_areas (unsigned N,
 void yac_compute_concave_overlap_areas (unsigned N,
                                         struct grid_cell * source_cell,
                                         struct grid_cell target_cell,
-                                        double * target_node_x,
-                                        double * target_node_y,
+                                        double target_node_xyz[3],
                                         double * partial_areas) {
   enum cell_type target_cell_type;
 
@@ -150,7 +149,7 @@ void yac_compute_concave_overlap_areas (unsigned N,
     return;
   }
 
-  if ( target_node_x == NULL || target_node_y == NULL )
+  if ( target_node_xyz == NULL )
     yac_internal_abort_message("ERROR: missing target point coordinates "
                                "(x_coordinates == NULL || y_coordinates == NULL)",
                                __FILE__ , __LINE__);
@@ -183,10 +182,11 @@ void yac_compute_concave_overlap_areas (unsigned N,
   for ( unsigned n = 0; n < N; n++) partial_areas[n] = 0.0;
 
   // common node point to all partial target cells
-  target_partial_cell.coordinates_x[0] = *target_node_x;
-  target_partial_cell.coordinates_y[0] = *target_node_y;
-
-  LLtoXYZ ( *target_node_x, *target_node_y, target_partial_cell.coordinates_xyz );
+  target_partial_cell.coordinates_xyz[0] = target_node_xyz[0];
+  target_partial_cell.coordinates_xyz[1] = target_node_xyz[1];
+  target_partial_cell.coordinates_xyz[2] = target_node_xyz[2];
+  XYZtoLL(target_node_xyz, target_partial_cell.coordinates_x,
+          target_partial_cell.coordinates_y);
 
   for ( unsigned num_corners = 0; num_corners < target_cell.num_corners; ++num_corners ) {
 
@@ -1203,7 +1203,6 @@ static void remove_points(struct point_list * list) {
 static unsigned remove_zero_length_edges(struct point_list * list) {
 
   struct point_list_element * curr = list->first;
-  double const tol = 1e-10;
 
   if (curr == NULL) return 0;
 

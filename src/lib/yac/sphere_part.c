@@ -83,7 +83,20 @@ struct sphere_part_search {
 
    struct grid_search_vtable * vtable;
    struct sphere_part_node base_node;
+   unsigned * local_cell_ids;
    struct grid * grid_data;
+};
+
+enum node_type {
+  I_NODE = 0,
+  U_NODE = 1,
+  T_NODE = 2,
+};
+
+struct temp_partition_data {
+  unsigned local_id;
+  struct bounding_circle bnd_circle;
+  int node_type;
 };
 
 #ifdef YAC
@@ -99,13 +112,11 @@ static void sphere_part_do_point_search_c(struct grid_search * search,
                                           struct grid * grid_data,
                                           struct dep_list * tgt_to_src_cells);
 static void sphere_part_do_point_search_c2(struct grid_search * search,
-                                           double * x_coordinates,
-                                           double * y_coordinates,
+                                           double (*coordinates_xyz)[3],
                                            unsigned num_points,
                                            struct dep_list * tgt_to_src_cells);
 static void sphere_part_do_point_search_c3(struct grid_search * search,
-                                           double * x_coordinates,
-                                           double * y_coordinates,
+                                           double (*coordinates_xyz)[3],
                                            unsigned num_points,
                                            struct dep_list * tgt_to_src_cells,
                                            struct points * points);
@@ -113,19 +124,16 @@ static void sphere_part_do_point_search_p(struct grid_search * search,
                                           struct grid * grid_data,
                                           struct dep_list * target_to_src_points);
 static void sphere_part_do_point_search_p2(struct grid_search * search,
-                                           double * x_coordinates,
-                                           double * y_coordinates,
+                                           double (*coordinates_xyz)[3],
                                            unsigned num_points,
                                            struct dep_list * target_to_src_points);
 static void sphere_part_do_point_search_p3(struct grid_search * search,
-                                           double * x_coordinates,
-                                           double * y_coordinates,
+                                           double (*coordinates_xyz)[3],
                                            unsigned num_points,
                                            struct dep_list * target_to_src_points,
                                            struct points * points);
 static void sphere_part_do_point_search_p4 (struct grid_search * search,
-                                            double x_coordinate,
-                                            double y_coordinate,
+                                            double coordinate_xyz[3],
                                             unsigned * n_points,
                                             unsigned * points_size,
                                             unsigned ** points);
@@ -174,7 +182,6 @@ struct point_sphere_part_search {
    struct point_id_xyz * points;
 };
 
-#ifdef YAC
 static void init_sphere_part_node(struct sphere_part_node * node) {
 
    node->flags = 0;
@@ -195,30 +202,26 @@ static struct sphere_part_node * get_sphere_part_node() {
    return node;
 }
 
-static void partition_data (struct grid * grid, unsigned * local_cell_ids,
-                            size_t num_cell_ids, size_t threshold,
-                            struct sphere_part_node * parent_node,
-                            double prev_gc_norm_vector[]) {
+static int compare_temp_partition_data(const void * a, const void * b) {
+
+  return ((const struct temp_partition_data *)a)->node_type -
+         ((const struct temp_partition_data *)b)->node_type;
+}
+
+static void partition_data (
+   struct grid * grid, unsigned * local_cell_ids,
+   struct temp_partition_data * part_data, size_t num_cell_ids,
+   size_t threshold, struct sphere_part_node * parent_node,
+   double prev_gc_norm_vector[]) {
 
    double balance_point[3] = {0.0,0.0,0.0};
 
    // compute balance point
-
-   struct grid_cell cell;
-   struct bounding_circle bnd_circle;
-
-   yac_init_grid_cell(&cell);
-
    for (size_t i = 0; i < num_cell_ids; ++i) {
 
-      yac_get_grid_cell(grid, local_cell_ids[i], &cell);
-
-      for (unsigned j = 0; j < cell.num_corners; ++j) {
-
-        balance_point[0] += cell.coordinates_xyz[0+j*3];
-        balance_point[1] += cell.coordinates_xyz[1+j*3];
-        balance_point[2] += cell.coordinates_xyz[2+j*3];
-      }
+     balance_point[0] += part_data[i].bnd_circle.base_vector[0];
+     balance_point[1] += part_data[i].bnd_circle.base_vector[1];
+     balance_point[2] += part_data[i].bnd_circle.base_vector[2];
    }
 
    normalise_vector(balance_point);
@@ -232,24 +235,21 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
    // partition data into cells that overlap with the great circle and cells
    // that are on side of the circle
 
-   unsigned * I = NULL; // list of cells on the great circle
-   unsigned * U = NULL; // list of cells on one side of the great circle
-   unsigned * T = NULL; // list of cells on that other side of the great circle
-
-   size_t I_size = 0, I_array_size = 0;
-   size_t U_size = 0, U_array_size = 0;
-   size_t T_size = 0, T_array_size = 0;
+   size_t I_size = 0;
+   size_t U_size = 0;
+   size_t T_size = 0;
 
    struct sin_cos_angle max_inc_angle = SIN_COS_ZERO;
 
    for (size_t i = 0; i < num_cell_ids; ++i) {
 
-      yac_get_grid_cell2(grid, local_cell_ids[i], &cell, &bnd_circle);
+      struct bounding_circle curr_bnd_circle = part_data[i].bnd_circle;
 
       // get angle between the norm vector of the great circle and the base
       // point of the bounding circle
       struct sin_cos_angle angle =
-        get_vector_angle_2(bnd_circle.base_vector, parent_node->gc_norm_vector);
+        get_vector_angle_2(
+          curr_bnd_circle.base_vector, parent_node->gc_norm_vector);
 
       // get the angle between between the plane of the great circle and base
       // point of the bounding circle
@@ -257,14 +257,14 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
         sin_cos_angle_new(fabs(angle.cos), angle.sin);
 
       // if the point intersects with the great circle
-      if (compare_angles(diff_angle_gc, bnd_circle.inc_angle) <= 0) {
+      if (compare_angles(diff_angle_gc, curr_bnd_circle.inc_angle) <= 0) {
 
-         // add to list I
-         ENSURE_ARRAY_SIZE(I, I_array_size, I_size + 1);
-         I[I_size++] = local_cell_ids[i];
+         // set node type for current cell
+         part_data[i].node_type = I_NODE;
+         I_size++;
 
          struct sin_cos_angle inc_angle =
-            sum_angles_no_check(diff_angle_gc, bnd_circle.inc_angle);
+            sum_angles_no_check(diff_angle_gc, curr_bnd_circle.inc_angle);
 
          if (compare_angles(max_inc_angle, inc_angle) < 0)
             max_inc_angle = inc_angle;
@@ -272,17 +272,20 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
       // angle > M_PI_2
       } else if (angle.cos < 0.0) {
 
-         // add to list U
-         ENSURE_ARRAY_SIZE(U, U_array_size, U_size + 1);
-         U[U_size++] = local_cell_ids[i];
+         // set node type for current cell
+         part_data[i].node_type = U_NODE;
+         U_size++;
 
       } else {
 
-         // add to list T
-         ENSURE_ARRAY_SIZE(T, T_array_size, T_size + 1);
-         T[T_size++] = local_cell_ids[i];
+         // set node type for current cell
+         part_data[i].node_type = T_NODE;
+         T_size++;
       }
    }
+
+   qsort(
+      part_data, num_cell_ids, sizeof(*part_data), compare_temp_partition_data);
 
    parent_node->I_size = I_size;
    parent_node->U_size = U_size;
@@ -300,26 +303,25 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
       if (I_size > I_list_tree_min_size) {
 
          assert(sizeof(struct interval_node) > sizeof(unsigned));
-         parent_node->I.ivt.head_node
-            = (void *)(I = realloc(I, I_size * sizeof(struct interval_node)));
+         struct interval_node * head_node = malloc(I_size * sizeof(*head_node));
+         parent_node->I.ivt.head_node = head_node;
          parent_node->I.ivt.num_nodes = I_size;
 
-         for (size_t i = I_size - 1 ; i < I_size; --i) {
+         for (size_t i = 0; i < I_size; ++i) {
 
             struct sin_cos_angle base_angle, corrected_inc_angle;
             int big_sum, neg;
             double GCp[3], bVp[3];
-            unsigned cell_idx = I[i];
+            struct bounding_circle curr_bnd_circle = part_data[i].bnd_circle;
 
-            yac_get_grid_cell2(grid, I[i], &cell, &bnd_circle);
             crossproduct_ld(parent_node->gc_norm_vector,
-                            bnd_circle.base_vector, GCp);
+                            curr_bnd_circle.base_vector, GCp);
             crossproduct_ld(GCp, parent_node->gc_norm_vector, bVp);
             normalise_vector(bVp);
             base_angle = get_vector_angle_2(bVp, prev_gc_norm_vector);
             big_sum =
-              sum_angles(bnd_circle.inc_angle,
-                         get_vector_angle_2(bVp, bnd_circle.base_vector),
+              sum_angles(curr_bnd_circle.inc_angle,
+                         get_vector_angle_2(bVp, curr_bnd_circle.base_vector),
                          &corrected_inc_angle);
 
             // if the angle is bigger then PI
@@ -332,55 +334,57 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
             // base_angle + corrected_inc_angle
             big_sum = sum_angles(base_angle, corrected_inc_angle, &right);
 
-            parent_node->I.ivt.head_node[i].range.left  =
-              compute_angle(left) - (neg?2.0*M_PI:0.0);
-            parent_node->I.ivt.head_node[i].range.right =
-              compute_angle(right) + (big_sum?2.0*M_PI:0.0);
-            parent_node->I.ivt.head_node[i].value = cell_idx;
+            head_node[i].range.left = compute_angle(left) - (neg?2.0*M_PI:0.0);
+            head_node[i].range.right = compute_angle(right) +
+                                       (big_sum?2.0*M_PI:0.0);
+            head_node[i].value = part_data[i].local_id;
          }
 
-         parent_node->I.ivt.num_nodes = I_size;
-         parent_node->I.ivt.head_node = realloc(parent_node->I.ivt.head_node,
-            I_size * sizeof(*(parent_node->I.ivt.head_node)));
-
-         yac_generate_interval_tree(parent_node->I.ivt.head_node,
-                                    parent_node->I.ivt.num_nodes);
+         yac_generate_interval_tree(head_node, I_size);
          parent_node->flags |= I_IS_INTERVAL_TREE;
-      } else
-         parent_node->I.list = realloc(I, I_size * sizeof(unsigned));
+      } else {
+         for (size_t i = 0; i < I_size; ++i)
+            local_cell_ids[i] = part_data[i].local_id;
+         parent_node->I.list = (void*)local_cell_ids;
+      }
    } else
       parent_node->I.list = NULL;
 
-   yac_free_grid_cell(&cell);
+   part_data += I_size;
+   local_cell_ids += I_size;
 
    // check whether the lists are small enough (if not -> partition again)
    if (U_size <= threshold) {
 
-      parent_node->U = realloc(U, U_size * sizeof(unsigned));
+      for (size_t i = 0; i < U_size; ++i)
+         local_cell_ids[i] = part_data[i].local_id;
+      parent_node->U = (void*)local_cell_ids;
       parent_node->flags |= U_IS_LEAF;
 
    } else {
 
       parent_node->U = get_sphere_part_node();
-      partition_data(grid, U, U_size, threshold, parent_node->U,
-                     parent_node->gc_norm_vector);
-      free(U);
+      partition_data(grid, local_cell_ids, part_data, U_size, threshold,
+                     parent_node->U, parent_node->gc_norm_vector);
    }
+   local_cell_ids += U_size;
+   part_data += U_size;
 
    if (T_size <= threshold) {
 
-      parent_node->T = realloc(T, T_size * sizeof(unsigned));
+      for (size_t i = 0; i < T_size; ++i)
+         local_cell_ids[i] = part_data[i].local_id;
+      parent_node->T = (void*)local_cell_ids;
       parent_node->flags |= T_IS_LEAF;
+      local_cell_ids += T_size;
 
    } else {
 
       parent_node->T = get_sphere_part_node();
-      partition_data(grid, T, T_size, threshold, parent_node->T,
-                     parent_node->gc_norm_vector);
-      free(T);
+      partition_data(grid, local_cell_ids, part_data, T_size, threshold,
+                     parent_node->T, parent_node->gc_norm_vector);
    }
 }
-#endif
 
 static int compare_point_idx_xyz(void const * a, void const * b) {
   return (((struct point_id_xyz *)a)->idx > ((struct point_id_xyz *)b)->idx) -
@@ -507,20 +511,29 @@ struct grid_search * yac_sphere_part_search_new (struct grid * grid) {
 
    size_t num_grid_cells = (size_t)yac_get_num_grid_cells(grid);
    unsigned * local_cell_ids = malloc(num_grid_cells * sizeof(*local_cell_ids));
+   search->local_cell_ids = local_cell_ids;
 
-   for (size_t i = 0; i < num_grid_cells; ++i) local_cell_ids[i] = i;
+   struct grid_cell dummy_cell;
+   struct temp_partition_data * part_data =
+      malloc(num_grid_cells * sizeof(*part_data));
+   yac_init_grid_cell(&dummy_cell);
+   for (size_t i = 0; i < num_grid_cells; ++i) {
+      yac_get_grid_cell2(grid, i, &dummy_cell, &(part_data[i].bnd_circle));
+      part_data[i].local_id = i;
+   }
+   yac_free_grid_cell(&dummy_cell);
 
-   partition_data(grid, local_cell_ids, num_grid_cells, I_list_tree_min_size,
-                  &(search->base_node), gc_norm_vector);
+   partition_data(grid, local_cell_ids, part_data, num_grid_cells,
+                  I_list_tree_min_size, &(search->base_node), gc_norm_vector);
 
-   free(local_cell_ids);
+   free(part_data);
 
    return (struct grid_search *)search;
 }
 #endif
 
 struct point_sphere_part_search * yac_point_sphere_part_search_new (
-  size_t num_points, double * coordinates_xyz) {
+  size_t num_points, double (*coordinates_xyz)[3]) {
 
   if (num_points == 0) return NULL;
 
@@ -530,9 +543,9 @@ struct point_sphere_part_search * yac_point_sphere_part_search_new (
 
   for (size_t i = 0; i < num_points; ++i) {
     points[i].idx = i;
-    points[i].coordinates_xyz[0] = coordinates_xyz[3 * i + 0];
-    points[i].coordinates_xyz[1] = coordinates_xyz[3 * i + 1];
-    points[i].coordinates_xyz[2] = coordinates_xyz[3 * i + 2];
+    points[i].coordinates_xyz[0] = coordinates_xyz[i][0];
+    points[i].coordinates_xyz[1] = coordinates_xyz[i][1];
+    points[i].coordinates_xyz[2] = coordinates_xyz[i][2];
   }
 
   struct point_sphere_part_node * tmp_node =
@@ -869,7 +882,7 @@ static int point_check_bnd_circle(
 }
 
 static inline struct sin_cos_angle get_min_angle(
-  struct point_id_xyz * points, size_t num_points, double * coordinate_xyz) {
+  struct point_id_xyz * points, size_t num_points, double coordinate_xyz[3]) {
 
   double max_cos = -1.0;
   size_t min_angle_idx = 0;
@@ -901,9 +914,9 @@ static inline struct sin_cos_angle get_min_angle(
 
 void yac_point_sphere_part_search_NN(struct point_sphere_part_search * search,
                                      size_t num_points,
-                                     double * coordinates_xyz,
+                                     double (*coordinates_xyz)[3],
                                      double * cos_angles,
-                                     double ** result_coordinates_xyz,
+                                     double (**result_coordinates_xyz)[3],
                                      size_t * result_coordinates_xyz_array_size,
                                      unsigned ** local_point_ids,
                                      size_t * local_point_ids_array_size,
@@ -931,7 +944,7 @@ void yac_point_sphere_part_search_NN(struct point_sphere_part_search * search,
 
     struct point_sphere_part_node * curr_node = base_node;
 
-    double * curr_coordinates_xyz = coordinates_xyz + 3 * i;
+    double * curr_coordinates_xyz = coordinates_xyz[i];
 
     struct bounding_circle bnd_circle;
     bnd_circle.base_vector[0] = curr_coordinates_xyz[0];
@@ -1012,18 +1025,18 @@ void yac_point_sphere_part_search_NN(struct point_sphere_part_search * search,
     if (result_coordinates_xyz != NULL)
       ENSURE_ARRAY_SIZE(
         *result_coordinates_xyz, *result_coordinates_xyz_array_size,
-        3*(total_num_local_point_ids + num_overlap_leaf_points));
+        total_num_local_point_ids + num_overlap_leaf_points);
 
     for (size_t j = 0; j < num_overlap_leaf_points; ++j) {
       if (cos_distances[j] == max_cos_distance) {
         (*local_point_ids)[total_num_local_point_ids] =
           (unsigned)(overlap_leaf_points[j].idx);
         if (result_coordinates_xyz != NULL) {
-          (*result_coordinates_xyz)[0+total_num_local_point_ids*3] =
+          (*result_coordinates_xyz)[total_num_local_point_ids][0] =
             overlap_leaf_points[j].coordinates_xyz[0];
-          (*result_coordinates_xyz)[1+total_num_local_point_ids*3] =
+          (*result_coordinates_xyz)[total_num_local_point_ids][1] =
             overlap_leaf_points[j].coordinates_xyz[1];
-          (*result_coordinates_xyz)[2+total_num_local_point_ids*3] =
+          (*result_coordinates_xyz)[total_num_local_point_ids][2] =
             overlap_leaf_points[j].coordinates_xyz[2];
         }
         total_num_local_point_ids++;
@@ -1074,10 +1087,10 @@ static size_t get_leaf_points(
 
 void yac_point_sphere_part_search_NNN(struct point_sphere_part_search * search,
                                       size_t num_points,
-                                      double * coordinates_xyz, unsigned n,
+                                      double (*coordinates_xyz)[3], unsigned n,
                                       double ** cos_angles,
                                       size_t * cos_angles_array_size,
-                                      double ** result_coordinates_xyz,
+                                      double (**result_coordinates_xyz)[3],
                                       size_t * result_coordinates_xyz_array_size,
                                       unsigned ** local_point_ids,
                                       size_t * local_point_ids_array_size,
@@ -1133,7 +1146,7 @@ void yac_point_sphere_part_search_NNN(struct point_sphere_part_search * search,
   // coarse search
   for (size_t i = 0; i < num_points; ++i) {
 
-    double * curr_coordinates_xyz = coordinates_xyz + 3 * i;
+    double * curr_coordinates_xyz = coordinates_xyz[i];
 
     struct point_sphere_part_node * curr_node = base_node;
     struct point_sphere_part_node * next_node;
@@ -1252,7 +1265,7 @@ void yac_point_sphere_part_search_NNN(struct point_sphere_part_search * search,
     if (result_coordinates_xyz != NULL)
       ENSURE_ARRAY_SIZE(
         *result_coordinates_xyz, *result_coordinates_xyz_array_size,
-        3*(total_num_local_point_ids + num_overlap_leaf_points));
+        total_num_local_point_ids + num_overlap_leaf_points);
 
     for (size_t j = 0; j < num_overlap_leaf_points; ++j) {
       if (cos_distances[j] >= max_cos_distance) {
@@ -1261,11 +1274,11 @@ void yac_point_sphere_part_search_NNN(struct point_sphere_part_search * search,
         (*local_point_ids)[total_num_local_point_ids] =
           (unsigned)(overlap_leaf_points[j].idx);
         if (result_coordinates_xyz != NULL) {
-          (*result_coordinates_xyz)[0+total_num_local_point_ids*3] =
+          (*result_coordinates_xyz)[total_num_local_point_ids][0] =
             overlap_leaf_points[j].coordinates_xyz[0];
-          (*result_coordinates_xyz)[1+total_num_local_point_ids*3] =
+          (*result_coordinates_xyz)[total_num_local_point_ids][1] =
             overlap_leaf_points[j].coordinates_xyz[1];
-          (*result_coordinates_xyz)[2+total_num_local_point_ids*3] =
+          (*result_coordinates_xyz)[total_num_local_point_ids][2] =
             overlap_leaf_points[j].coordinates_xyz[2];
         }
         total_num_local_point_ids++;
@@ -1567,8 +1580,7 @@ static int compare_uint (const void * a, const void * b) {
 }
 
 static void sphere_part_do_point_search_c2(struct grid_search * search,
-                                           double * x_coordinates,
-                                           double * y_coordinates,
+                                           double (*coordinates_xyz)[3],
                                            unsigned num_points,
                                            struct dep_list * tgt_to_src_cells) {
 
@@ -1593,15 +1605,14 @@ static void sphere_part_do_point_search_c2(struct grid_search * search,
    size_t total_num_dependencies = 0;
 
    for (size_t i = 0; i < num_points; ++i) {
-      double point_3d[3];
 
-      LLtoXYZ(x_coordinates[i], y_coordinates[i], point_3d);
+      double * curr_coordinates_xyz = coordinates_xyz[i];
 
       num_temp_search_results = 0;
 
       double gc_norm_vector[3] = {0.0,0.0,1.0};
 
-      search_point(base_node, point_3d, &temp_search_results,
+      search_point(base_node, curr_coordinates_xyz, &temp_search_results,
                    &temp_search_results_array_size, &num_temp_search_results,
                    &search_interval_tree_buffer, gc_norm_vector);
 
@@ -1615,7 +1626,7 @@ static void sphere_part_do_point_search_c2(struct grid_search * search,
          yac_get_grid_cell2(sp_search->grid_data, temp_search_results[j],
                             &cell, &bnd_circle);
 
-         if (yac_point_in_cell2(point_3d, cell, bnd_circle)) {
+         if (yac_point_in_cell2(curr_coordinates_xyz, cell, bnd_circle)) {
 
             tgt_src_dependencies[total_num_dependencies + num_matches] =
                temp_search_results[j];
@@ -1641,14 +1652,13 @@ static void sphere_part_do_point_search_c2(struct grid_search * search,
 }
 
 static void sphere_part_do_point_search_c3(struct grid_search * search,
-                                           double * x_coordinates,
-                                           double * y_coordinates,
+                                           double (*coordinates_xyz)[3],
                                            unsigned num_points,
                                            struct dep_list * tgt_to_src_cells,
                                            struct points * points) {
 
   yac_grid_search_utils_do_point_search_c3(
-    search, x_coordinates, y_coordinates, num_points, tgt_to_src_cells, points);
+    search, coordinates_xyz, num_points, tgt_to_src_cells, points);
 }
 
 static void sphere_part_do_point_search_p(struct grid_search * search,
@@ -1662,43 +1672,39 @@ static void sphere_part_do_point_search_p(struct grid_search * search,
 }
 
 static void sphere_part_do_point_search_p2(struct grid_search * search,
-                                           double * x_coordinates,
-                                           double * y_coordinates,
+                                           double (*coordinates_xyz)[3],
                                            unsigned num_points,
                                            struct dep_list * target_to_src_points) {
 
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
 
-   yac_grid_search_utils_do_point_search_p2(search, sp_search->grid_data,
-                                            x_coordinates, y_coordinates,
-                                            num_points, target_to_src_points);
+   yac_grid_search_utils_do_point_search_p2(
+      search, sp_search->grid_data, coordinates_xyz, num_points,
+      target_to_src_points);
 }
 
 static void sphere_part_do_point_search_p3(struct grid_search * search,
-                                           double * x_coordinates,
-                                           double * y_coordinates,
+                                           double (*coordinates_xyz)[3],
                                            unsigned num_points,
                                            struct dep_list * target_to_src_points,
                                            struct points * points) {
 
-   yac_grid_search_utils_do_point_search_p3(search, x_coordinates, y_coordinates,
-                                            num_points, target_to_src_points,
-                                            points);
+   yac_grid_search_utils_do_point_search_p3(
+      search, coordinates_xyz, num_points, target_to_src_points, points);
 }
 
 
 static void sphere_part_do_point_search_p4 (struct grid_search * search,
-                                            double x_coordinate,
-                                            double y_coordinate,
+                                            double coordinate_xyz[3],
                                             unsigned * n_points,
                                             unsigned * points_size,
                                             unsigned ** points) {
 
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
 
-   yac_grid_search_utils_do_point_search_p4(search, sp_search->grid_data,
-                                            x_coordinate, y_coordinate, n_points,
-                                            points_size, points);
+   yac_grid_search_utils_do_point_search_p4(
+      search, sp_search->grid_data, coordinate_xyz, n_points, points_size,
+      points);
 }
 
 static void sphere_part_do_bnd_circle_search (struct grid_search * search,
@@ -1742,15 +1748,13 @@ static void sphere_part_do_bnd_circle_search (struct grid_search * search,
 
       for (size_t j = 0; j < num_temp_search_results; ++j) {
 
-         yac_get_grid_cell(sp_search->grid_data, temp_search_results[j], &cell);
+         struct bounding_circle cell_bnd_circle;
+         yac_get_grid_cell2(sp_search->grid_data, temp_search_results[j], &cell,
+                            &cell_bnd_circle);
 
-         unsigned k;
-         // for all corners of the cell
-         for (k = 0; k < cell.num_corners; ++k)
-           // if the current corner is inside the bounding circle
-           if (yac_point_in_bounding_circle_vec(cell.coordinates_xyz+k*3,
-                                                bnd_circles + i)) break;
-         if (k != cell.num_corners) {
+         // if the bounding circle of the current cell overlaps with the current
+         // bounding circle
+         if (yac_extents_overlap(&cell_bnd_circle, bnd_circles + i)) {
             bnd_to_cells_dependencies[total_num_dependencies++] =
                temp_search_results[j];
             num_cells_per_bnd[i]++;
@@ -1770,22 +1774,21 @@ static void sphere_part_do_bnd_circle_search (struct grid_search * search,
                         bnd_to_cells_dependencies);
 }
 
-static void free_sphere_part_tree (struct sphere_part_node * tree) {
-
+static void free_sphere_part_tree (struct sphere_part_node tree) {
 
    // free I_list
-   if (tree->flags & I_IS_INTERVAL_TREE)
-      free(tree->I.ivt.head_node);
-   else
-      free(tree->I.list);
+   if (tree.flags & I_IS_INTERVAL_TREE)
+      free(tree.I.ivt.head_node);
 
-   if ((tree->flags & U_IS_LEAF) == 0)
-      free_sphere_part_tree(tree->U);
-   free(tree->U);
+   if ((tree.flags & U_IS_LEAF) == 0) {
+      free_sphere_part_tree(*(struct sphere_part_node*)(tree.U));
+      free(tree.U);
+   }
 
-   if ((tree->flags & T_IS_LEAF) == 0)
-      free_sphere_part_tree(tree->T);
-   free(tree->T);
+   if ((tree.flags & T_IS_LEAF) == 0) {
+      free_sphere_part_tree(*(struct sphere_part_node*)(tree.T));
+      free(tree.T);
+   }
 }
 #endif
 
@@ -1807,8 +1810,9 @@ static void delete_sphere_part_search(struct grid_search * search) {
 
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
 
-   free_sphere_part_tree(&(sp_search->base_node));
+   free_sphere_part_tree(sp_search->base_node);
 
+   free(sp_search->local_cell_ids);
    free(sp_search);
 }
 #endif

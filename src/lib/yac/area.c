@@ -170,29 +170,21 @@ double yac_cell_area ( struct grid_cell cell ) {
   /* generalised version based on the ICON code, mo_base_geometry.f90
      provided by Luis Kornblueh, MPI-M. */
 
-  int const M = cell.num_corners; // number of vertices
+  size_t const M = (size_t)(cell.num_corners); // number of vertices
 
-  double area;
-  double s[cell.num_corners];
-  double ca[cell.num_corners];
-  double a[cell.num_corners];
+  double area, s[M], ca[M], a[M], * p[M], u[M][3];
 
-  double * p[cell.num_corners];
-  double u[cell.num_corners][3];
-
-  for (unsigned i = 0; i < cell.num_corners; ++i)
-    p[i] = cell.coordinates_xyz + i * 3;
+  for (size_t i = 0; i < M; ++i) p[i] = cell.coordinates_xyz + i * 3;
 
   /* First, compute cross products Uij = Vi x Vj. */
 
-  for (int m = 0; m < M; m++ )
-    crossproduct_ld (p[m], p[(m+1)%M], u[m]);
+  for (size_t m = 0; m < M; m++ ) crossproduct_ld (p[m], p[(m+1)%M], u[m]);
 
   /*  Normalize Uij to unit vectors. */
 
   area = 0.0;
 
-  for (int m = 0; m < M; m++ ) {
+  for (size_t m = 0; m < M; m++ ) {
     s[m] = scalar_product(u[m], u[m]);
     area += s[m];
   }
@@ -201,11 +193,10 @@ double yac_cell_area ( struct grid_cell cell ) {
 
   if ( area != 0.0 ) {
 
-    for (int m = 0; m < M; m++ )
-      s[m] = sqrt(s[m]);
+    for (size_t m = 0; m < M; m++ ) s[m] = sqrt(s[m]);
 
-    for (int m = 0; m < M; m++ )
-      for (int i = 0; i < 3; i++ )
+    for (size_t m = 0; m < M; m++ )
+      for (size_t i = 0; i < 3; i++ )
         u[m][i] = u[m][i]/s[m];
 
     /*  Compute interior angles Ai as the dihedral angles between planes
@@ -223,7 +214,7 @@ double yac_cell_area ( struct grid_cell cell ) {
 
      */
 
-    for (int m = 0; m < M; m++ ) {
+    for (size_t m = 0; m < M; m++ ) {
       ca[m] = - scalar_product(u[m], u[(m+1)%M]);
       if ( ca[m] < -1.0 ) ca[m] = -1.0;
       if ( ca[m] >  1.0 ) ca[m] =  1.0;
@@ -236,7 +227,7 @@ double yac_cell_area ( struct grid_cell cell ) {
 
     area = - (double) (M-2) * M_PI;
 
-    for (int m = 0; m < M; m++ )
+    for (size_t m = 0; m < M; m++ )
       area += a[m];
   }
 
@@ -256,16 +247,15 @@ double yac_girards_area ( struct grid_cell cell  ) {
      (R. Redler, M. Hanke 2013)
   */
 
-  int m;
   const double tol = 1e-18;
   double area = 0.0;
 
-  int M = cell.num_corners;
+  size_t const M = (size_t)(cell.num_corners);
   if (M < 3) return area;  // a degenerate cell
 
   double * theta = (double *)malloc ( M * sizeof(theta[0]) );
 
-  for ( m = 0; m < M; m++ ) {
+  for (size_t m = 0; m < M; m++ ) {
      theta[m] = yac_partial_area(cell.coordinates_x[(m+1)%M], cell.coordinates_y[(m+1)%M],
                              cell.coordinates_x[(m+2)%M], cell.coordinates_y[(m+2)%M],
                              cell.coordinates_x[m%M], cell.coordinates_y[m%M]);
@@ -279,8 +269,7 @@ double yac_girards_area ( struct grid_cell cell  ) {
 
   area = - (double) (M-2) * M_PI;
 
-  for ( m = 0; m < M; m++ )
-    area += theta[m];
+  for (size_t m = 0; m < M; m++ ) area += theta[m];
 
   /* Area on Sphere with radius EarthRadius */
 
@@ -313,45 +302,51 @@ double yac_girards_area ( struct grid_cell cell  ) {
   *
   * \remark all edges are on great circle
   */
-static double
-tri_area(double u[3], double v[3], double w[3]) {
+static double tri_area(double u[3], double v[3], double w[3]) {
 
-  double a_ = get_vector_angle(u,v);
-  double b_ = get_vector_angle(u,w);
-  double c_ = get_vector_angle(w,v);
+  struct sin_cos_angle angle_a = get_vector_angle_2(u,v);
+  struct sin_cos_angle angle_b = get_vector_angle_2(u,w);
+  struct sin_cos_angle angle_c = get_vector_angle_2(w,v);
 
-  double a, b, c;
+  if (compare_angles(angle_a, SIN_COS_LOW_TOL) < 0) return 0.0;
+  if (compare_angles(angle_b, SIN_COS_LOW_TOL) < 0) return 0.0;
+  if (compare_angles(angle_c, SIN_COS_LOW_TOL) < 0) return 0.0;
 
-  if (a_ < b_) {
-    if (a_ < c_) {
-      if (b_ < c_) {
-        a = a_, b = b_, c = c_;
-      } else {
-        a = a_, b = c_, c = b_;
-      }
-    } else {
-      a = c_, b = a_, c = b_;
-    }
-  } else {
-    if (b_ < c_) {
-      if (a_ < c_) {
-        a = b_, b = a_, c = c_;
-      } else {
-        a = b_, b = c_, c = a_;
-      }
-    } else {
-      a = c_, b = b_, c = a_;
-    }
-  }
+  double sin_sin = angle_a.sin * angle_b.sin;
+  double sin_cos = angle_a.sin * angle_b.cos;
+  double cos_sin = angle_a.cos * angle_b.sin;
+  double cos_cos = angle_a.cos * angle_b.cos;
 
-  // see: http://en.wikipedia.org/wiki/Heron%27s_formula#Numerical_stability
-  // see also: http://www.eecs.berkeley.edu/~wkahan/Triangle.pdf
+  double sin_sin_sin = sin_sin * angle_c.sin;
+  double sin_sin_cos = sin_sin * angle_c.cos;
+  double sin_cos_sin = sin_cos * angle_c.sin;
+  double sin_cos_cos = sin_cos * angle_c.cos;
+  double cos_sin_sin = cos_sin * angle_c.sin;
+  double cos_sin_cos = cos_sin * angle_c.cos;
+  double cos_cos_sin = cos_cos * angle_c.sin;
+  double cos_cos_cos = cos_cos * angle_c.cos;
 
-  // the tolerance value is determined empirically
-  if ((a + (b - c)) < c * 1e-14) return 0.0;
+  double t_sin_a = sin_sin_sin - sin_cos_cos;
+  double t_sin_b = cos_sin_cos + cos_cos_sin;
+  double t_sin_c = sin_sin_sin + sin_cos_cos;
+  double t_sin_d = cos_sin_cos - cos_cos_sin;
+  double t_cos_a = cos_cos_cos - cos_sin_sin;
+  double t_cos_b = sin_sin_cos + sin_cos_sin;
+  double t_cos_c = cos_cos_cos + cos_sin_sin;
+  double t_cos_d = sin_sin_cos - sin_cos_sin;
 
-  double t = tan(0.25 * (a + (b + c))) * tan(0.25 * (c - (a - b))) *
-             tan(0.25 * (c + (a - b))) * tan(0.25 * (a + (b - c)));
+  struct sin_cos_angle t_angle[4] = {
+    quarter_angle((struct sin_cos_angle){.sin = - t_sin_a + t_sin_b,
+                                         .cos = + t_cos_a - t_cos_b}),
+    quarter_angle((struct sin_cos_angle){.sin = + t_sin_a + t_sin_b,
+                                         .cos = + t_cos_a + t_cos_b}),
+    quarter_angle((struct sin_cos_angle){.sin = + t_sin_c - t_sin_d,
+                                         .cos = + t_cos_c + t_cos_d}),
+    quarter_angle((struct sin_cos_angle){.sin = + t_sin_c + t_sin_d,
+                                         .cos = + t_cos_c - t_cos_d})};
+
+  double t = (t_angle[0].sin*t_angle[1].sin*t_angle[2].sin*t_angle[3].sin) /
+             (t_angle[0].cos*t_angle[1].cos*t_angle[2].cos*t_angle[3].cos);
 
   return fabs(4.0 * atan(sqrt(fabs(t))));
 }
@@ -362,9 +357,9 @@ static inline int compute_norm_vector(double a[], double b[], double norm[]) {
 
   crossproduct_ld(a, b, norm);
 
-  double scale = sqrt(norm[0] * norm[0] + norm[1] * norm[1] + norm[2] * norm[2]);
+  double scale = sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2]);
 
-  if (scale == 0) return 1;
+  if (scale <= yac_angle_tol) return 1;
 
   scale = 1.0 / scale;
 
@@ -444,7 +439,7 @@ double yac_pole_area ( struct grid_cell cell ) {
 
   double area = 0.0;
 
-  int M = cell.num_corners;
+  size_t const M = (size_t)(cell.num_corners);
 
   if (M < 2) return 0.0;
 
@@ -458,7 +453,7 @@ double yac_pole_area ( struct grid_cell cell ) {
   // the equator (were the other method is probably most
   // inaccurate)
 
-  for (int i = 0; i < M; ++i) {
+  for (size_t i = 0; i < M; ++i) {
 
     // if one of the points it at the pole
     if (fabs(fabs(cell.coordinates_y[i]) - M_PI_2) < 1e-12) continue;
@@ -522,19 +517,21 @@ double yac_planar_3dcell_area (struct grid_cell cell) {
   *
   */
 
-  double area = 0.0;
   double norm[3] = {0,0,0};
+  size_t M = (size_t)(cell.num_corners);
 
-  if (cell.num_corners < 3) return area;
+  if (M < 3) return 0.0;
 
-  for ( unsigned i0=cell.num_corners-1, i1=0;  i1<cell.num_corners; i0=i1, ++i1) {
-    norm[0] += cell.coordinates_xyz[1+i0*3]*cell.coordinates_xyz[2+i1*3] - cell.coordinates_xyz[1+i1*3]*cell.coordinates_xyz[2+i0*3];
-    norm[1] += cell.coordinates_xyz[2+i0*3]*cell.coordinates_xyz[0+i1*3] - cell.coordinates_xyz[2+i1*3]*cell.coordinates_xyz[0+i0*3];
-    norm[2] += cell.coordinates_xyz[0+i0*3]*cell.coordinates_xyz[1+i1*3] - cell.coordinates_xyz[0+i1*3]*cell.coordinates_xyz[1+i0*3];
+  for (size_t i0 = M - 1, i1 = 0; i1 < M; i0 = i1, ++i1) {
+    norm[0] += cell.coordinates_xyz[1+i0*3]*cell.coordinates_xyz[2+i1*3] -
+               cell.coordinates_xyz[1+i1*3]*cell.coordinates_xyz[2+i0*3];
+    norm[1] += cell.coordinates_xyz[2+i0*3]*cell.coordinates_xyz[0+i1*3] -
+               cell.coordinates_xyz[2+i1*3]*cell.coordinates_xyz[0+i0*3];
+    norm[2] += cell.coordinates_xyz[0+i0*3]*cell.coordinates_xyz[1+i1*3] -
+               cell.coordinates_xyz[0+i1*3]*cell.coordinates_xyz[1+i0*3];
   };
 
-  return area = 0.5 * sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2] );
-
+  return 0.5 * sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2]);
 }
 
  /*
@@ -547,23 +544,24 @@ double yac_planar_3dcell_area (struct grid_cell cell) {
   */
 double yac_huiliers_area (struct grid_cell cell) {
 
-  if (cell.num_corners < 2) return 0;
+  size_t M = (size_t)(cell.num_corners);
+
+  if (M < 2) return 0.0;
 
   int lat_flag = 0;
 
-  for (unsigned i = 0; i < cell.num_corners; i++)
+  for (size_t i = 0; i < M; i++)
     lat_flag |= cell.edge_type[i] == LAT_CIRCLE;
 
-  if (cell.num_corners == 3 && !lat_flag)
+  if (M == 3 && !lat_flag)
     return fabs(tri_area(cell.coordinates_xyz + 0*3,
                          cell.coordinates_xyz + 1*3,
                          cell.coordinates_xyz + 2*3));
-    //         * EarthRadius * EarthRadius;
 
   // sum areas around cell
   double area = 0.0;
 
-  for (unsigned i = 2; i < cell.num_corners; ++i) {
+  for (size_t i = 2; i < M; ++i) {
 
     double tmp_area = tri_area(cell.coordinates_xyz + 0*3,
                                cell.coordinates_xyz + (i-1)*3,
@@ -576,20 +574,18 @@ double yac_huiliers_area (struct grid_cell cell) {
 
     double scalar_base = scalar_product(norm, cell.coordinates_xyz + 0*3);
 
-    if (scalar_base > 0)
-      area += tmp_area;
-    else
-      area -= tmp_area;
+    if (scalar_base > 0) area += tmp_area;
+    else area -= tmp_area;
   }
 
   // if there is at least one latitude circle edge
   if (lat_flag) {
 
-    for (unsigned i = 0; i < cell.num_corners; ++i) {
+    for (size_t i = 0; i < M; ++i) {
 
       if (cell.edge_type[i] == LAT_CIRCLE) {
 
-        unsigned i_ = (i+1)%cell.num_corners;
+        size_t i_ = (i+1)%cell.num_corners;
 
         area += lat_edge_correction(cell.coordinates_xyz + 0 * 3,
                                     cell.coordinates_xyz + i * 3,
@@ -601,7 +597,6 @@ double yac_huiliers_area (struct grid_cell cell) {
   }
 
   return fabs(area);
-  // return fabs(area) * EarthRadius * EarthRadius;
 }
 
 /* ----------------------------------- */

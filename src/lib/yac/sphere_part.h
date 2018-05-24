@@ -106,7 +106,7 @@ struct grid_search * yac_sphere_part_search_new (struct grid * grid_data);
 struct point_sphere_part_search;
 
 struct point_sphere_part_search * yac_point_sphere_part_search_new (
-  size_t num_points, double * coordinates_xyz);
+  size_t num_points, double (*coordinates_xyz)[3]);
 
 void yac_delete_point_sphere_part_search(
   struct point_sphere_part_search * search);
@@ -117,9 +117,9 @@ void yac_delete_point_sphere_part_search(
  */
 void yac_point_sphere_part_search_NN(struct point_sphere_part_search * search,
                                      size_t num_points,
-                                     double * coordinates_xyz,
+                                     double (*coordinates_xyz)[3],
                                      double * cos_angles,
-                                     double ** result_coordinates_xyz,
+                                     double (**result_coordinates_xyz)[3],
                                      size_t * result_coordinates_xyz_array_size,
                                      unsigned ** local_point_ids,
                                      size_t * local_point_ids_array_size,
@@ -131,10 +131,10 @@ void yac_point_sphere_part_search_NN(struct point_sphere_part_search * search,
  */
 void yac_point_sphere_part_search_NNN(struct point_sphere_part_search * search,
                                       size_t num_points,
-                                      double * coordinates_xyz, unsigned n,
+                                      double (*coordinates_xyz)[3], unsigned n,
                                       double ** cos_angles,
                                       size_t * cos_angles_array_size,
-                                      double ** result_coordinates_xyz,
+                                      double (**result_coordinates_xyz)[3],
                                       size_t * result_coordinates_xyz_array_size,
                                       unsigned ** local_point_ids,
                                       size_t * local_point_ids_array_size,

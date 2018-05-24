@@ -55,6 +55,10 @@
 #define M_SQRT1_2 (0.707106781186547524401) /* sqrt(0.5) */
 #endif
 
+#ifndef M_SQRT3_4
+#define M_SQRT3_4 (0.866025403784438646764) /* sqrt(0.75) */
+#endif
+
 #define SIN_COS_M_PI_2 ((struct sin_cos_angle){.sin = 1.0, .cos = 0.0}) /* PI/2 */
 #define SIN_COS_M_PI ((struct sin_cos_angle){.sin = 0.0, .cos = -1.0}) /* PI */
 #define SIN_COS_ZERO ((struct sin_cos_angle){.sin = 0.0, .cos = 1.0}) /* 0.0 */
@@ -735,8 +739,8 @@ static inline int compare_angles(
   // 2: 3*PI/4 <= angle < 5*PI/4
   // 3: 5*PI/4 <= angle < 7*PI/4
   // 4: 7*PI/4 <= angle < 2*PI
-  int t_a = fabs(a.cos) < M_SQRT1_2;
-  int t_b = fabs(b.cos) < M_SQRT1_2;
+  int t_a = fabs(a.cos) <= M_SQRT1_2;
+  int t_b = fabs(b.cos) <= M_SQRT1_2;
   int a_section = t_a | ((((a.sin < 0.0) & t_a) |
                           ((a.cos < 0.0) & (fabs(a.sin) < M_SQRT1_2))) << 1);
   int b_section = t_b | ((((b.sin < 0.0) & t_b) |
@@ -747,20 +751,47 @@ static inline int compare_angles(
   if (a_section != b_section)
     return (a_section > b_section) - (a_section < b_section);
 
+  int ret;
+
   switch (a_section) {
     case(0):
     case(4):
     default:
-      if ((a.sin < 0.0) == (b.sin < 0.0))
-        return (a.sin > b.sin) - (a.sin < b.sin);
-      else
+      if ((a.sin < 0.0) == (b.sin < 0.0)) {
+        ret = (a.sin > b.sin) - (a.sin < b.sin);
+        if (ret) return ret;
+        else {
+          ret = (a.cos < b.cos) - (a.cos > b.cos);
+          if (a.sin >= 0.0) return ret;
+          else return -ret;
+        }
+      } else {
         return (a.sin < 0.0) - (b.sin < 0.0);
+      }
     case(1):
-      return (a.cos < b.cos) - (a.cos > b.cos);
+      ret = (a.cos < b.cos) - (a.cos > b.cos);
+      if (ret) return ret;
+      else {
+        ret = (a.sin > b.sin) - (a.sin < b.sin);
+        if (a.cos >= 0.0) return ret;
+        else return -ret;
+      }
     case(2):
-      return (a.sin < b.sin) - (a.sin > b.sin);
+      ret = (a.sin < b.sin) - (a.sin > b.sin);
+      if (ret) return ret;
+      else {
+        ret = (a.cos < b.cos) - (a.cos > b.cos);
+        if (a.sin >= 0.0) return ret;
+        else return -ret;
+      }
     case(3):
-      return (a.cos > b.cos) - (a.cos < b.cos);
+      ret = (a.cos > b.cos) - (a.cos < b.cos);
+      if (ret) return ret;
+      else {
+        ret = (a.sin < b.sin) - (a.sin > b.sin);
+        if (a.cos <= 0.0) return ret;
+        else return -ret;
+      }
   }
 }
 
@@ -833,25 +864,51 @@ static inline double compute_angle(struct sin_cos_angle angle) {
 }
 
 //! computes angle / 2
+//! The basic idea is to imagin angle being a vector v with (cos(x); sin(x)) and
+//! w being a vector with (1.0; 0.0). The normalised sum of v and w gives us v_h
+//! with (cos(x/2); sin(x/2)).
+//! For quadrants 2, 3, and 4 we have to apply some little tricks for higher
+//! accuracy.
 static inline struct sin_cos_angle half_angle(struct sin_cos_angle angle) {
 
-  {
-    double x = angle.sin;
-    double y = (1.0 + fabs(angle.cos));
+  double x = (1.0 + fabs(angle.cos));
 
-    double scale = 1.0 / sqrt(x * x + y * y);
+  double scale = 1.0 / sqrt(x * x + angle.sin * angle.sin);
 
-    x *= scale;
-    y *= scale;
+  // first or fourth quadrant
+  if (angle.cos >= 0) {
+    scale = copysign(scale, angle.sin);
+    return sin_cos_angle_new(angle.sin * scale, x * scale);
 
-    if (angle.cos >= 0) {
-      // first quadrant
-      if (angle.sin >= 0) return sin_cos_angle_new(x, y);
-      // fourth quadrant
-      else return sin_cos_angle_new(-x, -y);
-      // second and third quadrant
-    } else return sin_cos_angle_new(y, x);
+  // second and third quadrant
+  } else return sin_cos_angle_new(x * scale, angle.sin * scale);
+}
+
+//! computes angle / 4
+//! I derived it based on \ref half_angle
+static inline struct sin_cos_angle quarter_angle(struct sin_cos_angle angle) {
+
+  double tan = fabs(angle.sin) / (1.0 + fabs(angle.cos));
+  double one_plus_sq_tan = 1.0 + tan * tan;
+  double sqrt_one_plus_sq_tan = sqrt(one_plus_sq_tan);
+
+  double a = 1.0;
+  double b = tan;
+
+  // second and third quadrant
+  if (angle.cos < 0.0) {
+    a = tan;
+    b = 1.0;
   }
+
+  double scale = M_SQRT1_2 / sqrt(one_plus_sq_tan + a * sqrt_one_plus_sq_tan);
+  double x = b * scale;
+  double y = (a + sqrt_one_plus_sq_tan) * scale;
+
+  // first and second quadrant
+  if (angle.sin >= 0.0) return sin_cos_angle_new(x, y);
+  // third and fourth quadrant
+  else return sin_cos_angle_new(y, x);
 }
 
 /**

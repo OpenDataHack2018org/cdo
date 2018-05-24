@@ -283,7 +283,8 @@ gs_create_nanoflann(size_t n, const double *restrict lons, const double *restric
 static void *
 gs_create_spherepart(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
 {
-  double *coordinates_xyz = (double *) malloc(3 * n * sizeof(*coordinates_xyz));
+  double (*coordinates_xyz)[3];
+  coordinates_xyz = (double (*)[3]) malloc(n * sizeof(*coordinates_xyz));
   gs->coordinates_xyz = coordinates_xyz;
 
   double min[3] = { 1.e9, 1.e9, 1.e9 };
@@ -294,7 +295,7 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
 #endif
   for (size_t i = 0; i < n; i++)
     {
-      double *restrict point = coordinates_xyz + i * 3;
+      double *restrict point = coordinates_xyz[i];
       cdoLLtoXYZ(lons[i], lats[i], point);
       for (unsigned j = 0; j < 3; ++j)
         {
@@ -313,7 +314,7 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
 
   if (cdoVerbose) cdoPrint("BBOX: min=%g/%g/%g  max=%g/%g/%g", min[0], min[1], min[2], max[0], max[1], max[2]);
 
-  return (void *) yac_point_sphere_part_search_new(n, coordinates_xyz);
+  return (void *) yac_point_sphere_part_search_new(n, gs->coordinates_xyz);
 }
 
 static void
@@ -509,12 +510,12 @@ static size_t
 gs_nearest_spherepart(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
                       GridSearch *gs)
 {
-  double query_pt[3];
-  cdoLLtoXYZ(lon, lat, query_pt);
+  double query_pt[1][3];
+  cdoLLtoXYZ(lon, lat, query_pt[0]);
 
   if (!gs->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
-      if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return 0;
+      if (query_pt[0][j] < gs->min[j] || query_pt[0][j] > gs->max[j]) return 0;
 
   size_t local_point_ids_array_size = 0;
   size_t num_local_point_ids;
@@ -710,12 +711,12 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadi
 
   if (gs)
     {
-      double query_pt[3];
-      cdoLLtoXYZ(lon, lat, query_pt);
+      double query_pt[1][3];
+      cdoLLtoXYZ(lon, lat, query_pt[0]);
 
       if (!gs->extrapolate)
         for (unsigned j = 0; j < 3; ++j)
-          if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return nadds;
+          if (query_pt[0][j] < gs->min[j] || query_pt[0][j] > gs->max[j]) return nadds;
 
       size_t local_point_ids_array_size = 0;
       size_t num_local_point_ids;

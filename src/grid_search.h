@@ -76,7 +76,7 @@ struct GridSearch
   float min[3], max[3];
   void *pointcloud;
 
-  double *coordinates_xyz;
+  double (*coordinates_xyz)[3];
 };
 
 void gridSearchPoint(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights);
