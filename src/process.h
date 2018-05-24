@@ -91,6 +91,7 @@ public:
   char prompt[64];
   short m_noper;
   bool m_isActive;
+  const char * m_obase;
 
   module_t m_module;
   std::vector<char *> m_oargv;
@@ -167,6 +168,9 @@ public:
   int checkInFileStreams();
   void validate();
   void handleProcessErr(ProcessStatus p_proErr);
+
+  bool hasOutStream(PstreamType* p_streamPtr);
+  bool hasInStream(PstreamType* p_streamPtr);
 
 private:
   void initProcess();

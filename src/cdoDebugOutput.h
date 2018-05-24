@@ -75,6 +75,7 @@ extern int PROCESS;
 extern int PIPE;
 extern int ARGUMENT;
 extern int PTHREAD;
+extern int PROCESS_MANAGER;
 
 // File switches and streams
 extern std::string outfile;

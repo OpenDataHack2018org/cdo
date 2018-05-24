@@ -363,7 +363,7 @@ ProcessType::getOperatorID()
         }
       if (operID == m_noper)
         {
-          cdoAbort("Operator not callable by this name!");
+          CdoError::Abort(Cdo::progname, prompt, "Operator not callable by this name! Name is:", operatorName);
         }
     }
   else
@@ -612,4 +612,28 @@ ProcessType::printProcessedValues()
   if (ntimesteps > 0) fprintf(stderr, " over %d timestep%s", ntimesteps, ADD_PLURAL(ntimesteps));
 
   //  fprintf(stderr, ".");
+}
+bool
+ProcessType::hasOutStream(PstreamType *p_streamPtr)
+{
+  for (PstreamType *streamPtr : outputStreams)
+    {
+      if (streamPtr == p_streamPtr)
+        {
+          return true;
+        }
+    }
+  return false;
+}
+bool
+ProcessType::hasInStream(PstreamType *p_streamPtr)
+{
+  for (PstreamType *streamPtr : inputStreams)
+    {
+      if (streamPtr == p_streamPtr)
+        {
+          return true;
+        }
+    }
+  return false;
 }

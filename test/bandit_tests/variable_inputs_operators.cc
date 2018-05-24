@@ -33,24 +33,24 @@ go_bandit([]() {
 
     unsigned int i;
     for (i = 0; i < numberOfRuns; i++) {
-        createProcessesFromInput(test_argvs[i].size(),&test_argvs[i][0]);
-        auto process = getProcess(0);
-        std::string runInfo = std::string(getProcess(0)->operatorName) + " in run " + std::to_string(i + 1);
+        g_processManager.createProcessesFromInput(test_argvs[i].size(),&test_argvs[i][0]);
+        auto process = g_processManager.getProcess(0);
+        std::string runInfo = std::string(g_processManager.getProcess(0).operatorName) + " in run " + std::to_string(i + 1);
       bandit::it(
               "created inputs for:"+ runInfo, [&]() {
         AssertThat(
-            process->childProcesses.size() + process->inputStreams.size(),
+            process.childProcesses.size() + process.inputStreams.size(),
             snowhouse::Equals(expectedInputForRun[i]));
       });
       bandit::it("created outputs for: " + runInfo, [&]() {
         AssertThat(
-            process->parentProcesses.size() + process->outputStreams.size(),
+            process.parentProcesses.size() + process.outputStreams.size(),
             snowhouse::Equals(expectedOutputs[i]));
       });
      bandit::it("created right amount of processes",[&]() {
-        AssertThat(1, snowhouse::Equals(processNums()));
+        AssertThat(1, snowhouse::Equals(g_processManager.processNums()));
         });
-      clearProcesses();
+      g_processManager.clearProcesses();
     }
   });
 });
