@@ -169,6 +169,9 @@ public:
   void validate();
   void handleProcessErr(ProcessStatus p_proErr);
 
+  bool hasOutStream(PstreamType* p_streamPtr);
+  bool hasInStream(PstreamType* p_streamPtr);
+
 private:
   void initProcess();
   ProcessType();
