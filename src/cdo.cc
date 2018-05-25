@@ -38,7 +38,6 @@
 #endif
 #endif
 #include <unistd.h> /* sysconf, gethostname */
-#include <thread>
 #include "timer.h"
 
 #if defined(SX)
@@ -1781,7 +1780,6 @@ main(int argc, char *argv[])
   if (Debug)
     {
       print_pthread_info();
-      //      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
     }
 
 #ifdef _OPENMP

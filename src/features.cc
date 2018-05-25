@@ -52,6 +52,8 @@ extern "C" {
 
 #include "cdo_int.h"  // HAVE_OPENMP4
 
+#include <thread> // std::thread::hardware_concurrency()
+
 extern "C" {
 size_t getMemorySize(void);
 }
@@ -62,6 +64,7 @@ printFeatures(void)
   fprintf(stderr, "Features:");
   size_t memory_size = getMemorySize() / (1024 * 1024 * 1024);
   if (memory_size > 0) fprintf(stderr, " %zuGB", memory_size);
+  fprintf(stderr, " %uthreads", std::thread::hardware_concurrency());
 #ifdef __cplusplus
   fprintf(stderr, " C++%d", (int) ((__cplusplus - (__cplusplus / 10000) * 10000) / 100));
 #endif
