@@ -1300,7 +1300,6 @@ parse_options_long(int argc, char *argv[])
           break;
         case 'a': cdoDefaultTimeType = TAXIS_ABSOLUTE; break;
         case 'b': setDefaultDataType(CDO_optarg); break;
-        case 'B': cdoBenchmark = TRUE; break;
         case 'C': CDO_Color = TRUE; break;
         case 'c': cdoCheckDatarange = TRUE; break;
         case 'd': Debug = 1; break;

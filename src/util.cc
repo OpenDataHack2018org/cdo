@@ -74,7 +74,6 @@ int CDO_Reset_History = FALSE;
 int cdoDebug = 0;
 int cdoChunkType = CDI_UNDEFID;
 int cdoOverwriteMode = FALSE;
-int cdoBenchmark = FALSE;
 int cdoTimer = FALSE;
 int cdoVerbose = FALSE;
 int cdoParIO = FALSE;

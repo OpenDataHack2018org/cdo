@@ -559,24 +559,11 @@ ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
 #ifdef HAVE_SYS_TIMES_H
   if (m_ID == 0)
     {
-      if (cdoBenchmark)
-        fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime, p_times.c_systime, p_times.c_cputime, p_memstring);
-      else if (!Options::silentMode)
-        fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
+      if (!Options::silentMode) fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
     }
   else
     {
       fprintf(stderr, "\n");
-    }
-
-  if (cdoBenchmark && m_ID == 0)
-    {
-      p_times.p_usertime = a_utime;
-      p_times.p_systime = a_stime;
-
-      p_times.p_cputime = p_times.p_usertime + p_times.p_systime;
-      fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_times.p_usertime, p_times.p_systime, p_times.p_cputime,
-              p_memstring);
     }
 #else
   fprintf(stderr, "\n");

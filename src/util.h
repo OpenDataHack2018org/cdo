@@ -77,7 +77,6 @@ extern int cdoCheckDatarange;
 
 extern int cdoOverwriteMode;
 extern int cdoRegulargrid;
-extern int cdoBenchmark;
 extern int cdoTimer;
 extern int cdoVerbose;
 extern int cdoParIO;
