@@ -104,6 +104,12 @@ struct RemapSearch
   GridSearchBins tgtBins;
 
   GridSearch *gs;
+
+#ifdef YAC_CELL_SEARCH
+  void *yacSrcGrid;
+  void *yacTgtGrid;
+  void *yacSearch;
+#endif
 };
 
 struct remapType

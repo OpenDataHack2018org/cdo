@@ -554,6 +554,14 @@ remapGridFree(RemapGrid &grid)
   vectorFree(grid.cell_frac);
 }
 
+#ifdef YAC_CELL_SEARCH
+extern "C" {
+#include "lib/yac/grid_reg2d.h"
+#include "lib/yac/grid_scrip.h"
+#include "lib/yac/sphere_part.h"
+}
+#endif
+
 void
 remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, RemapGrid &tgt_grid)
 {
@@ -570,6 +578,43 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
 
   search.gs = NULL;
 
+#ifdef YAC_CELL_SEARCH
+  double start = cdoVerbose ? cdo_get_wtime() : 0;
+      
+  if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
+    {
+      unsigned nx = src_grid.dims[0];
+      unsigned ny = src_grid.dims[1];
+      unsigned num_cells[2] = {nx,ny};
+      unsigned cyclic[2] = {1,0};
+      // printf("num src cells %ux%u\n", num_cells[0], num_cells[1]);
+      search.yacSrcGrid = (void*)yac_reg2d_grid_new(src_grid.reg2d_corner_lon, src_grid.reg2d_corner_lat, num_cells, cyclic);
+      search.yacSearch = yac_sphere_part_search_new((struct grid *)search.yacSrcGrid);
+    }
+  else
+    {
+      // printf("num src cells %zu\n", src_grid.size);
+      search.yacSrcGrid = (void*)yac_scrip_grid_new(src_grid.cell_corner_lon, src_grid.cell_corner_lat, src_grid.size, src_grid.num_cell_corners);
+      search.yacSearch = yac_sphere_part_search_new((struct grid *)search.yacSrcGrid);
+    }
+      
+  if (tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
+    {
+      unsigned nx = tgt_grid.dims[0];
+      unsigned ny = tgt_grid.dims[1];
+      unsigned num_cells[2] = {nx,ny};
+      unsigned cyclic[2] = {1,0};
+      // printf("num tgt cells %ux%u\n", num_cells[0], num_cells[1]);
+      search.yacTgtGrid = (void*)yac_reg2d_grid_new(tgt_grid.reg2d_corner_lon, tgt_grid.reg2d_corner_lat, num_cells, cyclic);
+    }
+  else
+    {
+      // printf("num tgt cells %zu\n", tgt_grid.size);
+      search.yacTgtGrid = (void*)yac_scrip_grid_new(tgt_grid.cell_corner_lon, tgt_grid.cell_corner_lat, tgt_grid.size, tgt_grid.num_cell_corners);
+    }
+
+  if (cdoVerbose) cdoPrint("Cell search created: %.2f seconds", cdo_get_wtime() - start);
+#else
   bool useGridsearch = mapType == RemapMethod::DISTWGT;
   if (src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D && pointSearchMethod != PointSearchMethod::latbins)
     {
@@ -616,6 +661,7 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
           if (cdoVerbose) cdoPrint("Latitude bins created: %.2f seconds", cdo_get_wtime() - start);
         }
     }
+#endif
 }
 
 void
@@ -649,11 +695,15 @@ remapInitGrids(RemapMethod mapType, bool lextrapolate, int gridID1, RemapGrid &s
       // src_grid.remap_grid_type = 0;
     }
 
+#ifdef YAC_CELL_SEARCH
+  if (IS_REG2D_GRID(gridID2) && mapType == RemapMethod::CONSERV_YAC) tgt_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
+#else
   if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
     {
       if (IS_REG2D_GRID(gridID2) && mapType == RemapMethod::CONSERV_YAC) tgt_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // else src_grid.remap_grid_type = -1;
     }
+#endif
 
   if (!remap_gen_weights && IS_REG2D_GRID(gridID2) && tgt_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D)
     {

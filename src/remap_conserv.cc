@@ -26,6 +26,10 @@ extern "C" {
 #include "lib/yac/clipping.h"
 #include "lib/yac/area.h"
 #include "lib/yac/geometry.h"
+#ifdef YAC_CELL_SEARCH
+#undef GRID_SEARCH_H
+#include "lib/yac/grid_search.h"
+#endif
 }
 
 struct search_t
@@ -789,6 +793,25 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
       // Get search cells
 
+#ifdef YAC_CELL_SEARCH
+      set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, &tgt_grid_cell[ompthID]);
+
+      struct bounding_circle bnd_circle;
+      yac_get_cell_bounding_circle(tgt_grid_cell[ompthID], &bnd_circle);
+
+      struct dep_list result_list;
+      yac_do_bnd_circle_search((struct grid_search *)rsearch.yacSearch, &bnd_circle, 1, &result_list);
+
+      // unsigned num_matching_cells = yac_get_total_num_dependencies (result_list);
+      // printf("num_matching_cells %u\n", num_matching_cells);
+
+      num_srch_cells = result_list.num_deps_per_element[0];
+      unsigned const *curr_neighs = yac_get_dependencies_of_element(result_list,0);
+      for (size_t i = 0; i < num_srch_cells; ++i)
+        srch_add[ompthID][i] = curr_neighs[i];
+
+      yac_free_dep_list(&result_list);
+#else
       if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D)
         {
           double tgt_cell_bound_box[4];
@@ -827,6 +850,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
           num_srch_cells = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r, srch_add[ompthID]);
         }
+#endif
 
       if (1 && cdoVerbose)
         {
@@ -839,7 +863,9 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
       if (num_srch_cells == 0) continue;
 
+#ifndef YAC_CELL_SEARCH
       set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, &tgt_grid_cell[ompthID]);
+#endif
 
       // Create search arrays
 

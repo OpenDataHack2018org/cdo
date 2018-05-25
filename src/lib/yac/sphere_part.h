@@ -39,9 +39,7 @@
 
 #include "grid.h"
 #include "interval_tree.h"
-#ifdef YAC
 #include "grid_search.h"
-#endif
 
 /**
  * \file sphere_part.h
@@ -100,9 +98,8 @@
  * - returns list of matching polygons
  */
 
-#ifdef YAC
 struct grid_search * yac_sphere_part_search_new (struct grid * grid_data);
-#endif
+
 struct point_sphere_part_search;
 
 struct point_sphere_part_search * yac_point_sphere_part_search_new (
@@ -144,8 +141,7 @@ void yac_point_sphere_part_search_NNN(struct point_sphere_part_search * search,
  * This routine returns true if the provided point_sphere_part_search contains
  * a point that is within the provided bounding circle.
  */
-#ifdef YAC
 int yac_point_sphere_part_search_bnd_circle_contains_points(
   struct point_sphere_part_search * search, struct bounding_circle circle);
-#endif
+
 #endif // SPHERE_PART_H

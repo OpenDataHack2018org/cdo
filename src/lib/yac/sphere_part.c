@@ -41,10 +41,8 @@
 #include "interval_tree.h"
 #include "utils.h"
 #include "ensure_array_size.h"
-#ifdef YAC
 #include "grid_search.h"
 #include "grid_search_utils.h"
-#endif
 
 union I_list {
   struct {
@@ -99,7 +97,6 @@ struct temp_partition_data {
   int node_type;
 };
 
-#ifdef YAC
 static void sphere_part_do_cell_search(struct grid_search * search,
                                        struct grid * grid_data,
                                        struct dep_list * tgt_to_src_cells);
@@ -157,7 +154,6 @@ static struct grid_search_vtable sphere_part_search_vtable =
    .do_bnd_circle_search  = sphere_part_do_bnd_circle_search,
    .delete_grid_search    = delete_sphere_part_search
 };
-#endif
 
 struct point_id_xyz {
   size_t idx; // index of the point in the coordinates array passed to
@@ -497,7 +493,6 @@ static struct point_sphere_part_node * partition_point_data (
   return node;
 }
 
-#ifdef YAC
 struct grid_search * yac_sphere_part_search_new (struct grid * grid) {
 
    struct sphere_part_search * search = malloc(1 * sizeof(*search));
@@ -530,7 +525,6 @@ struct grid_search * yac_sphere_part_search_new (struct grid * grid) {
 
    return (struct grid_search *)search;
 }
-#endif
 
 struct point_sphere_part_search * yac_point_sphere_part_search_new (
   size_t num_points, double (*coordinates_xyz)[3]) {
@@ -558,7 +552,6 @@ struct point_sphere_part_search * yac_point_sphere_part_search_new (
   return search;
 }
 
-#ifdef YAC
 static void search_bnd_circle_I_node(
   struct sphere_part_node * node, struct bounding_circle bnd_circle,
   unsigned ** restrict overlap_cells, size_t * overlap_cells_array_size,
@@ -758,7 +751,6 @@ static void search_bnd_circle(struct sphere_part_node * node,
       node, bnd_circle, overlap_cells, overlap_cells_array_size,
       num_overlap_cells, search_interval_tree_buffer, prev_gc_norm_vector);
 }
-#endif
 
 static void point_search_small_bnd_circle(
    struct point_sphere_part_node * node, struct bounding_circle bnd_circle,
@@ -1301,7 +1293,6 @@ int yac_point_sphere_part_search_bnd_circle_contains_points(
   return point_check_bnd_circle(&(search->base_node), circle);
 }
 
-#ifdef YAC
 static void search_point(struct sphere_part_node * node,
                          double point[],
                          unsigned ** overlap_cells,
@@ -1790,7 +1781,6 @@ static void free_sphere_part_tree (struct sphere_part_node tree) {
       free(tree.T);
    }
 }
-#endif
 
 static void free_point_sphere_part_tree (struct point_sphere_part_node * tree) {
 
@@ -1805,7 +1795,6 @@ static void free_point_sphere_part_tree (struct point_sphere_part_node * tree) {
    }
 }
 
-#ifdef YAC
 static void delete_sphere_part_search(struct grid_search * search) {
 
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
@@ -1815,7 +1804,6 @@ static void delete_sphere_part_search(struct grid_search * search) {
    free(sp_search->local_cell_ids);
    free(sp_search);
 }
-#endif
 
 void yac_delete_point_sphere_part_search(
    struct point_sphere_part_search * search) {
