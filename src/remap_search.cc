@@ -17,7 +17,6 @@
 
 #include "cdo_int.h"
 #include "remap.h"
-#include "grid_search.h"
 
 // This routine finds the closest numNeighbor points to a search point and computes a distance to each of the neighbors
 #define MAX_SEARCH_CELLS 25

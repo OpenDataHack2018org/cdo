@@ -99,8 +99,8 @@ libcdo_la_SOURCES =            \
                griddes_nc.cc    \
                grid_cell_search.cc   \
                grid_cell_search.h   \
-               grid_search.cc   \
-               grid_search.h   \
+               grid_point_search.cc   \
+               grid_point_search.h   \
                hetaeta.cc       \
                hetaeta.h       \
                institution.cc   \

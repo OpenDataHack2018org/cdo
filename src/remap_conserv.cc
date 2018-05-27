@@ -26,7 +26,6 @@ extern "C" {
 #include "lib/yac/clipping.h"
 #include "lib/yac/area.h"
 #include "lib/yac/geometry.h"
-#undef GRID_SEARCH_H
 #include "lib/yac/grid_search.h"
 }
 

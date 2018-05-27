@@ -28,7 +28,7 @@
 #include "dmemory.h"
 #include "util.h"
 #include "grid.h"
-#include "grid_search.h"
+#include "grid_point_search.h"
 #include "kdtreelib/kdtree.h"
 #include "nanoflann.hpp"
 extern "C" {

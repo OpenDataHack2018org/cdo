@@ -31,7 +31,7 @@
 #include "pmlist.h"
 #include "cdoOptions.h"
 
-#include "grid_search.h"
+#include "grid_point_search.h"
 
 enum
 {

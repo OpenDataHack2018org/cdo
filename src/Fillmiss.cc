@@ -26,7 +26,7 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "grid.h"
-#include "grid_search.h"
+#include "grid_point_search.h"
 #include "cdoOptions.h"
 
 void

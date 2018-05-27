@@ -18,7 +18,7 @@
 
 #include "cdo_int.h"
 #include "grid.h"
-#include "grid_search.h"
+#include "grid_point_search.h"
 
 constexpr int MAX_CHILDS = 9;
 
