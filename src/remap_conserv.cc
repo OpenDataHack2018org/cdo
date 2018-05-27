@@ -26,10 +26,8 @@ extern "C" {
 #include "lib/yac/clipping.h"
 #include "lib/yac/area.h"
 #include "lib/yac/geometry.h"
-#ifdef YAC_CELL_SEARCH
 #undef GRID_SEARCH_H
 #include "lib/yac/grid_search.h"
-#endif
 }
 
 struct search_t
@@ -340,8 +338,6 @@ boundbox_from_corners1r(size_t ic, size_t nc, const double *restrict corner_lon,
     }
   */
 }
-
-//#ifdef  HAVE_LIBYAC
 
 static double
 gridcell_area(struct grid_cell cell)
@@ -767,13 +763,15 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
   num_srch_cells_stat[1] = 100000;
   num_srch_cells_stat[2] = 0;
 
+  extern CellSearchMethod cellSearchMethod;
+
 // Loop over destination grid
 
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic) default(none)                                                                        \
     shared(findex, rsearch, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose, tgt_num_cell_corners, \
            target_cell_type, weightLinks, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, search, srch_add,     \
-           tgt_grid_cell, num_srch_cells_stat)
+           tgt_grid_cell, num_srch_cells_stat, cellSearchMethod)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -793,64 +791,67 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
       // Get search cells
 
-#ifdef YAC_CELL_SEARCH
-      set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, &tgt_grid_cell[ompthID]);
-
-      struct bounding_circle bnd_circle;
-      yac_get_cell_bounding_circle(tgt_grid_cell[ompthID], &bnd_circle);
-
-      struct dep_list result_list;
-      yac_do_bnd_circle_search((struct grid_search *)rsearch.yacSearch, &bnd_circle, 1, &result_list);
-
-      // unsigned num_matching_cells = yac_get_total_num_dependencies (result_list);
-      // printf("num_matching_cells %u\n", num_matching_cells);
-
-      num_srch_cells = result_list.num_deps_per_element[0];
-      unsigned const *curr_neighs = yac_get_dependencies_of_element(result_list,0);
-      for (size_t i = 0; i < num_srch_cells; ++i)
-        srch_add[ompthID][i] = curr_neighs[i];
-
-      yac_free_dep_list(&result_list);
-#else
-      if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D)
+      if ( cellSearchMethod == CellSearchMethod::spherepart )
         {
-          double tgt_cell_bound_box[4];
-          boundbox_from_corners_reg2d(tgt_cell_add, tgt_grid->dims, tgt_grid->reg2d_corner_lon, tgt_grid->reg2d_corner_lat,
-                                      tgt_cell_bound_box);
-          restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
+          set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, &tgt_grid_cell[ompthID]);
 
-          num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
-                                                tgt_cell_bound_box, srch_add[ompthID]);
+          struct bounding_circle bnd_circle;
+          yac_get_cell_bounding_circle(tgt_grid_cell[ompthID], &bnd_circle);
 
-          if (num_srch_cells == 1 && src_grid->dims[0] == 1 && src_grid->dims[1] == 1
-              && IS_EQUAL(src_grid->reg2d_corner_lat[0], src_grid->reg2d_corner_lat[1])
-              && IS_EQUAL(src_grid->reg2d_corner_lon[0], src_grid->reg2d_corner_lon[1]))
-            num_srch_cells = 0;
-        }
-      else if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        {
-          double tgt_cell_bound_box[4];
-          boundbox_from_corners1(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
-                                 tgt_cell_bound_box);
-          restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
+          struct dep_list result_list;
+          yac_do_bnd_circle_search((struct grid_search *)rsearch.yacSearch, &bnd_circle, 1, &result_list);
 
-          num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
-                                                tgt_cell_bound_box, srch_add[ompthID]);
+          // unsigned num_matching_cells = yac_get_total_num_dependencies (result_list);
+          // printf("num_matching_cells %u\n", num_matching_cells);
 
-          if (num_srch_cells == 1 && src_grid->dims[0] == 1 && src_grid->dims[1] == 1
-              && IS_EQUAL(src_grid->reg2d_corner_lat[0], src_grid->reg2d_corner_lat[1])
-              && IS_EQUAL(src_grid->reg2d_corner_lon[0], src_grid->reg2d_corner_lon[1]))
-            num_srch_cells = 0;
+          num_srch_cells = result_list.num_deps_per_element[0];
+          unsigned const *curr_neighs = yac_get_dependencies_of_element(result_list,0);
+          for (size_t i = 0; i < num_srch_cells; ++i)
+            srch_add[ompthID][i] = curr_neighs[i];
+
+          yac_free_dep_list(&result_list);
         }
       else
         {
-          float tgt_cell_bound_box_r[4];
-          boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
-                                  tgt_cell_bound_box_r);
+          if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D)
+            {
+              double tgt_cell_bound_box[4];
+              boundbox_from_corners_reg2d(tgt_cell_add, tgt_grid->dims, tgt_grid->reg2d_corner_lon, tgt_grid->reg2d_corner_lat,
+                                          tgt_cell_bound_box);
+              restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
 
-          num_srch_cells = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r, srch_add[ompthID]);
+              num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
+                                                    tgt_cell_bound_box, srch_add[ompthID]);
+
+              if (num_srch_cells == 1 && src_grid->dims[0] == 1 && src_grid->dims[1] == 1
+                  && IS_EQUAL(src_grid->reg2d_corner_lat[0], src_grid->reg2d_corner_lat[1])
+                  && IS_EQUAL(src_grid->reg2d_corner_lon[0], src_grid->reg2d_corner_lon[1]))
+                num_srch_cells = 0;
+            }
+          else if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
+            {
+              double tgt_cell_bound_box[4];
+              boundbox_from_corners1(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
+                                     tgt_cell_bound_box);
+              restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
+
+              num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
+                                                    tgt_cell_bound_box, srch_add[ompthID]);
+
+              if (num_srch_cells == 1 && src_grid->dims[0] == 1 && src_grid->dims[1] == 1
+                  && IS_EQUAL(src_grid->reg2d_corner_lat[0], src_grid->reg2d_corner_lat[1])
+                  && IS_EQUAL(src_grid->reg2d_corner_lon[0], src_grid->reg2d_corner_lon[1]))
+                num_srch_cells = 0;
+            }
+          else
+            {
+              float tgt_cell_bound_box_r[4];
+              boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
+                                      tgt_cell_bound_box_r);
+
+              num_srch_cells = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r, srch_add[ompthID]);
+            }
         }
-#endif
 
       if (1 && cdoVerbose)
         {
@@ -863,9 +864,8 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
       if (num_srch_cells == 0) continue;
 
-#ifndef YAC_CELL_SEARCH
-      set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, &tgt_grid_cell[ompthID]);
-#endif
+      if ( cellSearchMethod != CellSearchMethod::spherepart )
+        set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, &tgt_grid_cell[ompthID]);
 
       // Create search arrays
 

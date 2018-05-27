@@ -21,6 +21,7 @@
 #include <cmath>
 #include "remap_vars.h"
 #include "grid_search.h"
+#include "grid_cell_search.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288
@@ -105,11 +106,9 @@ struct RemapSearch
 
   GridSearch *gs;
 
-#ifdef YAC_CELL_SEARCH
   void *yacSrcGrid;
   void *yacTgtGrid;
   void *yacSearch;
-#endif
 };
 
 struct remapType
