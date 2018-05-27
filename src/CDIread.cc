@@ -150,8 +150,7 @@ CDIread(void *process)
               if (memtype == MEMTYPE_FLOAT)
                 {
                   pstreamReadRecordF(streamID, farray, &nmiss);
-                  //  for ( size_t i = 0; i < gridsize; ++i ) darray[i] =
-                  //  farray[i];
+                  //  for ( size_t i = 0; i < gridsize; ++i ) darray[i] = farray[i];
                   data_size += gridsize * 4;
                 }
               else

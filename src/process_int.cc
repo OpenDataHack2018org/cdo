@@ -46,7 +46,6 @@ std::map<int, char *> obase;
 std::vector<pthread_t> threadIDs;
 /*TEMP*/  // Possibly not the best solution (19.Jan.2018)
 
-static int NumProcess = 0;
 static int NumProcessActive = 0;
 
 void
@@ -55,7 +54,7 @@ cdoRun(int processed_argc, const char **processed_argv)
   g_processManager.createProcesses(processed_argc, processed_argv);
   g_processManager.runProcesses();
   g_processManager.clearProcesses();
-};
+}
 
 ProcessType &
 processSelf(void)
@@ -441,7 +440,7 @@ processAccuTime(double utime, double stime)
 void
 processStartTime(double *utime, double *stime)
 {
-  // used in: Command.cc, CDItest.cc, process.cc
+  // used in: CDItest.cc, process.cc
   ProcessType &process = processSelf();
 
   *utime = process.s_utime;

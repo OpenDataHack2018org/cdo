@@ -509,8 +509,7 @@ ProcessType::query_user_exit(const char *argument)
           }
     }
 
-  /* Ensure one case statement for each exit condition in preceding while loop
-   */
+  /* Ensure one case statement for each exit condition in preceding while loop */
   usr_rpl_int = (int) usr_rpl[0];
   switch (usr_rpl_int)
     {
@@ -522,8 +521,7 @@ ProcessType::query_user_exit(const char *argument)
     } /* end switch */
 }
 
-/** function for operators with obase usage, will be called while operator
- * execution */
+/** function for operators with obase usage, will be called while operator execution */
 
 cdoTimes
 ProcessType::getTimes(int p_processNums)

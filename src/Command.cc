@@ -175,7 +175,7 @@ com_stat(const char *arg)
           fmean /= gridsize;
           counter_stop(&counter);
 
-          fprintf(stdout, "timestep=%d %g %g %g (%gs)\n", tsID + 1, fmin, fmean, fmax, counter_cputime(counter));
+          fprintf(stdout, "timestep=%d %g %g %g [%.2fs]\n", tsID + 1, fmin, fmean, fmax, counter_cputime(counter));
         }
     }
 
@@ -327,14 +327,9 @@ Command(void *process)
 {
   // int recID, varID, levelID;
   // size_t nmiss;
-  double s_utime, s_stime;
-  double e_utime, e_stime;
-  double c_cputime = 0, c_usertime = 0, c_systime = 0;
   char line[MAX_LINE];
 
   cdoInitialize(process);
-
-  processStartTime(&s_utime, &s_stime);
 
   gl_streamID = streamOpenRead(cdoGetStreamName(0).c_str());
 
@@ -355,17 +350,6 @@ Command(void *process)
 
   if (gl_data) Free(gl_data);
   if (all_vars) Free(all_vars);
-
-  cdoProcessTime(&e_utime, &e_stime);
-
-  c_usertime = e_utime - s_utime;
-  c_systime = e_stime - s_stime;
-  c_cputime = c_usertime + c_systime;
-
-  s_utime = e_utime;
-  s_stime = e_stime;
-
-  cdoPrint("%.2fs %.2fs %.2fs", c_usertime, c_systime, c_cputime);
 
   cdoFinish();
 
