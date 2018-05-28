@@ -49,33 +49,34 @@ print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID,
   cdiDecodeDate(vdate, &year, &month, &day);
   cdiDecodeTime(vtime, &hour, &minute, &second);
 
-  if (gridInqType(gridID) == GRID_GAUSSIAN || gridInqType(gridID) == GRID_LONLAT)
+  bool lreg2d = (gridInqType(gridID) == GRID_GAUSSIAN || gridInqType(gridID) == GRID_LONLAT);
+
+  if (lreg2d || gridInqType(gridID) == GRID_CURVILINEAR || gridInqType(gridID) == GRID_UNSTRUCTURED)
     {
       int zaxisID = vlistInqVarZaxis(vlistID, varID);
       double level = cdoZaxisInqLevel(zaxisID, levelID);
+      size_t gridsize = gridInqSize(gridID);
       size_t nlon = gridInqXsize(gridID);
-      size_t nlat = gridInqYsize(gridID);
-      for (size_t j = 0; j < nlat; ++j)
-        for (size_t i = 0; i < nlon; ++i)
-          {
-            if (DBL_IS_EQUAL(fieldptr[j * nlon + i], sglval))
-              {
-                double xval = gridInqXval(gridID, i);
-                double yval = gridInqYval(gridID, j);
-                if (showHeader)
-                  {
-                    if (operfunc == func_min)
-                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
-                    else
-                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
+      for (size_t ij = 0; ij < gridsize; ++ij)
+        {
+          if (DBL_IS_EQUAL(fieldptr[ij], sglval))
+            {
+              size_t j = ij/nlon;
+              size_t i = ij - j*nlon;
+              double xval = gridInqXval(gridID, lreg2d ? i : ij);
+              double yval = gridInqYval(gridID, lreg2d ? j : ij);
+              if (showHeader)
+                {
+                  fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          %s\n",
+                          operfunc == func_min ? "Minval" : "Maxval");
+                  showHeader = false;
+                }
 
-                    showHeader = false;
-                  }
-
-                fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n", year, month, day, hour, minute,
-                        second, code, level, xval, yval, sglval);
-              }
-          }
+              fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n", year, month, day, hour, minute,
+                      second, code, level, xval, yval, sglval);
+              break;
+            }
+        }
     }
 }
 
