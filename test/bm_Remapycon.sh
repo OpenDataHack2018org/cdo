@@ -12,16 +12,24 @@ for N in 3 4 5 6 7 8 9; do
   IFILE=topor2b$N
   $CDO -f nc topo,icor2b$N $IFILE
   OFILE=${IFILE}ycon
-  $CDO remapycon,global_0.2 $IFILE ${OFILE}
+  time $CDO -P 8 remapycon,global_0.2 $IFILE ${OFILE}
 done
 #
-# CDO version 1.9.4rc1
+# CDO version 1.9.5rc2
 #
 #1 bailung: gcc 7.2 sse4_2
-#2 mistral: intel 18.0.1 avx2 (interactiv)
-#3 bailung: gcc 7.2 sse4_2 sphere part search prototype
-#       3   4   5    6    7     8      9
-#1     25  35  72  200  770  6680
-#2     15  23  55  162  588  4492
-#2*8    3   4   8   22   76   533   1808
-#3     27  29  33   40   59   110    280
+#2   8 cores
+#3   spherepart
+#4   spherepart 8 cores
+#       3   4   5    6    7     8      9     10
+#1     24  34  71  194  874  x6680
+#2      5   6  11   28  126   2005   6660
+#x2*8    3   4   8   22   76   533   1808
+#x3     27  29  33   40   59   110    280
+
+#1 mistral: intel 18.0.1 avx2 (interactiv on login node)
+#       3   4   5    6    7     8      9     10
+#1     15  22  54  161  568  4454
+#2      3   4   8   22   76   462   2692
+#3     17  19  22   29   48    92    235    774
+#4      4   4   4    6   10    25     86    351

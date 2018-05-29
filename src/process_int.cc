@@ -342,6 +342,7 @@ cdoGetInStreamName(int p_inStream)
     }
   return name;
 }
+
 std::string
 cdoGetStreamName(int p_streamIndex)
 {

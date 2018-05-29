@@ -441,10 +441,10 @@ ctl_xydef(FILE *gdp, int gridID, bool *yrev)
       fprintf(gdp, "PDEF %d %d LCCR %g %g 1 1 %g %g %g %g %g\n", xsize, ysize, xval_0, yval_0, lat_1, lat_2, lon_0, xinc, yinc);
 
       gridID = gridToCurvilinear(gridID, 0);
-      double *xvals = (double *) Malloc(xsize * ysize * sizeof(double));
-      double *yvals = (double *) Malloc(xsize * ysize * sizeof(double));
-      gridInqXvals(gridID, xvals);
-      gridInqYvals(gridID, yvals);
+      std::vector<double> xvals(xsize * ysize);
+      std::vector<double> yvals(xsize * ysize);
+      gridInqXvals(gridID, xvals.data());
+      gridInqYvals(gridID, yvals.data());
       for (i = 0; i < xsize * ysize; ++i)
         {
           if (xvals[i] > 180) xvals[i] -= 360;
@@ -453,8 +453,6 @@ ctl_xydef(FILE *gdp, int gridID, bool *yrev)
           if (yvals[i] < ymin) ymin = yvals[i];
           if (yvals[i] > ymax) ymax = yvals[i];
         }
-      Free(xvals);
-      Free(yvals);
 
       xfirst = ((int) (xmin - 0.0));
       yfirst = ((int) (ymin - 0.0));
@@ -483,8 +481,8 @@ ctl_xydef(FILE *gdp, int gridID, bool *yrev)
       xinc = gridInqXinc(gridID);
       if (IS_EQUAL(xinc, 0) && gridInqXvals(gridID, NULL))
         {
-          double *xvals = (double *) Malloc(xsize * sizeof(double));
-          gridInqXvals(gridID, xvals);
+          std::vector<double> xvals(xsize);
+          gridInqXvals(gridID, xvals.data());
           fprintf(gdp, "XDEF %d LEVELS ", xsize);
           j = 0;
           for (i = 0; i < xsize; i++)
@@ -499,8 +497,6 @@ ctl_xydef(FILE *gdp, int gridID, bool *yrev)
                 }
             }
           if (j) fprintf(gdp, "\n");
-
-          Free(xvals);
         }
       else
         {
@@ -519,8 +515,8 @@ ctl_xydef(FILE *gdp, int gridID, bool *yrev)
 
       if (IS_EQUAL(yinc, 0) && gridInqYvals(gridID, NULL))
         {
-          double *yvals = (double *) Malloc(ysize * sizeof(double));
-          gridInqYvals(gridID, yvals);
+          std::vector<double> yvals(ysize);
+          gridInqYvals(gridID, yvals.data());
           fprintf(gdp, "YDEF %d LEVELS ", ysize);
           j = 0;
           if (yvals[0] > yvals[ysize - 1])
@@ -554,8 +550,6 @@ ctl_xydef(FILE *gdp, int gridID, bool *yrev)
             }
 
           if (j) fprintf(gdp, "\n");
-
-          Free(yvals);
         }
       else
         {
@@ -594,8 +588,8 @@ ctl_zdef(FILE *gdp, int vlistID, bool *zrev)
         }
     }
 
-  double *levels = (double *) Malloc(nlevmax * sizeof(double));
-  cdoZaxisInqLevels(zaxisIDmax, levels);
+  std::vector<double> levels(nlevmax);
+  cdoZaxisInqLevels(zaxisIDmax, levels.data());
   bool lplev = (zaxisInqType(zaxisIDmax) == ZAXIS_PRESSURE);
   double level0 = levels[0];
   if (nlevmax > 1)
@@ -658,8 +652,6 @@ ctl_zdef(FILE *gdp, int vlistID, bool *zrev)
       }
       if (j) fprintf(gdp, "\n");
     }
-
-  Free(levels);
 }
 
 static void
@@ -833,7 +825,6 @@ write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum,
     {
       int nb, bcnt, rc, j;
       float fdum;
-      unsigned char *map;
       unsigned char ibmfloat[4];
 
       /* calculate the size of the ver==1 index file */
@@ -843,11 +834,10 @@ write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum,
 
       /* add additional info */
 
-      nb += 7;     /* base time (+ sec)  for compatibility with earlier version 2
-                      maps */
+      nb += 7;     /* base time (+ sec)  for compatibility with earlier version 2 maps */
       nb += 8 * 4; /* grvals for time <-> grid conversion */
 
-      map = (unsigned char *) Malloc(nb);
+      unsigned char *map = (unsigned char *) Malloc(nb);
 
       bcnt = 0;
       Put1Byte(map, bcnt, 0);
@@ -908,16 +898,14 @@ write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum,
       if (indx.hinum > 0) fwrite(hinum, sizeof(int), indx.hinum, mapfp);
       if (map_version == 1)
         {
-          int *intnumbuf;
-          intnumbuf = (int *) Malloc(indx.intnum * sizeof(int));
+          std::vector<int> intnumbuf(indx.intnum);
           for (i = 0; i < nrecords; i++)
             {
               intnumbuf[i * 3 + 0] = (int) bignum[i * 2];
               intnumbuf[i * 3 + 1] = (int) bignum[i * 2 + 1];
               intnumbuf[i * 3 + 2] = intnum[i];
             }
-          if (indx.intnum > 0) fwrite(intnumbuf, sizeof(int), indx.intnum, mapfp);
-          Free(intnumbuf);
+          if (indx.intnum > 0) fwrite(intnumbuf.data(), sizeof(int), indx.intnum, mapfp);
           if (indx.fltnum > 0) fwrite(fltnum, sizeof(float), indx.fltnum, mapfp);
         }
       else
@@ -970,10 +958,10 @@ Gradsdes(void *process)
   int map_version = 2;
   int maxrecs = 0;
   int monavg = -1;
-  int *intnum = NULL;
-  float *fltnum = NULL;
-  off_t *bignum = NULL;
-  double *array = NULL;
+  std::vector<int> intnum;
+  std::vector<float> fltnum;
+  std::vector<off_t> bignum;
+  std::vector<double> array;
   const char *cmons[] = { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
   cdoInitialize(process);
@@ -1057,8 +1045,8 @@ Gradsdes(void *process)
   if (index == ngrids) cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!", gridNamePtr(gridtype));
 
   /* select all variables with used gridID */
-  int *vars = (int *) Malloc(nvars * sizeof(int));
-  int *recoffset = (int *) Malloc(nvars * sizeof(int));
+  std::vector<int> vars(nvars);
+  std::vector<int> recoffset(nvars);
   int nvarsout = 0;
   int nrecsout = 0;
   for (varID = 0; varID < nvars; varID++)
@@ -1181,7 +1169,7 @@ Gradsdes(void *process)
         }
 
       gridsize = vlistGridsizeMax(vlistID);
-      array = (double *) Malloc(gridsize * sizeof(double));
+      array.resize(gridsize);
     }
   else if (filetype == CDI_FILETYPE_NC)
     {
@@ -1281,8 +1269,7 @@ Gradsdes(void *process)
             }
           /*
           printf("monavg %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d\n",
-                 tsID, monavg, mdt, imm , imms, idmm, iyy, iyys, idyy, idd,
-          idds, iddd);
+                 tsID, monavg, mdt, imm , imms, idmm, iyy, iyys, idyy, idd, idds, iddd);
           */
           imns = imn;
           ihhs = ihh;
@@ -1297,9 +1284,9 @@ Gradsdes(void *process)
           if (nrecords >= maxrecs)
             {
               maxrecs = nrecords;
-              intnum = (int *) Realloc(intnum, 1 * maxrecs * sizeof(int));
-              fltnum = (float *) Realloc(fltnum, 3 * maxrecs * sizeof(float));
-              bignum = (off_t *) Realloc(bignum, 2 * maxrecs * sizeof(off_t));
+              intnum.resize(1 * maxrecs);
+              fltnum.resize(3 * maxrecs);
+              bignum.resize(2 * maxrecs);
             }
 
           for (int recID = 0; recID < nrecs; recID++)
@@ -1307,7 +1294,7 @@ Gradsdes(void *process)
               pstreamInqRecord(streamID, &varID, &levelID);
               if (vars[varID] == TRUE)
                 {
-                  pstreamReadRecord(streamID, array, &nmiss);
+                  pstreamReadRecord(streamID, array.data(), &nmiss);
 
                   index = (tsID * nrecsout + recoffset[varID] + levelID);
 
@@ -1379,32 +1366,25 @@ LABEL_STOP:
   ctl_undef(gdp, vlistID);
 
   /* VARS */
-  ctl_vars(gdp, filetype, vlistID, nvarsout, vars);
+  ctl_vars(gdp, filetype, vlistID, nvarsout, vars.data());
 
   /* INDEX file */
   if (filetype == CDI_FILETYPE_GRB)
     {
-      write_map_grib1(idxfile, map_version, nrecords, intnum, fltnum, bignum);
+      write_map_grib1(idxfile, map_version, nrecords, intnum.data(), fltnum.data(), bignum.data());
     }
   if (filetype == CDI_FILETYPE_GRB2)
     {
       cdoAbort("The fileformat GRIB2 is not fully supported yet for the gradsdes operator.\n"
                "The .ctl file %s was generated. You can add the necessary .idx file by running\n\tgribmap -i %s",
                ctlfile, ctlfile);
-      // write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum,
-      // bignum);
+      // write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum, bignum);
     }
 
   pstreamClose(streamID);
 
   if (ctlfile) Free(ctlfile);
   if (idxfile) Free(idxfile);
-
-  if (vars) Free(vars);
-  if (recoffset) Free(recoffset);
-  if (array) Free(array);
-  if (intnum) Free(intnum);
-  if (fltnum) Free(fltnum);
 
   cdoFinish();
 
