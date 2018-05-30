@@ -233,10 +233,8 @@ Wind(void *process)
 
           if (gridIDgp != -1)
             {
-              if (operatorID == DV2UV)
-                ntr = nlat_to_ntr(gridInqYsize(gridIDgp));
-              else
-                ntr = nlat_to_ntr_linear(gridInqYsize(gridIDgp));
+              int nlat = gridInqYsize(gridIDgp);
+              ntr = (operatorID == DV2UV) ? nlat_to_ntr(nlat) : nlat_to_ntr_linear(nlat);
 
               if (gridInqTrunc(gridIDsp) != ntr) gridIDgp = -1;
             }
