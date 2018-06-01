@@ -181,18 +181,23 @@ Pack(void *process)
         {
           for (int tsID = 0; tsID < nts; tsID++)
             {
+              double zmin = 1.e300;
+              double zmax = -1.e300;
               if (tsID > 0 && varIsConst[varID]) continue;
               double *array = vars[tsID][varID][levelID].ptr;
               size_t nmiss = vars[tsID][varID][levelID].nmiss;
               if (nmiss > 0)
                 {
                   nmisspv += nmiss;
-                  arrayMinMaxMV(gridsize, array, missval1, &fmin, &fmax);
+                  arrayMinMaxMV(gridsize, array, missval1, &zmin, &zmax);
                 }
               else
                 {
-                  arrayMinMax(gridsize, array, &fmin, &fmax);
+                  arrayMinMax(gridsize, array, &zmin, &zmax);
                 }
+
+              if ( zmin < fmin ) fmin = zmin;
+              if ( zmax > fmax ) fmax = zmax;
             }
         }
 
