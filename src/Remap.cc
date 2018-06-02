@@ -961,7 +961,7 @@ Remap(void *argument)
       needGradients = true;
     }
 
-  gradientsType gradients;
+  RemapGradients gradients;
   if (needGradients) gradients.init(grid1sizemax);
 
   std::vector<double> array1(grid1sizemax);

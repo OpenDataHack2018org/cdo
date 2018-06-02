@@ -73,7 +73,7 @@ bicubicWarning(void)
 
 static void
 bicubicRemap(double *restrict tgt_point, const double *restrict src_array, double wgts[4][4], const size_t src_add[4],
-             gradientsType &gradients)
+             RemapGradients &gradients)
 {
   const double *restrict glat = &gradients.grad_lat[0];
   const double *restrict glon = &gradients.grad_lon[0];
@@ -217,7 +217,7 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
 
   // Compute mappings from source to target grid
 
-  gradientsType gradients(src_grid->size);
+  RemapGradients gradients(src_grid->size);
   remapGradients(*src_grid, src_array, gradients);
 
   double findex = 0;

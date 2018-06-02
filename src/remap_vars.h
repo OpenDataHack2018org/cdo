@@ -1,7 +1,7 @@
 #ifndef REMAP_VARS_H
 #define REMAP_VARS_H
 
-class gradientsType
+class RemapGradients
 {
 public:
   std::vector<double> grad_lat;
@@ -16,8 +16,8 @@ public:
     grad_latlon.resize(size);
   }
 
-  gradientsType(size_t size) { init(size); }
-  gradientsType() {}
+  RemapGradients(size_t size) { init(size); }
+  RemapGradients() {}
 };
 
 enum struct RemapMethod
@@ -68,7 +68,7 @@ struct RemapVars
 };
 
 void remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv, const double *restrict src_array,
-           gradientsType &gradients);
+           RemapGradients &gradients);
 void remap_laf(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv,
                const double *restrict src_array);
 void remap_sum(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv,

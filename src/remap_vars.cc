@@ -12,7 +12,7 @@
 */
 void
 remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv, const double *restrict src_array,
-      gradientsType &gradients)
+      RemapGradients &gradients)
 {
   /*
     Input arrays:

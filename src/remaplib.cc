@@ -867,7 +867,7 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
 /*****************************************************************************/
 
 void
-remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gradients)
+remapGradients(RemapGrid &grid, const double *restrict array, RemapGradients &gradients)
 {
   if (grid.rank != 2) cdoAbort("Internal problem (remapGradients), grid rank = %d!", grid.rank);
 
