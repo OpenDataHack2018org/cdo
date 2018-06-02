@@ -34,7 +34,6 @@ Monarith(void *process)
 {
   int nrecs, nrecs2, nlev;
   int varID, levelID;
-  size_t offset;
   size_t nmiss;
   int yearmon2 = -1;
 
@@ -57,13 +56,13 @@ Monarith(void *process)
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
   Field field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
-  field2.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field1.ptr = (double *) Malloc(gridsizemax * sizeof(double));
+  field2.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -75,15 +74,15 @@ Monarith(void *process)
 
   int nvars = vlistNvars(vlistID2);
 
-  double **vardata2 = (double **) Malloc(nvars * sizeof(double *));
-  size_t **varnmiss2 = (size_t **) Malloc(nvars * sizeof(size_t *));
+  std::vector<std::vector<double>> vardata2(nvars);
+  std::vector<std::vector<size_t>> varnmiss2(nvars);
 
   for (varID = 0; varID < nvars; varID++)
     {
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
       nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-      vardata2[varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
-      varnmiss2[varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+      vardata2[varID].resize(nlev * gridsize);
+      varnmiss2[varID].resize(nlev);
     }
 
   int tsID = 0;
@@ -118,10 +117,10 @@ Monarith(void *process)
             {
               pstreamInqRecord(streamID2, &varID, &levelID);
 
-              gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-              offset = gridsize * levelID;
+              size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+              size_t offset = gridsize * levelID;
 
-              pstreamReadRecord(streamID2, vardata2[varID] + offset, &nmiss);
+              pstreamReadRecord(streamID2, &vardata2[varID][offset], &nmiss);
               varnmiss2[varID][levelID] = nmiss;
             }
 
@@ -139,9 +138,9 @@ Monarith(void *process)
           field1.grid = vlistInqVarGrid(vlistID1, varID);
           field1.missval = vlistInqVarMissval(vlistID1, varID);
 
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          offset = gridsize * levelID;
-          arrayCopy(gridsize, vardata2[varID] + offset, field2.ptr);
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          size_t offset = gridsize * levelID;
+          arrayCopy(gridsize, &vardata2[varID][offset], field2.ptr);
           field2.nmiss = varnmiss2[varID][levelID];
           field2.grid = vlistInqVarGrid(vlistID2, varID);
           field2.missval = vlistInqVarMissval(vlistID2, varID);
@@ -158,15 +157,6 @@ Monarith(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  for (varID = 0; varID < nvars; varID++)
-    {
-      Free(vardata2[varID]);
-      Free(varnmiss2[varID]);
-    }
-
-  Free(vardata2);
-  Free(varnmiss2);
 
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);

@@ -32,6 +32,127 @@
 #include "grid.h"
 #include "pstream_int.h"
 
+static
+void outputarr(size_t gridsize, std::vector<double> &array)
+{
+  for (size_t i = 0; i < gridsize; i++)
+    {
+      fprintf(stdout, "  arr[%zu] = %12.6g;\n", i, array[i]);
+    }
+}
+
+static
+void outputsp(size_t gridsize, std::vector<double> &array, long ntr)
+{
+  double minval = array[0];
+  double maxval = array[0];
+  arrayMinMax(gridsize, array.data(), &minval, &maxval);
+  if ( /* T11 */ minval >= -1 && maxval <= 12 )
+    {
+      double *spc = array.data();
+      for (long m = 0; m <= ntr; m++)
+        {
+          for (long n = m; n <= ntr; n++)
+            {
+              fprintf(stdout, "%3d", (int) *spc++);
+              fprintf(stdout, "%3d", (int) *spc++);
+            }
+          fprintf(stdout, "\n");
+        }
+    }
+}
+
+static
+void output(size_t gridsize, std::vector<double> &array)
+{
+  int nout = 0;
+  for (size_t i = 0; i < gridsize; i++)
+    {
+      if (nout == 6)
+        {
+          nout = 0;
+          fprintf(stdout, "\n");
+        }
+      fprintf(stdout, " %12.6g", array[i]);
+      nout++;
+    }
+  fprintf(stdout, "\n");
+}
+
+static
+void outputxyz(size_t gridsize, std::vector<double> &array, double missval, size_t nlon, size_t nlat, std::vector<double> &lon, std::vector<double> &lat)
+{
+  double fmin = 0;
+  double x, y, z;
+  for (size_t i = 0; i < gridsize; i++)
+    if (!DBL_IS_EQUAL(array[i], missval))
+      {
+        if (array[i] < fmin) fmin = array[i];
+        fprintf(stdout, "%g\t%g\t%g\t%g\n", lon[i], lat[i], array[i], array[i]);
+      }
+  const char *fname = "frontplane.xyz";
+  FILE *fp = fopen(fname, "w");
+  if (fp == NULL) cdoAbort("Open failed on %s", fname);
+  // first front plane
+  double dx = (lon[1] - lon[0]);
+  double x0 = lon[0] - dx / 2;
+  double y0 = lat[0] - dx / 2;
+  double z0 = fmin;
+  fprintf(fp, ">\n");
+  for (size_t i = 0; i < nlon; ++i)
+    {
+      x = x0;
+      y = y0;
+      z = z0;
+      fprintf(fp, "%g %g %g\n", x, y, z);
+      x = x0;
+      y = y0;
+      z = array[i];
+      fprintf(fp, "%g %g %g\n", x, y, z);
+      x = x0 + dx;
+      y = y0;
+      fprintf(fp, "%g %g %g\n", x, y, z);
+      x0 = x; /*y0 = y0;*/
+      z0 = z;
+    }
+  x = x0;
+  y = y0;
+  z = fmin;
+  fprintf(fp, "%g %g %g\n", x, y, z);
+  x = lon[0] - dx / 2;
+  fprintf(fp, "%g %g %g\n", x, y, z);
+
+  // second front plane
+  x0 = lon[0] - dx / 2;
+  y0 = lat[0] - dx / 2;
+  z0 = fmin;
+  fprintf(fp, ">\n");
+  for (size_t i = 0; i < nlat; ++i)
+    {
+      x = x0;
+      y = y0;
+      z = z0;
+      fprintf(fp, "%g %g %g\n", x, y, z);
+      x = x0;
+      y = y0;
+      z = array[i * nlon];
+      fprintf(fp, "%g %g %g\n", x, y, z);
+      x = x0;
+      y = y0 + dx;
+      fprintf(fp, "%g %g %g\n", x, y, z);
+      /*x0 = x0;*/ y0 = y;
+      z0 = z;
+    }
+  x = x0;
+  y = y0;
+  z = fmin;
+  fprintf(fp, "%g %g %g\n", x, y, z);
+  y = lat[0] - dx / 2;
+  fprintf(fp, "%g %g %g\n", x, y, z);
+
+  fclose(fp);
+}
+
 void *
 Output(void *process)
 {
@@ -46,10 +167,11 @@ Output(void *process)
   const char *format = NULL;
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  double *grid_center_lon = NULL, *grid_center_lat = NULL;
+  std::vector<double> grid_center_lon, grid_center_lat;
   char name[CDI_MAX_NAME];
   int year, month, day;
-  int *keys = NULL, nkeys = 0, k;
+  std::vector<int> keys;
+  int nkeys = 0, k;
   int nKeys;
 
   // clang-format off
@@ -97,7 +219,7 @@ Output(void *process)
       if (cdoVerbose)
         for (int i = 0; i < npar; i++) cdoPrint("key %d = %s", i + 1, parnames[i]);
 
-      keys = (int *) Malloc(npar * sizeof(int));
+      keys.resize(npar);
       nkeys = 0;
       nKeys = sizeof(Keynames) / sizeof(char *);
       for (int i = 0; i < npar; i++)
@@ -162,7 +284,7 @@ Output(void *process)
       size_t gridsize = gridInqSize(gridID);
       int gridtype = gridInqType(gridID);
 
-      double *array = (double *) Malloc(gridsize * sizeof(double));
+      std::vector<double> array(gridsize);
 
       if (operatorID == OUTPUTFLD || operatorID == OUTPUTXYZ || operatorID == OUTPUTTAB)
         {
@@ -173,18 +295,18 @@ Output(void *process)
 
           gridtype = gridInqType(gridID);
 
-          grid_center_lon = (double *) Malloc(gridsize * sizeof(double));
-          grid_center_lat = (double *) Malloc(gridsize * sizeof(double));
-          gridInqXvals(gridID, grid_center_lon);
-          gridInqYvals(gridID, grid_center_lat);
+          grid_center_lon.resize(gridsize);
+          grid_center_lat.resize(gridsize);
+          gridInqXvals(gridID, grid_center_lon.data());
+          gridInqYvals(gridID, grid_center_lat.data());
 
           /* Convert lat/lon units if required */
           {
             char units[CDI_MAX_NAME];
             gridInqXunits(gridID, units);
-            grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
+            grid_to_degree(units, gridsize, grid_center_lon.data(), "grid center lon");
             gridInqYunits(gridID, units);
-            grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
+            grid_to_degree(units, gridsize, grid_center_lat.data(), "grid center lat");
           }
         }
 
@@ -222,7 +344,7 @@ Output(void *process)
                   nlat = 1;
                 }
 
-              pstreamReadRecord(streamID, array, &nmiss);
+              pstreamReadRecord(streamID, array.data(), &nmiss);
 
               if (operatorID == OUTPUTSRV)
                 fprintf(stdout, "%4d %8g %8lld %4d %8zu %8zu %d %d\n", code, level, vdate, vtime, nlon, nlat, 0, 0);
@@ -328,123 +450,22 @@ Output(void *process)
                 {
                   if (tsID == 0 && recID == 0)
                     {
-                      const char *fname = "frontplane.xyz";
-                      double fmin = 0;
-                      double x, y, z;
-                      for (size_t i = 0; i < gridsize; i++)
-                        if (!DBL_IS_EQUAL(array[i], missval))
-                          {
-                            if (array[i] < fmin) fmin = array[i];
-                            fprintf(stdout, "%g\t%g\t%g\t%g\n", grid_center_lon[i], grid_center_lat[i], array[i], array[i]);
-                          }
-                      FILE *fp = fopen(fname, "w");
-                      if (fp == NULL) cdoAbort("Open failed on %s", fname);
-                      // first front plane
-                      double dx = (grid_center_lon[1] - grid_center_lon[0]);
-                      double x0 = grid_center_lon[0] - dx / 2;
-                      double y0 = grid_center_lat[0] - dx / 2;
-                      double z0 = fmin;
-                      fprintf(fp, ">\n");
-                      for (size_t i = 0; i < nlon; ++i)
-                        {
-                          x = x0;
-                          y = y0;
-                          z = z0;
-                          fprintf(fp, "%g %g %g\n", x, y, z);
-                          x = x0;
-                          y = y0;
-                          z = array[i];
-                          fprintf(fp, "%g %g %g\n", x, y, z);
-                          x = x0 + dx;
-                          y = y0;
-                          fprintf(fp, "%g %g %g\n", x, y, z);
-                          x0 = x; /*y0 = y0;*/
-                          z0 = z;
-                        }
-                      x = x0;
-                      y = y0;
-                      z = fmin;
-                      fprintf(fp, "%g %g %g\n", x, y, z);
-                      x = grid_center_lon[0] - dx / 2;
-                      fprintf(fp, "%g %g %g\n", x, y, z);
-
-                      // second front plane
-                      x0 = grid_center_lon[0] - dx / 2;
-                      y0 = grid_center_lat[0] - dx / 2;
-                      z0 = fmin;
-                      fprintf(fp, ">\n");
-                      for (size_t i = 0; i < nlat; ++i)
-                        {
-                          x = x0;
-                          y = y0;
-                          z = z0;
-                          fprintf(fp, "%g %g %g\n", x, y, z);
-                          x = x0;
-                          y = y0;
-                          z = array[i * nlon];
-                          fprintf(fp, "%g %g %g\n", x, y, z);
-                          x = x0;
-                          y = y0 + dx;
-                          fprintf(fp, "%g %g %g\n", x, y, z);
-                          /*x0 = x0;*/ y0 = y;
-                          z0 = z;
-                        }
-                      x = x0;
-                      y = y0;
-                      z = fmin;
-                      fprintf(fp, "%g %g %g\n", x, y, z);
-                      y = grid_center_lat[0] - dx / 2;
-                      fprintf(fp, "%g %g %g\n", x, y, z);
-
-                      fclose(fp);
+                      outputxyz(gridsize, array, missval, nlon, nlat, grid_center_lon, grid_center_lat);
                     }
                 }
               else if (operatorID == OUTPUTARR)
                 {
-                  for (size_t i = 0; i < gridsize; i++)
-                    {
-                      fprintf(stdout, "  arr[%zu] = %12.6g;\n", i, array[i]);
-                    }
+                  outputarr(gridsize, array);
                 }
               else
                 {
-                  double minval, maxval;
-                  minval = array[0];
-                  maxval = array[0];
                   if (gridInqType(gridID) == GRID_SPECTRAL && gridsize <= 156)
                     {
-                      arrayMinMax(gridsize, array, &minval, &maxval);
-                    }
-
-                  if (gridInqType(gridID) == GRID_SPECTRAL && gridsize <= 156 /* T11 */ && minval >= -1 && maxval <= 12)
-                    {
-                      long m, n;
-                      double *spc = array;
-                      long ntr = gridInqTrunc(gridID);
-                      for (m = 0; m <= ntr; m++)
-                        {
-                          for (n = m; n <= ntr; n++)
-                            {
-                              fprintf(stdout, "%3d", (int) *spc++);
-                              fprintf(stdout, "%3d", (int) *spc++);
-                            }
-                          fprintf(stdout, "\n");
-                        }
+                      outputsp(gridsize, array, gridInqTrunc(gridID));
                     }
                   else
                     {
-                      int nout = 0;
-                      for (size_t i = 0; i < gridsize; i++)
-                        {
-                          if (nout == 6)
-                            {
-                              nout = 0;
-                              fprintf(stdout, "\n");
-                            }
-                          fprintf(stdout, " %12.6g", array[i]);
-                          nout++;
-                        }
-                      fprintf(stdout, "\n");
+                      output(gridsize, array);
                     }
                 }
             }
@@ -453,13 +474,7 @@ Output(void *process)
         }
 
       pstreamClose(streamID);
-
-      if (array) Free(array);
-      if (grid_center_lon) Free(grid_center_lon);
-      if (grid_center_lat) Free(grid_center_lat);
     }
-
-  if (keys) Free(keys);
 
   cdoFinish();
 
