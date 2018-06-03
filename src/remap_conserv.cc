@@ -886,10 +886,9 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
         }
       else
         {
-          double cell_center_lon = tgt_grid->cell_center_lon[tgt_cell_add];
-          double cell_center_lat = tgt_grid->cell_center_lat[tgt_cell_add];
-          cdo_compute_concave_overlap_areas(num_srch_cells, &search[ompthID], tgt_grid_cell[ompthID], cell_center_lon,
-                                            cell_center_lat);
+          cdo_compute_concave_overlap_areas(num_srch_cells, &search[ompthID], tgt_grid_cell[ompthID],
+                                            tgt_grid->cell_center_lon[tgt_cell_add],
+                                            tgt_grid->cell_center_lat[tgt_cell_add]);
         }
 
       double tgt_area = gridcell_area(tgt_grid_cell[ompthID]);
@@ -970,8 +969,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       storeWeightLinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightLinks);
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area;
-      // printf("area %d %g %g\n", tgt_cell_add,
-      // tgt_grid->cell_area[tgt_cell_add], tgt_area);
+      // printf("area %d %g %g\n", tgt_cell_add, tgt_grid->cell_area[tgt_cell_add], tgt_area);
     }
 
   progressStatus(0, 1, 1);
