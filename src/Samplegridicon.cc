@@ -311,7 +311,7 @@ compute_child_from_bounds(CellIndex *cellindex2, long ncells2, double *grid_cent
   size_t dims[2];
   dims[0] = ncells1;
   dims[1] = 0;
-  GridSearch *gs = gridsearch_create(xIsCyclic, dims, ncells1, grid_center_lon1, grid_center_lat1);
+  GridSearch *gs = gridPointSearchCreate(xIsCyclic, dims, ncells1, grid_center_lon1, grid_center_lat1);
   knnWeightsType knnWeights(MAX_SEARCH);
   size_t *nbr_addr = &knnWeights.m_addr[0];
 

@@ -374,7 +374,7 @@ gs_create_full(size_t n, const double *restrict lons, const double *restrict lat
 }
 
 GridSearch *
-gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
+gridPointSearchCreate(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
 {
   GridSearch *gs = (GridSearch *) Calloc(1, sizeof(GridSearch));
 

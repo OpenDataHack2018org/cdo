@@ -443,7 +443,7 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
     {
       bool xIsCyclic = false;
       size_t dims[2] = { nvals, 0 };
-      gs = gridsearch_create(xIsCyclic, dims, nvals, &lons[0], &lats[0]);
+      gs = gridPointSearchCreate(xIsCyclic, dims, nvals, &lons[0], &lats[0]);
       gridsearch_extrapolate(gs);
     }
 

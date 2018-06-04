@@ -595,7 +595,7 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
       if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
         search.gs = gridPointSearchCreateReg2d(xIsCyclic, dims, src_grid.reg2d_center_lon, src_grid.reg2d_center_lat);
       else
-        search.gs = gridsearch_create(xIsCyclic, dims, src_grid.size, src_grid.cell_center_lon, src_grid.cell_center_lat);
+        search.gs = gridPointSearchCreate(xIsCyclic, dims, src_grid.size, src_grid.cell_center_lon, src_grid.cell_center_lat);
 
       if (src_grid.lextrapolate) gridsearch_extrapolate(search.gs);
 

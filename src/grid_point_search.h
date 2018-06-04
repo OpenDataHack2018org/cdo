@@ -82,7 +82,7 @@ struct GridSearch
 void gridSearchPoint(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights);
 
 GridSearch *gridPointSearchCreateReg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats);
-GridSearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
+GridSearch *gridPointSearchCreate(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
                               const double *restrict lats);
 void gridsearch_delete(GridSearch *gs);
 size_t gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double *dist);
