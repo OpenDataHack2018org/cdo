@@ -29,3 +29,13 @@ setCellSearchMethod(const char *methodstr)
   else cdoAbort("Grid cell search method %s not available!", methodstr);
   // clang-format on
 }
+
+
+void
+gridCellSearchDelete(GridCellSearch *gcs)
+{
+  if (gcs)
+    {
+      Free(gcs);
+    }
+}

@@ -79,6 +79,7 @@ struct GridPointSearch
   double (*coordinates_xyz)[3];
 };
 
+
 void gridSearchPoint(GridPointSearch *gps, double plon, double plat, knnWeightsType &knnWeights);
 
 GridPointSearch *gridPointSearchCreateReg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats);

@@ -31,4 +31,7 @@ struct GridCellSearch
   void *yacSearch;
 };
 
+
+void gridCellSearchDelete(GridCellSearch *gcs);
+
 #endif

@@ -575,6 +575,7 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
   search.tgtBins.nbins = remap_num_srch_bins;
 
   search.gps = NULL;
+  search.gcs = NULL;
 
   bool useGridsearch = mapType == RemapMethod::DISTWGT;
   if (src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D && pointSearchMethod != PointSearchMethod::latbins)
@@ -671,6 +672,9 @@ remapSearchFree(RemapSearch &search)
 
   if (search.gps) gridPointSearchDelete(search.gps);
   search.gps = NULL;
+
+  if (search.gcs) gridCellSearchDelete(search.gcs);
+  search.gcs = NULL;
 }
 
 void
