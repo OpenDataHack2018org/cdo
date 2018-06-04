@@ -296,12 +296,19 @@ gridDefine(GridDesciption &grid)
 }
 
 int
-cdoDefineGrid(const char *gridfile)
+cdoDefineGrid(const char *pgridfile)
 {
   int gridID = -1;
-  size_t len;
   bool isreg = false;
   bool lalloc = false;
+  char *gridfile = strdup(pgridfile);
+  size_t len = strlen(gridfile);
+  int gridno = 1;
+  if ( len > 2 && gridfile[len-2] == ':' && isdigit(gridfile[len-1]) )
+    {
+      gridno = gridfile[len-1] - '0';
+      gridfile[len-2] = 0;
+    }
 
   char *filename = expand_filename(gridfile);
   if (filename)
@@ -364,7 +371,9 @@ cdoDefineGrid(const char *gridfile)
           if (streamID >= 0)
             {
               int vlistID = streamInqVlist(streamID);
-              gridID = vlistGrid(vlistID, 0);
+              int ngrids = vlistNgrids(vlistID);
+              if ( gridno < 1 || gridno > ngrids ) cdoAbort("Grid number %d not available in %s!", gridno, filename);
+              gridID = vlistGrid(vlistID, gridno-1);
               streamClose(streamID);
             }
         }
@@ -393,6 +402,7 @@ cdoDefineGrid(const char *gridfile)
     }
 
   if (lalloc) Free(filename);
+  free(gridfile);
 
   return gridID;
 }

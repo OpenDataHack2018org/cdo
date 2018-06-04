@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.5
 	* Version 1.9.5 release
 
+2018-06-04 Uwe Schulzweida
+
+	* gridfile: added extension ":X" to select grid number X from grid file
+
 2018-05-18 Uwe Schulzweida
 
 	* remapnn/remapdis: wrong result with regular 2D source grids if nlat > nlon  [Bug #8498]
