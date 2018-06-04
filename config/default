@@ -89,15 +89,15 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = sanitize_address ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-                    LDFLAGS="/opt/local/lib/gcc6/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
-	            CXX=g++ CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fsanitize=address -fno-omit-frame-pointer" \
-                    CC=gcc  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fsanitize=address -fno-omit-frame-pointer"
+                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
+	            CXX=clang++ CXXFLAGS="-g -Wall -Wextra -O3 -march=native -fsanitize=address -fno-omit-frame-pointer" \
+                    CC=clang    CFLAGS="-g -Wall -Wextra -O3 -march=native -fsanitize=address -fno-omit-frame-pointer"
         elif  test "$COMP" = sanitize_undefined ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-                    LDFLAGS="/opt/local/lib/gcc6/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
-	            CXX=g++ CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fsanitize=undefined -fno-omit-frame-pointer" \
-                    CC=gcc  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fsanitize=undefined -fno-omit-frame-pointer" --disable-openmp
+                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.6.0/lib" \
+	            CXX=clang++ CXXFLAGS="-g -Wall -Wextra -O3 -march=native -fsanitize=undefined -fno-omit-frame-pointer" \
+                    CC=clang    CFLAGS="-g -Wall -Wextra -O3 -march=native -fsanitize=undefined -fno-omit-frame-pointer" --disable-openmp
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9
         else
