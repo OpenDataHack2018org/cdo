@@ -137,7 +137,7 @@ gridsearch_extrapolate(GridSearch *gs)
 }
 
 GridSearch *
-gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
+gridPointSearchCreateReg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
 {
   GridSearch *gs = (GridSearch *) Calloc(1, sizeof(GridSearch));
 
