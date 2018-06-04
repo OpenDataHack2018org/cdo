@@ -84,9 +84,9 @@ void gridSearchPoint(GridPointSearch *gps, double plon, double plat, knnWeightsT
 GridPointSearch *gridPointSearchCreateReg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats);
 GridPointSearch *gridPointSearchCreate(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
                               const double *restrict lats);
-void gridSearchDelete(GridPointSearch *gps);
-size_t gridSearchNearest(GridPointSearch *gps, double lon, double lat, size_t *addr, double *dist);
-size_t gridSearchQnearest(GridPointSearch *gps, double lon, double lat, size_t nnn, size_t *adds, double *dist);
-void gridSearchExtrapolate(GridPointSearch *gps);
+void gridPointSearchDelete(GridPointSearch *gps);
+size_t gridPointSearchNearest(GridPointSearch *gps, double lon, double lat, size_t *addr, double *dist);
+size_t gridPointSearchQnearest(GridPointSearch *gps, double lon, double lat, size_t nnn, size_t *adds, double *dist);
+void gridPointSearchExtrapolate(GridPointSearch *gps);
 
 #endif

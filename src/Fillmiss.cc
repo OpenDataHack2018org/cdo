@@ -444,7 +444,7 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
       bool xIsCyclic = false;
       size_t dims[2] = { nvals, 0 };
       gps = gridPointSearchCreate(xIsCyclic, dims, nvals, &lons[0], &lats[0]);
-      gridSearchExtrapolate(gps);
+      gridPointSearchExtrapolate(gps);
     }
 
   finish = clock();
@@ -490,7 +490,7 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
 
   if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
-  if (gps) gridSearchDelete(gps);
+  if (gps) gridPointSearchDelete(gps);
 
   if (gridID0 != gridID) gridDestroy(gridID);
 }

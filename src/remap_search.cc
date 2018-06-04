@@ -194,9 +194,9 @@ gridSearchPoint(GridPointSearch *gps, double plon, double plat, knnWeightsType &
 
   size_t nadds = 0;
   if (numNeighbors == 1)
-    nadds = gridSearchNearest(gps, plon, plat, adds, dist);
+    nadds = gridPointSearchNearest(gps, plon, plat, adds, dist);
   else
-    nadds = gridSearchQnearest(gps, plon, plat, ndist, adds, dist);
+    nadds = gridPointSearchQnearest(gps, plon, plat, ndist, adds, dist);
 
   ndist = nadds;
   if (ndist < numNeighbors) numNeighbors = ndist;
@@ -240,7 +240,7 @@ gridSearchSquareCurv2d(GridPointSearch *gps, RemapGrid *rgrid, size_t *restrict 
 
   double dist;
   size_t addr;
-  size_t nadds = gridSearchNearest(gps, plon, plat, &addr, &dist);
+  size_t nadds = gridPointSearchNearest(gps, plon, plat, &addr, &dist);
   if (nadds > 0)
     {
       for (unsigned k = 0; k < 4; ++k)
@@ -267,7 +267,7 @@ gridSearchSquareCurv2d(GridPointSearch *gps, RemapGrid *rgrid, size_t *restrict 
   if (!rgrid->lextrapolate) return search_result;
 
   size_t ndist = 4;
-  nadds = gridSearchQnearest(gps, plon, plat, ndist, src_add, src_lats);
+  nadds = gridPointSearchQnearest(gps, plon, plat, ndist, src_add, src_lats);
   if (nadds == 4)
     {
       for (unsigned n = 0; n < 4; ++n) src_lats[n] = 1.0 / (src_lats[n] + TINY);

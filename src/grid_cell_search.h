@@ -24,4 +24,11 @@ enum struct CellSearchMethod
   latbins
 };
 
+struct GridCellSearch
+{
+  void *yacSrcGrid;
+  void *yacTgtGrid;
+  void *yacSearch;
+};
+
 #endif

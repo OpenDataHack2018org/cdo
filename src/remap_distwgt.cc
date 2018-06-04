@@ -86,7 +86,7 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
 
   progressStatus(0, 1, 1);
 
-  if (rsearch.gps) gridSearchDelete(rsearch.gps);
+  if (rsearch.gps) gridPointSearchDelete(rsearch.gps);
   rsearch.gps = NULL;
 
   weightLinksToRemapLinks(0, tgt_grid_size, weightLinks, rv);

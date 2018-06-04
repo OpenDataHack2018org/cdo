@@ -139,7 +139,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
-  if (gps) gridSearchDelete(gps);
+  if (gps) gridPointSearchDelete(gps);
 
   if (gridID0 != gridID) gridDestroy(gridID);
 }

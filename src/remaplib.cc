@@ -597,7 +597,7 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
       else
         search.gps = gridPointSearchCreate(xIsCyclic, dims, src_grid.size, src_grid.cell_center_lon, src_grid.cell_center_lat);
 
-      if (src_grid.lextrapolate) gridSearchExtrapolate(search.gps);
+      if (src_grid.lextrapolate) gridPointSearchExtrapolate(search.gps);
 
       if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", cdo_get_wtime() - start);
     }
@@ -669,7 +669,7 @@ remapSearchFree(RemapSearch &search)
   vectorFree(search.tgtBins.bin_lats);
   vectorFree(search.tgtBins.cell_bound_box);
 
-  if (search.gps) gridSearchDelete(search.gps);
+  if (search.gps) gridPointSearchDelete(search.gps);
   search.gps = NULL;
 }
 

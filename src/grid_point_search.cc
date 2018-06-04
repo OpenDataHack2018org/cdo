@@ -131,7 +131,7 @@ setPointSearchMethod(const char *methodstr)
 }
 
 void
-gridSearchExtrapolate(GridPointSearch *gps)
+gridPointSearchExtrapolate(GridPointSearch *gps)
 {
   gps->extrapolate = true;
 }
@@ -414,7 +414,7 @@ gridPointSearchCreate(bool xIsCyclic, size_t dims[2], size_t n, const double *re
 }
 
 void
-gridSearchDelete(GridPointSearch *gps)
+gridPointSearchDelete(GridPointSearch *gps)
 {
   if (gps)
     {
@@ -608,7 +608,7 @@ llindex_in_quad(GridPointSearch *gps, size_t index, double lon, double lat)
 }
 
 size_t
-gridSearchNearest(GridPointSearch *gps, double lon, double lat, size_t *addr, double *dist)
+gridPointSearchNearest(GridPointSearch *gps, double lon, double lat, size_t *addr, double *dist)
 {
   if (gps)
     {
@@ -753,7 +753,7 @@ gps_qnearest_spherepart(GridPointSearch *gps, double lon, double lat, double sea
 }
 
 size_t
-gridSearchQnearest(GridPointSearch *gps, double lon, double lat, size_t nnn, size_t *adds, double *dist)
+gridPointSearchQnearest(GridPointSearch *gps, double lon, double lat, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
