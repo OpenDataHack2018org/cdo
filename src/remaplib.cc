@@ -574,7 +574,7 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
   search.srcBins.nbins = remap_num_srch_bins;
   search.tgtBins.nbins = remap_num_srch_bins;
 
-  search.gs = NULL;
+  search.gps = NULL;
 
   bool useGridsearch = mapType == RemapMethod::DISTWGT;
   if (src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D && pointSearchMethod != PointSearchMethod::latbins)
@@ -593,11 +593,11 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
       bool xIsCyclic = src_grid.is_cyclic;
       size_t *dims = src_grid.dims;
       if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        search.gs = gridPointSearchCreateReg2d(xIsCyclic, dims, src_grid.reg2d_center_lon, src_grid.reg2d_center_lat);
+        search.gps = gridPointSearchCreateReg2d(xIsCyclic, dims, src_grid.reg2d_center_lon, src_grid.reg2d_center_lat);
       else
-        search.gs = gridPointSearchCreate(xIsCyclic, dims, src_grid.size, src_grid.cell_center_lon, src_grid.cell_center_lat);
+        search.gps = gridPointSearchCreate(xIsCyclic, dims, src_grid.size, src_grid.cell_center_lon, src_grid.cell_center_lat);
 
-      if (src_grid.lextrapolate) gridsearch_extrapolate(search.gs);
+      if (src_grid.lextrapolate) gridSearchExtrapolate(search.gps);
 
       if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", cdo_get_wtime() - start);
     }
@@ -669,8 +669,8 @@ remapSearchFree(RemapSearch &search)
   vectorFree(search.tgtBins.bin_lats);
   vectorFree(search.tgtBins.cell_bound_box);
 
-  if (search.gs) gridsearch_delete(search.gs);
-  search.gs = NULL;
+  if (search.gps) gridSearchDelete(search.gps);
+  search.gps = NULL;
 }
 
 void

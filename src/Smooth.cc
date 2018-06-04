@@ -87,9 +87,9 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   bool xIsCyclic = false;
   size_t dims[2] = { gridsize, 0 };
-  GridSearch *gs = gridPointSearchCreate(xIsCyclic, dims, gridsize, &xvals[0], &yvals[0]);
+  GridPointSearch *gps = gridPointSearchCreate(xIsCyclic, dims, gridsize, &xvals[0], &yvals[0]);
 
-  gs->searchRadius = spoint.radius;
+  gps->searchRadius = spoint.radius;
 
   finish = clock();
 
@@ -104,7 +104,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for schedule(dynamic) default(none) reduction(+ : nmissx) shared( \
-    findex, cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
+    findex, cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gps, gridsize, missval)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -116,7 +116,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
       findex++;
       if (cdoVerbose && cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / gridsize);
 
-      gridSearchPoint(gs, xvals[i], yvals[i], knnWeights[ompthID]);
+      gridSearchPoint(gps, xvals[i], yvals[i], knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights(mask, spoint.radius, spoint.weight0, spoint.weightR);
@@ -139,7 +139,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
-  if (gs) gridsearch_delete(gs);
+  if (gps) gridSearchDelete(gps);
 
   if (gridID0 != gridID) gridDestroy(gridID);
 }

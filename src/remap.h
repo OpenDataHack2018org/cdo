@@ -104,7 +104,7 @@ struct RemapSearch
   GridSearchBins srcBins;
   GridSearchBins tgtBins;
 
-  GridSearch *gs;
+  GridPointSearch *gps;
 
   void *yacSrcGrid;
   void *yacTgtGrid;

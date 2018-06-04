@@ -40,7 +40,7 @@ extern "C" {
 
 PointSearchMethod pointSearchMethod(PointSearchMethod::nanoflann);
 
-struct gsFull
+struct gpsFull
 {
   size_t n;
   const double *plons;
@@ -131,20 +131,20 @@ setPointSearchMethod(const char *methodstr)
 }
 
 void
-gridsearch_extrapolate(GridSearch *gs)
+gridSearchExtrapolate(GridPointSearch *gps)
 {
-  gs->extrapolate = true;
+  gps->extrapolate = true;
 }
 
-GridSearch *
+GridPointSearch *
 gridPointSearchCreateReg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
 {
-  GridSearch *gs = (GridSearch *) Calloc(1, sizeof(GridSearch));
+  GridPointSearch *gps = (GridPointSearch *) Calloc(1, sizeof(GridPointSearch));
 
-  gs->is_cyclic = xIsCyclic;
-  gs->is_reg2d = true;
-  gs->dims[0] = dims[0];
-  gs->dims[1] = dims[1];
+  gps->is_cyclic = xIsCyclic;
+  gps->is_reg2d = true;
+  gps->dims[0] = dims[0];
+  gps->dims[1] = dims[1];
   size_t nx = dims[0];
   size_t ny = dims[1];
 
@@ -176,21 +176,21 @@ gridPointSearchCreateReg2d(bool xIsCyclic, size_t dims[2], const double *restric
       sinlat[n] = sin(lats[n]);
     }
 
-  gs->reg2d_center_lon = reg2d_center_lon;
-  gs->reg2d_center_lat = reg2d_center_lat;
+  gps->reg2d_center_lon = reg2d_center_lon;
+  gps->reg2d_center_lat = reg2d_center_lat;
 
-  gs->coslon = coslon;
-  gs->sinlon = sinlon;
-  gs->coslat = coslat;
-  gs->sinlat = sinlat;
+  gps->coslon = coslon;
+  gps->sinlon = sinlon;
+  gps->coslat = coslat;
+  gps->sinlat = sinlat;
 
-  gs->searchRadius = cdoDefaultSearchRadius();
+  gps->searchRadius = cdoDefaultSearchRadius();
 
-  return gs;
+  return gps;
 }
 
 static void *
-gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
+gps_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats, GridPointSearch *gps)
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));
   // see  example_cartesian.c
@@ -217,8 +217,8 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
     {
       min[j] = min[j] < 0 ? min[j] * 1.01 : min[j] * 0.99;
       max[j] = max[j] < 0 ? max[j] * 0.99 : max[j] * 1.01;
-      gs->min[j] = min[j];
-      gs->max[j] = max[j];
+      gps->min[j] = min[j];
+      gps->max[j] = max[j];
     }
 
   if (cdoVerbose) cdoPrint("BBOX: min=%g/%g/%g  max=%g/%g/%g", min[0], min[1], min[2], max[0], max[1], max[2]);
@@ -231,7 +231,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
 }
 
 static void *
-gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
+gps_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, GridPointSearch *gps)
 {
   PointCloud<double> *pointcloud = new PointCloud<double>();
 
@@ -257,14 +257,14 @@ gs_create_nanoflann(size_t n, const double *restrict lons, const double *restric
         }
     }
 
-  gs->pointcloud = (void *) pointcloud;
+  gps->pointcloud = (void *) pointcloud;
 
   for (unsigned j = 0; j < 3; ++j)
     {
       min[j] = min[j] < 0 ? min[j] * 1.01 : min[j] * 0.99;
       max[j] = max[j] < 0 ? max[j] * 0.99 : max[j] * 1.01;
-      gs->min[j] = min[j];
-      gs->max[j] = max[j];
+      gps->min[j] = min[j];
+      gps->max[j] = max[j];
     }
 
   for (unsigned j = 0; j < 3; ++j)
@@ -281,11 +281,11 @@ gs_create_nanoflann(size_t n, const double *restrict lons, const double *restric
 }
 
 static void *
-gs_create_spherepart(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
+gps_create_spherepart(size_t n, const double *restrict lons, const double *restrict lats, GridPointSearch *gps)
 {
   double (*coordinates_xyz)[3];
   coordinates_xyz = (double (*)[3]) malloc(n * sizeof(*coordinates_xyz));
-  gs->coordinates_xyz = coordinates_xyz;
+  gps->coordinates_xyz = coordinates_xyz;
 
   double min[3] = { 1.e9, 1.e9, 1.e9 };
   double max[3] = { -1.e9, -1.e9, -1.e9 };
@@ -308,26 +308,26 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
     {
       min[j] = min[j] < 0 ? min[j] * 1.01 : min[j] * 0.99;
       max[j] = max[j] < 0 ? max[j] * 0.99 : max[j] * 1.01;
-      gs->min[j] = min[j];
-      gs->max[j] = max[j];
+      gps->min[j] = min[j];
+      gps->max[j] = max[j];
     }
 
   if (cdoVerbose) cdoPrint("BBOX: min=%g/%g/%g  max=%g/%g/%g", min[0], min[1], min[2], max[0], max[1], max[2]);
 
-  return (void *) yac_point_sphere_part_search_new(n, gs->coordinates_xyz);
+  return (void *) yac_point_sphere_part_search_new(n, gps->coordinates_xyz);
 }
 
 static void
-gs_destroy_kdtree(void *search_container)
+gps_destroy_kdtree(void *search_container)
 {
   kdTree_t *kdt = (kdTree_t *) search_container;
   if (kdt) kd_destroyTree(kdt);
 }
 
 static void
-gs_destroy_full(void *search_container)
+gps_destroy_full(void *search_container)
 {
-  struct gsFull *full = (struct gsFull *) search_container;
+  struct gpsFull *full = (struct gpsFull *) search_container;
   if (full)
     {
       if (full->pts)
@@ -341,17 +341,17 @@ gs_destroy_full(void *search_container)
 }
 
 static void
-gs_destroy_spherepart(void *search_container)
+gps_destroy_spherepart(void *search_container)
 {
   yac_delete_point_sphere_part_search((struct point_sphere_part_search *) search_container);
 }
 
 static void *
-gs_create_full(size_t n, const double *restrict lons, const double *restrict lats)
+gps_create_full(size_t n, const double *restrict lons, const double *restrict lats)
 {
   if (cdoVerbose) cdoPrint("Init full grid search: n=%zu", n);
 
-  struct gsFull *full = (struct gsFull *) Calloc(1, sizeof(struct gsFull));
+  struct gpsFull *full = (struct gpsFull *) Calloc(1, sizeof(struct gpsFull));
 
   double **p = (double **) Malloc(n * sizeof(double *));
   p[0] = (double *) Malloc(3 * n * sizeof(double));
@@ -373,80 +373,80 @@ gs_create_full(size_t n, const double *restrict lons, const double *restrict lat
   return (void *) full;
 }
 
-GridSearch *
+GridPointSearch *
 gridPointSearchCreate(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
 {
-  GridSearch *gs = (GridSearch *) Calloc(1, sizeof(GridSearch));
+  GridPointSearch *gps = (GridPointSearch *) Calloc(1, sizeof(GridPointSearch));
 
-  gs->is_cyclic = xIsCyclic;
-  gs->is_curve = n != 1 && n == dims[0] * dims[1];
-  gs->dims[0] = dims[0];
-  gs->dims[1] = dims[1];
+  gps->is_cyclic = xIsCyclic;
+  gps->is_curve = n != 1 && n == dims[0] * dims[1];
+  gps->dims[0] = dims[0];
+  gps->dims[1] = dims[1];
 
-  gs->method = pointSearchMethod;
-  if (gs->method == PointSearchMethod::latbins) gs->method = PointSearchMethod::nanoflann;
+  gps->method = pointSearchMethod;
+  if (gps->method == PointSearchMethod::latbins) gps->method = PointSearchMethod::nanoflann;
 
-  gs->n = n;
-  if (n == 0) return gs;
+  gps->n = n;
+  if (n == 0) return gps;
 
-  gs->plons = lons;
-  gs->plats = lats;
+  gps->plons = lons;
+  gps->plats = lats;
 
   // clang-format off
   if (cdoVerbose)
     {
-      if      (gs->method == PointSearchMethod::kdtree)     cdoPrint("Point search method: kdtree");
-      else if (gs->method == PointSearchMethod::full)       cdoPrint("Point search method: full");
-      else if (gs->method == PointSearchMethod::nanoflann)  cdoPrint("Point search method: nanoflann");
-      else if (gs->method == PointSearchMethod::spherepart) cdoPrint("Point search method: spherepart");
+      if      (gps->method == PointSearchMethod::kdtree)     cdoPrint("Point search method: kdtree");
+      else if (gps->method == PointSearchMethod::full)       cdoPrint("Point search method: full");
+      else if (gps->method == PointSearchMethod::nanoflann)  cdoPrint("Point search method: nanoflann");
+      else if (gps->method == PointSearchMethod::spherepart) cdoPrint("Point search method: spherepart");
     }
 
-  if      (gs->method == PointSearchMethod::kdtree)     gs->search_container = gs_create_kdtree(n, lons, lats, gs);
-  else if (gs->method == PointSearchMethod::full)       gs->search_container = gs_create_full(n, lons, lats);
-  else if (gs->method == PointSearchMethod::nanoflann)  gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
-  else if (gs->method == PointSearchMethod::spherepart) gs->search_container = gs_create_spherepart(n, lons, lats, gs);
+  if      (gps->method == PointSearchMethod::kdtree)     gps->search_container = gps_create_kdtree(n, lons, lats, gps);
+  else if (gps->method == PointSearchMethod::full)       gps->search_container = gps_create_full(n, lons, lats);
+  else if (gps->method == PointSearchMethod::nanoflann)  gps->search_container = gps_create_nanoflann(n, lons, lats, gps);
+  else if (gps->method == PointSearchMethod::spherepart) gps->search_container = gps_create_spherepart(n, lons, lats, gps);
   else cdoAbort("%s::method undefined!", __func__);
   // clang-format on
 
-  gs->searchRadius = cdoDefaultSearchRadius();
+  gps->searchRadius = cdoDefaultSearchRadius();
 
-  return gs;
+  return gps;
 }
 
 void
-gridsearch_delete(GridSearch *gs)
+gridSearchDelete(GridPointSearch *gps)
 {
-  if (gs)
+  if (gps)
     {
-      if (gs->reg2d_center_lon) Free(gs->reg2d_center_lon);
-      if (gs->reg2d_center_lat) Free(gs->reg2d_center_lat);
+      if (gps->reg2d_center_lon) Free(gps->reg2d_center_lon);
+      if (gps->reg2d_center_lat) Free(gps->reg2d_center_lat);
 
-      if (gs->coslat) Free(gs->coslat);
-      if (gs->coslon) Free(gs->coslon);
-      if (gs->sinlat) Free(gs->sinlat);
-      if (gs->sinlon) Free(gs->sinlon);
+      if (gps->coslat) Free(gps->coslat);
+      if (gps->coslon) Free(gps->coslon);
+      if (gps->sinlat) Free(gps->sinlat);
+      if (gps->sinlon) Free(gps->sinlon);
 
       // clang-format off
-      if      (gs->method == PointSearchMethod::kdtree)     gs_destroy_kdtree(gs->search_container);
-      else if (gs->method == PointSearchMethod::nanoflann)
+      if      (gps->method == PointSearchMethod::kdtree)     gps_destroy_kdtree(gps->search_container);
+      else if (gps->method == PointSearchMethod::nanoflann)
         {
-          delete ((PointCloud<double> *) gs->pointcloud);
-          delete ((nfTree_t *) gs->search_container);
+          delete ((PointCloud<double> *) gps->pointcloud);
+          delete ((nfTree_t *) gps->search_container);
         }
-      else if (gs->method == PointSearchMethod::spherepart)
+      else if (gps->method == PointSearchMethod::spherepart)
         {
-          free(gs->coordinates_xyz);
-          gs_destroy_spherepart(gs->search_container);
+          free(gps->coordinates_xyz);
+          gps_destroy_spherepart(gps->search_container);
         }
-      else if (gs->method == PointSearchMethod::full)       gs_destroy_full(gs->search_container);
+      else if (gps->method == PointSearchMethod::full)       gps_destroy_full(gps->search_container);
       // clang-format on
 
-      Free(gs);
+      Free(gps);
     }
 }
 
 static size_t
-gs_nearest_kdtree(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist, GridSearch *gs)
+gps_nearest_kdtree(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist, GridPointSearch *gps)
 {
   kdTree_t *kdt = (kdTree_t *) search_container;
   if (kdt == NULL) return 0;
@@ -457,9 +457,9 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double searchR
   double query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
 
-  if (!gs->extrapolate)
+  if (!gps->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
-      if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return 0;
+      if (query_pt[j] < gps->min[j] || query_pt[j] > gps->max[j]) return 0;
 
   kdNode *node = kd_nearest(kdt->node, query_pt, &sqrDist, 3);
 
@@ -474,8 +474,8 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double searchR
 }
 
 static size_t
-gs_nearest_nanoflann(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
-                     GridSearch *gs)
+gps_nearest_nanoflann(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
+                     GridPointSearch *gps)
 {
   nfTree_t *nft = (nfTree_t *) search_container;
   if (nft == NULL) return 0;
@@ -485,9 +485,9 @@ gs_nearest_nanoflann(void *search_container, double lon, double lat, double sear
   double query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
 
-  if (!gs->extrapolate)
+  if (!gps->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
-      if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return 0;
+      if (query_pt[j] < gps->min[j] || query_pt[j] > gps->max[j]) return 0;
 
   const size_t num_results = 1;
   size_t retIndex;
@@ -496,7 +496,7 @@ gs_nearest_nanoflann(void *search_container, double lon, double lat, double sear
   resultSet.init(&retIndex, &sqrDist);
   nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
 
-  if (retIndex != GS_NOT_FOUND)
+  if (retIndex != GPS_NOT_FOUND)
     {
       *addr = retIndex;
       *dist = sqrt(sqrDist);
@@ -507,15 +507,15 @@ gs_nearest_nanoflann(void *search_container, double lon, double lat, double sear
 }
 
 static size_t
-gs_nearest_spherepart(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
-                      GridSearch *gs)
+gps_nearest_spherepart(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist,
+                      GridPointSearch *gps)
 {
   double query_pt[1][3];
   cdoLLtoXYZ(lon, lat, query_pt[0]);
 
-  if (!gs->extrapolate)
+  if (!gps->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
-      if (query_pt[0][j] < gs->min[j] || query_pt[0][j] > gs->max[j]) return 0;
+      if (query_pt[0][j] < gps->min[j] || query_pt[0][j] > gps->max[j]) return 0;
 
   size_t local_point_ids_array_size = 0;
   size_t num_local_point_ids;
@@ -544,9 +544,9 @@ gs_nearest_spherepart(void *search_container, double lon, double lat, double sea
 }
 
 static size_t
-gs_nearest_full(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist)
+gps_nearest_full(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist)
 {
-  struct gsFull *full = (struct gsFull *) search_container;
+  struct gpsFull *full = (struct gpsFull *) search_container;
   if (full == NULL) return 0;
 
   double sqrDistMax = SQR(searchRadius);
@@ -582,16 +582,16 @@ bool pointInQuad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_
                  double plon, double plat, const double *restrict centerLon, const double *restrict centerLat);
 
 static size_t
-llindex_in_quad(GridSearch *gs, size_t index, double lon, double lat)
+llindex_in_quad(GridPointSearch *gps, size_t index, double lon, double lat)
 {
-  if (index != GS_NOT_FOUND)
+  if (index != GPS_NOT_FOUND)
     {
-      size_t nx = gs->dims[0];
-      size_t ny = gs->dims[1];
+      size_t nx = gps->dims[0];
+      size_t ny = gps->dims[1];
       size_t adds[4];
       double lons[4];
       double lats[4];
-      bool isCyclic = gs->is_cyclic;
+      bool isCyclic = gps->is_cyclic;
       for (unsigned k = 0; k < 4; ++k)
         {
           // Determine neighbor addresses
@@ -600,34 +600,34 @@ llindex_in_quad(GridSearch *gs, size_t index, double lon, double lat)
           if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (isCyclic) ? nx - 1 : 0;
           if (k == 2 || k == 3) j = (j > 0) ? j - 1 : 0;
 
-          if (pointInQuad(isCyclic, nx, ny, i, j, adds, lons, lats, lon, lat, gs->plons, gs->plats)) return index;
+          if (pointInQuad(isCyclic, nx, ny, i, j, adds, lons, lats, lon, lat, gps->plons, gps->plats)) return index;
         }
     }
 
-  return GS_NOT_FOUND;
+  return GPS_NOT_FOUND;
 }
 
 size_t
-gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double *dist)
+gridSearchNearest(GridPointSearch *gps, double lon, double lat, size_t *addr, double *dist)
 {
-  if (gs)
+  if (gps)
     {
       size_t nadds = 0;
-      double searchRadius = gs->searchRadius;
-      void *sc = gs->search_container;
+      double searchRadius = gps->searchRadius;
+      void *sc = gps->search_container;
       // clang-format off
-      if      ( gs->method == PointSearchMethod::kdtree )     nadds = gs_nearest_kdtree(sc, lon, lat, searchRadius, addr, dist, gs);
-      else if ( gs->method == PointSearchMethod::nanoflann )  nadds = gs_nearest_nanoflann(sc, lon, lat, searchRadius, addr, dist, gs);
-      else if ( gs->method == PointSearchMethod::spherepart ) nadds = gs_nearest_spherepart(sc, lon, lat, searchRadius, addr, dist, gs);
-      else if ( gs->method == PointSearchMethod::full )       nadds = gs_nearest_full(sc, lon, lat, searchRadius, addr, dist);
+      if      ( gps->method == PointSearchMethod::kdtree )     nadds = gps_nearest_kdtree(sc, lon, lat, searchRadius, addr, dist, gps);
+      else if ( gps->method == PointSearchMethod::nanoflann )  nadds = gps_nearest_nanoflann(sc, lon, lat, searchRadius, addr, dist, gps);
+      else if ( gps->method == PointSearchMethod::spherepart ) nadds = gps_nearest_spherepart(sc, lon, lat, searchRadius, addr, dist, gps);
+      else if ( gps->method == PointSearchMethod::full )       nadds = gps_nearest_full(sc, lon, lat, searchRadius, addr, dist);
       else cdoAbort("%s::method undefined!", __func__);
       // clang-format on
 
       if (nadds > 0)
         {
           size_t index = *addr;
-          if (!gs->extrapolate && gs->is_curve) index = llindex_in_quad(gs, *addr, lon, lat);
-          if (index != GS_NOT_FOUND) return 1;
+          if (!gps->extrapolate && gps->is_curve) index = llindex_in_quad(gps, *addr, lon, lat);
+          if (index != GPS_NOT_FOUND) return 1;
         }
     }
 
@@ -635,11 +635,11 @@ gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double 
 }
 
 static size_t
-gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
+gps_qnearest_kdtree(GridPointSearch *gps, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
-  kdTree_t *kdt = (kdTree_t *) gs->search_container;
+  kdTree_t *kdt = (kdTree_t *) gps->search_container;
   if (kdt == NULL) return nadds;
 
   double sqrDistMax = SQR(searchRadius);
@@ -649,11 +649,11 @@ gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double searchRadius, 
   kdata_t query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
 
-  if (!gs->extrapolate)
+  if (!gps->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
-      if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return nadds;
+      if (query_pt[j] < gps->min[j] || query_pt[j] > gps->max[j]) return nadds;
 
-  if (gs)
+  if (gps)
     {
       result = kd_qnearest(kdt->node, query_pt, &sqrDist, nnn, 3);
       if (result)
@@ -682,11 +682,11 @@ gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double searchRadius, 
 }
 
 static size_t
-gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
+gps_qnearest_nanoflann(GridPointSearch *gps, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
-  nfTree_t *nft = (nfTree_t *) gs->search_container;
+  nfTree_t *nft = (nfTree_t *) gps->search_container;
   if (nft == NULL) return nadds;
 
   double sqrDistMax = SQR(searchRadius);
@@ -694,9 +694,9 @@ gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double searchRadiu
   double query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
 
-  if (!gs->extrapolate)
+  if (!gps->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
-      if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return nadds;
+      if (query_pt[j] < gps->min[j] || query_pt[j] > gps->max[j]) return nadds;
 
   nadds = nft->knnRangeSearch(&query_pt[0], sqrDistMax, nnn, &adds[0], &dist[0]);
   for (size_t i = 0; i < nadds; ++i) dist[i] = sqrt(dist[i]);
@@ -705,18 +705,18 @@ gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double searchRadiu
 }
 
 static size_t
-gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
+gps_qnearest_spherepart(GridPointSearch *gps, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
-  if (gs)
+  if (gps)
     {
       double query_pt[1][3];
       cdoLLtoXYZ(lon, lat, query_pt[0]);
 
-      if (!gs->extrapolate)
+      if (!gps->extrapolate)
         for (unsigned j = 0; j < 3; ++j)
-          if (query_pt[0][j] < gs->min[j] || query_pt[0][j] > gs->max[j]) return nadds;
+          if (query_pt[0][j] < gps->min[j] || query_pt[0][j] > gps->max[j]) return nadds;
 
       size_t local_point_ids_array_size = 0;
       size_t num_local_point_ids;
@@ -725,7 +725,7 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadi
       size_t cos_angles_array_size = 0;
       double *cos_angles = NULL;
 
-      yac_point_sphere_part_search_NNN((struct point_sphere_part_search *) gs->search_container, 1, query_pt, nnn, &cos_angles,
+      yac_point_sphere_part_search_NNN((struct point_sphere_part_search *) gps->search_container, 1, query_pt, nnn, &cos_angles,
                                        &cos_angles_array_size, NULL, NULL, &local_point_ids, &local_point_ids_array_size,
                                        &num_local_point_ids);
 
@@ -753,28 +753,28 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadi
 }
 
 size_t
-gridsearch_qnearest(GridSearch *gs, double lon, double lat, size_t nnn, size_t *adds, double *dist)
+gridSearchQnearest(GridPointSearch *gps, double lon, double lat, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
-  if (gs)
+  if (gps)
     {
-      double searchRadius = gs->searchRadius;
+      double searchRadius = gps->searchRadius;
       // clang-format off
-      if      ( gs->method == PointSearchMethod::kdtree )     nadds = gs_qnearest_kdtree(gs, lon, lat, searchRadius, nnn, adds, dist);
-      else if ( gs->method == PointSearchMethod::nanoflann )  nadds = gs_qnearest_nanoflann(gs, lon, lat, searchRadius, nnn, adds, dist);
-      else if ( gs->method == PointSearchMethod::spherepart ) nadds = gs_qnearest_spherepart(gs, lon, lat, searchRadius, nnn, adds, dist);
+      if      ( gps->method == PointSearchMethod::kdtree )     nadds = gps_qnearest_kdtree(gps, lon, lat, searchRadius, nnn, adds, dist);
+      else if ( gps->method == PointSearchMethod::nanoflann )  nadds = gps_qnearest_nanoflann(gps, lon, lat, searchRadius, nnn, adds, dist);
+      else if ( gps->method == PointSearchMethod::spherepart ) nadds = gps_qnearest_spherepart(gps, lon, lat, searchRadius, nnn, adds, dist);
       else cdoAbort("%s::method undefined!", __func__);
       // clang-format on
 
-      if (!gs->extrapolate && gs->is_curve)
+      if (!gps->extrapolate && gps->is_curve)
         {
           size_t naddsmax = nadds;
           nadds = 0;
           for (size_t i = 0; i < naddsmax; ++i)
             {
-              size_t index = llindex_in_quad(gs, adds[i], lon, lat);
-              if (index != GS_NOT_FOUND)
+              size_t index = llindex_in_quad(gps, adds[i], lon, lat);
+              if (index != GPS_NOT_FOUND)
                 {
                   adds[nadds] = adds[i];
                   dist[nadds] = dist[i];

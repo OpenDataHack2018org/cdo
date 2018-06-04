@@ -20,7 +20,7 @@
 #include <stdbool.h>
 #include <knn_weights.h>
 
-#define GS_NOT_FOUND SIZE_MAX
+#define GPS_NOT_FOUND SIZE_MAX
 
 constexpr double
 square(const double x) noexcept
@@ -52,7 +52,7 @@ enum struct PointSearchMethod
   latbins
 };
 
-struct GridSearch
+struct GridPointSearch
 {
   bool extrapolate;
   bool is_cyclic;
@@ -79,14 +79,14 @@ struct GridSearch
   double (*coordinates_xyz)[3];
 };
 
-void gridSearchPoint(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights);
+void gridSearchPoint(GridPointSearch *gps, double plon, double plat, knnWeightsType &knnWeights);
 
-GridSearch *gridPointSearchCreateReg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats);
-GridSearch *gridPointSearchCreate(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
+GridPointSearch *gridPointSearchCreateReg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats);
+GridPointSearch *gridPointSearchCreate(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
                               const double *restrict lats);
-void gridsearch_delete(GridSearch *gs);
-size_t gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double *dist);
-size_t gridsearch_qnearest(GridSearch *gs, double lon, double lat, size_t nnn, size_t *adds, double *dist);
-void gridsearch_extrapolate(GridSearch *gs);
+void gridSearchDelete(GridPointSearch *gps);
+size_t gridSearchNearest(GridPointSearch *gps, double lon, double lat, size_t *addr, double *dist);
+size_t gridSearchQnearest(GridPointSearch *gps, double lon, double lat, size_t nnn, size_t *adds, double *dist);
+void gridSearchExtrapolate(GridPointSearch *gps);
 
 #endif

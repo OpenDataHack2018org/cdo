@@ -311,7 +311,7 @@ compute_child_from_bounds(CellIndex *cellindex2, long ncells2, double *grid_cent
   size_t dims[2];
   dims[0] = ncells1;
   dims[1] = 0;
-  GridSearch *gs = gridPointSearchCreate(xIsCyclic, dims, ncells1, grid_center_lon1, grid_center_lat1);
+  GridPointSearch *gps = gridPointSearchCreate(xIsCyclic, dims, ncells1, grid_center_lon1, grid_center_lat1);
   knnWeightsType knnWeights(MAX_SEARCH);
   size_t *nbr_addr = &knnWeights.m_addr[0];
 
@@ -384,7 +384,7 @@ compute_child_from_bounds(CellIndex *cellindex2, long ncells2, double *grid_cent
       if (invert_result) is_clockwise = !is_clockwise;
       if (is_clockwise) continue;
 
-      gridSearchPoint(gs, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2], knnWeights);
+      gridSearchPoint(gps, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2], knnWeights);
       int k = 0;
 
       for (int i = 0; i < MAX_SEARCH; ++i)

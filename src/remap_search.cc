@@ -21,7 +21,7 @@
 // This routine finds the closest numNeighbor points to a search point and computes a distance to each of the neighbors
 #define MAX_SEARCH_CELLS 25
 static void
-gridSearchPointReg2d(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
+gridSearchPointReg2d(GridPointSearch *gps, double plon, double plat, knnWeightsType &knnWeights)
 {
   /*
     Input variables:
@@ -42,13 +42,13 @@ gridSearchPointReg2d(GridSearch *gs, double plon, double plat, knnWeightsType &k
   std::vector<size_t> src_add_tmp;
   size_t *psrc_add = src_add;
   size_t num_add = 0;
-  const double *restrict src_center_lon = gs->reg2d_center_lon;
-  const double *restrict src_center_lat = gs->reg2d_center_lat;
+  const double *restrict src_center_lon = gps->reg2d_center_lon;
+  const double *restrict src_center_lat = gps->reg2d_center_lat;
 
-  long nx = gs->dims[0];
-  long ny = gs->dims[1];
+  long nx = gps->dims[0];
+  long ny = gps->dims[1];
 
-  size_t nxm = gs->is_cyclic ? nx + 1 : nx;
+  size_t nxm = gps->is_cyclic ? nx + 1 : nx;
 
   if (plon < src_center_lon[0]) plon += PI2;
   if (plon > src_center_lon[nxm - 1]) plon -= PI2;
@@ -57,7 +57,7 @@ gridSearchPointReg2d(GridSearch *gs, double plon, double plat, knnWeightsType &k
   int lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon, src_center_lat);
   if (lfound)
     {
-      if (gs->is_cyclic && ii == (nxm - 1)) ii = 0;
+      if (gps->is_cyclic && ii == (nxm - 1)) ii = 0;
 
       long k;
       for (k = 3; k < 10000; k += 2)
@@ -87,7 +87,7 @@ gridSearchPointReg2d(GridSearch *gs, double plon, double plat, knnWeightsType &k
         for (long i = i0; i <= in; ++i)
           {
             long ix = i;
-            if (gs->is_cyclic)
+            if (gps->is_cyclic)
               {
                 if (ix < 0) ix += nx;
                 if (ix >= nx) ix -= nx;
@@ -103,15 +103,15 @@ gridSearchPointReg2d(GridSearch *gs, double plon, double plat, knnWeightsType &k
 
   if (lfound)
     {
-      const double *restrict coslon = gs->coslon;
-      const double *restrict sinlon = gs->sinlon;
-      const double *restrict coslat = gs->coslat;
-      const double *restrict sinlat = gs->sinlat;
+      const double *restrict coslon = gps->coslon;
+      const double *restrict sinlon = gps->sinlon;
+      const double *restrict coslat = gps->coslat;
+      const double *restrict sinlat = gps->sinlat;
 
       double xyz[3];
       double query_pt[3];
       cdoLLtoXYZ(plon, plat, query_pt);
-      double sqrSearchRadius = SQR(gs->searchRadius);
+      double sqrSearchRadius = SQR(gps->searchRadius);
 
       for (size_t na = 0; na < num_add; ++na)
         {
@@ -133,7 +133,7 @@ gridSearchPointReg2d(GridSearch *gs, double plon, double plat, knnWeightsType &k
 
       knnWeights.check_distance();
     }
-  else if (gs->extrapolate)
+  else if (gps->extrapolate)
     {
       int search_result;
 
@@ -160,7 +160,7 @@ gridSearchPointReg2d(GridSearch *gs, double plon, double plat, knnWeightsType &k
 }
 
 void
-gridSearchPoint(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
+gridSearchPoint(GridPointSearch *gps, double plon, double plat, knnWeightsType &knnWeights)
 {
   /*
     Input variables:
@@ -185,7 +185,7 @@ gridSearchPoint(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
     ndist += 8;
   else
     ndist *= 2;
-  if (ndist > gs->n) ndist = gs->n;
+  if (ndist > gps->n) ndist = gps->n;
 
   if (knnWeights.m_tmpaddr.size() == 0) knnWeights.m_tmpaddr.resize(ndist);
   if (knnWeights.m_tmpdist.size() == 0) knnWeights.m_tmpdist.resize(ndist);
@@ -194,9 +194,9 @@ gridSearchPoint(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
 
   size_t nadds = 0;
   if (numNeighbors == 1)
-    nadds = gridsearch_nearest(gs, plon, plat, adds, dist);
+    nadds = gridSearchNearest(gps, plon, plat, adds, dist);
   else
-    nadds = gridsearch_qnearest(gs, plon, plat, ndist, adds, dist);
+    nadds = gridSearchQnearest(gps, plon, plat, ndist, adds, dist);
 
   ndist = nadds;
   if (ndist < numNeighbors) numNeighbors = ndist;
@@ -210,13 +210,13 @@ void
 remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights)
 {
   if (rsearch.srcGrid->remap_grid_type == REMAP_GRID_TYPE_REG2D)
-    gridSearchPointReg2d(rsearch.gs, plon, plat, knnWeights);
+    gridSearchPointReg2d(rsearch.gps, plon, plat, knnWeights);
   else
-    gridSearchPoint(rsearch.gs, plon, plat, knnWeights);
+    gridSearchPoint(rsearch.gps, plon, plat, knnWeights);
 }
 
 static int
-gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *rgrid, size_t *restrict src_add, double *restrict src_lats,
+gridSearchSquareCurv2d(GridPointSearch *gps, RemapGrid *rgrid, size_t *restrict src_add, double *restrict src_lats,
                        double *restrict src_lons, double plat, double plon)
 {
   /*
@@ -240,7 +240,7 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *rgrid, size_t *restrict src_ad
 
   double dist;
   size_t addr;
-  size_t nadds = gridsearch_nearest(gs, plon, plat, &addr, &dist);
+  size_t nadds = gridSearchNearest(gps, plon, plat, &addr, &dist);
   if (nadds > 0)
     {
       for (unsigned k = 0; k < 4; ++k)
@@ -267,7 +267,7 @@ gridSearchSquareCurv2d(GridSearch *gs, RemapGrid *rgrid, size_t *restrict src_ad
   if (!rgrid->lextrapolate) return search_result;
 
   size_t ndist = 4;
-  nadds = gridsearch_qnearest(gs, plon, plat, ndist, src_add, src_lats);
+  nadds = gridSearchQnearest(gps, plon, plat, ndist, src_add, src_lats);
   if (nadds == 4)
     {
       for (unsigned n = 0; n < 4; ++n) src_lats[n] = 1.0 / (src_lats[n] + TINY);
@@ -286,8 +286,8 @@ remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t *src_ad
   int searchResult;
   if (rsearch.srcGrid->remap_grid_type == REMAP_GRID_TYPE_REG2D)
     searchResult = gridSearchSquareReg2d(rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
-  else if (rsearch.gs)
-    searchResult = gridSearchSquareCurv2d(rsearch.gs, rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
+  else if (rsearch.gps)
+    searchResult = gridSearchSquareCurv2d(rsearch.gps, rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon);
   else
     searchResult = gridSearchSquareCurv2dScrip(rsearch.srcGrid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);
 

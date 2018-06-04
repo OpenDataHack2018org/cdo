@@ -437,14 +437,14 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
   clock_t start, finish;
   start = clock();
 
-  GridSearch *gs = NULL;
+  GridPointSearch *gps = NULL;
 
   if (nmiss)
     {
       bool xIsCyclic = false;
       size_t dims[2] = { nvals, 0 };
-      gs = gridPointSearchCreate(xIsCyclic, dims, nvals, &lons[0], &lats[0]);
-      gridsearch_extrapolate(gs);
+      gps = gridPointSearchCreate(xIsCyclic, dims, nvals, &lons[0], &lats[0]);
+      gridSearchExtrapolate(gps);
     }
 
   finish = clock();
@@ -458,7 +458,7 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
   double findex = 0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(knnWeights, findex, mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, \
+#pragma omp parallel for default(none) shared(knnWeights, findex, mindex, vindex, array1, array2, xvals, yvals, gps, nmiss, \
                                               numNeighbors)
 #endif
   for (size_t i = 0; i < nmiss; ++i)
@@ -471,7 +471,7 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      gridSearchPoint(gs, xvals[mindex[i]], yvals[mindex[i]], knnWeights[ompthID]);
+      gridSearchPoint(gps, xvals[mindex[i]], yvals[mindex[i]], knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights();
@@ -490,7 +490,7 @@ setmisstodis(Field *field1, Field *field2, int numNeighbors)
 
   if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
-  if (gs) gridsearch_delete(gs);
+  if (gps) gridSearchDelete(gps);
 
   if (gridID0 != gridID) gridDestroy(gridID);
 }
