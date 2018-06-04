@@ -43,8 +43,7 @@ fld_weights(int gridID, size_t ngp)
       if (wstatus != 0 && lwarn)
         {
           lwarn = false;
-          cdoWarning("Grid cell bounds not available, using constant grid cell "
-                     "area weights!");
+          cdoWarning("Grid cell bounds not available, using constant grid cell area weights!");
         }
     }
 

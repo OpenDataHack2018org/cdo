@@ -920,7 +920,7 @@ ex_fun_var(int init, int funcID, nodeType *p1)
               assert(weights != NULL);
             }
 
-          double (*exprfunc)(Field) = (double (*)(Field)) fun_sym_tbl[funcID].func;
+          double (*exprfunc)(Field&) = (double (*)(Field&)) fun_sym_tbl[funcID].func;
           for (size_t k = 0; k < nlev; k++)
             {
               fld_field_init(&field, nmiss, missval, ngp, p1data + k * ngp, weights);
@@ -934,7 +934,7 @@ ex_fun_var(int init, int funcID, nodeType *p1)
           std::vector<double> weights;
           if (funcflag == 1) vert_weights(p1->param.zaxisID, nlev, weights);
           std::vector<double> array(nlev);
-          double (*exprfunc)(Field) = (double (*)(Field)) fun_sym_tbl[funcID].func;
+          double (*exprfunc)(Field&) = (double (*)(Field&)) fun_sym_tbl[funcID].func;
           for (size_t i = 0; i < ngp; i++)
             {
               for (size_t k = 0; k < nlev; k++) array[k] = p1data[k * ngp + i];
