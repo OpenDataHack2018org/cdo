@@ -48,7 +48,7 @@ REMAP3       = topo_eu5_bic_def_ref   topo_eu5_bic_off_ref   topo_eu5_bic_on_ref
                topo_eu5_con2_def_ref  topo_eu5_con2_off_ref  topo_eu5_con2_on_ref
 SELECT       = select1_ref select2_ref select3_ref select4_ref select5_ref
 DETREND      = detrend_ref
-EXPR         = expr1_ref aexpr1_ref expr2_ref aexpr2_ref
+EXPR         = expr1_ref aexpr1_ref expr2_ref aexpr2_ref expr3_ref aexpr3_ref
 THREAD       = thread1_ref tsformat1_ref
 GRADSDES     = pl_data.ctl pl_data.gmp
 ARITH        = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
