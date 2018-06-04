@@ -15,11 +15,11 @@
   GNU General Public License for more details.
 */
 
-#ifndef _EXPR_FUN_H
-#define _EXPR_FUN_H
+#ifndef EXPR_FUN_H
+#define EXPR_FUN_H
 
 void fld_field_init(Field *field, size_t nmiss, double missval, size_t ngp, double *array, double *w);
 double *fld_weights(int gridID, size_t ngp);
-double *vert_weights(int zaxisID, size_t nlev);
+void vert_weights(int zaxisID, size_t nlev, std::vector<double> &weights);
 
 #endif

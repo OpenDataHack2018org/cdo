@@ -53,25 +53,20 @@ fld_weights(int gridID, size_t ngp)
 
 int getLayerThickness(bool useweights, bool genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights);
 
-double *
-vert_weights(int zaxisID, size_t nlev)
+void vert_weights(int zaxisID, size_t nlev, std::vector<double> &weights)
 {
   static bool lwarn = true;
-  double *weights = (double *) Malloc(nlev * sizeof(double));
-  double *thickness = (double *) Malloc(nlev * sizeof(double));
+  weights.resize(nlev);
+  std::vector<double> thickness(nlev);
   for (size_t i = 0; i < nlev; ++i) weights[i] = 1;
 
   if (nlev > 1)
     {
-      int wstatus = getLayerThickness(1, 0, 0, zaxisID, nlev, thickness, weights);
+      int wstatus = getLayerThickness(1, 0, 0, zaxisID, nlev, thickness.data(), weights.data());
       if (wstatus != 0 && lwarn && nlev > 1)
         {
           lwarn = false;
           cdoWarning("Layer bounds not available, using constant vertical weights!");
         }
     }
-
-  Free(thickness);
-
-  return weights;
 }

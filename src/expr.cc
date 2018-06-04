@@ -931,18 +931,16 @@ ex_fun_var(int init, int funcID, nodeType *p1)
       else if (functype == FT_VERT)
         {
           Field field;
-          double *weights = NULL;
-          if (funcflag == 1) weights = vert_weights(p1->param.zaxisID, nlev);
-          double *array = (double *) Malloc(nlev * sizeof(double));
+          std::vector<double> weights;
+          if (funcflag == 1) vert_weights(p1->param.zaxisID, nlev, weights);
+          std::vector<double> array(nlev);
           double (*exprfunc)(Field) = (double (*)(Field)) fun_sym_tbl[funcID].func;
           for (size_t i = 0; i < ngp; i++)
             {
               for (size_t k = 0; k < nlev; k++) array[k] = p1data[k * ngp + i];
-              fld_field_init(&field, nmiss, missval, nlev, array, weights);
+              fld_field_init(&field, nmiss, missval, nlev, array.data(), weights.data());
               pdata[i] = exprfunc(field);
             }
-          if (array) Free(array);
-          if (weights) Free(weights);
         }
       else if (functype == FT_CONST)
         {
