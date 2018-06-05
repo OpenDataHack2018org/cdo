@@ -87,13 +87,14 @@ Zonstat(void *process)
   int ngrids = vlistNgrids(vlistID1);
   for (index = 0; index < ngrids; index++)
     {
-      if (gridInqXsize(vlistGrid(vlistID1, index)) > 1)
+      int gridID = vlistGrid(vlistID1, index);
+      if (gridInqXsize(gridID) > 1)
         {
-          if (gridID1 == -1) gridID1 = vlistGrid(vlistID1, index);
+          if (gridID1 == -1) gridID1 = gridID;
         }
       else
         {
-          if (zongridID == -1) zongridID = vlistGrid(vlistID1, index);
+          if (zongridID == -1) zongridID = gridID;
         }
     }
 
@@ -107,7 +108,8 @@ Zonstat(void *process)
 
   if (gridID1 != -1)
     {
-      if (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN || gridInqType(gridID1) == GRID_GENERIC)
+      int gridtype = gridInqType(gridID1);
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_GENERIC)
         {
           if (zongridID != -1 && gridInqYsize(zongridID) == gridInqYsize(gridID1))
             gridID2 = zongridID;

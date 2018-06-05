@@ -98,6 +98,7 @@ struct paramType
   int datatype;
   int steptype;
   size_t ngp;
+  size_t nlat;
   size_t nlev;
   size_t nmiss;
   char *name;
@@ -151,6 +152,7 @@ struct parseParamType
   int maxcoords;
   int tsID;
   int pointID;
+  int zonalID;
   int surfaceID;
   coordType *coords;
   paramType *params;

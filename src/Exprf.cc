@@ -179,6 +179,7 @@ params_new(int vlistID)
       int zaxisID = vlistInqVarZaxis(vlistID, varID);
       int datatype = vlistInqVarDatatype(vlistID, varID);
       int steptype = vlistInqVarTimetype(vlistID, varID);
+      size_t nlat = gridInqYsize(gridID);
       size_t ngp = gridInqSize(gridID);
       size_t nlev = zaxisInqSize(zaxisID);
       double missval = vlistInqVarMissval(vlistID, varID);
@@ -196,6 +197,7 @@ params_new(int vlistID)
       params[varID].zaxisID = zaxisID;
       params[varID].datatype = datatype;
       params[varID].steptype = steptype;
+      params[varID].nlat = nlat;
       params[varID].ngp = ngp;
       params[varID].nlev = nlev;
       params[varID].missval = missval;
@@ -313,7 +315,7 @@ params_delete(paramType *params)
 }
 
 static void
-parseParamInit(parseParamType *parse_arg, int vlistID, int pointID, int surfaceID, paramType *params)
+parseParamInit(parseParamType *parse_arg, int vlistID, int pointID, int zonalID, int surfaceID, paramType *params)
 {
   int nvars = vlistNvars(vlistID);
   int ngrids = vlistNgrids(vlistID);
@@ -327,11 +329,32 @@ parseParamInit(parseParamType *parse_arg, int vlistID, int pointID, int surfaceI
   parse_arg->debug = cdoVerbose != 0;
   parse_arg->params = params;
   parse_arg->pointID = pointID;
+  parse_arg->zonalID = zonalID;
   parse_arg->surfaceID = surfaceID;
   parse_arg->needed = (bool *) Malloc(nvars * sizeof(bool));
   parse_arg->coords = (coordType *) Malloc(maxcoords * sizeof(coordType));
   parse_arg->maxcoords = maxcoords;
   parse_arg->ncoords = 0;
+}
+
+static
+int genZonalID(int vlistID)
+{
+  int zonalID = -1;
+
+  int ngrids = vlistNgrids(vlistID);
+  for (int index = 0; index < ngrids; index++)
+    {
+      int gridID = vlistGrid(vlistID, index);
+      int gridtype = gridInqType(gridID);
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_GENERIC)
+        if (gridInqXsize(gridID) > 1)
+          {
+            zonalID = gridToZonal(gridID);
+          }
+    }
+ 
+  return zonalID;
 }
 
 void *
@@ -370,11 +393,12 @@ Expr(void *process)
   int nvars1 = vlistNvars(vlistID1);
 
   int pointID = gridCreate(GRID_GENERIC, 1);
+  int zonalID = genZonalID(vlistID1);
   int surfaceID = getSurfaceID(vlistID1);
 
   paramType *params = params_new(vlistID1);
 
-  parseParamInit(&parse_arg, vlistID1, pointID, surfaceID, params);
+  parseParamInit(&parse_arg, vlistID1, pointID, zonalID, surfaceID, params);
 
   // Set all input variables to 'needed' if replacing is switched off
   for (int varID = 0; varID < nvars1; varID++) parse_arg.needed[varID] = !replacesVariables;
@@ -500,10 +524,8 @@ Expr(void *process)
                   if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
                     gridID = gridToCurvilinear(gridID, 0);
 
-                  if (coord == 'x')
-                    gridInqXvals(gridID, data);
-                  else if (coord == 'y')
-                    gridInqYvals(gridID, data);
+                  if (coord == 'x') gridInqXvals(gridID, data);
+                  if (coord == 'y') gridInqYvals(gridID, data);
 
                   if (gridID != parse_arg.coords[i].cdiID) gridDestroy(gridID);
                 }
@@ -702,6 +724,7 @@ Expr(void *process)
   if (varIDmap) Free(varIDmap);
 
   gridDestroy(pointID);
+  if ( zonalID != -1 ) gridDestroy(zonalID);
 
   cdoFinish();
 

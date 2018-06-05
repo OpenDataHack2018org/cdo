@@ -28,6 +28,7 @@
 static const char *ExIn[] = { "expr", "init" };
 static const char *tmpvnm = "_tmp_";
 int pointID = -1;
+int zonalID = -1;
 int surfaceID = -1;
 
 enum
@@ -35,6 +36,7 @@ enum
   FT_STD,
   FT_CONST,
   FT_FLD,
+  FT_ZON,
   FT_VERT,
   FT_COORD,
   FT_1C,
@@ -129,7 +131,7 @@ static func_t fun_sym_tbl[] = {
   { FT_CONST, 0, "size", (double (*)()) pt_size },        // ngp*nlev
   { FT_CONST, 0, "missval", (double (*)()) pt_missval },  // Returns the missing value of a variable
 
-  // cdo field functions (Reduce grid to point)
+  // CDO field functions (Reduce grid to point)
   { FT_FLD, 0, "fldmin", (double (*)()) fldmin },
   { FT_FLD, 0, "fldmax", (double (*)()) fldmax },
   { FT_FLD, 0, "fldsum", (double (*)()) fldsum },
@@ -140,7 +142,18 @@ static func_t fun_sym_tbl[] = {
   { FT_FLD, 1, "fldvar", (double (*)()) fldvarw },
   { FT_FLD, 1, "fldvar1", (double (*)()) fldvar1w },
 
-  // cdo field functions (Reduce level to point)
+  // CDO zonal functions (Reduce grid to point)
+  { FT_ZON, 0, "zonmin", (double (*)()) zonmin },
+  { FT_ZON, 0, "zonmax", (double (*)()) zonmax },
+  { FT_ZON, 0, "zonsum", (double (*)()) zonsum },
+  { FT_ZON, 0, "zonmean", (double (*)()) zonmean },
+  { FT_ZON, 0, "zonavg", (double (*)()) zonavg },
+  { FT_ZON, 0, "zonstd", (double (*)()) zonstd },
+  { FT_ZON, 0, "zonstd1", (double (*)()) zonstd1 },
+  { FT_ZON, 0, "zonvar", (double (*)()) zonvar },
+  { FT_ZON, 0, "zonvar1", (double (*)()) zonvar1 },
+
+  // CDO field functions (Reduce level to point)
   { FT_VERT, 0, "vertmin", (double (*)()) fldmin },
   { FT_VERT, 0, "vertmax", (double (*)()) fldmax },
   { FT_VERT, 0, "vertsum", (double (*)()) fldsum },
@@ -230,6 +243,7 @@ param_meta_copy(paramType *out, paramType *in)
   out->datatype = in->datatype;
   out->steptype = in->steptype;
   out->ngp = in->ngp;
+  out->nlat = in->nlat;
   out->nlev = in->nlev;
   out->missval = in->missval;
   out->nmiss = 0;
@@ -633,8 +647,7 @@ expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
     }
 
   p->param.name = p->u.var.nm;
-  // printf("%s %s nmiss %zu %zu\n", p->u.var.nm, px->param.name, nmiss1,
-  // nmiss2);
+  // printf("%s %s nmiss %zu %zu\n", p->u.var.nm, px->param.name, nmiss1, nmiss2);
 
   if (!init)
     {
@@ -845,7 +858,9 @@ ex_fun_var(int init, int funcID, nodeType *p1)
   int functype = fun_sym_tbl[funcID].type;
   int funcflag = fun_sym_tbl[funcID].flag;
 
+  size_t gridID = p1->param.gridID;
   size_t ngp = p1->param.ngp;
+  size_t nlat = p1->param.nlat;
   size_t nlev = p1->param.nlev;
   size_t nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
@@ -868,6 +883,12 @@ ex_fun_var(int init, int funcID, nodeType *p1)
     {
       p->param.gridID = pointID;
       p->param.ngp = 1;
+    }
+  else if (functype == FT_ZON)
+    {
+      if (zonalID == -1) cdoAbort("Function %s() is only available for regular 2D grids!", fun_sym_tbl[funcID].name);
+      p->param.gridID = zonalID;
+      p->param.ngp = nlat;
     }
   else if (functype == FT_VERT)
     {
@@ -913,7 +934,6 @@ ex_fun_var(int init, int funcID, nodeType *p1)
         {
           Field field;
           double *weights = NULL;
-          // if ( funcflag == 1 ) weights = fld_weights(p1->param.gridID, ngp);
           if (funcflag == 1)
             {
               weights = p1->param.weight;
@@ -926,7 +946,18 @@ ex_fun_var(int init, int funcID, nodeType *p1)
               fld_field_init(&field, nmiss, missval, ngp, p1data + k * ngp, weights);
               pdata[k] = exprfunc(field);
             }
-          // if ( weights ) Free(weights);
+        }
+      else if (functype == FT_ZON)
+        {
+          Field field1, field2;
+          void (*exprfunc)(Field&, Field&) = (void (*)(Field&, Field&)) fun_sym_tbl[funcID].func;
+          for (size_t k = 0; k < nlev; k++)
+            {
+              fld_field_init(&field1, nmiss, missval, ngp, p1data + k * ngp, NULL);
+              field1.grid = gridID;
+              fld_field_init(&field2, nmiss, missval, nlat, &pdata[k], NULL);
+              exprfunc(field1, field2);
+            }
         }
       else if (functype == FT_VERT)
         {
@@ -1466,6 +1497,7 @@ nodeType *
 expr_run(nodeType *p, parseParamType *parse_arg)
 {
   pointID = parse_arg->pointID;
+  zonalID = parse_arg->zonalID;
   surfaceID = parse_arg->surfaceID;
   int init = parse_arg->init;
   paramType *params = parse_arg->params;
@@ -1571,6 +1603,7 @@ expr_run(nodeType *p, parseParamType *parse_arg)
                         params[nvarID].zaxisID = parse_arg->surfaceID;
                         params[nvarID].steptype = TIME_CONSTANT;
                         params[nvarID].ngp = params[varID].ngp;
+                        params[nvarID].nlat = params[varID].nlat;
                         params[nvarID].nlev = 1;
                         if (units) params[nvarID].units = strdup(units);
                         if (longname) params[nvarID].longname = strdup(longname);
