@@ -878,8 +878,15 @@ static inline struct sin_cos_angle get_min_angle(
 
   double max_cos = -1.0;
   size_t min_angle_idx = 0;
+  double const tol = 1e-10;
 
   for (size_t i = 0; i < num_points; ++i) {
+
+    // if the points are nearly identical
+    if ((fabs(points[i].coordinates_xyz[0] - coordinate_xyz[0]) < tol) &&
+        (fabs(points[i].coordinates_xyz[1] - coordinate_xyz[1]) < tol) &&
+        (fabs(points[i].coordinates_xyz[2] - coordinate_xyz[2]) < tol))
+      return SIN_COS_ZERO;
 
     double curr_cos = points[i].coordinates_xyz[0] * coordinate_xyz[0] +
                       points[i].coordinates_xyz[1] * coordinate_xyz[1] +
