@@ -142,6 +142,9 @@ void farmod(Field *field, const double divisor);
 void farinv(Field *field);
 void farround(Field *field);
 
+// fieldccplx.cc
+void farcfuncplx(Field *field, const double rconstcplx[2], const int function);
+
 // field2.cc
 void farfun(Field *field1, Field field2, int function);
 

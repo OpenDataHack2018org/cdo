@@ -69,6 +69,7 @@ libcdo_la_SOURCES =            \
                field.h         \
                field.cc         \
                fieldc.cc        \
+               fieldccplx.cc    \
                field2.cc        \
                field2cplx.cc    \
                fieldmem.cc      \

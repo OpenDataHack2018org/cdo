@@ -182,7 +182,7 @@ Output(void *process)
 
   cdoInitialize(process);
 
-  int OUTPUT    = cdoOperatorAdd("output",    0, 0, NULL);
+  int OUTPUT    = cdoOperatorAdd("output",    0, 1, NULL);
   int OUTPUTINT = cdoOperatorAdd("outputint", 0, 0, NULL);
   int OUTPUTSRV = cdoOperatorAdd("outputsrv", 0, 0, NULL);
   int OUTPUTEXT = cdoOperatorAdd("outputext", 0, 0, NULL);
@@ -197,6 +197,7 @@ Output(void *process)
   UNUSED(OUTPUT);
 
   int operatorID = cdoOperatorID();
+  bool opercplx = cdoOperatorF2(operatorID);
 
   if (operatorID == OUTPUTF)
     {
@@ -281,10 +282,12 @@ Output(void *process)
       if (ndiffgrids > 0) cdoAbort("Too many different grids!");
 
       gridID = vlistGrid(vlistID, 0);
-      size_t gridsize = gridInqSize(gridID);
       int gridtype = gridInqType(gridID);
-
-      std::vector<double> array(gridsize);
+      size_t gridsize = gridInqSize(gridID);
+      size_t nwpv = (vlistNumber(vlistID) == CDI_COMP) ? 2 : 1;
+      if (nwpv == 2 && opercplx == false) cdoAbort("Fields with complex numbers are not supported by this operator!");
+      size_t gridsizemax = nwpv*gridInqSize(gridID);
+      std::vector<double> array(gridsizemax);
 
       if (operatorID == OUTPUTFLD || operatorID == OUTPUTXYZ || operatorID == OUTPUTTAB)
         {
@@ -330,7 +333,8 @@ Output(void *process)
               int code = vlistInqVarCode(vlistID, varID);
               int gridID = vlistInqVarGrid(vlistID, varID);
               int zaxisID = vlistInqVarZaxis(vlistID, varID);
-              size_t gridsize = gridInqSize(gridID);
+              size_t nwpv = (vlistInqVarNumber(vlistID, varID) == CDI_COMP) ? 2 : 1;
+              size_t gridsize = nwpv*gridInqSize(gridID);
               size_t nlon = gridInqXsize(gridID);
               size_t nlat = gridInqYsize(gridID);
               double level = cdoZaxisInqLevel(zaxisID, levelID);

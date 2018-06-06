@@ -35,7 +35,6 @@ farcfun(Field *field, double rconst, int function)
 void
 farcmul(Field *field, double rconst)
 {
-  int i, len;
   int nwpv = field->nwpv;
   int grid = field->grid;
   size_t nmiss = field->nmiss;
@@ -45,11 +44,11 @@ farcmul(Field *field, double rconst)
 
   if (nwpv != 2) nwpv = 1;
 
-  len = nwpv * gridInqSize(grid);
+  size_t len = nwpv * gridInqSize(grid);
 
   if (nmiss > 0)
     {
-      for (i = 0; i < len; i++) array[i] = MULMN(array[i], rconst);
+      for (size_t i = 0; i < len; i++) array[i] = MULMN(array[i], rconst);
     }
   else
     {
@@ -58,53 +57,57 @@ farcmul(Field *field, double rconst)
 #pragma omp parallel for default(shared) private(i)
 #endif
       */
-      for (i = 0; i < len; i++) array[i] *= rconst;
+      for (size_t i = 0; i < len; i++) array[i] *= rconst;
     }
 }
 
 void
 farcdiv(Field *field, double rconst)
 {
-  int i, len;
+  int nwpv = field->nwpv;
   int grid = field->grid;
   size_t nmiss = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
   double *array = field->ptr;
 
-  len = gridInqSize(grid);
+  if (nwpv != 2) nwpv = 1;
+
+  size_t len = nwpv * gridInqSize(grid);
 
   if (nmiss > 0 || IS_EQUAL(rconst, 0))
     {
-      for (i = 0; i < len; i++) array[i] = DIVMN(array[i], rconst);
+      for (size_t i = 0; i < len; i++) array[i] = DIVMN(array[i], rconst);
 
       if (IS_EQUAL(rconst, 0)) field->nmiss = len;
     }
   else
     {
-      for (i = 0; i < len; i++) array[i] /= rconst;
+      for (size_t i = 0; i < len; i++) array[i] /= rconst;
     }
 }
 
 void
 farcadd(Field *field, double rconst)
 {
-  int i, len;
+  int nwpv = field->nwpv;
   int grid = field->grid;
   size_t nmiss = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
   double *array = field->ptr;
 
-  len = gridInqSize(grid);
+  if (nwpv != 2) nwpv = 1;
+
+  size_t len = nwpv * gridInqSize(grid);
 
   if (nmiss > 0)
     {
-      for (i = 0; i < len; i++) array[i] = ADDMN(array[i], rconst);
+      for (size_t i = 0; i < len; i++) array[i] = ADDMN(array[i], rconst);
     }
   else
     {
-      for (i = 0; i < len; i++) array[i] += rconst;
+      for (size_t i = 0; i < len; i++) array[i] += rconst;
     }
 }
 

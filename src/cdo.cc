@@ -1405,7 +1405,7 @@ void init_modules()
   add_module("Adisit"        , {Adisit        , AdisitHelp        , AdisitOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Afterburner"   , {Afterburner   , AfterburnerHelp   , AfterburnerOperators   , 1 , CDI_REAL , -1 , 1  });
   add_module("Arith"         , {Arith         , ArithHelp         , ArithOperators         , 1 , CDI_BOTH , 2  , 1  });
-  add_module("Arithc"        , {Arithc        , ArithcHelp        , ArithcOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Arithc"        , {Arithc        , ArithcHelp        , ArithcOperators        , 1 , CDI_BOTH , 1  , 1  });
   add_module("Arithdays"     , {Arithdays     , ArithdaysHelp     , ArithdaysOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Arithlat"      , {Arithlat      , {}                , ArithlatOperators      , 1 , CDI_REAL , 1  , 1  });
   add_module("Cat"           , {Cat           , CopyHelp          , CatOperators           , 1 , CDI_REAL , -1 , 1  });
@@ -1494,7 +1494,7 @@ void init_modules()
   add_module("NCL_wind"      , {NCL_wind      , NCL_windHelp      , NCL_windOperators      , 1 , CDI_REAL , 1  , 1  });
   add_module("Ninfo"         , {Ninfo         , NinfoHelp         , NinfoOperators         , 1 , CDI_BOTH , 1  , 0  });
   add_module("Nmldump"       , {Nmldump       , {}                , NmldumpOperators       , 0 , CDI_REAL , 0  , 0  });
-  add_module("Output"        , {Output        , OutputHelp        , OutputOperators        , 1 , CDI_REAL , -1 , 0  });
+  add_module("Output"        , {Output        , OutputHelp        , OutputOperators        , 1 , CDI_BOTH , -1 , 0  });
   add_module("Outputtab"     , {Output        , OutputtabHelp     , OutputtabOperators     , 1 , CDI_REAL , -1 , 0  });
   add_module("Outputgmt"     , {Outputgmt     , OutputgmtHelp     , OutputgmtOperators     , 1 , CDI_REAL , 1  , 0  });
   add_module("Pack"          , {Pack          , {}                , PackOperators          , 1 , CDI_REAL , 1  , 1  });

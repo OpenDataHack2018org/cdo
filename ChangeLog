@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.5
 	* Version 1.9.5 release
 
+2018-06-06 Uwe Schulzweida
+
+	* addc, subc, mulc, divc: added support for complex numbers
+
 2018-06-04 Uwe Schulzweida
 
 	* gridfile: added extension ":X" to select grid number X from grid file
