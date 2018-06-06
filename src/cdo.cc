@@ -306,7 +306,7 @@ cdo_usage(void)
   fprintf(stderr, "\n");
 
   fprintf(stderr, "    --timestat_date <srcdate>\n");
-  fprintf(stderr, "                   Target timestamp (time statistics): "
+  fprintf(stderr, "                   Target timestamp (temporal statistics): "
                   "first, middle, midhigh or last source timestep.\n");
   fprintf(stderr, "    -V, --version  Print the version number\n");
   fprintf(stderr, "    -v, --verbose  Print extra details for some operators\n");
@@ -696,14 +696,12 @@ defineCompress(const char *arg)
 static void
 defineChunktype(const char *arg)
 {
-  if (STR_IS_EQ("auto", arg))
-    cdoChunkType = CDI_CHUNK_AUTO;
-  else if (STR_IS_EQ("grid", arg))
-    cdoChunkType = CDI_CHUNK_GRID;
-  else if (STR_IS_EQ("lines", arg))
-    cdoChunkType = CDI_CHUNK_LINES;
-  else
-    cdoAbort("Chunk type '%s' unsupported!", arg);
+  // clang-format off
+  if      (STR_IS_EQ("auto",  arg)) cdoChunkType = CDI_CHUNK_AUTO;
+  else if (STR_IS_EQ("grid",  arg)) cdoChunkType = CDI_CHUNK_GRID;
+  else if (STR_IS_EQ("lines", arg)) cdoChunkType = CDI_CHUNK_LINES;
+  else cdoAbort("Chunk type '%s' unsupported!", arg);
+  // clang-format on
 }
 
 static void
