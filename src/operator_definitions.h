@@ -121,6 +121,7 @@
 #define  PardupOperators        {"pardup", "parmul"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap"}
+#define  RecttocomplexOperators {"recttocomplex"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
 #define  RemapbilOperators      {"remapbil", "genbil"}

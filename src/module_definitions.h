@@ -115,6 +115,7 @@ void *Pack(void *argument);
 void *Pardup(void *argument);
 void *Pinfo(void *argument);
 void *Pressure(void *argument);
+void *Recttocomplex(void *argument);
 void *Regres(void *argument);
 void *Remap(void *argument);
 void *Remapeta(void *argument);

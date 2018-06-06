@@ -1501,6 +1501,7 @@ void init_modules()
   add_module("Pardup"        , {Pardup        , {}                , PardupOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Pinfo"         , {Pinfo         , {}                , PinfoOperators         , 1 , CDI_REAL , 1  , 1  });
   add_module("Pressure"      , {Pressure      , {}                , PressureOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Recttocomplex" , {Recttocomplex , {}                , RecttocomplexOperators , 1 , CDI_REAL , 2  , 1  });
   add_module("Regres"        , {Regres        , RegresHelp        , RegresOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Remap"         , {Remap         , RemapHelp         , RemapOperators         , 1 , CDI_REAL , 1  , 1  });
   add_module("Remapbil"      , {Remap         , RemapbilHelp      , RemapbilOperators      , 1 , CDI_REAL , 1  , 1  });

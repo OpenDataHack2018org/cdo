@@ -316,6 +316,7 @@ cdo_SOURCES += Adisit.cc        \
                Pardup.cc        \
                Pinfo.cc         \
                Pressure.cc      \
+               Recttocomplex.cc \
                Regres.cc        \
                Remap.cc         \
                Remapeta.cc      \

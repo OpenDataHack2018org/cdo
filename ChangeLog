@@ -5,6 +5,7 @@
 
 2018-06-06 Uwe Schulzweida
 
+	* New operator recttocomples - rectangular to complex
 	* addc, subc, mulc, divc: added support for complex numbers
 
 2018-06-04 Uwe Schulzweida
