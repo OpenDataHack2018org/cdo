@@ -170,7 +170,8 @@ Spectrum(void *process)
 
   int nvars = vlistNvars(vlistID1);
   std::vector<Field **> vars;
-  std::vector<int> vdate, vtime;
+  std::vector<int64_t> vdate;
+  std::vector<int> vtime;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))

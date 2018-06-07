@@ -32,7 +32,8 @@ Mergetime(void *process)
 {
   int tsID2 = 0;
   int taxisID2 = CDI_UNDEFID;
-  int last_vdate = -1, last_vtime = -1;
+  int64_t last_vdate = -1;
+  int last_vtime = -1;
   bool skip_same_time = false;
   double *array = NULL;
   struct sfile_t
@@ -127,7 +128,7 @@ Mergetime(void *process)
 
       int fileID = next_fileID;
 
-      if (cdoVerbose) cdoPrint("nextstep = %d  vdate = %d  vtime = %d", fileID, vdate, vtime);
+      if (cdoVerbose) cdoPrint("nextstep = %d  vdate = %ld  vtime = %d", fileID, vdate, vtime);
 
       if (fileID == -1) break;
 

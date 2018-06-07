@@ -105,7 +105,7 @@ extern char *DEVICE_TABLE;
 extern int DEVICE_COUNT;
 
 static void
-maggraph(const char *plotfile, const char *varname, const char *varunits, long nfiles, long *nts, int **vdate, int **vtime,
+maggraph(const char *plotfile, const char *varname, const char *varunits, long nfiles, long *nts, int64_t **vdate, int **vtime,
          double **datatab, int nparam, char **params)
 {
   char *lines[1];
@@ -310,7 +310,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits, long n
           if (DBG)
             {
               fprintf(stderr, "%ld: %s\n", tsID, date_time_str[0][tsID]);
-              fprintf(stderr, "%6d %6d", vdate[0][tsID], vtime[0][tsID]);
+              fprintf(stderr, "%6ld %6d", vdate[0][tsID], vtime[0][tsID]);
             }
 
           for (fileID = 0; fileID < nfiles; ++fileID)
@@ -915,7 +915,7 @@ Maggraph(void *process)
     }
 
   double **datatab = (double **) Malloc(nfiles * sizeof(double *));
-  int **vdate = (int **) Malloc(nfiles * sizeof(int *));
+  int64_t **vdate = (int64_t **) Malloc(nfiles * sizeof(int64_t *));
   int **vtime = (int **) Malloc(nfiles * sizeof(int *));
   long *nts = (long *) Malloc(nfiles * sizeof(long));
 
@@ -967,7 +967,7 @@ Maggraph(void *process)
             {
               nts_alloc += NINC_ALLOC;
               datatab[fileID] = (double *) Malloc(nts_alloc * sizeof(double));
-              vdate[fileID] = (int *) Malloc(nts_alloc * sizeof(int));
+              vdate[fileID] = (int64_t *) Malloc(nts_alloc * sizeof(int64_t));
               vtime[fileID] = (int *) Malloc(nts_alloc * sizeof(int));
             }
 
@@ -977,7 +977,7 @@ Maggraph(void *process)
             {
               nts_alloc += NINC_ALLOC;
               datatab[fileID] = (double *) Realloc(datatab[fileID], nts_alloc * sizeof(double));
-              vdate[fileID] = (int *) Realloc(vdate[fileID], nts_alloc * sizeof(int));
+              vdate[fileID] = (int64_t *) Realloc(vdate[fileID], nts_alloc * sizeof(int64_t));
               vtime[fileID] = (int *) Realloc(vtime[fileID], nts_alloc * sizeof(int));
             }
 

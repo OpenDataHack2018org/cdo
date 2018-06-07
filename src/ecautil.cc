@@ -470,11 +470,9 @@ void
 adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int64_t ovdate, Field *startDateWithHist[2],
               Field *endDateWithHist[2])
 {
-  int levelID, ovdateSouth;
+  int64_t ovdateSouth = MIN(cdiEncodeDate(ovdate / 10000, 6, 30), ovdate);
 
-  ovdateSouth = MIN(cdiEncodeDate(ovdate / 10000, 6, 30), ovdate);
-
-  for (levelID = 0; levelID < nlevels; levelID++)
+  for (int levelID = 0; levelID < nlevels; levelID++)
     {
       for (size_t i = 0; i < gridsize; i++)
         {
