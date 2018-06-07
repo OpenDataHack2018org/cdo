@@ -35,7 +35,6 @@ Mergetime(void *process)
   int64_t last_vdate = -1;
   int last_vtime = -1;
   bool skip_same_time = false;
-  double *array = NULL;
   struct sfile_t
   {
     int streamID;
@@ -63,8 +62,7 @@ Mergetime(void *process)
   bool lcopy = UNCHANGED_RECORD;
 
   int nfiles = cdoStreamCnt() - 1;
-
-  sfile_t *sf = (sfile_t *) Malloc(nfiles * sizeof(sfile_t));
+  std::vector<sfile_t> sf(nfiles);
 
   for (int fileID = 0; fileID < nfiles; fileID++)
     {
@@ -102,10 +100,11 @@ Mergetime(void *process)
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
+  std::vector<double> array;
   if (!lcopy)
     {
-      size_t gridsize = vlistGridsizeMax(sf[0].vlistID);
-      array = (double *) Malloc(gridsize * sizeof(double));
+      size_t gridsizemax = vlistGridsizeMax(sf[0].vlistID);
+      array.resize(gridsizemax);
     }
 
   while (true)
@@ -180,8 +179,8 @@ Mergetime(void *process)
               else
                 {
                   size_t nmiss;
-                  pstreamReadRecord(sf[fileID].streamID, array, &nmiss);
-                  pstreamWriteRecord(streamID2, array, nmiss);
+                  pstreamReadRecord(sf[fileID].streamID, array.data(), &nmiss);
+                  pstreamWriteRecord(streamID2, array.data(), nmiss);
                 }
             }
 
@@ -202,11 +201,6 @@ Mergetime(void *process)
     }
 
   pstreamClose(streamID2);
-
-  if (!lcopy)
-    if (array) Free(array);
-
-  if (sf) Free(sf);
 
   cdoFinish();
 
