@@ -56,7 +56,7 @@ EstFreq(void *process)
 
   int tsID = 0;
   int fyear, lyear, fmonth, lmonth, lymonth, dummy;
-  int step_per_year = 0, step_per_month, currentyear, currentmon;
+  int step_per_year = 0, currentyear, currentmon;
 
   while ((nrecs = streamInqTimestep(streamID1, tsID)))
     {
@@ -101,8 +101,7 @@ EstFreq(void *process)
     {
       int reclast = streamInqTimestep(streamID2, ntsteps);
       cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummy);
-      /* First, estimation by maximal number of time steps divided by covered
-       * years between last and first time step */
+      /* First, estimation by maximal number of time steps divided by covered years between last and first time step */
       if (cdoVerbose)
         printf("Frequency is calculated by dividing the number of time steps '%d' included in the time axis by the covered years"
                " of the time axis\ncomputed by the difference of the year of the last time stamp '%d' and the year of the first"
@@ -150,8 +149,7 @@ EstFreq(void *process)
         }
     }
   else
-    cdoAbort("For %d found timesteps no frequency can be computed - at least 3 "
-             "timesteps are required.",
+    cdoAbort("For %d found timesteps no frequency can be computed - at least 3 timesteps are required.",
              ntsteps);
   if (cdoVerbose) printf("Your file indicates a frequency of '%s'.\n", frequency);
   cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", 3, frequency);

@@ -164,6 +164,7 @@ template <typename... T>
 void
 SysError_(const char *p_file, const int p_line, const char *p_func, T &&... args)
 {
+  (void) p_func; // unused
   int saved_errno = errno;
   std::stringstream message;
   message << "SysError in:" << p_file << std::endl;

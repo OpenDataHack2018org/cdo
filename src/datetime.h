@@ -106,7 +106,6 @@ class DateTimeList
   int has_bounds;
   int calendar;
   TimeStat stat;
-  int timestat_date;
   DateTimeInfo timestat;
   std::vector<DateTimeInfo> dtinfo;
 

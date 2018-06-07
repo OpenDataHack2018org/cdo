@@ -61,7 +61,7 @@ gridSearchPointReg2d(GridPointSearch *gps, double plon, double plat, knnWeightsT
 
       long k;
       for (k = 3; k < 10000; k += 2)
-        if (numNeighbors <= (k - 2) * (k - 2)) break;
+        if (numNeighbors <= (size_t)(k - 2) * (k - 2)) break;
 
       if ((k * k) > MAX_SEARCH_CELLS)
         {

@@ -348,9 +348,10 @@ int genZonalID(int vlistID)
       int gridID = vlistGrid(vlistID, index);
       int gridtype = gridInqType(gridID);
       if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_GENERIC)
-        if (gridInqXsize(gridID) > 1)
+        if (gridInqXsize(gridID) > 1 && gridInqYsize(gridID) >= 1)
           {
             zonalID = gridToZonal(gridID);
+            break;
           }
     }
  
