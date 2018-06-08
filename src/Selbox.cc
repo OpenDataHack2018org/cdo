@@ -241,7 +241,7 @@ gengridcell(int gridID1, size_t gridsize2, long *cellidx)
 
   if (gridtype == GRID_CURVILINEAR) gridtype = GRID_UNSTRUCTURED;
 
-  if (gridtype == GRID_UNSTRUCTURED)
+  if (gridtype == GRID_UNSTRUCTURED || gridtype == GRID_GENERIC)
     gridID2 = gridCreate(gridtype, gridsize2);
   else
     return gridID2;
