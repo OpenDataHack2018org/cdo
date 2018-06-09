@@ -296,6 +296,7 @@ cdo_SOURCES += Adisit.cc        \
                Invert.cc        \
                Invertlev.cc     \
                Isosurface.cc    \
+               Lic.cc           \
 	       MapReduce.cc     \
                Maskbox.cc       \
                Mastrfu.cc       \

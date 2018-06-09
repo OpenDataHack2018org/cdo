@@ -1479,6 +1479,7 @@ void init_modules()
   add_module("Invert"        , {Invert        , InvertHelp        , InvertOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Invertlev"     , {Invertlev     , InvertlevHelp     , InvertlevOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Isosurface"    , {Isosurface    , {}                , IsosurfaceOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("Lic"           , {Lic           , {}                , LicOperators           , 1 , CDI_REAL , 1  , 1  });
   add_module("MapReduce"     , {MapReduce     , MapReduceHelp     , MapReduceOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Maskbox"       , {Maskbox       , MaskboxHelp       , MaskboxOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Maskregion"    , {Maskbox       , MaskregionHelp    , MaskregionOperators    , 1 , CDI_REAL , 1  , 1  });

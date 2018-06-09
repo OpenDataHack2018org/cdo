@@ -94,7 +94,7 @@ void *Intyear(void *argument);
 void *Invert(void *argument);
 void *Invertlev(void *argument);
 void *Isosurface(void *argument);
-void *Log(void *argument);
+void *Lic(void *argument);
 void *MapReduce(void *argument);
 void *Maskbox(void *argument);
 void *Mastrfu(void *argument);
