@@ -28,6 +28,35 @@
 
 CPT cpt;
 
+///////////////////////////////////////////////////////////////////////////
+//               Line Integral Convolution for Flow Visualization 
+//                                                   Initial  Version
+//
+//                                                     May 15, 1999
+//
+//                                                                  by
+//
+//                             Zhanping Liu
+//
+//                      (zhanping@erc.msstate.edu)
+//                                                          while with
+//
+//                                             Graphics  Laboratory
+//
+//                                              Peking  University
+//
+//                                                     P. R.  China
+//
+//----------------------------------------------------------------------///
+//                                                   Later  Condensed
+//
+//                             May 4,  2002
+//
+//          VAIL (Visualization Analysis & Imaging Laboratory) 
+//                  ERC  (Engineering Research Center)
+//                     Mississippi State University
+///////////////////////////////////////////////////////////////////////////
+
 #define SQUARE_FLOW_FIELD_SZ 400
 #define DISCRETE_FILTER_SIZE 2048
 #define LOWPASS_FILTR_LENGTH 10.00000f
@@ -225,127 +254,129 @@ FlowImagingLIC(int n_xres, int n_yres, float *pVectr, unsigned char *pNoise, uns
 #endif
   for (int j = 0; j < n_yres; j++)
     {
-  int vec_id;                       /// ID in the VECtor buffer (for the input flow field)
-  int advDir;                       /// ADVection DIRection (0: positive;  1: negative)
-  int advcts;                       /// number of ADVeCTion stepS per direction (a step counter)
-  int ADVCTS = (int) (krnlen * 3);  /// MAXIMUM number of advection steps per direction to break dead loops
+      int vec_id;                       /// ID in the VECtor buffer (for the input flow field)
+      int advDir;                       /// ADVection DIRection (0: positive;  1: negative)
+      int advcts;                       /// number of ADVeCTion stepS per direction (a step counter)
+      int ADVCTS = (int) (krnlen * 3);  /// MAXIMUM number of advection steps per direction to break dead loops
 
-  float vctr_x;                                        /// x-component  of the VeCToR at the forefront point
-  float vctr_y;                                        /// y-component  of the VeCToR at the forefront point
-  float clp0_x;                                        /// x-coordinate of CLiP point 0 (current)
-  float clp0_y;                                        /// y-coordinate of CLiP point 0	(current)
-  float clp1_x;                                        /// x-coordinate of CLiP point 1 (next   )
-  float clp1_y;                                        /// y-coordinate of CLiP point 1 (next   )
-  float samp_x;                                        /// x-coordinate of the SAMPle in the current pixel
-  float samp_y;                                        /// y-coordinate of the SAMPle in the current pixel
-  float tmpLen;                                        /// TeMPorary LENgth of a trial clipped-segment
-  float segLen;                                        /// SEGment   LENgth
-  float curLen;                                        /// CURrent   LENgth of the streamline
-  float prvLen;                                        /// PReVious  LENgth of the streamline
-  float W_ACUM;                                        /// ACcuMulated Weight from the seed to the current streamline forefront
-  float texVal;                                        /// TEXture VALue
-  float smpWgt;                                        /// WeiGhT of the current SaMPle
-  float t_acum[2];                                     /// two ACcUMulated composite Textures for the two directions, perspectively
-  float w_acum[2];                                     /// two ACcUMulated Weighting values   for the two directions, perspectively
-  float *wgtLUT = NULL;                                /// WeiGhT Look Up Table pointing to the target filter LUT
-  float len2ID = (DISCRETE_FILTER_SIZE - 1) / krnlen;  /// map a curve LENgth TO an ID in the LUT
-    for (int i = 0; i < n_xres; i++)
-      {
-        /// init the composite texture accumulators and the weight accumulators///
-        t_acum[0] = t_acum[1] = w_acum[0] = w_acum[1] = 0.0f;
+      float vctr_x;          /// x-component  of the VeCToR at the forefront point
+      float vctr_y;          /// y-component  of the VeCToR at the forefront point
+      float clp0_x;          /// x-coordinate of CLiP point 0 (current)
+      float clp0_y;          /// y-coordinate of CLiP point 0	(current)
+      float clp1_x;          /// x-coordinate of CLiP point 1 (next   )
+      float clp1_y;          /// y-coordinate of CLiP point 1 (next   )
+      float samp_x;          /// x-coordinate of the SAMPle in the current pixel
+      float samp_y;          /// y-coordinate of the SAMPle in the current pixel
+      float tmpLen;          /// TeMPorary LENgth of a trial clipped-segment
+      float segLen;          /// SEGment   LENgth
+      float curLen;          /// CURrent   LENgth of the streamline
+      float prvLen;          /// PReVious  LENgth of the streamline
+      float W_ACUM;          /// ACcuMulated Weight from the seed to the current streamline forefront
+      float texVal;          /// TEXture VALue
+      float smpWgt;          /// WeiGhT of the current SaMPle
+      float t_acum[2];       /// two ACcUMulated composite Textures for the two directions, perspectively
+      float w_acum[2];       /// two ACcUMulated Weighting values   for the two directions, perspectively
+      float *wgtLUT = NULL;  /// WeiGhT Look Up Table pointing to the target filter LUT
+      float len2ID = (DISCRETE_FILTER_SIZE - 1) / krnlen;  /// map a curve LENgth TO an ID in the LUT
+      for (int i = 0; i < n_xres; i++)
+        {
+          /// init the composite texture accumulators and the weight accumulators///
+          t_acum[0] = t_acum[1] = w_acum[0] = w_acum[1] = 0.0f;
 
-        /// for either advection direction///
-        for (advDir = 0; advDir < 2; advDir++)
-          {
-            /// init the step counter, curve-length measurer, and streamline seed///
-            advcts = 0;
-            curLen = 0.0f;
-            clp0_x = i + 0.5f;
-            clp0_y = j + 0.5f;
+          /// for either advection direction///
+          for (advDir = 0; advDir < 2; advDir++)
+            {
+              /// init the step counter, curve-length measurer, and streamline seed///
+              advcts = 0;
+              curLen = 0.0f;
+              clp0_x = i + 0.5f;
+              clp0_y = j + 0.5f;
 
-            /// access the target filter LUT///
-            wgtLUT = (advDir == 0) ? p_LUT0 : p_LUT1;
+              /// access the target filter LUT///
+              wgtLUT = (advDir == 0) ? p_LUT0 : p_LUT1;
 
-            /// until the streamline is advected long enough or a tightly  spiralling center / focus is encountered///
-            while (curLen < krnlen && advcts < ADVCTS)
-              {
-                /// access the vector at the sample///
-                vec_id = ((int) (clp0_y) *n_xres + (int) (clp0_x)) << 1;
-                vctr_x = pVectr[vec_id];
-                vctr_y = pVectr[vec_id + 1];
+              /// until the streamline is advected long enough or a tightly  spiralling center / focus is encountered///
+              while (curLen < krnlen && advcts < ADVCTS)
+                {
+                  /// access the vector at the sample///
+                  vec_id = ((int) (clp0_y) *n_xres + (int) (clp0_x)) << 1;
+                  vctr_x = pVectr[vec_id];
+                  vctr_y = pVectr[vec_id + 1];
 
-                /// in case of a critical point///
-                if (vctr_x == 0.0f && vctr_y == 0.0f)
-                  {
-                    t_acum[advDir] = (advcts == 0) ? 0.0f : t_acum[advDir];  /// this line is indeed unnecessary
-                    w_acum[advDir] = (advcts == 0) ? 1.0f : w_acum[advDir];
-                    break;
-                  }
+                  /// in case of a critical point///
+                  if (vctr_x == 0.0f && vctr_y == 0.0f)
+                    {
+                      t_acum[advDir] = (advcts == 0) ? 0.0f : t_acum[advDir];  /// this line is indeed unnecessary
+                      w_acum[advDir] = (advcts == 0) ? 1.0f : w_acum[advDir];
+                      break;
+                    }
 
-                /// negate the vector for the backward-advection case///
-                vctr_x = (advDir == 0) ? vctr_x : -vctr_x;
-                vctr_y = (advDir == 0) ? vctr_y : -vctr_y;
+                  /// negate the vector for the backward-advection case///
+                  vctr_x = (advDir == 0) ? vctr_x : -vctr_x;
+                  vctr_y = (advDir == 0) ? vctr_y : -vctr_y;
 
-                /// clip the segment against the pixel boundaries --- find the shorter from the two clipped segments///
-                /// replace  all  if-statements  whenever  possible  as  they  might  affect the computational speed///
-                segLen = LINE_SQUARE_CLIP_MAX;
-                segLen = (vctr_x < -VECTOR_COMPONENT_MIN) ? ((int) (clp0_x) -clp0_x) / vctr_x : segLen;
-                segLen = (vctr_x > VECTOR_COMPONENT_MIN) ? ((int) ((int) (clp0_x) + 1.5f) - clp0_x) / vctr_x : segLen;
-                segLen = (vctr_y < -VECTOR_COMPONENT_MIN)
-                             ? (((tmpLen = ((int) (clp0_y) -clp0_y) / vctr_y) < segLen) ? tmpLen : segLen)
-                             : segLen;
-                segLen = (vctr_y > VECTOR_COMPONENT_MIN)
-                             ? (((tmpLen = ((int) ((int) (clp0_y) + 1.5f) - clp0_y) / vctr_y) < segLen) ? tmpLen : segLen)
-                             : segLen;
+                  /// clip the segment against the pixel boundaries --- find the shorter from the two clipped segments///
+                  /// replace  all  if-statements  whenever  possible  as  they  might  affect the computational speed///
+                  segLen = LINE_SQUARE_CLIP_MAX;
+                  segLen = (vctr_x < -VECTOR_COMPONENT_MIN) ? ((int) (clp0_x) -clp0_x) / vctr_x : segLen;
+                  segLen = (vctr_x > VECTOR_COMPONENT_MIN) ? ((int) ((int) (clp0_x) + 1.5f) - clp0_x) / vctr_x : segLen;
+                  segLen = (vctr_y < -VECTOR_COMPONENT_MIN)
+                               ? (((tmpLen = ((int) (clp0_y) -clp0_y) / vctr_y) < segLen) ? tmpLen : segLen)
+                               : segLen;
+                  segLen = (vctr_y > VECTOR_COMPONENT_MIN)
+                               ? (((tmpLen = ((int) ((int) (clp0_y) + 1.5f) - clp0_y) / vctr_y) < segLen) ? tmpLen : segLen)
+                               : segLen;
 
-                /// update the curve-length measurers///
-                prvLen = curLen;
-                curLen += segLen;
-                segLen += 0.0004f;
+                  /// update the curve-length measurers///
+                  prvLen = curLen;
+                  curLen += segLen;
+                  segLen += 0.0004f;
 
-                /// check if the filter has reached either end///
-                segLen = (curLen > krnlen) ? ((curLen = krnlen) - prvLen) : segLen;
+                  /// check if the filter has reached either end///
+                  segLen = (curLen > krnlen) ? ((curLen = krnlen) - prvLen) : segLen;
 
-                /// obtain the next clip point///
-                clp1_x = clp0_x + vctr_x * segLen;
-                clp1_y = clp0_y + vctr_y * segLen;
+                  /// obtain the next clip point///
+                  clp1_x = clp0_x + vctr_x * segLen;
+                  clp1_y = clp0_y + vctr_y * segLen;
 
-                /// obtain the middle point of the segment as the texture-contributing sample///
-                samp_x = (clp0_x + clp1_x) * 0.5f;
-                samp_y = (clp0_y + clp1_y) * 0.5f;
+                  /// obtain the middle point of the segment as the texture-contributing sample///
+                  samp_x = (clp0_x + clp1_x) * 0.5f;
+                  samp_y = (clp0_y + clp1_y) * 0.5f;
 
-                /// obtain the texture value of the sample///
-                texVal = pNoise[(int) (samp_y) *n_xres + (int) (samp_x)];
+                  /// obtain the texture value of the sample///
+                  if (samp_x >= n_xres) samp_x = n_xres - 1;  // bug fix
+                  if (samp_y >= n_yres) samp_y = n_yres - 1;  // bug fix
+                  texVal = pNoise[(int) (samp_y) *n_xres + (int) (samp_x)];
 
-                /// update the accumulated weight and the accumulated composite texture (texture x weight)///
-                W_ACUM = wgtLUT[(int) (curLen * len2ID)];
-                smpWgt = W_ACUM - w_acum[advDir];
-                w_acum[advDir] = W_ACUM;
-                t_acum[advDir] += texVal * smpWgt;
+                  /// update the accumulated weight and the accumulated composite texture (texture x weight)///
+                  W_ACUM = wgtLUT[(int) (curLen * len2ID)];
+                  smpWgt = W_ACUM - w_acum[advDir];
+                  w_acum[advDir] = W_ACUM;
+                  t_acum[advDir] += texVal * smpWgt;
 
-                /// update the step counter and the "current" clip point///
-                advcts++;
-                clp0_x = clp1_x;
-                clp0_y = clp1_y;
+                  /// update the step counter and the "current" clip point///
+                  advcts++;
+                  clp0_x = clp1_x;
+                  clp0_y = clp1_y;
 
-                /// check if the streamline has gone beyond the flow field///
-                if (clp0_x < 0.0f || clp0_x >= n_xres || clp0_y < 0.0f || clp0_y >= n_yres) break;
-              }
-          }
+                  /// check if the streamline has gone beyond the flow field///
+                  if (clp0_x < 0.0f || clp0_x >= n_xres || clp0_y < 0.0f || clp0_y >= n_yres) break;
+                }
+            }
 
-        /// normalize the accumulated composite texture///
-        texVal = (t_acum[0] + t_acum[1]) / (w_acum[0] + w_acum[1]);
+          /// normalize the accumulated composite texture///
+          texVal = (t_acum[0] + t_acum[1]) / (w_acum[0] + w_acum[1]);
 
-        /// clamp the texture value against the displayable intensity range [0, 255]
-        texVal = (texVal < 0.0f) ? 0.0f : texVal;
-        texVal = (texVal > 255.0f) ? 255.0f : texVal;
-        pImage[j * n_xres + i] = (unsigned char) texVal;
-      }
+          /// clamp the texture value against the displayable intensity range [0, 255]
+          texVal = (texVal < 0.0f) ? 0.0f : texVal;
+          texVal = (texVal > 255.0f) ? 255.0f : texVal;
+          pImage[j * n_xres + i] = (unsigned char) texVal;
+        }
     }
 }
 
 void
-lic1(int num, int n_xres, int n_yres, float *pVectr)
+lic1(const char *obasename, int num, int n_xres, int n_yres, float *pVectr)
 {
   float *p_LUT0 = (float *) malloc(sizeof(float) * DISCRETE_FILTER_SIZE);
   float *p_LUT1 = (float *) malloc(sizeof(float) * DISCRETE_FILTER_SIZE);
@@ -359,7 +390,7 @@ lic1(int num, int n_xres, int n_yres, float *pVectr)
 #pragma omp parallel for default(none) shared(mag, pVectr, n)
 #endif
   for (int i = 0; i < n; ++i)
-    mag[i] = (float)sqrt((double) pVectr[i * 2] * pVectr[i * 2] + (double) pVectr[i * 2 + 1] * pVectr[i * 2 + 1]);
+    mag[i] = (float) sqrt((double) pVectr[i * 2] * pVectr[i * 2] + (double) pVectr[i * 2 + 1] * pVectr[i * 2 + 1]);
 
   if (cdoVerbose)
     {
@@ -370,17 +401,17 @@ lic1(int num, int n_xres, int n_yres, float *pVectr)
           if (mag[i] < vmin) vmin = mag[i];
           if (mag[i] > vmax) vmax = mag[i];
         }
-      cdoPrint("ts=%d minval=%g  maxval=%g", num+1, vmin, vmax);
+      cdoPrint("ts=%d minval=%g  maxval=%g", num + 1, vmin, vmax);
     }
 
   NormalizVectrs(n_xres, n_yres, pVectr);
   MakeWhiteNoise(n_xres, n_yres, pNoise);
   GenBoxFiltrLUT(DISCRETE_FILTER_SIZE, p_LUT0, p_LUT1);
   FlowImagingLIC(n_xres, n_yres, pVectr, pNoise, pImage, p_LUT0, p_LUT1, LOWPASS_FILTR_LENGTH);
-  //const char *fname = "LIC.ppm";
-  //WriteImage2PPM(n_xres, n_yres, pImage, fname);
-  char filename[256];
-  sprintf(filename, "image%04d.png", num);
+  // const char *fname = "LIC.ppm";
+  // WriteImage2PPM(n_xres, n_yres, pImage, fname);
+  char filename[8192];
+  sprintf(filename, "%s%04d.png", obasename, num);
   WriteImage2PNG(n_xres, n_yres, pImage, mag, filename);
 
   free(p_LUT0);
@@ -397,7 +428,6 @@ Lic(void *process)
   int varID, levelID;
   int nlev = 0;
   size_t nmiss;
-  int varID1 = -1, varID2 = -1;
   size_t offset;
 
   cdoInitialize(process);
@@ -408,15 +438,17 @@ Lic(void *process)
 
   // int operatorID = cdoOperatorID();
 
-  operatorCheckArgc(1);
+  if (operatorArgc() < 1 || operatorArgc() > 2) operatorCheckArgc(1);
   char *cpt_file = operatorArgv()[0];
-
+  int nstart = (operatorArgc() == 2) ? atoi(operatorArgv()[1]) : 0;
   FILE *cpt_fp = fopen(cpt_file, "r");
   if (cpt_fp == NULL) cdoAbort("Open failed on color palette table %s", cpt_file);
 
   int status = cptRead(cpt_fp, &cpt);
   if (status != 0) cdoAbort("Error during read of color palette table %s", cpt_file);
 
+  std::string obase = cdoGetStreamName(1);
+  const char *obasename = obase.c_str();
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
@@ -426,25 +458,15 @@ Lic(void *process)
   /* find variables */
   int nvars = vlistNvars(vlistID1);
   if (nvars != 2) cdoAbort("Need 2 input variable, found %d\n", nvars);
-  varID1 = 0;
-  varID2 = 1;
+  int varID1 = 0;
+  int varID2 = 1;
 
   int ngrids = vlistNgrids(vlistID1);
   if (ngrids != 1) cdoAbort("Need 1 grid, found %d\n", ngrids);
 
   int gridID = vlistInqVarGrid(vlistID1, varID1);
   int zaxisID = vlistInqVarZaxis(vlistID1, varID1);
-  /*
-  int vlistID2 = vlistCreate();
-  int outvarID = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARYING);
 
-  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  int taxisID2 = taxisDuplicate(taxisID1);
-  vlistDefTaxis(vlistID2, taxisID2);
-
-  pstreamDefVlist(streamID2, vlistID2);
-  */
   size_t gridsize = vlistGridsizeMax(vlistID1);
   std::vector<double> array1(gridsize);
   std::vector<float> varray(2 * gridsize);
@@ -468,6 +490,11 @@ Lic(void *process)
   size_t nx = gridInqXsize(gridID);
   size_t ny = gridInqYsize(gridID);
 
+  std::vector<double> xvals(nx);
+  std::vector<double> yvals(ny);
+  gridInqYvals(gridID, yvals.data());
+  bool invertlat = (yvals[0] < yvals[ny - 1]);
+
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
@@ -482,10 +509,20 @@ Lic(void *process)
           if (varID == varID1 || varID == varID2)
             {
               pstreamReadRecord(streamID1, array1.data(), &nmiss);
-              if (nmiss) cdoAbort("Missing values unsupported for spectral data!");
+              if (nmiss) cdoAbort("Missing values unsupported!");
 
               gridsize = gridInqSize(gridID);
               offset = gridsize * levelID;
+
+              if (invertlat)
+                {
+                  for (size_t j = 0; j < ny/2; ++j)
+                    {
+                      for (size_t i = 0; i < nx; ++i) xvals[i] = array1[j * nx + i];
+                      for (size_t i = 0; i < nx; ++i) array1[j * nx + i] = array1[(ny - j - 1) * nx + i];
+                      for (size_t i = 0; i < nx; ++i) array1[(ny - j - 1) * nx + i] = xvals[i];
+                    }
+                }
 
               if (varID == varID1)
                 for (size_t i = 0; i < gridsize; ++i) varray[i * 2] = (float) array1[i];
@@ -494,21 +531,11 @@ Lic(void *process)
             }
         }
 
-      lic1(tsID, nx, ny, varray.data());
-      /*
-      gridsize = gridInqSize(gridID);
-      for (levelID = 0; levelID < nlev; levelID++)
-        {
-          offset = gridsize * levelID;
-          pstreamDefRecord(streamID2, outvarID, levelID);
-          pstreamWriteRecord(streamID2, &ovar1[offset], 0);
-        }
-      */
+      lic1(obasename, nstart + tsID, nx, ny, varray.data());
 
       tsID++;
     }
 
-  // pstreamClose(streamID2);
   pstreamClose(streamID1);
 
   cdoFinish();
